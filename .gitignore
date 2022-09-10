@@ -1,0 +1,16 @@
+/node_modules
+.npm-debug.log
+*.DS_Store
+.vscode
+.env
+yarn.lock
+package-lock.json
+coverage
+coverage.json
+typechain
+typechain-types
+
+#Hardhat files
+cache
+artifacts
+
