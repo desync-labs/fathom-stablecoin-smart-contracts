@@ -1,0 +1,11 @@
+/node_modules
+/build
+/scripts/local
+.npm-debug.log
+*.DS_Store
+.vscode
+.env
+privateKey
+yarn.lock
+package-lock.json
+bin
