@@ -20,9 +20,9 @@ contract StrictFathomOraclePriceFeed is PausableUpgradeable, AccessControlUpgrad
   }
 
   // primary.fathomOracle will be use as the price source
-  FathomOracleConfig public primary;
+  OracleConfig public primary;
   // secondary.fathomOracle will be use as the price ref for diff checking
-  FathomOracleConfig public secondary;
+  OracleConfig public secondary;
 
   uint256 public priceLife; // [seconds] how old the price is considered stale, default 1 day
   uint256 public maxPriceDiff; // [basis point] ie. 5% diff = 10500 (105%)
@@ -119,7 +119,7 @@ contract StrictFathomOraclePriceFeed is PausableUpgradeable, AccessControlUpgrad
     secondary.token0 = _secondaryToken0;
     secondary.token1 = _secondaryToken1;
     secondary.fathomOracle.getPrice(secondary.token0, secondary.token1);
-    emit LogSetSecondary(msg.sender, _primaryFathomOracle, _secondaryToken0, _secondaryToken1);
+    emit LogSetSecondary(msg.sender, _secondaryFathomOracle, _secondaryToken0, _secondaryToken1);
   }
 
   /// @dev access: OWNER_ROLE, GOV_ROLE

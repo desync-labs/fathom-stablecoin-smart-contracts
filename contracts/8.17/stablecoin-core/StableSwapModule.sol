@@ -15,7 +15,7 @@ import "../interfaces/IStableSwapModule.sol";
 import "../utils/SafeToken.sol";
 
 // Stable Swap Module
-// Allows anyone to go between AUSD and the Token by pooling the liquidity
+// Allows anyone to go between FUSD and the Token by pooling the liquidity
 // An optional fee is charged for incoming and outgoing transfers
 
 contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModule {

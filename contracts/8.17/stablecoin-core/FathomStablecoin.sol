@@ -16,7 +16,7 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
 
   // --- ERC20 Data ---
   string public name; // Fathom USD Stablecoin
-  string public symbol; // AUSD
+  string public symbol; // FUSD
   string public constant version = "1";
   uint8 public constant override decimals = 18;
   uint256 public totalSupply;

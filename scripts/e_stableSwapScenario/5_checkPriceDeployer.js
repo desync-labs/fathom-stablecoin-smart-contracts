@@ -79,8 +79,7 @@ async function main() {
             WXDCJSON.address // The deployed contract address
         ).connect(walletDeployer)
 
-        // Original Copyright Alpaca Fin Corporation 2022
-// Copyright Fathom 2022
+        // Copyright Fathom 2022
         const FathomStablecoin = await hre.ethers.getContractFactory("FathomStablecoin");
         const fathomStablecoin = await FathomStablecoin.attach(
             fathomStablecoinJSON.address 

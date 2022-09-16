@@ -196,8 +196,7 @@ async function main() {
             stablecoinAdapterJSON.address // The deployed contract address
         )
 
-        // Original Copyright Alpaca Fin Corporation 2022
-// Copyright Fathom 2022 stablecoin attach
+        // Copyright Fathom 2022 stablecoin attach
         const FathomStablecoin = await hre.ethers.getContractFactory("FathomStablecoin");
         const fathomStablecoin = await FathomStablecoin.attach(
             fathomStablecoinJSON.address // The deployed contract address

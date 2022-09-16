@@ -3,7 +3,6 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
 import "./FathomToken.sol";
 import "./interfaces/IFairLaunch.sol";
@@ -228,11 +227,11 @@ contract FairLaunch is IFairLaunch, Ownable {
     uint256 fathomReward = multiplier * (fathomPerBlock) * (pool.allocPoint) / (totalAllocPoint);
     fathom.mint(devaddr, fathomReward / 10);
     fathom.mint(address(this), fathomReward);
-    pool.accFacthomPerShare = pool.accFathomPerShare + (fathomReward * 1e12 / lpSupply);
-    // update accFacthomPerShareTilBonusEnd
+    pool.accFathomPerShare = pool.accFathomPerShare + (fathomReward * 1e12 / lpSupply);
+    // update accFathomPerShareTilBonusEnd
     if (block.number <= bonusEndBlock) {
       fathom.lock(devaddr, fathomReward / 10 * bonusLockUpBps / 10000);
-      pool.accFacthomPerShareTilBonusEnd = pool.accFacthomPerShare;
+      pool.accFathomPerShareTilBonusEnd = pool.accFathomPerShare;
     }
     if (block.number > bonusEndBlock && pool.lastRewardBlock < bonusEndBlock) {
       uint256 fathomBonusPortion = (bonusEndBlock
@@ -242,7 +241,7 @@ contract FairLaunch is IFairLaunch, Ownable {
          * (pool.allocPoint)
          / (totalAllocPoint);
       fathom.lock(devaddr, fathomBonusPortion / 10 * bonusLockUpBps / 10000);
-      pool.accFacthomPerShareTilBonusEnd = pool.accFathomPerShareTilBonusEnd + (
+      pool.accFathomPerShareTilBonusEnd = pool.accFathomPerShareTilBonusEnd + (
         fathomBonusPortion * 1e12 / lpSupply
       );
     }
@@ -264,8 +263,8 @@ contract FairLaunch is IFairLaunch, Ownable {
     if (user.fundedBy == address(0)) user.fundedBy = msg.sender;
     IERC20(pool.stakeToken).safeTransferFrom(address(msg.sender), address(this), _amount);
     user.amount = user.amount + _amount;
-    user.rewardDebt = user.amount * pool.accFacthomPerShare / 1e12;
-    user.bonusDebt = user.amount * pool.accFacthomPerShareTilBonusEnd / 1e12;
+    user.rewardDebt = user.amount * pool.accFathomPerShare / 1e12;
+    user.bonusDebt = user.amount * pool.accFathomPerShareTilBonusEnd / 1e12;
     emit Deposit(msg.sender, _pid, _amount);
   }
 
@@ -294,8 +293,8 @@ contract FairLaunch is IFairLaunch, Ownable {
     updatePool(_pid);
     _harvest(_for, _pid);
     user.amount = user.amount - _amount;
-    user.rewardDebt = user.amount * pool.accFacthomPerShare / 1e12;
-    user.bonusDebt = user.amount * pool.accFacthomPerShareTilBonusEnd / 1e12;
+    user.rewardDebt = user.amount * pool.accFathomPerShare / 1e12;
+    user.bonusDebt = user.amount * pool.accFathomPerShareTilBonusEnd / 1e12;
     if (pool.stakeToken != address(0)) {
       IERC20(pool.stakeToken).safeTransfer(address(msg.sender), _amount);
     }
@@ -308,17 +307,17 @@ contract FairLaunch is IFairLaunch, Ownable {
     UserInfo storage user = userInfo[_pid][msg.sender];
     updatePool(_pid);
     _harvest(msg.sender, _pid);
-    user.rewardDebt = user.amount * pool.accFacthomPerShare / 1e12;
-    user.bonusDebt = user.amount * pool.accFacthomPerShareTilBonusEnd / 1e12;
+    user.rewardDebt = user.amount * pool.accFathomPerShare / 1e12;
+    user.bonusDebt = user.amount * pool.accFathomPerShareTilBonusEnd / 1e12;
   }
 
   function _harvest(address _to, uint256 _pid) internal {
     PoolInfo storage pool = poolInfo[_pid];
     UserInfo storage user = userInfo[_pid][_to];
     require(user.amount > 0, "nothing to harvest");
-    uint256 pending = user.amount * (pool.accFacthomPerShare) / (1e12) - (user.rewardDebt);
+    uint256 pending = user.amount * (pool.accFathomPerShare) / (1e12) - (user.rewardDebt);
     require(pending <= fathom.balanceOf(address(this)), "wtf not enough fathom");
-    uint256 bonus = user.amount * (pool.accFacthomPerShareTilBonusEnd) / (1e12) - (user.bonusDebt);
+    uint256 bonus = user.amount * (pool.accFathomPerShareTilBonusEnd) / (1e12) - (user.bonusDebt);
     safeFathomTransfer(_to, pending);
     fathom.lock(_to, bonus * (bonusLockUpBps) / (10000));
   }

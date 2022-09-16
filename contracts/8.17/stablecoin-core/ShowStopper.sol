@@ -31,12 +31,12 @@ import "../interfaces/IShowStopper.sol";
        - set the cage price for each `collateralPoolId`, reading off the price feed
 
     We must process some system state before it is possible to calculate
-    the final AUSD / collateral price. In particular, we need to determine
+    the final FUSD / collateral price. In particular, we need to determine
 
       a. `badDebtAccumulator`, the collateral badDebtAccumulator per collateral type by
          considering under-collateralised CDPs.
 
-      b. `debt`, the outstanding AUSD supply after including system
+      b. `debt`, the outstanding FUSD supply after including system
          surplus / deficit
 
     We determine (a) by processing all under-collateralised CDPs with
@@ -47,9 +47,9 @@ import "../interfaces/IShowStopper.sol";
        - any excess collateral remains
        - backing collateral taken
 
-    We determine (b) by processing ongoing AUSD generating processes,
+    We determine (b) by processing ongoing FUSD generating processes,
     i.e. auctions. We need to ensure that auctions will not generate any
-    further AUSD income.
+    further FUSD income.
 
     In the two-way auction model (Flipper) this occurs cagedTimestamp
     all auctions are in the reverse (`dent`) phase. There are two ways
@@ -60,18 +60,18 @@ import "../interfaces/IShowStopper.sol";
            cage administrator.
 
            This takes a fairly predictable time to occur but with altered
-           auction dynamics due to the block.timestamp varying price of AUSD.
+           auction dynamics due to the block.timestamp varying price of FUSD.
 
        ii) `skip`: cancel all ongoing auctions and seize the collateral.
 
            This allows for faster processing at the expense of more
-           processing calls. This option allows AUSD holders to retrieve
+           processing calls. This option allows FUSD holders to retrieve
            their collateral faster.
 
            `skip(collateralPoolId, id)`:
             - cancel individual flip auctions in the `tend` (forward) phase
             - retrieves collateral and debt (including penalty) to owner's CDP
-            - returns AUSD to last bidder
+            - returns FUSD to last bidder
             - `dent` (reverse) phase auctions can continue normally
 
     Option (i), `cageCoolDown`, is sufficient (if all auctions were bidded at least
@@ -82,7 +82,7 @@ import "../interfaces/IShowStopper.sol";
     In the case of the Dutch Auctions model (Clipper) they keep recovering
     debt during the whole lifetime and there isn't a max duration time
     guaranteed for the auction to end.
-    So the way to ensure the protocol will not receive extra AUSD income is:
+    So the way to ensure the protocol will not receive extra FUSD income is:
 
     4b. i) `snip`: cancel all ongoing auctions and seize the collateral.
 
@@ -104,7 +104,7 @@ import "../interfaces/IShowStopper.sol";
     6. `finalizeDebt()`:
        - only callable after processing time period elapsed
        - assumption that all under-collateralised CDPs are processed
-       - fixes the total outstanding supply of AUSD
+       - fixes the total outstanding supply of FUSD
        - may also require extra CDP processing to cover systemDebtEngine surplus
 
     7. `finalizeCashPrice(collateralPoolId)`:
@@ -112,21 +112,21 @@ import "../interfaces/IShowStopper.sol";
         - adjusts the `fix` in the case of deficit / surplus
 
     At this point we have computed the final price for each collateral
-    type and AUSD holders can block.timestamp turn their AUSD into collateral. Each
-    unit AUSD can claim a fixed basket of collateral.
+    type and FUSD holders can block.timestamp turn their FUSD into collateral. Each
+    unit FUSD can claim a fixed basket of collateral.
 
-    AUSD holders must first `accumulateStablecoin` some AUSD into a `stablecoinAccumulator`. Once packed,
-    AUSD cannot be unpacked and is not transferrable. More AUSD can be
+    FUSD holders must first `accumulateStablecoin` some FUSD into a `stablecoinAccumulator`. Once packed,
+    FUSD cannot be unpacked and is not transferrable. More FUSD can be
     added to a stablecoinAccumulator later.
 
     8. `accumulateStablecoin(wad)`:
-        - put some AUSD into a stablecoinAccumulator in preparation for `redeemStablecoin`
+        - put some FUSD into a stablecoinAccumulator in preparation for `redeemStablecoin`
 
     Finally, collateral can be obtained with `redeemStablecoin`. The bigger the stablecoinAccumulator,
     the more collateral can be released.
 
     9. `redeemStablecoin(collateralPoolId, wad)`:
-        - exchange some AUSD from your stablecoinAccumulator for gems from a specific collateralPoolId
+        - exchange some FUSD from your stablecoinAccumulator for gems from a specific collateralPoolId
         - the number of gems is limited by how big your stablecoinAccumulator is
 */
 

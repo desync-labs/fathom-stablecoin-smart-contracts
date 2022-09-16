@@ -9,7 +9,7 @@ import "../interfaces/IStdReference.sol";
 contract MockStdReference is IStdReference {
   function getReferenceData(string memory _base, string memory _quote)
     external
-    view
+    pure
     override
     returns (IStdReference.ReferenceData memory data)
   {
@@ -20,7 +20,7 @@ contract MockStdReference is IStdReference {
 
   function getReferenceDataBulk(string[] memory _bases, string[] memory _quotes)
     external
-    view
+    pure
     override
     returns (IStdReference.ReferenceData[] memory arr)
   {
