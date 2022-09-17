@@ -1,27 +1,22 @@
 {
-  "name": "fathom-stablecoin-smart-contracts",
-  "author": "Fathom",
+  "name": "fathomstablecoinstandalone",
   "version": "1.0.0",
-  "description": "Fathom Stablecoin Smart Contracts",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "license": "AGPL-3.0",
+  "author": "",
+  "license": "ISC",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^1.0.2",
-    "@openzeppelin/contracts-ethereum-package": "^3.0.0",
-    "hardhat": "^2.11.0",
-    "@alpaca-finance/alpaca-contract": "1.2.22",
-    "@ethersproject/constants": "^5.6.1",
-    "@openzeppelin/contracts": "3.4.2",
-    "@pancakeswap-libs/pancake-swap-core": "^0.1.0",
-    "dotenv": "^16.0.1",
-    "ethers": "^5.0.31",
-    "typechain": "^8.1.0"
+    "@nomiclabs/hardhat-ethers": "^2.1.1",
+    "@openzeppelin/hardhat-upgrades": "^1.20.0",
+    "ethers": "^5.7.0",
+    "hardhat": "^2.11.1"
   },
   "dependencies": {
-    "@uniswap/sdk": "^3.0.3",
-    "@uniswap/v2-core": "^1.0.1",
-    "@uniswap/v2-periphery": "^1.1.0-beta.0"
+    "@openzeppelin/contracts": "^4.7.3",
+    "@openzeppelin/contracts-upgradeable": "^4.7.3"    
   }
 }
