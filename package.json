@@ -13,7 +13,8 @@
     "@nomiclabs/hardhat-ethers": "^2.1.1",
     "@openzeppelin/hardhat-upgrades": "^1.20.0",
     "ethers": "^5.7.0",
-    "hardhat": "^2.11.1"
+    "hardhat": "^2.11.1",
+    "dotenv": "^16.0.1"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.7.3",

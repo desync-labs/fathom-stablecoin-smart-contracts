@@ -44,6 +44,10 @@ deploy:
 	npx hardhat run --network ganache scripts/deployment/24_stable-swap-module/config/set-fee-in.js
 	npx hardhat run --network ganache scripts/deployment/24_stable-swap-module/config/set-fee-out.js
 
+zero:
+	npx hardhat run --network ganache scripts/scenarios/a_liquidationScenario/0_deployment.js
+
+
 
 
 
