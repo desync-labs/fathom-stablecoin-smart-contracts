@@ -32,10 +32,10 @@ contract ProxyWallet is FathomAuth, FathomNote {
       _target = cache.write(_code);
     }
 
-    _response = execute(_target, _data);
+    _response = execute2(_target, _data);
   }
 
-  function execute(address _target, bytes memory _data) public payable auth note returns (bytes memory _response) {
+  function execute2(address _target, bytes memory _data) public payable auth note returns (bytes memory _response) {
     require(_target != address(0), "proxy-wallet-target-address-required");
 
     // call contract in current context

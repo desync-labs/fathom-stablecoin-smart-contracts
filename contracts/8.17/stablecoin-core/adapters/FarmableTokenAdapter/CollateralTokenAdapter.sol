@@ -15,10 +15,10 @@ import "../../../interfaces/ICagable.sol";
 import "../../../interfaces/IManager.sol";
 import "../../../utils/SafeToken.sol";
 
-/// @title IbTokenAdapter is the adapter that inherited BaseFarmableTokenAdapter.
+/// @title CollateralTokenAdapter is the adapter that inherited BaseFarmableTokenAdapter.
 /// It receives Fathom's ibTOKEN from users and deposit in Fathom's FairLaunch.
 /// Hence, users will still earn FATHOM rewards while holding positions.
-contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
   using SafeToken for address;
 
   uint256 internal constant WAD = 10**18;
@@ -30,7 +30,7 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
   IShield public shield;
   /// @dev The Timelock that owns Shield
   ITimeLock public timelock;
-  /// @dev The pool id that this ibTokenAdapter is working with
+  /// @dev The pool id that this collateralTokenAdapter is working with
   uint256 public pid;
 
   uint256 public treasuryFeeBps;
@@ -119,10 +119,10 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
     // 2. Sanity checks
     (address _stakeToken, , , , ) = IFathomFairLaunch(_fairlaunch).poolInfo(_pid);
-    require(_stakeToken == _collateralToken, "IbTokenAdapter/collateralToken-not-match");
-    require(IFathomFairLaunch(_fairlaunch).fathom() == _rewardToken, "IbTokenAdapter/reward-token-not-match");
-    require(IFathomFairLaunch(_fairlaunch).owner() == _shield, "IbTokenAdapter/shield-not-match");
-    require(IShield(_shield).owner() == _timelock, "IbTokenAdapter/timelock-not-match");
+    require(_stakeToken == _collateralToken, "CollateralTokenAdapter/collateralToken-not-match");
+    require(IFathomFairLaunch(_fairlaunch).fathom() == _rewardToken, "CollateralTokenAdapter/reward-token-not-match");
+    require(IFathomFairLaunch(_fairlaunch).owner() == _shield, "CollateralTokenAdapter/shield-not-match");
+    require(IShield(_shield).owner() == _timelock, "CollateralTokenAdapter/timelock-not-match");
 
     fairlaunch = IFathomFairLaunch(_fairlaunch);
     shield = IShield(_shield);
@@ -135,14 +135,14 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
     collateralPoolId = _collateralPoolId;
     collateralToken = _collateralToken;
     decimals = IToken(collateralToken).decimals();
-    require(decimals <= 18, "IbTokenAdapter/decimals > 18");
+    require(decimals <= 18, "CollateralTokenAdapter/decimals > 18");
 
     to18ConversionFactor = 10**(18 - decimals);
     toTokenConversionFactor = 10**decimals;
     rewardToken = IToken(_rewardToken);
 
-    require(_treasuryAccount != address(0), "IbTokenAdapter/bad treasury account");
-    require(_treasuryFeeBps <= 5000, "IbTokenAdapter/bad treasury fee bps");
+    require(_treasuryAccount != address(0), "CollateralTokenAdapter/bad treasury account");
+    require(_treasuryFeeBps <= 5000, "CollateralTokenAdapter/bad treasury fee bps");
     treasuryFeeBps = _treasuryFeeBps;
     treasuryAccount = _treasuryAccount;
 
@@ -197,15 +197,15 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
   }
 
   function setTreasuryFeeBps(uint256 _treasuryFeeBps) external onlyOwner {
-    require(live == 1, "IbTokenAdapter/not-live");
-    require(_treasuryFeeBps <= 5000, "IbTokenAdapter/bad treasury fee bps");
+    require(live == 1, "CollateralTokenAdapter/not-live");
+    require(_treasuryFeeBps <= 5000, "CollateralTokenAdapter/bad treasury fee bps");
     treasuryFeeBps = _treasuryFeeBps;
     emit LogSetTreasuryFeeBps(msg.sender, _treasuryFeeBps);
   }
 
   function setTreasuryAccount(address _treasuryAccount) external onlyOwner {
-    require(live == 1, "IbTokenAdapter/not-live");
-    require(_treasuryAccount != address(0), "IbTokenAdapter/bad treasury account");
+    require(live == 1, "CollateralTokenAdapter/not-live");
+    require(_treasuryAccount != address(0), "CollateralTokenAdapter/bad treasury account");
     treasuryAccount = _treasuryAccount;
     emit LogSetTreasuryAccount(msg.sender, _treasuryAccount);
   }
@@ -242,7 +242,7 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
     address _harvestTo = positionManager.mapPositionHandlerToOwner(_positionAddress);
     // defeault _harvestTo as _positionAddress if not properly defined
     if (_harvestTo == address(0)) _harvestTo = _positionAddress;
-    require(_harvestTo != address(0), "IbTokenAdapter/harvest-to-address-zero");
+    require(_harvestTo != address(0), "CollateralTokenAdapter/harvest-to-address-zero");
     // 2. Perform actual harvest. Calculate the new accRewardPerShare.
     if (totalShare > 0) accRewardPerShare = add(accRewardPerShare, rdiv(_harvestFromFarm(), totalShare));
     // 3. Calculate the rewards that "to" should get by:
@@ -318,7 +318,7 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
     uint256 _amount,
     bytes calldata /* _data */
   ) private {
-    require(live == 1, "IbTokenAdapter/not live");
+    require(live == 1, "CollateralTokenAdapter/not live");
     //2022 Aug 8th, 5:15 PM harvesting fathom reward token
     _harvest(_positionAddress);
 
@@ -326,7 +326,7 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
       uint256 _share = wdiv(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
       // Overflow check for int256(wad) cast below
       // Also enforces a non-zero wad
-      require(int256(_share) > 0, "IbTokenAdapter/share-overflow");
+      require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
       //I think this line below has a hint. - tracking ibToken when liquidated
       //the wierd thing is that the _amount is 0 in liquidtion process.
       //the best guess so far is that the ibToken does not directly move to
@@ -368,8 +368,8 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
       uint256 _share = wdivup(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
       // Overflow check for int256(wad) cast below
       // Also enforces a non-zero wad
-      require(int256(_share) > 0, "IbTokenAdapter/share-overflow");
-      require(stake[msg.sender] >= _share, "IbTokenAdapter/insufficient staked amount");
+      require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
+      require(stake[msg.sender] >= _share, "CollateralTokenAdapter/insufficient staked amount");
 
       bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
       totalShare = sub(totalShare, _share);
@@ -393,7 +393,7 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
   /// @param _to The address to received collateralTokens
   function _emergencyWithdraw(address _to) private {
     uint256 _share = bookKeeper.collateralToken(collateralPoolId, msg.sender); //[wad]
-    require(_share < 2**255, "IbTokenAdapter/share-overflow");
+    require(_share < 2**255, "CollateralTokenAdapter/share-overflow");
     uint256 _amount = wmul(wmul(_share, netAssetPerShare()), toTokenConversionFactor);
     bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
     totalShare = sub(totalShare, _share);
@@ -445,12 +445,12 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
     (uint256 _lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _source);
     require(
       stake[_source] >= add(bookKeeper.collateralToken(collateralPoolId, _source), _lockedCollateral),
-      "IbTokenAdapter/stake[source] < collateralTokens + lockedCollateral"
+      "CollateralTokenAdapter/stake[source] < collateralTokens + lockedCollateral"
     );
     (_lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _destination);
     require(
       stake[_destination] <= add(bookKeeper.collateralToken(collateralPoolId, _destination), _lockedCollateral),
-      "IbTokenAdapter/stake[destination] > collateralTokens + lockedCollateral"
+      "CollateralTokenAdapter/stake[destination] > collateralTokens + lockedCollateral"
     );
     emit LogMoveStake(_source, _destination, _share);
   }
@@ -479,7 +479,7 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
     _moveStake(_source, _destination, _share, _data);
   }
 
-  /// @dev Pause ibTokenAdapter when assumptions change
+  /// @dev Pause collateralTokenAdapter when assumptions change
   /// @dev access: OWNER_ROLE
   function cage() external override nonReentrant {
     // Allow caging if
@@ -489,9 +489,9 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
     require(
       _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
         shield.owner() != address(timelock),
-      "IbTokenAdapter/not-authorized"
+      "CollateralTokenAdapter/not-authorized"
     );
-    require(live == 1, "IbTokenAdapter/not-live");
+    require(live == 1, "CollateralTokenAdapter/not-live");
     fairlaunch.emergencyWithdraw(pid);
     live = 0;
     emit LogCage();
@@ -499,7 +499,7 @@ contract IbTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, Reentranc
 
   /// @dev access: OWNER_ROLE
   function uncage() external override onlyOwner {
-    require(live == 0, "IbTokenAdapter/not-caged");
+    require(live == 0, "CollateralTokenAdapter/not-caged");
     fairlaunch.deposit(address(this), pid, totalShare);
     live = 1;
     emit LogUncage();

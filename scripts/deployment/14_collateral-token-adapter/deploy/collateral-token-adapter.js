@@ -16,15 +16,15 @@ async function main() {
   const deployerAddress = signers[0].address;
   const devAddress = signers[3].address;
 
-  console.log(">> Deploying an upgradable IbTokenAdapter contract")
-  const IbTokenAdapter = (await ethers.getContractFactory(
-    "IbTokenAdapter",
+  console.log(">> Deploying an upgradable CollateralTokenAdapter contract")
+  const CollateralTokenAdapter = (await ethers.getContractFactory(
+    "CollateralTokenAdapter",
     (
       await ethers.getSigners()
     )[0]
   ))
 
-  const ibTokenAdapter = await upgrades.deployProxy(IbTokenAdapter, [
+  const collateralTokenAdapter = await upgrades.deployProxy(CollateralTokenAdapter, [
     stablecoinAddress.bookKeeper,
     COLLATERAL_POOL_ID,
     stablecoinAddress.WXDC,             //COLLATERAL_TOKEN_ADDR
@@ -38,13 +38,13 @@ async function main() {
     stablecoinAddress.positionManager,
   ])
   
-  await ibTokenAdapter.deployed()
-  console.log(`>> Deployed at ${ibTokenAdapter.address}`)
-  const tx = await ibTokenAdapter.deployTransaction.wait()
+  await collateralTokenAdapter.deployed()
+  console.log(`>> Deployed at ${collateralTokenAdapter.address}`)
+  const tx = await collateralTokenAdapter.deployTransaction.wait()
   console.log(`>> Deploy block ${tx.blockNumber}`)
 
   let addressesUpdate = { 
-    ibTokenAdapter: ibTokenAdapter.address,
+    collateralTokenAdapter: collateralTokenAdapter.address,
   };
 
   const newAddresses = {

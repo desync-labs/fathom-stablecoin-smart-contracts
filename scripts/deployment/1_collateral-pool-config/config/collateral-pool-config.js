@@ -41,7 +41,7 @@ async function main() {
     stablecoinAddress.simplePriceFeed,  //<-_priceFeed
     WeiPerRay,  //<-_liquidationRatio   1 RAY, therefore MAX LTV rate of 100%
     WeiPerRay,  //<-_stabilityFeeRate   Initially set as 1 RAY, which is 0 stability fee taken by the system from _usrs
-    stablecoinAddress.ibTokenAdapter,   //<-_adapter
+    stablecoinAddress.collateralTokenAdapter,   //<-_adapter
     CLOSE_FACTOR_BPS.mul(2),   // <-_closeFactorBps    mul(2) therefore 100%
     LIQUIDATOR_INCENTIVE_BPS,  //<-_liquidatorIncentiveBps
     TREASURY_FEE_BPS,  //<-_treasuryFeesBps

@@ -26,6 +26,111 @@
       "kind": "transparent"
     },
     {
+      "address": "0x337a8840345f10C45BaD259Ed554e690F4EC3bE5",
+      "txHash": "0x672d1e03e4614f4712fedd946934e7f158e9b76ce2359eba032fa4b03f93e319",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xB0eb6d7DA96e37F3C81C745db2625D8899872FEe",
+      "txHash": "0x4fda966141265b81562236e770d4e8ffae97dff7046250ff8bf33744f22db733",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xde448Cbb67F0599cAA0903727C03c0176709b59A",
+      "txHash": "0x3031345c6c9b01df033204f75ad9fca3ed68210e0c32a39a0d67831ba990e711",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe3670aAFe20676D80c7Ede7413C3ace40B44bE5E",
+      "txHash": "0xf7cb65916240c14bf999a0a2952d7623d0e70e4a1ce75f4b26c2be2af1ba3160",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7340A1Be1fA4cFCA7B0E1581e1D06aCF634D12ae",
+      "txHash": "0x667f0cf3facd1b59f2df28497cf3d3013f9a39403d691af070d69f07aa33c758",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7dc0c8b612587Dd08e65824589C9E7753110DD8A",
+      "txHash": "0x9cadcf601b2d4d3e8544c48fa97ef7f983e54a094cf4f7ad12da600ab8602ae6",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x151e078C5C26334C2FC4ebE504F003F3D4665232",
+      "txHash": "0x5d50ec276bd85b5c4d6396317adbbda097bf98850e3e116c0add6e5633eb05b0",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7F402c0928f0d47Ac10D2ce34d60D9B271343e1B",
+      "txHash": "0xbe94c5ff5d9d13cc1196de1aad7ebde95c5dc831452388891f93e386ba34b382",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x60D00c5CEB25ee50b13B33B2dd52A2F0E3036951",
+      "txHash": "0xbe0b9ca326582b679b52ab5d5be4692f61ce1b252c340b2743e913ea0c5960bb",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x01Bc4D3fc20e27CaC45f109b841bad073BE9fCcD",
+      "txHash": "0x4580d529e7c0bcc777996963412e1d95cb686633f22010fa00551319eb83195c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x70e2B7DAC52040efA7E67435Ed0D6998C2593714",
+      "txHash": "0xcaf96556464329bcc2dc88885a4cd25b2870d8414b48342558df27d68ab06663",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9D7F8A947b623b141C8761dcBB5f9EfCcbF38023",
+      "txHash": "0xd7a3f241abfd8a9ae7c61c539e384b7ce29c65bc25bfd936306d5f06287ae19e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3fd753D38E5669057639753c5201633954B3786C",
+      "txHash": "0x391c0b680906124d8f3457a03fe3e46222cf253bb352d37a159351933a9d9ce6",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x64761dA24202Da160eC7FeBc2338c3CCb600b5cf",
+      "txHash": "0x3ab892be89301fc7147dcd3839f7e184e7e7929c105def53c347a1a74b58e163",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xc34701a8a0BF6522b29E158eEcCEC4620290a378",
+      "txHash": "0xb32b6da4eed47a91bcd4d126b701d9c3dbfdf1fc17da29bb839f8c11555a4db8",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xB367073dFa25bA0284656f2eB7eEb44F33BB8172",
+      "txHash": "0x2d621313d9dd5f7e5c3cc0f810898bb8f87cc50abf765fc7e76ef5150add6fbe",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xf9e9cEf8D2c0c8Bb415227de07b76eFB850a4b0C",
+      "txHash": "0xc8e767959a366d4899a7aa6c4b1dbfca7afddc199bb7d3bab979df00245a3ba1",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7B66c965A6a99E59Ce5472B0a64676Dc39A77A41",
+      "txHash": "0x1798e0b9d45550e4117ee3ef62be1e7f542785495581a7753036adf22c48888d",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x69acc260481b5332C1114BF65c981783E208fAC0",
+      "txHash": "0x04eaf49e79f3e4d5307b7eb71319d71fbf4ba9d64d1351c0145caaa27a794fa7",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xC7ddA58273AB7bC325Ec795e009799643983C618",
+      "txHash": "0x749cf8306cbff2a2913fd184d0ce26cb7c0cc357ca630aac7d3a9d87a2b1166c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x0ba150475cd37dbF60dF57E821Cf5045c45f95A5",
+      "txHash": "0xf31311f7c90dc5564033210bc5d583ebfa58726c172392217832f2943eb91920",
+      "kind": "transparent"
+    },
+    {
       "address": "0x0D2B0406bc8400E61f7507bDed415c98E54A8b11",
       "txHash": "0x63f5e43c729d25d940197fb2dd8e3d31f39b77f8d6badf452fad094590b85587",
       "kind": "transparent"
@@ -445,227 +550,6 @@
               {
                 "label": "adminRole",
                 "type": "t_bytes32",
-                "offset": 0,
-                "slot": "1"
-              }
-            ],
-            "numberOfBytes": "64"
-          },
-          "t_uint256": {
-            "label": "uint256",
-            "numberOfBytes": "32"
-          },
-          "t_uint8": {
-            "label": "uint8",
-            "numberOfBytes": "1"
-          }
-        }
-      }
-    },
-    "d7f5b7bbc05c9fb92c6677139da809a81b65fcd41a1f2478d19ebf401b9b0bba": {
-      "address": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753",
-      "txHash": "0x72e8b062e354e42ac23a7fc7cf956d6bc540e59cee945900c80d4daca2243caf",
-      "layout": {
-        "storage": [
-          {
-            "label": "_initialized",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_uint8",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
-            "retypedFrom": "bool"
-          },
-          {
-            "label": "_initializing",
-            "offset": 1,
-            "slot": "0",
-            "type": "t_bool",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "1",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ContextUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
-          },
-          {
-            "label": "_paused",
-            "offset": 0,
-            "slot": "51",
-            "type": "t_bool",
-            "contract": "PausableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "52",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "PausableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
-          },
-          {
-            "label": "_status",
-            "offset": 0,
-            "slot": "101",
-            "type": "t_uint256",
-            "contract": "ReentrancyGuardUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "ReentrancyGuardUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
-          },
-          {
-            "label": "positionWhitelist",
-            "offset": 0,
-            "slot": "151",
-            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
-            "contract": "BookKeeper",
-            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:109"
-          },
-          {
-            "label": "positions",
-            "offset": 0,
-            "slot": "152",
-            "type": "t_mapping(t_bytes32,t_mapping(t_address,t_struct(Position)19871_storage))",
-            "contract": "BookKeeper",
-            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:136"
-          },
-          {
-            "label": "collateralToken",
-            "offset": 0,
-            "slot": "153",
-            "type": "t_mapping(t_bytes32,t_mapping(t_address,t_uint256))",
-            "contract": "BookKeeper",
-            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:137"
-          },
-          {
-            "label": "stablecoin",
-            "offset": 0,
-            "slot": "154",
-            "type": "t_mapping(t_address,t_uint256)",
-            "contract": "BookKeeper",
-            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:138"
-          },
-          {
-            "label": "systemBadDebt",
-            "offset": 0,
-            "slot": "155",
-            "type": "t_mapping(t_address,t_uint256)",
-            "contract": "BookKeeper",
-            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:139"
-          },
-          {
-            "label": "totalStablecoinIssued",
-            "offset": 0,
-            "slot": "156",
-            "type": "t_uint256",
-            "contract": "BookKeeper",
-            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:141"
-          },
-          {
-            "label": "totalUnbackedStablecoin",
-            "offset": 0,
-            "slot": "157",
-            "type": "t_uint256",
-            "contract": "BookKeeper",
-            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:142"
-          },
-          {
-            "label": "totalDebtCeiling",
-            "offset": 0,
-            "slot": "158",
-            "type": "t_uint256",
-            "contract": "BookKeeper",
-            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:143"
-          },
-          {
-            "label": "live",
-            "offset": 0,
-            "slot": "159",
-            "type": "t_uint256",
-            "contract": "BookKeeper",
-            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:144"
-          },
-          {
-            "label": "collateralPoolConfig",
-            "offset": 0,
-            "slot": "160",
-            "type": "t_address",
-            "contract": "BookKeeper",
-            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:145"
-          },
-          {
-            "label": "accessControlConfig",
-            "offset": 0,
-            "slot": "161",
-            "type": "t_address",
-            "contract": "BookKeeper",
-            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:146"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]",
-            "numberOfBytes": "1568"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]",
-            "numberOfBytes": "1600"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
-          },
-          "t_bytes32": {
-            "label": "bytes32",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
-            "label": "mapping(address => mapping(address => uint256))",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_struct(Position)19871_storage)": {
-            "label": "mapping(address => struct BookKeeper.Position)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_bytes32,t_mapping(t_address,t_struct(Position)19871_storage))": {
-            "label": "mapping(bytes32 => mapping(address => struct BookKeeper.Position))",
-            "numberOfBytes": "32"
-          },
-          "t_mapping(t_bytes32,t_mapping(t_address,t_uint256))": {
-            "label": "mapping(bytes32 => mapping(address => uint256))",
-            "numberOfBytes": "32"
-          },
-          "t_struct(Position)19871_storage": {
-            "label": "struct BookKeeper.Position",
-            "members": [
-              {
-                "label": "lockedCollateral",
-                "type": "t_uint256",
-                "offset": 0,
-                "slot": "0"
-              },
-              {
-                "label": "debtShare",
-                "type": "t_uint256",
                 "offset": 0,
                 "slot": "1"
               }
@@ -1776,289 +1660,6 @@
         }
       }
     },
-    "d442b35c23079e7ff6d26cc71805f73e74257e6f4f6af229a55fcce751c22741": {
-      "address": "0x7F402c0928f0d47Ac10D2ce34d60D9B271343e1B",
-      "txHash": "0x59a260e1860d57ec410189c300d48037279b8c4697d4aa55fb5b67dc677e9faf",
-      "layout": {
-        "storage": [
-          {
-            "label": "_initialized",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_uint8",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
-            "retypedFrom": "bool"
-          },
-          {
-            "label": "_initializing",
-            "offset": 1,
-            "slot": "0",
-            "type": "t_bool",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "1",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ContextUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
-          },
-          {
-            "label": "_paused",
-            "offset": 0,
-            "slot": "51",
-            "type": "t_bool",
-            "contract": "PausableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "52",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "PausableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
-          },
-          {
-            "label": "_status",
-            "offset": 0,
-            "slot": "101",
-            "type": "t_uint256",
-            "contract": "ReentrancyGuardUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "ReentrancyGuardUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
-          },
-          {
-            "label": "fairlaunch",
-            "offset": 0,
-            "slot": "151",
-            "type": "t_contract(IFathomFairLaunch)10095",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:28"
-          },
-          {
-            "label": "shield",
-            "offset": 0,
-            "slot": "152",
-            "type": "t_contract(IShield)10646",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:30"
-          },
-          {
-            "label": "timelock",
-            "offset": 0,
-            "slot": "153",
-            "type": "t_contract(ITimeLock)10860",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:32"
-          },
-          {
-            "label": "pid",
-            "offset": 0,
-            "slot": "154",
-            "type": "t_uint256",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:34"
-          },
-          {
-            "label": "treasuryFeeBps",
-            "offset": 0,
-            "slot": "155",
-            "type": "t_uint256",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:36"
-          },
-          {
-            "label": "treasuryAccount",
-            "offset": 0,
-            "slot": "156",
-            "type": "t_address",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:37"
-          },
-          {
-            "label": "live",
-            "offset": 0,
-            "slot": "157",
-            "type": "t_uint256",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:39"
-          },
-          {
-            "label": "bookKeeper",
-            "offset": 0,
-            "slot": "158",
-            "type": "t_contract(IBookKeeper)9713",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:42"
-          },
-          {
-            "label": "collateralPoolId",
-            "offset": 0,
-            "slot": "159",
-            "type": "t_bytes32",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:44"
-          },
-          {
-            "label": "collateralToken",
-            "offset": 0,
-            "slot": "160",
-            "type": "t_address",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:46"
-          },
-          {
-            "label": "decimals",
-            "offset": 0,
-            "slot": "161",
-            "type": "t_uint256",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:48"
-          },
-          {
-            "label": "rewardToken",
-            "offset": 0,
-            "slot": "162",
-            "type": "t_contract(IToken)10904",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:50"
-          },
-          {
-            "label": "positionManager",
-            "offset": 0,
-            "slot": "163",
-            "type": "t_contract(IManager)10581",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:52"
-          },
-          {
-            "label": "accRewardPerShare",
-            "offset": 0,
-            "slot": "164",
-            "type": "t_uint256",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:55"
-          },
-          {
-            "label": "totalShare",
-            "offset": 0,
-            "slot": "165",
-            "type": "t_uint256",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:57"
-          },
-          {
-            "label": "accRewardBalance",
-            "offset": 0,
-            "slot": "166",
-            "type": "t_uint256",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:59"
-          },
-          {
-            "label": "rewardDebts",
-            "offset": 0,
-            "slot": "167",
-            "type": "t_mapping(t_address,t_uint256)",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:62"
-          },
-          {
-            "label": "stake",
-            "offset": 0,
-            "slot": "168",
-            "type": "t_mapping(t_address,t_uint256)",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:66"
-          },
-          {
-            "label": "to18ConversionFactor",
-            "offset": 0,
-            "slot": "169",
-            "type": "t_uint256",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:68"
-          },
-          {
-            "label": "toTokenConversionFactor",
-            "offset": 0,
-            "slot": "170",
-            "type": "t_uint256",
-            "contract": "IbTokenAdapter",
-            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/IbTokenAdapter.sol:69"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]",
-            "numberOfBytes": "1568"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]",
-            "numberOfBytes": "1600"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
-          },
-          "t_bytes32": {
-            "label": "bytes32",
-            "numberOfBytes": "32"
-          },
-          "t_contract(IBookKeeper)9713": {
-            "label": "contract IBookKeeper",
-            "numberOfBytes": "20"
-          },
-          "t_contract(IFathomFairLaunch)10095": {
-            "label": "contract IFathomFairLaunch",
-            "numberOfBytes": "20"
-          },
-          "t_contract(IManager)10581": {
-            "label": "contract IManager",
-            "numberOfBytes": "20"
-          },
-          "t_contract(IShield)10646": {
-            "label": "contract IShield",
-            "numberOfBytes": "20"
-          },
-          "t_contract(ITimeLock)10860": {
-            "label": "contract ITimeLock",
-            "numberOfBytes": "20"
-          },
-          "t_contract(IToken)10904": {
-            "label": "contract IToken",
-            "numberOfBytes": "20"
-          },
-          "t_mapping(t_address,t_uint256)": {
-            "label": "mapping(address => uint256)",
-            "numberOfBytes": "32"
-          },
-          "t_uint256": {
-            "label": "uint256",
-            "numberOfBytes": "32"
-          },
-          "t_uint8": {
-            "label": "uint8",
-            "numberOfBytes": "1"
-          }
-        }
-      }
-    },
     "b22192342e8c5d5c60f40d45a4bbed549df844ae4c22bde6376c28e1877f0832": {
       "address": "0x60D00c5CEB25ee50b13B33B2dd52A2F0E3036951",
       "txHash": "0x895545aa02d6340c01ec9e4e33067ca1fb1dfb27029541f2ce64fa63022aa855",
@@ -2359,275 +1960,6 @@
           "t_uint256": {
             "label": "uint256",
             "numberOfBytes": "32"
-          },
-          "t_uint8": {
-            "label": "uint8",
-            "numberOfBytes": "1"
-          }
-        }
-      }
-    },
-    "9122024d1bfe135ebc8694f34183f4d4588d8392799a7102cb20cd81743d7995": {
-      "address": "0x88CDb11c52968EdB3F815167b8c3308E36E33d11",
-      "txHash": "0xb170c54fe1f4180377a0d0a88f2b4fc12fe63f1740f997697ad8844a09741e96",
-      "layout": {
-        "storage": [
-          {
-            "label": "_initialized",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_uint8",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
-            "retypedFrom": "bool"
-          },
-          {
-            "label": "_initializing",
-            "offset": 1,
-            "slot": "0",
-            "type": "t_bool",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "1",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ContextUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
-          },
-          {
-            "label": "_paused",
-            "offset": 0,
-            "slot": "51",
-            "type": "t_bool",
-            "contract": "PausableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "52",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "PausableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
-          },
-          {
-            "label": "_status",
-            "offset": 0,
-            "slot": "101",
-            "type": "t_uint256",
-            "contract": "ReentrancyGuardUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "ReentrancyGuardUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
-          },
-          {
-            "label": "bookKeeper",
-            "offset": 0,
-            "slot": "151",
-            "type": "t_contract(IBookKeeper)9713",
-            "contract": "StabilityFeeCollector",
-            "src": "contracts/8.17/stablecoin-core/StabilityFeeCollector.sol:26"
-          },
-          {
-            "label": "systemDebtEngine",
-            "offset": 0,
-            "slot": "152",
-            "type": "t_address",
-            "contract": "StabilityFeeCollector",
-            "src": "contracts/8.17/stablecoin-core/StabilityFeeCollector.sol:27"
-          },
-          {
-            "label": "globalStabilityFeeRate",
-            "offset": 0,
-            "slot": "153",
-            "type": "t_uint256",
-            "contract": "StabilityFeeCollector",
-            "src": "contracts/8.17/stablecoin-core/StabilityFeeCollector.sol:28"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]",
-            "numberOfBytes": "1568"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]",
-            "numberOfBytes": "1600"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
-          },
-          "t_contract(IBookKeeper)9713": {
-            "label": "contract IBookKeeper",
-            "numberOfBytes": "20"
-          },
-          "t_uint256": {
-            "label": "uint256",
-            "numberOfBytes": "32"
-          },
-          "t_uint8": {
-            "label": "uint8",
-            "numberOfBytes": "1"
-          }
-        }
-      }
-    },
-    "a2b69afb23953b9a8716571eed7c7b83d582cfceed7fe811e64d923fb3e58b27": {
-      "address": "0xD6CB3736bfACe9fD1c0484e1cDa1cA3DAB49329a",
-      "txHash": "0x3746671b9a5e14637c11f8fd8916aaa53be0c41ab341c29b4465cf1edcb28de7",
-      "layout": {
-        "storage": [
-          {
-            "label": "_initialized",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_uint8",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
-            "retypedFrom": "bool"
-          },
-          {
-            "label": "_initializing",
-            "offset": 1,
-            "slot": "0",
-            "type": "t_bool",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "1",
-            "type": "t_array(t_uint256)50_storage",
-            "contract": "ContextUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
-          },
-          {
-            "label": "_owner",
-            "offset": 0,
-            "slot": "51",
-            "type": "t_address",
-            "contract": "OwnableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
-          },
-          {
-            "label": "__gap",
-            "offset": 0,
-            "slot": "52",
-            "type": "t_array(t_uint256)49_storage",
-            "contract": "OwnableUpgradeable",
-            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
-          },
-          {
-            "label": "proxies",
-            "offset": 0,
-            "slot": "101",
-            "type": "t_mapping(t_address,t_contract(ProxyWallet)19242)",
-            "contract": "ProxyWalletRegistry",
-            "src": "contracts/8.17/proxy-wallet/ProxyWalletRegistry.sol:12"
-          },
-          {
-            "label": "factory",
-            "offset": 0,
-            "slot": "102",
-            "type": "t_contract(ProxyWalletFactory)19386",
-            "contract": "ProxyWalletRegistry",
-            "src": "contracts/8.17/proxy-wallet/ProxyWalletRegistry.sol:13"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_array(t_uint256)49_storage": {
-            "label": "uint256[49]",
-            "numberOfBytes": "1568"
-          },
-          "t_array(t_uint256)50_storage": {
-            "label": "uint256[50]",
-            "numberOfBytes": "1600"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
-          },
-          "t_contract(ProxyWallet)19242": {
-            "label": "contract ProxyWallet",
-            "numberOfBytes": "20"
-          },
-          "t_contract(ProxyWalletFactory)19386": {
-            "label": "contract ProxyWalletFactory",
-            "numberOfBytes": "20"
-          },
-          "t_mapping(t_address,t_contract(ProxyWallet)19242)": {
-            "label": "mapping(address => contract ProxyWallet)",
-            "numberOfBytes": "32"
-          },
-          "t_uint256": {
-            "label": "uint256",
-            "numberOfBytes": "32"
-          },
-          "t_uint8": {
-            "label": "uint8",
-            "numberOfBytes": "1"
-          }
-        }
-      }
-    },
-    "05edc24df8b3dc44a99f17c55483fbb79ddd727cc68f1a2944b4349224968260": {
-      "address": "0xf1adf79b0de93D22a47702848572cd9B3DA04FC4",
-      "txHash": "0x72e2d541262a4bc84fcfebd66aef9bcf481afdbec0bafe4fce77d1a86fc51df0",
-      "layout": {
-        "storage": [
-          {
-            "label": "_initialized",
-            "offset": 0,
-            "slot": "0",
-            "type": "t_uint8",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
-            "retypedFrom": "bool"
-          },
-          {
-            "label": "_initializing",
-            "offset": 1,
-            "slot": "0",
-            "type": "t_bool",
-            "contract": "Initializable",
-            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
-          },
-          {
-            "label": "dexFactory",
-            "offset": 2,
-            "slot": "0",
-            "type": "t_address",
-            "contract": "DexPriceOracle",
-            "src": "contracts/8.17/price-oracles/DexPriceOracle.sol:12"
-          }
-        ],
-        "types": {
-          "t_address": {
-            "label": "address",
-            "numberOfBytes": "20"
-          },
-          "t_bool": {
-            "label": "bool",
-            "numberOfBytes": "1"
           },
           "t_uint8": {
             "label": "uint8",
@@ -3039,6 +2371,779 @@
           "t_bool": {
             "label": "bool",
             "numberOfBytes": "1"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "ff5b6da398a662ae22d162b2a8b5ad4d0e2f80af560f45d8e976b5b9129c7b87": {
+      "address": "0xD6CB3736bfACe9fD1c0484e1cDa1cA3DAB49329a",
+      "txHash": "0xd709c0270333552f7063b681f84d2e1cf9d628425f0997030bffe6392d16120e",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "proxies",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_mapping(t_address,t_contract(ProxyWallet)882)",
+            "contract": "ProxyWalletRegistry",
+            "src": "contracts/8.17/proxy-wallet/ProxyWalletRegistry.sol:12"
+          },
+          {
+            "label": "factory",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_contract(ProxyWalletFactory)1026",
+            "contract": "ProxyWalletRegistry",
+            "src": "contracts/8.17/proxy-wallet/ProxyWalletRegistry.sol:13"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(ProxyWallet)882": {
+            "label": "contract ProxyWallet",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ProxyWalletFactory)1026": {
+            "label": "contract ProxyWalletFactory",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_contract(ProxyWallet)882)": {
+            "label": "mapping(address => contract ProxyWallet)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "32df8e8412c223e3dd9ca9e54b9f605b5e2ab1d8133c79f7d1b6022f53554667": {
+      "address": "0x7F402c0928f0d47Ac10D2ce34d60D9B271343e1B",
+      "txHash": "0xd4dc9e936d617fac16f176696be9be05a74da48f43cd39e4e200772637627d9a",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_paused",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_bool",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "label": "fairlaunch",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IFathomFairLaunch)1844",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:28"
+          },
+          {
+            "label": "shield",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_contract(IShield)2098",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:30"
+          },
+          {
+            "label": "timelock",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_contract(ITimeLock)2144",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:32"
+          },
+          {
+            "label": "pid",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_uint256",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:34"
+          },
+          {
+            "label": "treasuryFeeBps",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_uint256",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:36"
+          },
+          {
+            "label": "treasuryAccount",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_address",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:37"
+          },
+          {
+            "label": "live",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_uint256",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:39"
+          },
+          {
+            "label": "bookKeeper",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_contract(IBookKeeper)1552",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:42"
+          },
+          {
+            "label": "collateralPoolId",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_bytes32",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:44"
+          },
+          {
+            "label": "collateralToken",
+            "offset": 0,
+            "slot": "160",
+            "type": "t_address",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:46"
+          },
+          {
+            "label": "decimals",
+            "offset": 0,
+            "slot": "161",
+            "type": "t_uint256",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:48"
+          },
+          {
+            "label": "rewardToken",
+            "offset": 0,
+            "slot": "162",
+            "type": "t_contract(IToken)2188",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:50"
+          },
+          {
+            "label": "positionManager",
+            "offset": 0,
+            "slot": "163",
+            "type": "t_contract(IManager)2075",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:52"
+          },
+          {
+            "label": "accRewardPerShare",
+            "offset": 0,
+            "slot": "164",
+            "type": "t_uint256",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:55"
+          },
+          {
+            "label": "totalShare",
+            "offset": 0,
+            "slot": "165",
+            "type": "t_uint256",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:57"
+          },
+          {
+            "label": "accRewardBalance",
+            "offset": 0,
+            "slot": "166",
+            "type": "t_uint256",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:59"
+          },
+          {
+            "label": "rewardDebts",
+            "offset": 0,
+            "slot": "167",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:62"
+          },
+          {
+            "label": "stake",
+            "offset": 0,
+            "slot": "168",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:66"
+          },
+          {
+            "label": "to18ConversionFactor",
+            "offset": 0,
+            "slot": "169",
+            "type": "t_uint256",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:68"
+          },
+          {
+            "label": "toTokenConversionFactor",
+            "offset": 0,
+            "slot": "170",
+            "type": "t_uint256",
+            "contract": "CollateralTokenAdapter",
+            "src": "contracts/8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol:69"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_contract(IBookKeeper)1552": {
+            "label": "contract IBookKeeper",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IFathomFairLaunch)1844": {
+            "label": "contract IFathomFairLaunch",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IManager)2075": {
+            "label": "contract IManager",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IShield)2098": {
+            "label": "contract IShield",
+            "numberOfBytes": "20"
+          },
+          "t_contract(ITimeLock)2144": {
+            "label": "contract ITimeLock",
+            "numberOfBytes": "20"
+          },
+          "t_contract(IToken)2188": {
+            "label": "contract IToken",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "05edc24df8b3dc44a99f17c55483fbb79ddd727cc68f1a2944b4349224968260": {
+      "address": "0xf1adf79b0de93D22a47702848572cd9B3DA04FC4",
+      "txHash": "0x72e2d541262a4bc84fcfebd66aef9bcf481afdbec0bafe4fce77d1a86fc51df0",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "dexFactory",
+            "offset": 2,
+            "slot": "0",
+            "type": "t_address",
+            "contract": "DexPriceOracle",
+            "src": "contracts/8.17/price-oracles/DexPriceOracle.sol:12"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "9122024d1bfe135ebc8694f34183f4d4588d8392799a7102cb20cd81743d7995": {
+      "address": "0x88CDb11c52968EdB3F815167b8c3308E36E33d11",
+      "txHash": "0x95e89de6b5f8bb941fbbc155250bc09e9eb16b61e561ebb4d6675789759331dd",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_paused",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_bool",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "label": "bookKeeper",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_contract(IBookKeeper)1552",
+            "contract": "StabilityFeeCollector",
+            "src": "contracts/8.17/stablecoin-core/StabilityFeeCollector.sol:26"
+          },
+          {
+            "label": "systemDebtEngine",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_address",
+            "contract": "StabilityFeeCollector",
+            "src": "contracts/8.17/stablecoin-core/StabilityFeeCollector.sol:27"
+          },
+          {
+            "label": "globalStabilityFeeRate",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_uint256",
+            "contract": "StabilityFeeCollector",
+            "src": "contracts/8.17/stablecoin-core/StabilityFeeCollector.sol:28"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IBookKeeper)1552": {
+            "label": "contract IBookKeeper",
+            "numberOfBytes": "20"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "d7f5b7bbc05c9fb92c6677139da809a81b65fcd41a1f2478d19ebf401b9b0bba": {
+      "address": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753",
+      "txHash": "0x72e8b062e354e42ac23a7fc7cf956d6bc540e59cee945900c80d4daca2243caf",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_paused",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_bool",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "label": "positionWhitelist",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:109"
+          },
+          {
+            "label": "positions",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_mapping(t_bytes32,t_mapping(t_address,t_struct(Position)2235_storage))",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:136"
+          },
+          {
+            "label": "collateralToken",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_mapping(t_bytes32,t_mapping(t_address,t_uint256))",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:137"
+          },
+          {
+            "label": "stablecoin",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:138"
+          },
+          {
+            "label": "systemBadDebt",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:139"
+          },
+          {
+            "label": "totalStablecoinIssued",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_uint256",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:141"
+          },
+          {
+            "label": "totalUnbackedStablecoin",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_uint256",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:142"
+          },
+          {
+            "label": "totalDebtCeiling",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_uint256",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:143"
+          },
+          {
+            "label": "live",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_uint256",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:144"
+          },
+          {
+            "label": "collateralPoolConfig",
+            "offset": 0,
+            "slot": "160",
+            "type": "t_address",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:145"
+          },
+          {
+            "label": "accessControlConfig",
+            "offset": 0,
+            "slot": "161",
+            "type": "t_address",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:146"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(Position)2235_storage)": {
+            "label": "mapping(address => struct BookKeeper.Position)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_mapping(t_address,t_struct(Position)2235_storage))": {
+            "label": "mapping(bytes32 => mapping(address => struct BookKeeper.Position))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(bytes32 => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Position)2235_storage": {
+            "label": "struct BookKeeper.Position",
+            "members": [
+              {
+                "label": "lockedCollateral",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "debtShare",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
           },
           "t_uint8": {
             "label": "uint8",

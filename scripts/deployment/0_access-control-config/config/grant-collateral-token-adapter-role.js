@@ -5,7 +5,7 @@ let stablecoinAddress = JSON.parse(rawdata);
 
 async function main() {
 
-  const ADAPTER_ADDR = stablecoinAddress.ibTokenAdapter;
+  const ADAPTER_ADDR = stablecoinAddress.collateralTokenAdapter;
 
   const AccessControlConfig = await hre.ethers.getContractFactory("AccessControlConfig");
   const accessControlConfig = await AccessControlConfig.attach(stablecoinAddress.accessControlConfig);

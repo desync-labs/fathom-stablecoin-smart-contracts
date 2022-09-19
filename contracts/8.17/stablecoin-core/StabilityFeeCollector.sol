@@ -189,6 +189,7 @@ contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeabl
       rpow(add(globalStabilityFeeRate, _stabilityFeeRate), block.timestamp - _lastAccumulationTime, RAY),
       _previousDebtAccumulatedRate
     );
+
     bookKeeper.accrueStabilityFee(
       _collateralPoolId,
       systemDebtEngine,

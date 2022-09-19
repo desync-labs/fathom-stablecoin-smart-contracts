@@ -16,7 +16,7 @@ deploy:
 	npx hardhat run --network ganache scripts/deployment/12_shield/deploy/shield.js
 	npx hardhat run --network ganache scripts/deployment/10_fair-launch/config/fair-launch-config.js
 	npx hardhat run --network ganache scripts/deployment/13_position-manager/deploy/position-manager.js
-	npx hardhat run --network ganache scripts/deployment/14_ib-token-adapter/deploy/ib-token-adapter.js
+	npx hardhat run --network ganache scripts/deployment/14_collateral-token-adapter/deploy/collateral-token-adapter.js
 	npx hardhat run --network ganache scripts/deployment/15_simple-price-feed/deploy/simple-price-feed.js
 	npx hardhat run --network ganache scripts/deployment/16_fixed-spread-liquidation-strategy/deploy/fixed-spread-liquidation-strategy.js
 	npx hardhat run --network ganache scripts/deployment/0_access-control-config/config/grant-price-oracle-rote.js
@@ -31,7 +31,7 @@ deploy:
 	npx hardhat run --network ganache scripts/deployment/24_stable-swap-module/deploy/stable-swap-module.js
 	npx hardhat run --network ganache scripts/deployment/25_get-positions/deploy/get-positions.js
 	npx hardhat run --network ganache scripts/deployment/23_auth-token-adapter/config/auth-token-adapter-whitelist.js
-	npx hardhat run --network ganache scripts/deployment/0_access-control-config/config/grant-ib-token-adapter-role.js
+	npx hardhat run --network ganache scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role.js
 	npx hardhat run --network ganache scripts/deployment/0_access-control-config/config/grant-book-keeper-role.js
 	npx hardhat run --network ganache scripts/deployment/0_access-control-config/config/grant-collateral-manager-role.js
 	npx hardhat run --network ganache scripts/deployment/0_access-control-config/config/grant-gov-role.js

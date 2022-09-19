@@ -4,13 +4,13 @@ const rawdata = fs.readFileSync('./addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 async function main() {
 
-  const STABILITY_FEE_COLLECTOR_ADDR = stablecoinAddress.showStopper;
-
+  const STABILITY_FEE_COLLECTOR_ADDR = stablecoinAddress.stabilityFeeCollector;
+  
   const AccessControlConfig = await hre.ethers.getContractFactory("AccessControlConfig");
   const accessControlConfig = await AccessControlConfig.attach(stablecoinAddress.accessControlConfig);
 
   console.log(`>> Grant STABILITY_FEE_COLLECTOR_ADDR address: ${STABILITY_FEE_COLLECTOR_ADDR}`)
-  await accessControlConfig.grantRole(await accessControlConfig.POSITION_MANAGER_ROLE(), STABILITY_FEE_COLLECTOR_ADDR);
+  await accessControlConfig.grantRole(await accessControlConfig.STABILITY_FEE_COLLECTOR_ROLE(), STABILITY_FEE_COLLECTOR_ADDR);
   console.log("✅ Done")
 }
 
