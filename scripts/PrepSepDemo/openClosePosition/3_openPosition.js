@@ -29,7 +29,7 @@ var positionCounter = 0;
 let rawdata = fs.readFileSync('addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-let rawdata2 = fs.readFileSync('./scripts/PrepSepDemo/closePosition/cupcakes/2_proxyWalletAddresses.json');
+let rawdata2 = fs.readFileSync('./scripts/PrepSepDemo/openClosePosition/cupcakes/2_proxyWalletAddresses.json');
 let proxyWallets = JSON.parse(rawdata2);
 
 const proxyWalletAlice = proxyWallets.proxyWalletAlice;
@@ -67,21 +67,22 @@ async function main() {
 
     //Approve
     await WXDCAsAlice.approve(proxyWalletAlice, WeiPerWad.mul(10000));
-    // await WXDCAsBob.approve(proxyWalletBob, WeiPerWad.mul(10000));
 
     // 2. Open a position as Alice, and open a position as Bob
-    const alicePositionAddress = await openPosition(AliceAddress, proxyWalletAlice, proxyWalletAsAlice, "Alice");
-    console.log("Position opened for Alice");
+    const alicePositionAddress1 = await openPosition(AliceAddress, proxyWalletAlice, proxyWalletAsAlice, "Alice");
+    console.log("Position1 opened for Alice");
     const bobPositionAddress = "0x00"
+    const alicePositionAddress2 = await openPosition(AliceAddress, proxyWalletAlice, proxyWalletAsAlice, "Alice");
+    console.log("Position2 opened for Alice");
 
     let positionHandlerAddresses = { 
-        alicePositionAddress: alicePositionAddress,
-        bobPositionAddress: bobPositionAddress
+        alicePositionAddress1: alicePositionAddress1,
+        alicePositionAddress2: alicePositionAddress2
     };
 
     let data = JSON.stringify(positionHandlerAddresses);
-    fs.writeFileSync('./scripts/PrepSepDemo/closePosition/cupcakes/3_positionHandlerAddresses.json', data);
-    console.log("T9");
+    fs.writeFileSync('./scripts/PrepSepDemo/openClosePosition/cupcakes/3_positionHandlerAddresses.json', data);
+
     /// functions
     async function openPosition(address, proxyWallet, proxyWalletAs, username) {
         positionCounter++;

@@ -42,7 +42,7 @@ async function main() {
     };
 
     let data = JSON.stringify(proxyWalletAddresses);
-    fs.writeFileSync('./scripts/PrepSepDemo/openPosition/cupcakes/2_proxyWalletAddresses.json', data);
+    fs.writeFileSync('./scripts/PrepSepDemo/openClosePosition/cupcakes/2_proxyWalletAddresses.json', data);
 
 
     // https://github.com/ethers-io/ethers.js/issues/1160
