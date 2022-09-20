@@ -4534,6 +4534,116 @@
       "address": "0xB81DFf7580d700b1c2aDF70278fC0d097c191E0E",
       "txHash": "0x3c26343b3d712022baf47d615fbc07ecef2089d7b28aee88b708f37de98eac31",
       "kind": "transparent"
+    },
+    {
+      "address": "0xb6390BADa50015E2ADe603A19312fD535f7C3E42",
+      "txHash": "0x7b0be05dab273ebf1b9be61136d2270d79e664ce4b160d6b833597e5dfe5a227",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7Fd47B5325A0396a7050Fd9d143fC37B7a8ebf81",
+      "txHash": "0xc57b70ff4347f18aa50026939a87e3ac2b9240399e6742a44a56d6a6dcf42f63",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xD5302A093dCF4565CDA831C3cec81eAE0Ca3Db3c",
+      "txHash": "0x8d46e90bf32b6c3d2b2845c3da0c596c03a16a2705fba45b08a43e70858dbadb",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x5280F6eD412E5c6aB43B92E66b9DfD34f7dBE2bE",
+      "txHash": "0xecc94c5d3ed5fdd5c6d45f0288b8f5700ff4844656fb93cbe432fd1b25e3d169",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x6c9B1e039e01D5c5955FcF676B803041DF763cd7",
+      "txHash": "0x610016e6905a3ed6e8e3eb1f41c5cadb3bffb15b63b2568c995360413195eb3a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x03517AfF7eC9F30d1f629568Aa3d201bD397Cd62",
+      "txHash": "0xf6a980e9a155ccc24f305ec5eaa9901cb05cd48a6a7c1da26269e871781b7a77",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9df8E882E89bc897b0fD29D4e1b1d08c5D9c7117",
+      "txHash": "0x6e3eeb93a34b852e3302a8b2c86eafde88b993d34a71efd8735937a0c66a0c64",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1EF63410CDF3f8a276790BefBF9Bd6A2e393fa20",
+      "txHash": "0x42d34c4de8c1f8336dd1bea314144b6e39ddd55d8736f1e75539715807a7ec4e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x47b9F8f9e0623c0B6E40416A3FaA99Ed7554f549",
+      "txHash": "0x314e942234497a9fdedf2e48a5af5cd787554a6b6bc6f04f59b1b5e7e8a841ee",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xEc9c31D3E841882a0FF9Be82364661929333AfD4",
+      "txHash": "0x7a2fe7016a456d0b6ddd5219ecd94337b5112e53870b1937c18e2e9c0a6f644a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x27108E1dcd5a807941eC0dA31f188983F122bf67",
+      "txHash": "0x87bee7e2315a479d41fe3e24459e0974b543becd3d3ea1e8b764d06a35300995",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x620a96ed0EBDab759275bDa6EDC52F1cE9aDeF00",
+      "txHash": "0xfe2ed2adc5b5d334b1c0aebeba3863c61e1872a712d2ae3358841dce7999b038",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x20aEfbE0270Ef3B4D58806852f2C989174347245",
+      "txHash": "0xf207c9a3d8fa12ce0361a5cf79ecd69d5e4346ccc7a43fcfcabc5677d277a140",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe70B8E8979f9aF58fba4310b4750645e23d9728a",
+      "txHash": "0x9a02c362da7c869f1ef03dc641445ac291a1aedd456cf18f8c2e2d89c25844c5",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x82D035F5af3bdD0D1185AF94224F3598f7662399",
+      "txHash": "0xe5aff1965c12a541ef84c421a0a4a4daa5c0874f1ffc97ca8085fce39b17bbcb",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xd1a62Ac9D949f493573920690b4C1BAe4383dd80",
+      "txHash": "0xc9dc4007a9bd02ef27233ee88d9026fe1470c8029206ae78beb60362fc705864",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x6aCa5d88715Bf3672cCc940484D85Ce1c064Bb49",
+      "txHash": "0x19377e9505bb73f7cf8297ecec4925572ae18f6f5704555c2fe057e8d6f8a0aa",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x4fA40BAd064Ae49796c92988f2549f1924b6317B",
+      "txHash": "0xfda09c78e31ad57fcc7addbc9e9e26c300a6d14cf7479b7704dfd3aa776dce25",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xfd5033b897381F7e214f31a7483Ef576606A70A6",
+      "txHash": "0x409551dc7c9efd1ccb2461a79a2c4e89b18814723c2be619c8bbb4d66b115c8f",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xfb109F91719C3887076a7dF5D72311be184b0978",
+      "txHash": "0x9550f6fac1f9007e71ade4b1e10297ca36d9b2c81da3d245ee25af45f02aa80c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x554836B4c25C7449Aa80bb5C683049e138431657",
+      "txHash": "0xa01e44f73f8e6c11fee3ce490ee4a7d7dc83da480bf8a12fe2110b7f8c9e3f28",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x64fcd29C2Ed2b03B7aEf1333ecdFB6326837aC97",
+      "txHash": "0x3161a8d603bb8da7d276b3e0a9ec61bab1554dc70774a8615026609d06edde8f",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -13610,6 +13720,227 @@
             "numberOfBytes": "32"
           },
           "t_struct(Position)2263_storage": {
+            "label": "struct BookKeeper.Position",
+            "members": [
+              {
+                "label": "lockedCollateral",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "0"
+              },
+              {
+                "label": "debtShare",
+                "type": "t_uint256",
+                "offset": 0,
+                "slot": "1"
+              }
+            ],
+            "numberOfBytes": "64"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    },
+    "91ae16e91e2eca35d986a886326cac16648d4604e5df9ef68c597ec7194cfe69": {
+      "address": "0xBB3AEACcA5C4b370129F369B430bdbf946a5042F",
+      "txHash": "0x63e148ea14b99af325354cfd0b3af2f47c3206f2ae75e13ae2060a6bba1b5e5f",
+      "layout": {
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:62",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:67"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_paused",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_bool",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
+          },
+          {
+            "label": "_status",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_uint256",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:38"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "ReentrancyGuardUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol:74"
+          },
+          {
+            "label": "positionWhitelist",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:109"
+          },
+          {
+            "label": "positions",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_mapping(t_bytes32,t_mapping(t_address,t_struct(Position)9776_storage))",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:136"
+          },
+          {
+            "label": "collateralToken",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_mapping(t_bytes32,t_mapping(t_address,t_uint256))",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:137"
+          },
+          {
+            "label": "stablecoin",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:138"
+          },
+          {
+            "label": "systemBadDebt",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:139"
+          },
+          {
+            "label": "totalStablecoinIssued",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_uint256",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:141"
+          },
+          {
+            "label": "totalUnbackedStablecoin",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_uint256",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:142"
+          },
+          {
+            "label": "totalDebtCeiling",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_uint256",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:143"
+          },
+          {
+            "label": "live",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_uint256",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:144"
+          },
+          {
+            "label": "collateralPoolConfig",
+            "offset": 0,
+            "slot": "160",
+            "type": "t_address",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:145"
+          },
+          {
+            "label": "accessControlConfig",
+            "offset": 0,
+            "slot": "161",
+            "type": "t_address",
+            "contract": "BookKeeper",
+            "src": "contracts/8.17/stablecoin-core/BookKeeper.sol:146"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_bytes32": {
+            "label": "bytes32",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_struct(Position)9776_storage)": {
+            "label": "mapping(address => struct BookKeeper.Position)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_mapping(t_address,t_struct(Position)9776_storage))": {
+            "label": "mapping(bytes32 => mapping(address => struct BookKeeper.Position))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_bytes32,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(bytes32 => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_struct(Position)9776_storage": {
             "label": "struct BookKeeper.Position",
             "members": [
               {

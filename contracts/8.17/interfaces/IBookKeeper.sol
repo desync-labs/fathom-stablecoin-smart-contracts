@@ -34,15 +34,6 @@ interface IBookKeeper {
     int256 debtShare
   ) external;
 
-  function adjustPosition2(
-    bytes32 collateralPoolId,
-    address positionAddress,
-    address collateralOwner,
-    address stablecoinOwner,
-    int256 collateralValue,
-    int256 debtShare
-  ) external;
-
   function stablecoin(address ownerAddress) external view returns (uint256);
 
   function positions(bytes32 collateralPoolId, address positionAddress)

@@ -138,14 +138,6 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
     bytes calldata data
   ) external override nonReentrant {}
 
-  function onAdjustPosition2(
-    address src,
-    address dst,
-    int256 collateralValue,
-    int256 debtShare,
-    bytes calldata data
-  ) external override nonReentrant {}
-
   function onMoveCollateral(
     address src,
     address dst,

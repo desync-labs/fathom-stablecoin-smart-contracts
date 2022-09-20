@@ -61,8 +61,7 @@ contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, R
   /// @dev Mapping of user => rewardDebts
   mapping(address => uint256) public rewardDebts;
   /// @dev Mapping of user => collteralTokens that he is staking
-  /// 2022 Aug 8th 5:22 Pm so Staking in Lending protocol? or in terms of
-  /// deposited collateral asset?
+
   mapping(address => uint256) public stake;
 
   uint256 internal to18ConversionFactor;
@@ -463,18 +462,6 @@ contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, R
     int256, /* debtShare */
     bytes calldata _data
   ) external override nonReentrant whenNotPaused {
-    uint256 _unsignedCollateralValue = _collateralValue < 0 ? uint256(-_collateralValue) : uint256(_collateralValue);
-    _moveStake(_source, _destination, _unsignedCollateralValue, _data);
-  }
-
-  function onAdjustPosition2(
-    address _source,
-    address _destination,
-    int256 _collateralValue,
-    int256, /* debtShare */
-    bytes calldata _data
-  ) external override nonReentrant whenNotPaused {
-    revert("here");
     uint256 _unsignedCollateralValue = _collateralValue < 0 ? uint256(-_collateralValue) : uint256(_collateralValue);
     _moveStake(_source, _destination, _unsignedCollateralValue, _data);
   }

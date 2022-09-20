@@ -294,8 +294,7 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
     _adapter.onMoveCollateral(_positionAddress, address(this), info.collateralAmountToBeLiquidated, abi.encode(0));
 
     // 5. Give the collateral to the collateralRecipient
-    //2022 Aug 8th 5:11 PM, trying to track where ibToken(collateral) is
-    //going to. It should go to Bob's address but I don't see it yet.
+
     bookKeeper.moveCollateral(
       _collateralPoolId,
       address(this),

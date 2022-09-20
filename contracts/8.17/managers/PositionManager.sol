@@ -263,34 +263,6 @@ contract PositionManager is PausableUpgradeable, IManager {
     );
   }
 
-  function adjustPosition2(
-    uint256 _positionId,
-    int256 _collateralValue,
-    int256 _debtShare,
-    address _adapter,
-    bytes calldata _data
-  ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
-    address _positionAddress = positions[_positionId];
-    //2022 Sep 21 Wed 12:04 am
-    //breaking right below, for close position
-    IBookKeeper(bookKeeper).adjustPosition2(
-      collateralPools[_positionId],
-      _positionAddress,
-      _positionAddress,
-      _positionAddress,
-      _collateralValue,
-      _debtShare
-    );
-    IGenericTokenAdapter(_adapter).onAdjustPosition(
-      _positionAddress,
-      _positionAddress,
-      _collateralValue,
-      _debtShare,
-      _data
-    );
-  }
-
-
   /// @dev Transfer wad amount of position's collateral from the positionHandler address to a destination address.
   /// @param _positionId The position id to move collateral from
   /// @param _destination The destination to received collateral

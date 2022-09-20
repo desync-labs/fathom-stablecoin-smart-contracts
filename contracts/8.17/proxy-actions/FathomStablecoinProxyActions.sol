@@ -291,17 +291,6 @@ contract FathomStablecoinProxyActions {
     IManager(_manager).adjustPosition(_positionId, _collateralValue, _debtShare, _adapter, _data);
   }
 
-  function adjustPosition2(
-    address _manager,
-    uint256 _positionId,
-    int256 _collateralValue,
-    int256 _debtShare, // [wad]
-    address _adapter,
-    bytes calldata _data
-  ) public {
-    IManager(_manager).adjustPosition2(_positionId, _collateralValue, _debtShare, _adapter, _data);
-  }
-
   function exportPosition(
     address _manager,
     uint256 _positionId,
@@ -1047,9 +1036,8 @@ contract FathomStablecoinProxyActions {
       _data
     );
     uint256 _collateralAmountInWad = convertTo18(_tokenAdapter, _collateralAmount);
-    // Paybacks debt to the position and unlocks token amount from it
-    //2022 Sep 20th Tue, 7:10PM it is breaking here below
-    adjustPosition2(
+
+    adjustPosition(
       _manager,
       _positionId,
       -_safeToInt(_collateralAmountInWad),
