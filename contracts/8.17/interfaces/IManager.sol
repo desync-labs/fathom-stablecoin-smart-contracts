@@ -39,6 +39,14 @@ interface IManager {
     bytes calldata
   ) external;
 
+  function adjustPosition2(
+    uint256,
+    int256,
+    int256,
+    address,
+    bytes calldata
+  ) external;
+
   function moveCollateral(
     uint256,
     address,

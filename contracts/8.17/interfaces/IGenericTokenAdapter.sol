@@ -27,6 +27,14 @@ interface IGenericTokenAdapter {
     bytes calldata data
   ) external;
 
+  function onAdjustPosition2(
+    address src,
+    address dst,
+    int256 collateralValue,
+    int256 debtShare,
+    bytes calldata data
+  ) external;
+
   function onMoveCollateral(
     address src,
     address dst,

@@ -319,7 +319,7 @@ contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, R
     bytes calldata /* _data */
   ) private {
     require(live == 1, "CollateralTokenAdapter/not live");
-    //2022 Aug 8th, 5:15 PM harvesting fathom reward token
+
     _harvest(_positionAddress);
 
     if (_amount > 0) {
@@ -463,6 +463,18 @@ contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, R
     int256, /* debtShare */
     bytes calldata _data
   ) external override nonReentrant whenNotPaused {
+    uint256 _unsignedCollateralValue = _collateralValue < 0 ? uint256(-_collateralValue) : uint256(_collateralValue);
+    _moveStake(_source, _destination, _unsignedCollateralValue, _data);
+  }
+
+  function onAdjustPosition2(
+    address _source,
+    address _destination,
+    int256 _collateralValue,
+    int256, /* debtShare */
+    bytes calldata _data
+  ) external override nonReentrant whenNotPaused {
+    revert("here");
     uint256 _unsignedCollateralValue = _collateralValue < 0 ? uint256(-_collateralValue) : uint256(_collateralValue);
     _moveStake(_source, _destination, _unsignedCollateralValue, _data);
   }

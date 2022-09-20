@@ -111,7 +111,6 @@ async function main() {
         const stablecoinAfterWipe = await fathomStablecoin.balanceOf(address)
         console.log("Stablecoin balance after wipe : " + stablecoinAfterWipe)
     
-    
         const WXDCBalanceOfAfterWipe = await WXDC.balanceOf(address)
         console.log("WXDC balance after wipe : " + WXDCBalanceOfAfterWipe)
     

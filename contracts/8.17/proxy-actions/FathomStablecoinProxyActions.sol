@@ -291,6 +291,17 @@ contract FathomStablecoinProxyActions {
     IManager(_manager).adjustPosition(_positionId, _collateralValue, _debtShare, _adapter, _data);
   }
 
+  function adjustPosition2(
+    address _manager,
+    uint256 _positionId,
+    int256 _collateralValue,
+    int256 _debtShare, // [wad]
+    address _adapter,
+    bytes calldata _data
+  ) public {
+    IManager(_manager).adjustPosition2(_positionId, _collateralValue, _debtShare, _adapter, _data);
+  }
+
   function exportPosition(
     address _manager,
     uint256 _positionId,
@@ -1028,7 +1039,6 @@ contract FathomStablecoinProxyActions {
     address _positionAddress = IManager(_manager).positions(_positionId);
     bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
     (, uint256 _debtShare) = IBookKeeper(_bookKeeper).positions(_collateralPoolId, _positionAddress);
-
     // Deposits Fathom Stablecoin amount into the bookKeeper
     stablecoinAdapterDeposit(
       _stablecoinAdapter,
@@ -1038,7 +1048,8 @@ contract FathomStablecoinProxyActions {
     );
     uint256 _collateralAmountInWad = convertTo18(_tokenAdapter, _collateralAmount);
     // Paybacks debt to the position and unlocks token amount from it
-    adjustPosition(
+    //2022 Sep 20th Tue, 7:10PM it is breaking here below
+    adjustPosition2(
       _manager,
       _positionId,
       -_safeToInt(_collateralAmountInWad),
@@ -1046,6 +1057,7 @@ contract FathomStablecoinProxyActions {
       _tokenAdapter,
       _data
     );
+
     // Moves the amount from the position to proxy's address
     moveCollateral(_manager, _positionId, address(this), _collateralAmountInWad, _tokenAdapter, _data);
     // Withdraws token amount to the user's wallet as a token

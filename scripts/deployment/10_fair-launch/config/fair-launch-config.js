@@ -9,6 +9,10 @@ async function main() {
     const fairLaunch = await FairLaunch.attach(stablecoinAddress.fairLaunch);
 
     await fairLaunch.addPool(0, stablecoinAddress.WXDC, true);
+
+    console.log(">> Initializing fairLaunch with USDT");
+
+    await fairLaunch.addPool(1, stablecoinAddress.USDT, true);
     await fairLaunch.transferOwnership(stablecoinAddress.shield);
 }
 

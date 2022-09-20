@@ -68,7 +68,7 @@ async function main() {
     //Approve
     await WXDCAsAlice.approve(proxyWalletAlice, WeiPerWad.mul(10000));
 
-    // 2. Open a position as Alice, and open a position as Bob
+    // 2. Open a position as Alice twice
     const alicePositionAddress1 = await openPosition(AliceAddress, proxyWalletAlice, proxyWalletAsAlice, "Alice");
     console.log("Position1 opened for Alice");
     const bobPositionAddress = "0x00"
@@ -86,13 +86,14 @@ async function main() {
     /// functions
     async function openPosition(address, proxyWallet, proxyWalletAs, username) {
         positionCounter++;
+        console.log("positionNumber is " + positionCounter);
         // https://github.com/ethers-io/ethers.js/issues/478
         let openLockTokenAndDrawAbi = [
             "function openLockTokenAndDraw(address _manager, address _stabilityFeeCollector, address _tokenAdapter, address _stablecoinAdapter, bytes32 _collateralPoolId, uint256 _collateralAmount, uint256 _stablecoinAmount, bool _transferFrom, bytes calldata _data)"
         ];
         let openLockTokenAndDrawIFace = new hre.ethers.utils.Interface(openLockTokenAndDrawAbi);
         const encodedResult = hre.ethers.utils.defaultAbiCoder.encode(["address"], [address]);
-        console.log(encodedResult);
+        // console.log(encodedResult);
         let openPositionCall = openLockTokenAndDrawIFace.encodeFunctionData("openLockTokenAndDraw", [
             stablecoinAddress.positionManager,
             stablecoinAddress.stabilityFeeCollector,
@@ -104,7 +105,6 @@ async function main() {
             true,
             encodedResult,
         ]);
-
         const positionId = await proxyWalletAs.execute2(stablecoinAddress.fathomStablecoinProxyActions, openPositionCall);
         const positionAddress = await positionManager.positions(positionCounter)
         // const result = await bookKeeper.stablecoin();
