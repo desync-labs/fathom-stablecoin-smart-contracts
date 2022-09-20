@@ -50,8 +50,7 @@ deploy:
 	npx hardhat run --network ganache scripts/deployment/24_stable-swap-module/config/set-fee-in.js
 	npx hardhat run --network ganache scripts/deployment/24_stable-swap-module/config/set-fee-out.js
 	npx hardhat run --network ganache scripts/deployment/2_book-keeper/config/whitelist-collateral-token-adapter.js
-
-		# npx hardhat run --network ganache scripts/deployment/10_fair-launch/config/fair-launch-config-USDT.js
+	# npx hardhat run --network ganache scripts/deployment/10_fair-launch/config/fair-launch-config-USDT.js
 
 	npx hardhat run --network ganache scripts/deployment/14_collateral-token-adapter/deploy/collateral-token-adapter-USDT.js
 	npx hardhat run --network ganache scripts/deployment/2_book-keeper/config/whitelist-collateral-token-adapter-USDT.js
@@ -60,16 +59,7 @@ deploy:
 	npx hardhat run --network ganache scripts/deployment/1_collateral-pool-config/config/collateral-pool-config-USDT.js
 
 	npx hardhat run --network ganache scripts/deployment/9_fathom-token/config/fathom-token-ownership.js
-
-zero:
-	npx hardhat run --network ganache scripts/scenarios/a_liquidationScenario/0_deployment.js
-
-
-
-
-
-
-
-
-
 	
+	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/2_makeWallet.js
+	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/3_openPosition.js
+	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/4_closePosition.js

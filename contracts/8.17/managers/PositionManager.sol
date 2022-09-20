@@ -271,8 +271,9 @@ contract PositionManager is PausableUpgradeable, IManager {
     bytes calldata _data
   ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
     address _positionAddress = positions[_positionId];
-
-    IBookKeeper(bookKeeper).adjustPosition(
+    //2022 Sep 21 Wed 12:04 am
+    //breaking right below, for close position
+    IBookKeeper(bookKeeper).adjustPosition2(
       collateralPools[_positionId],
       _positionAddress,
       _positionAddress,
@@ -280,10 +281,7 @@ contract PositionManager is PausableUpgradeable, IManager {
       _collateralValue,
       _debtShare
     );
-    //2022 Sep 20 Tue 7:21 PM
-    //breaking right below, for close position
-    revert("here");
-    IGenericTokenAdapter(_adapter).onAdjustPosition2(
+    IGenericTokenAdapter(_adapter).onAdjustPosition(
       _positionAddress,
       _positionAddress,
       _collateralValue,

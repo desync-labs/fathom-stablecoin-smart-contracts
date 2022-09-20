@@ -159,33 +159,73 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
 
   // --- Math ---
   function add(uint256 x, int256 y) internal pure returns (uint256 z) {
-    z = x + uint256(y);
+    // z = x + uint256(y);
+    //2022 21 Sep 12:28 am
+    //close position breaking below.
+    //12:37 am, maybe I comment requires below, since it is 0.8.17 anyway,
+    //but the question remains, when x + y but y is explicited converted from int to uint
+    //would normal arithmatic still work?
+    //12:42 am, need to check how explicit conversion is working in 0.6.xx and 0.8.xx
+    // require(y >= 0 || z <= x);
+    // require(y <= 0 || z >= x);
+
+    //12:47 added
+    //12:53 arithematic works.
+    //these whole arithmatic functiosn were used to do overflow/underflow check
+    //but since 0.8.xx was already doing the overflow/underflow itself,
+    //alpaca's arithmatic did not really work.
+    // in order to make sure that arithematics all behave as 0.6.x,
+    //had to put calculation inside unchecked
+    unchecked{
+      z = x + uint256(y);
+    }
     require(y >= 0 || z <= x);
     require(y <= 0 || z >= x);
   }
 
   function sub(uint256 x, int256 y) internal pure returns (uint256 z) {
+    // z = x - uint256(y);
+    // require(y <= 0 || z <= x);
+    // require(y >= 0 || z >= x);
+
+    //12:49 added
+    unchecked{
     z = x - uint256(y);
+    }
     require(y <= 0 || z <= x);
     require(y >= 0 || z >= x);
   }
 
   function mul(uint256 x, int256 y) internal pure returns (int256 z) {
-    z = int256(x) * y;
+    // z = int256(x) * y;
+    // require(int256(x) >= 0);
+    // require(y == 0 || z / y == int256(x));
+
+    unchecked{
+      z = int256(x) * y;
+    }
     require(int256(x) >= 0);
     require(y == 0 || z / y == int256(x));
+
   }
 
   function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
-    require((z = x + y) >= x);
+    // require((z = x + y) >= x);
+
+    //added 2022 Sep 21 12:45 am
+    z = x + y;
   }
 
   function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
-    require((z = x - y) <= x);
+    // require((z = x - y) <= x);
+    //added 2022 Sep 21 12:45 am
+    z = x - y;
   }
 
   function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
-    require(y == 0 || (z = x * y) / y == x);
+    // require(y == 0 || (z = x * y) / y == x);
+        //added 2022 Sep 21 12:45 am
+    z = x * y;
   }
 
   // --- Administration ---
@@ -337,6 +377,92 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     // collateralPool has been initialised
     require(_vars.debtAccumulatedRate != 0, "BookKeeper/collateralPool-not-init");
     position.lockedCollateral = add(position.lockedCollateral, _collateralValue);
+    position.debtShare = add(position.debtShare, _debtShare);
+    _vars.totalDebtShare = add(_vars.totalDebtShare, _debtShare);
+    ICollateralPoolConfig(collateralPoolConfig).setTotalDebtShare(_collateralPoolId, _vars.totalDebtShare);
+
+    int256 _debtValue = mul(_vars.debtAccumulatedRate, _debtShare);
+    uint256 _positionDebtValue = mul(_vars.debtAccumulatedRate, position.debtShare);
+    totalStablecoinIssued = add(totalStablecoinIssued, _debtValue);
+
+    // either debt has decreased, or debt ceilings are not exceeded
+    require(
+      either(
+        _debtShare <= 0,
+        both(
+          mul(_vars.totalDebtShare, _vars.debtAccumulatedRate) <= _vars.debtCeiling,
+          totalStablecoinIssued <= totalDebtCeiling
+        )
+      ),
+      "BookKeeper/ceiling-exceeded"
+    );
+    // position is either less risky than before, or it is safe :: check work factor
+    require(
+      either(
+        both(_debtShare <= 0, _collateralValue >= 0),
+        _positionDebtValue <= mul(position.lockedCollateral, _vars.priceWithSafetyMargin)
+      ),
+      "BookKeeper/not-safe"
+    );
+
+    // position is either more safe, or the owner consents
+    require(
+      either(both(_debtShare <= 0, _collateralValue >= 0), wish(_positionAddress, msg.sender)),
+      "BookKeeper/not-allowed-position-address"
+    );
+    // collateral src consents
+    require(
+      either(_collateralValue <= 0, wish(_collateralOwner, msg.sender)),
+      "BookKeeper/not-allowed-collateral-owner"
+    );
+    // debt dst consents
+    require(either(_debtShare >= 0, wish(_stablecoinOwner, msg.sender)), "BookKeeper/not-allowed-stablecoin-owner");
+
+    // position has no debt, or a non-debtFloory amount
+    require(either(position.debtShare == 0, _positionDebtValue >= _vars.debtFloor), "BookKeeper/debt-floor");
+    collateralToken[_collateralPoolId][_collateralOwner] = sub(
+      collateralToken[_collateralPoolId][_collateralOwner],
+      _collateralValue
+    );
+    stablecoin[_stablecoinOwner] = add(stablecoin[_stablecoinOwner], _debtValue);
+
+    positions[_collateralPoolId][_positionAddress] = position;
+
+    emit LogAdjustPosition(
+      msg.sender,
+      _collateralPoolId,
+      _positionAddress,
+      position.lockedCollateral,
+      position.debtShare,
+      _collateralValue,
+      _debtShare
+    );
+  }
+
+  function adjustPosition2(
+    bytes32 _collateralPoolId,
+    address _positionAddress,
+    address _collateralOwner,
+    address _stablecoinOwner,
+    int256 _collateralValue, // <- negative value when closing position
+    int256 _debtShare // <- negative value when closing position
+  ) external override nonReentrant whenNotPaused onlyPositionManager {
+    // system is live
+
+    require(live == 1, "BookKeeper/not-live");
+
+    Position memory position = positions[_collateralPoolId][_positionAddress];
+
+    ICollateralPoolConfig.CollateralPoolInfo memory _vars = ICollateralPoolConfig(collateralPoolConfig)
+      .getCollateralPoolInfo(_collateralPoolId);
+
+    // collateralPool has been initialised
+    require(_vars.debtAccumulatedRate != 0, "BookKeeper/collateralPool-not-init");
+    //2022 Sep 21 Wed 12:23 am
+    //Arithmatic breaking below.
+    //we may need to return to 0.6.xx
+    position.lockedCollateral = add(position.lockedCollateral, _collateralValue);
+ 
     position.debtShare = add(position.debtShare, _debtShare);
     _vars.totalDebtShare = add(_vars.totalDebtShare, _debtShare);
     ICollateralPoolConfig(collateralPoolConfig).setTotalDebtShare(_collateralPoolId, _vars.totalDebtShare);
