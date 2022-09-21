@@ -63,3 +63,4 @@ deploy:
 	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/2_makeWallet.js
 	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/3_openPosition.js
 	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/4_closePosition.js
+	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/5_liquidation.js
