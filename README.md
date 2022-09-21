@@ -110,7 +110,7 @@ Stablecoin surplus can be withdrawn after systemDebt is settled(systemDebt === 0
 
 ## 16 scenarios and more to come
 
-Contrary to Alpaca's test scripts, that test smart contracts within simplified environment, Fathom stablecoin team strived to test the codebase with realistic scenarios. Scenarios cover; Position manipulation, liquidation, system surplus/debt management, pegging mechanism testing, DEX as price feed. 16 Scenarios cover core functionalities of CDP based smart contract, however, due to stablecoin's complexity there are more topics of research available.
+Contrary to Fathom's test scripts, that test smart contracts within simplified environment, Fathom stablecoin team strived to test the codebase with realistic scenarios. Scenarios cover; Position manipulation, liquidation, system surplus/debt management, pegging mechanism testing, DEX as price feed. 16 Scenarios cover core functionalities of CDP based smart contract, however, due to stablecoin's complexity there are more topics of research available.
 
 ## Scenarios in detail
 
@@ -211,7 +211,7 @@ With safetyBufferCalculation model, it is possible to calculate health of positi
 
 ## liquidation formula
 
-Alpaca's Fixed spread liquidation can be summarized to a simple formula below.
+Fathom's Fixed spread liquidation can be summarized to a simple formula below.
 
 ![](https://i.imgur.com/YXzhzKQ.png)
 

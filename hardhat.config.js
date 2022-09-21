@@ -1,4 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
+require("@nomiclabs/hardhat-waffle");
+require('@openzeppelin/hardhat-upgrades');
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -12,7 +14,7 @@ module.exports = {
   solidity: {
     compilers: [
       {
-        version: "0.6.12",
+        version: "0.8.17",
         settings: {
           optimizer: {
             enabled: true,
@@ -21,7 +23,7 @@ module.exports = {
         },
       },
       {
-        version: "0.5.12",
+        version: "0.8.0",
         settings: {
           optimizer: {
             enabled: true,
@@ -29,6 +31,9 @@ module.exports = {
           }
         },
       },
-    ],
+    ]
   },
+  paths: {
+    tests: "./test",
+  }
 }
