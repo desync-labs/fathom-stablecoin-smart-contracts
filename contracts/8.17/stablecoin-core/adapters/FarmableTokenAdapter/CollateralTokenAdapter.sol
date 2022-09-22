@@ -472,8 +472,6 @@ contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, R
     uint256 _share,
     bytes calldata _data
   ) external override nonReentrant whenNotPaused {
-    //2022 Aug 8th Mon 5:18 PM
-    //oh, the deposit function below has 0 value;
     _deposit(_source, 0, _data);
     _moveStake(_source, _destination, _share, _data);
   }

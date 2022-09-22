@@ -6,7 +6,7 @@ const rawdata = fs.readFileSync('./addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 async function main() {
   const NAME = "Fathom USD"
-  const SYMBOL = "AUSD"
+  const SYMBOL = "USXD"
 
   console.log(">> Deploying an upgradable FathomStablecoin contract")
   const FathomStablecoin = (await ethers.getContractFactory(

@@ -1,5 +1,3 @@
-# make deploy  <- deploy stablecoin having simplePriceFeed.
-
 deploy:
 	npx hardhat run --network ganache scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
 	npx hardhat run --network ganache scripts/deployment/1_collateral-pool-config/deploy/collateral-pool-config.js
@@ -64,3 +62,5 @@ deploy:
 	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/3_openPosition.js
 	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/4_closePosition.js
 	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/5_liquidation.js
+
+	npx hardhat run --network ganache scripts/PrepSepDemo/stableSwap/1_mintUSDTtoDeployer.js
