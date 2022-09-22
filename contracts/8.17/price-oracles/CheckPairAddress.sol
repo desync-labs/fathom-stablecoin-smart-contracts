@@ -6,9 +6,9 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 import "./lib/FathomSwapLibrary.sol";
-import "../interfaces/IFathomDEXOracle.sol";
+import "../interfaces/IFathomDEXPair.sol";
 
-contract DexPriceOracle is Initializable, IFathomDEXOracle {
+contract CheckPairAddress is Initializable, IFathomDEXPair {
   using SafeMathUpgradeable for uint256;
   address public dexFactory;
 
@@ -18,10 +18,8 @@ contract DexPriceOracle is Initializable, IFathomDEXOracle {
 
   /// @dev Return the wad price of token0/token1, multiplied by 1e18
   /// NOTE: (if you have 1 token0 how much you can sell it for token1)
-  function getPrice(address token0, address token1) external view override returns (uint256, uint256) {
-    if (token0 == token1) return (1e18, uint64(block.timestamp));
-    (uint256 r0, uint256 r1) = FathomSwapLibrary.getReserves(dexFactory, token0, token1);
-    uint256 price = r0.mul(1e18).div(r1);
-    return (price, uint64(block.timestamp));
+  function getPair(address token0, address token1) external view override returns (address) {
+    address pair = FathomSwapLibrary.pairFor(dexFactory, token0, token1);
+    return pair;
   }
 }

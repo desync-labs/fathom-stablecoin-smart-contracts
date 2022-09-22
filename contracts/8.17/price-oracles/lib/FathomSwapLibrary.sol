@@ -20,10 +20,32 @@ library FathomSwapLibrary{
   }
 
   // fetches and sorts the reserves for a pair
-  function getReserves(address factory, address tokenA, address tokenB) internal returns (uint reserveA, uint reserveB) {
+  // function getReserves(address factory, address tokenA, address tokenB) internal returns (uint reserveA, uint reserveB) {
+  //   (address token0,) = sortTokens(tokenA, tokenB);
+  //   address pair = pairFor(factory, tokenA, tokenB);
+  //   pairFor(factory, tokenA, tokenB);
+  //   (uint reserve0, uint reserve1,) = IFathomSwapPair(pair).getReserves();
+  //   (reserveA, reserveB) = tokenA == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
+
+  //   // (bool success, bytes memory data) = pair.call(
+  //   //         abi.encodeWithSignature("getReserves()")
+  //   //   );   
+  //   // require(success, "getReserves call failed");
+  //   // uint256 reserve0;
+  //   // uint256 reserve1;
+  //   // assembly {
+  //   //   let fmp := mload(0x40)
+  //   //   mstore(fmp, data)
+  //   //   reserve1 := mload(sub(fmp, 0x40))
+  //   //   reserve0 := mload(sub(fmp, 0x60))
+  //   // }
+  //   // (reserveA, reserveB) = tokenA == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
+  //   // return (reserveA, reserveB);
+  // }
+  function getReserves(address factory, address tokenA, address tokenB) internal view returns (uint reserveA, uint reserveB) {
     (address token0,) = sortTokens(tokenA, tokenB);
-    pairFor(factory, tokenA, tokenB);
-    (bool success, bytes memory data) = factory.call(
+    address pair = pairFor(factory, tokenA, tokenB);
+    (bool success, bytes memory data) = pair.staticcall(
             abi.encodeWithSignature("getReserves()")
       );   
     require(success, "getReserves call failed");
@@ -36,5 +58,6 @@ library FathomSwapLibrary{
       reserve0 := mload(sub(fmp, 0x60))
     }
     (reserveA, reserveB) = tokenA == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
+    return (reserveA, reserveB);
   }
 }
