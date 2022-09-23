@@ -105,23 +105,23 @@ describe("BookKeeper", () => {
 
       context("when collateral to add is negative", () => {
         // test is disabled due to broken negative nubmer support
-        xit("should be able to call addCollateral", async () => {
+        it("should be able to call addCollateral", async () => {
           mockedAccessControlConfig.hasRole.returns(true)
 
           // init BNB collateral pool
           mockedCollateralPoolConfig.getStabilityFeeRate.returns(WeiPerRay)
 
           // add collateral 1 BNB
-          await bookKeeper.addCollateral(formatBytes32String("BNB"), deployerAddress, WeiPerWad+1)
+          await bookKeeper.addCollateral(formatBytes32String("BNB"), deployerAddress, WeiPerWad)
 
           const collateralTokenBefore = await bookKeeper.collateralToken(formatBytes32String("BNB"), deployerAddress)
-          expect(collateralTokenBefore).to.be.equal(WeiPerWad+1)
+          expect(collateralTokenBefore).to.be.equal(WeiPerWad)
 
           // add collateral -1 BNB
           await bookKeeper.addCollateral(formatBytes32String("BNB"), deployerAddress, WeiPerWad.mul(-1))
 
           const collateralTokenAfter = await bookKeeper.collateralToken(formatBytes32String("BNB"), deployerAddress)
-          expect(collateralTokenAfter).to.be.equal()
+          expect(collateralTokenAfter).to.be.equal(0)
         })
       })
     })
@@ -478,7 +478,7 @@ describe("BookKeeper", () => {
           })
           context("when alice has enough lock collateral in position", () => {
             // test is disabled due to broken negative nubmer support
-            xit("should be able to call adjustPosition(free)", async () => {
+            it("should be able to call adjustPosition(free)", async () => {
               mockedAccessControlConfig.hasRole.returns(true)
 
               mockedCollateralPoolConfig.getDebtAccumulatedRate.returns(WeiPerRay)
@@ -556,7 +556,7 @@ describe("BookKeeper", () => {
           })
           context("when alice has enough lock collateral in position", () => {
             // test is disabled due to broken negative nubmer support
-            xit("should be able to call adjustPosition(free)", async () => {
+            it("should be able to call adjustPosition(free)", async () => {
               mockedAccessControlConfig.hasRole.returns(true)
 
               mockedCollateralPoolConfig.getDebtAccumulatedRate.returns(WeiPerRay)
@@ -757,9 +757,10 @@ describe("BookKeeper", () => {
             })
 
             context("when bob allow alice to manage position", () => {
-              xit("should be able to call adjustPosition(draw)", async () => {
+              it("should be able to call adjustPosition(draw)", async () => {
                 mockedAccessControlConfig.hasRole.returns(true)
 
+                mockedCollateralPoolConfig.setTotalDebtShare.reset()
                 mockedCollateralPoolConfig.getDebtAccumulatedRate.returns(WeiPerRay)
                 mockedCollateralPoolConfig.getTotalDebtShare.returns(0)
                 mockedCollateralPoolConfig.getDebtFloor.returns(0)
@@ -812,7 +813,7 @@ describe("BookKeeper", () => {
                   WeiPerWad.mul(10)
                 );
 
-                expect(mockedCollateralPoolConfig.setTotalDebtShare).to.be.calledOnceWith(formatBytes32String("BNB"), 10);
+                expect(mockedCollateralPoolConfig.setTotalDebtShare).to.be.calledWith(formatBytes32String("BNB"), WeiPerWad.mul(10));
 
                 const positionBobAfter = await bookKeeper.positions(formatBytes32String("BNB"), bobAddress)
                 expect(positionBobAfter.debtShare).to.be.equal(WeiPerWad.mul(10))
@@ -823,9 +824,10 @@ describe("BookKeeper", () => {
             })
           })
           context("when alice call and alice is position owner", () => {
-            xit("should be able to call adjustPosition(draw)", async () => {
+            it("should be able to call adjustPosition(draw)", async () => {
               mockedAccessControlConfig.hasRole.returns(true)
 
+              mockedCollateralPoolConfig.setTotalDebtShare.reset()
               mockedCollateralPoolConfig.getDebtAccumulatedRate.returns(WeiPerRay)
               mockedCollateralPoolConfig.getTotalDebtShare.returns(0)
               mockedCollateralPoolConfig.getDebtFloor.returns(0)
@@ -931,7 +933,7 @@ describe("BookKeeper", () => {
           context("when call adjustPosition(wipe)", () => {
             context("when alice call and alice is position owner", () => {
               // test is disabled due to broken negative nubmer support
-              xit("should be able to call adjustPosition(wipe)", async () => {
+              it("should be able to call adjustPosition(wipe)", async () => {
                 mockedCollateralPoolConfig.getDebtAccumulatedRate.returns(WeiPerRay)
                 mockedCollateralPoolConfig.getTotalDebtShare.returns(0)
                 mockedCollateralPoolConfig.getDebtFloor.returns(WeiPerRad.mul(1))
@@ -1002,7 +1004,7 @@ describe("BookKeeper", () => {
               })
             })
             context("when position debt value < debt floor", () => {
-              xit("should be revert", async () => {
+              it("should be revert", async () => {
                 mockedCollateralPoolConfig.getDebtAccumulatedRate.returns(WeiPerRay)
                 mockedCollateralPoolConfig.getTotalDebtShare.returns(0)
                 mockedCollateralPoolConfig.getDebtFloor.returns(WeiPerRad.mul(5))
@@ -1383,7 +1385,7 @@ describe("BookKeeper", () => {
       context("when start liquidation", () => {
         context("when liquidating all in position", () => {
           // test is disabled due to broken negative nubmer support
-          xit("should be able to call confiscatePosition", async () => {
+          it("should be able to call confiscatePosition", async () => {
             mockedCollateralPoolConfig.getDebtAccumulatedRate.returns(WeiPerRay)
             mockedCollateralPoolConfig.getTotalDebtShare.returns(0)
             mockedCollateralPoolConfig.getDebtFloor.returns(WeiPerRad.mul(1))
@@ -1460,7 +1462,7 @@ describe("BookKeeper", () => {
         })
         context("when liquidating some in position", () => {
           // test is disabled due to broken negative nubmer support
-          xit("should be able to call confiscatePosition", async () => {
+          it("should be able to call confiscatePosition", async () => {
             mockedCollateralPoolConfig.getDebtAccumulatedRate.returns(WeiPerRay)
             mockedCollateralPoolConfig.getTotalDebtShare.returns(0)
             mockedCollateralPoolConfig.getDebtFloor.returns(WeiPerRad.mul(1))

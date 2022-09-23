@@ -32,7 +32,7 @@ const loadFixtureHandler = async () => {
   const accessControlConfig = (await upgrades.deployProxy(AccessControlConfig, []))
 
   const mockedSimplePriceFeed = await smock.fake("SimplePriceFeed");
-  const mockedIbTokenAdapter = await smock.fake("IbTokenAdapter");
+  const mockedCollateralTokenAdapter = await smock.fake("CollateralTokenAdapter");
 
   // Deploy mocked FlashMintModule
   const CollateralPoolConfig = (await ethers.getContractFactory(
@@ -47,7 +47,7 @@ const loadFixtureHandler = async () => {
     collateralPoolConfig,
     accessControlConfig,
     mockedSimplePriceFeed,
-    mockedIbTokenAdapter,
+    mockedCollateralTokenAdapter,
   }
 }
 
@@ -62,14 +62,14 @@ describe("CollateralPoolConfig", () => {
 
   // Contracts
   let mockedSimplePriceFeed
-  let mockedIbTokenAdapter
+  let mockedCollateralTokenAdapter
   let accessControlConfig
 
   let collateralPoolConfig
   let collateralPoolConfigAsAlice
 
   beforeEach(async () => {
-    ;({ collateralPoolConfig, accessControlConfig, mockedSimplePriceFeed, mockedIbTokenAdapter } =
+    ;({ collateralPoolConfig, accessControlConfig, mockedSimplePriceFeed, mockedCollateralTokenAdapter } =
       await waffle.loadFixture(loadFixtureHandler))
     ;[deployer, alice] = await ethers.getSigners()
     ;[deployerAddress, aliceAddress] = await Promise.all([deployer.getAddress(), alice.getAddress()])
@@ -87,7 +87,7 @@ describe("CollateralPoolConfig", () => {
             mockedSimplePriceFeed.address,
             WeiPerRay,
             WeiPerRay,
-            mockedIbTokenAdapter.address,
+            mockedCollateralTokenAdapter.address,
             CLOSE_FACTOR_BPS,
             LIQUIDATOR_INCENTIVE_BPS,
             TREASURY_FEE_BPS,
@@ -105,7 +105,7 @@ describe("CollateralPoolConfig", () => {
           mockedSimplePriceFeed.address,
           WeiPerRay,
           WeiPerRay,
-          mockedIbTokenAdapter.address,
+          mockedCollateralTokenAdapter.address,
           CLOSE_FACTOR_BPS,
           LIQUIDATOR_INCENTIVE_BPS,
           TREASURY_FEE_BPS,
@@ -119,7 +119,7 @@ describe("CollateralPoolConfig", () => {
             mockedSimplePriceFeed.address,
             WeiPerRay,
             WeiPerRay,
-            mockedIbTokenAdapter.address,
+            mockedCollateralTokenAdapter.address,
             CLOSE_FACTOR_BPS,
             LIQUIDATOR_INCENTIVE_BPS,
             TREASURY_FEE_BPS,
@@ -138,7 +138,7 @@ describe("CollateralPoolConfig", () => {
             mockedSimplePriceFeed.address,
             WeiPerRay,
             WeiPerWad,
-            mockedIbTokenAdapter.address,
+            mockedCollateralTokenAdapter.address,
             CLOSE_FACTOR_BPS,
             LIQUIDATOR_INCENTIVE_BPS,
             TREASURY_FEE_BPS,
@@ -156,14 +156,14 @@ describe("CollateralPoolConfig", () => {
           mockedSimplePriceFeed.address,
           WeiPerRay,
           WeiPerRay,
-          mockedIbTokenAdapter.address,
+          mockedCollateralTokenAdapter.address,
           CLOSE_FACTOR_BPS,
           LIQUIDATOR_INCENTIVE_BPS,
           TREASURY_FEE_BPS,
           AddressZero
         )
         expect(await (await collateralPoolConfig.collateralPools(COLLATERAL_POOL_ID)).adapter).to.be.equal(
-          mockedIbTokenAdapter.address
+          mockedCollateralTokenAdapter.address
         )
       })
     })
@@ -299,15 +299,15 @@ describe("CollateralPoolConfig", () => {
     context("when the caller is not the owner", () => {
       it("should be revert", async () => {
         await expect(
-          collateralPoolConfigAsAlice.setAdapter(COLLATERAL_POOL_ID, mockedIbTokenAdapter.address)
+          collateralPoolConfigAsAlice.setAdapter(COLLATERAL_POOL_ID, mockedCollateralTokenAdapter.address)
         ).to.be.revertedWith("!ownerRole")
       })
     })
     context("when parameters are valid", () => {
       it("should success", async () => {
-        await expect(collateralPoolConfig.setAdapter(COLLATERAL_POOL_ID, mockedIbTokenAdapter.address))
+        await expect(collateralPoolConfig.setAdapter(COLLATERAL_POOL_ID, mockedCollateralTokenAdapter.address))
           .to.be.emit(collateralPoolConfig, "LogSetAdapter")
-          .withArgs(deployerAddress, COLLATERAL_POOL_ID, mockedIbTokenAdapter.address)
+          .withArgs(deployerAddress, COLLATERAL_POOL_ID, mockedCollateralTokenAdapter.address)
       })
     })
   })
@@ -550,9 +550,9 @@ describe("CollateralPoolConfig", () => {
   describe("#getAdapter", () => {
     context("when parameters are valid", () => {
       it("should success", async () => {
-        await collateralPoolConfig.setAdapter(COLLATERAL_POOL_ID, mockedIbTokenAdapter.address)
+        await collateralPoolConfig.setAdapter(COLLATERAL_POOL_ID, mockedCollateralTokenAdapter.address)
 
-        expect(await collateralPoolConfig.getAdapter(COLLATERAL_POOL_ID)).to.be.equal(mockedIbTokenAdapter.address)
+        expect(await collateralPoolConfig.getAdapter(COLLATERAL_POOL_ID)).to.be.equal(mockedCollateralTokenAdapter.address)
       })
     })
   })

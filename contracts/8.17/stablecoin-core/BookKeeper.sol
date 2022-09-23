@@ -159,33 +159,73 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
 
   // --- Math ---
   function add(uint256 x, int256 y) internal pure returns (uint256 z) {
-    z = x + uint256(y);
+    // z = x + uint256(y);
+    //2022 21 Sep 12:28 am
+    //close position breaking below.
+    //12:37 am, maybe I comment requires below, since it is 0.8.17 anyway,
+    //but the question remains, when x + y but y is explicited converted from int to uint
+    //would normal arithmatic still work?
+    //12:42 am, need to check how explicit conversion is working in 0.6.xx and 0.8.xx
+    // require(y >= 0 || z <= x);
+    // require(y <= 0 || z >= x);
+
+    //12:47 added
+    //12:53 arithematic works.
+    //these whole arithmatic functiosn were used to do overflow/underflow check
+    //but since 0.8.xx was already doing the overflow/underflow itself,
+    //alpaca's arithmatic did not really work.
+    // in order to make sure that arithematics all behave as 0.6.x,
+    //had to put calculation inside unchecked
+    unchecked{
+      z = x + uint256(y);
+    }
     require(y >= 0 || z <= x);
     require(y <= 0 || z >= x);
   }
 
   function sub(uint256 x, int256 y) internal pure returns (uint256 z) {
+    // z = x - uint256(y);
+    // require(y <= 0 || z <= x);
+    // require(y >= 0 || z >= x);
+
+    //12:49 added
+    unchecked{
     z = x - uint256(y);
+    }
     require(y <= 0 || z <= x);
     require(y >= 0 || z >= x);
   }
 
   function mul(uint256 x, int256 y) internal pure returns (int256 z) {
-    z = int256(x) * y;
+    // z = int256(x) * y;
+    // require(int256(x) >= 0);
+    // require(y == 0 || z / y == int256(x));
+
+    unchecked{
+      z = int256(x) * y;
+    }
     require(int256(x) >= 0);
     require(y == 0 || z / y == int256(x));
+
   }
 
   function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
-    require((z = x + y) >= x);
+    // require((z = x + y) >= x);
+
+    //added 2022 Sep 21 12:45 am
+    z = x + y;
   }
 
   function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
-    require((z = x - y) <= x);
+    // require((z = x - y) <= x);
+    //added 2022 Sep 21 12:45 am
+    z = x - y;
   }
 
   function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
-    require(y == 0 || (z = x * y) / y == x);
+    // require(y == 0 || (z = x * y) / y == x);
+        //added 2022 Sep 21 12:45 am
+    z = x * y;
   }
 
   // --- Administration ---

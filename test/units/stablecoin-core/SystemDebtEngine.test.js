@@ -16,7 +16,7 @@ const loadFixtureHandler = async () => {
   const mockedAccessControlConfig = await smock.fake("AccessControlConfig");
   const mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
   const mockedBookKeeper = await smock.fake("BookKeeper");
-  const mockedIbTokenAdapter = await smock.fake("IbTokenAdapter");
+  const mockedCollateralTokenAdapter = await smock.fake("CollateralTokenAdapter");
 
   const SystemDebtEngine = (await ethers.getContractFactory("SystemDebtEngine", deployer))
   const systemDebtEngine = (await upgrades.deployProxy(SystemDebtEngine, [
@@ -25,7 +25,7 @@ const loadFixtureHandler = async () => {
   return {
     systemDebtEngine,
     mockedBookKeeper,
-    mockedIbTokenAdapter,
+    mockedCollateralTokenAdapter,
     mockedAccessControlConfig,
     mockedCollateralPoolConfig,
   }
@@ -42,7 +42,7 @@ describe("SystemDebtEngine", () => {
 
   // Contracts
   let mockedBookKeeper
-  let mockedIbTokenAdapter
+  let mockedCollateralTokenAdapter
   let mockedAccessControlConfig
   let mockedCollateralPoolConfig
 
@@ -53,7 +53,7 @@ describe("SystemDebtEngine", () => {
     ;({
       systemDebtEngine,
       mockedBookKeeper,
-      mockedIbTokenAdapter,
+      mockedCollateralTokenAdapter,
       mockedAccessControlConfig,
       mockedCollateralPoolConfig,
     } = await waffle.loadFixture(loadFixtureHandler))
@@ -317,7 +317,7 @@ describe("SystemDebtEngine", () => {
         await expect(
           systemDebtEngineAsAlice.withdrawCollateralSurplus(
             formatBytes32String("BNB"),
-            mockedIbTokenAdapter.address,
+            mockedCollateralTokenAdapter.address,
             deployerAddress,
             UnitHelpers.WeiPerWad
           )
@@ -334,13 +334,13 @@ describe("SystemDebtEngine", () => {
 
         await systemDebtEngine.withdrawCollateralSurplus(
           formatBytes32String("BNB"),
-          mockedIbTokenAdapter.address,
+          mockedCollateralTokenAdapter.address,
           deployerAddress,
           UnitHelpers.WeiPerWad
         )
 
         expect(mockedBookKeeper.moveCollateral).to.be.calledOnceWith(formatBytes32String("BNB"), systemDebtEngine.address, deployerAddress, UnitHelpers.WeiPerWad)
-        expect(mockedIbTokenAdapter.onMoveCollateral).to.be.calledOnceWith(
+        expect(mockedCollateralTokenAdapter.onMoveCollateral).to.be.calledOnceWith(
           systemDebtEngine.address, 
           deployerAddress, 
           UnitHelpers.WeiPerWad, 

@@ -21,7 +21,7 @@ contract ProxyWalletRegistry is OwnableUpgradeable {
 
   // deploys a new proxy instance
   // sets owner of proxy to caller
-  function build() external returns (address payable _proxy) {
+  function build0() external returns (address payable _proxy) {
     _proxy = build(msg.sender);
   }
 

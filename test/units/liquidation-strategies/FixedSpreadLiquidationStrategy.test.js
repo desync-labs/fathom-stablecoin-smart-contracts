@@ -24,7 +24,7 @@ const loadFixture = async () => {
   const mockedLiquidationEngine = await smock.fake("LiquidationEngine");
   const mockedSystemDebtEngine = await smock.fake("SystemDebtEngine");
   const mockedFlashLendingCallee = await smock.fake("MockFlashLendingCallee");
-  const mockedIbTokenAdapter = await smock.fake("IbTokenAdapter");
+  const mockedCollateralTokenAdapter = await smock.fake("CollateralTokenAdapter");
 
   mockedBookKeeper.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
   mockedBookKeeper.accessControlConfig.returns(mockedAccessControlConfig.address)
@@ -49,7 +49,7 @@ const loadFixture = async () => {
     mockedPriceFeed,
     mockedSystemDebtEngine,
     mockedFlashLendingCallee,
-    mockedIbTokenAdapter,
+    mockedCollateralTokenAdapter,
     mockedAccessControlConfig,
     mockedCollateralPoolConfig,
   }
@@ -70,7 +70,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
   let mockedPriceFeed
   let mockedSystemDebtEngine
   let mockedFlashLendingCallee
-  let mockedIbTokenAdapter
+  let mockedCollateralTokenAdapter
   let mockedCollateralPoolConfig
   let mockedAccessControlConfig
 
@@ -85,7 +85,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
       mockedPriceFeed,
       mockedSystemDebtEngine,
       mockedFlashLendingCallee,
-      mockedIbTokenAdapter,
+      mockedCollateralTokenAdapter,
       mockedCollateralPoolConfig,
       mockedAccessControlConfig,
     } = await loadFixture())
@@ -227,9 +227,9 @@ describe("FixedSpreadLiquidationStrategy", () => {
             mockedCollateralPoolConfig.getCloseFactorBps.returns(10000)
             mockedCollateralPoolConfig.getLiquidatorIncentiveBps.returns(10250)
             mockedCollateralPoolConfig.getTreasuryFeesBps.returns(2500)
-            mockedCollateralPoolConfig.getAdapter.returns(mockedIbTokenAdapter.address)
+            mockedCollateralPoolConfig.getAdapter.returns(mockedCollateralTokenAdapter.address)
 
-            mockedIbTokenAdapter.onMoveCollateral.returns()
+            mockedCollateralTokenAdapter.onMoveCollateral.returns()
 
             mockedBookKeeper.confiscatePosition.returns()
             mockedBookKeeper.moveCollateral.returns()
@@ -304,9 +304,9 @@ describe("FixedSpreadLiquidationStrategy", () => {
             mockedCollateralPoolConfig.getCloseFactorBps.returns(5000)
             mockedCollateralPoolConfig.getLiquidatorIncentiveBps.returns(10300)
             mockedCollateralPoolConfig.getTreasuryFeesBps.returns(700)
-            mockedCollateralPoolConfig.getAdapter.returns(mockedIbTokenAdapter.address)
+            mockedCollateralPoolConfig.getAdapter.returns(mockedCollateralTokenAdapter.address)
 
-            mockedIbTokenAdapter.onMoveCollateral.returns()
+            mockedCollateralTokenAdapter.onMoveCollateral.returns()
 
             mockedBookKeeper.confiscatePosition.returns()
             mockedBookKeeper.moveCollateral.returns()
@@ -370,9 +370,9 @@ describe("FixedSpreadLiquidationStrategy", () => {
         mockedCollateralPoolConfig.getCloseFactorBps.returns(5000)
         mockedCollateralPoolConfig.getLiquidatorIncentiveBps.returns(10001)
         mockedCollateralPoolConfig.getTreasuryFeesBps.returns(17)
-        mockedCollateralPoolConfig.getAdapter.returns(mockedIbTokenAdapter.address)
+        mockedCollateralPoolConfig.getAdapter.returns(mockedCollateralTokenAdapter.address)
 
-        mockedIbTokenAdapter.onMoveCollateral.returns()
+        mockedCollateralTokenAdapter.onMoveCollateral.returns()
 
         mockedBookKeeper.confiscatePosition.returns()
         mockedBookKeeper.moveCollateral.returns()

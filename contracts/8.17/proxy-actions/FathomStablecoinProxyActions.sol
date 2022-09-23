@@ -715,6 +715,7 @@ contract FathomStablecoinProxyActions {
     tokenAdapterDeposit(_tokenAdapter, _manager.positions(_positionId), _collateralAmount, _transferFrom, _data);
     // Locks token amount into the position and generates debt
     int256 _collateralAmountInWad = _safeToInt(convertTo18(_tokenAdapter, _collateralAmount));
+
     int256 _drawDebtShare = _getDrawDebtShare(
       _manager.bookKeeper(),
       _stabilityFeeCollector,
@@ -722,6 +723,7 @@ contract FathomStablecoinProxyActions {
       _collateralPoolId,
       _stablecoinAmount
     ); // [wad]
+
     adjustPosition(address(_manager), _positionId, _collateralAmountInWad, _drawDebtShare, _tokenAdapter, _data);
     // Moves the Fathom Stablecoin amount (balance in the bookKeeper in rad) to proxy's address
     moveStablecoin(address(_manager), _positionId, address(this), _toRad(_stablecoinAmount));
@@ -1026,7 +1028,6 @@ contract FathomStablecoinProxyActions {
     address _positionAddress = IManager(_manager).positions(_positionId);
     bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
     (, uint256 _debtShare) = IBookKeeper(_bookKeeper).positions(_collateralPoolId, _positionAddress);
-
     // Deposits Fathom Stablecoin amount into the bookKeeper
     stablecoinAdapterDeposit(
       _stablecoinAdapter,
@@ -1035,7 +1036,7 @@ contract FathomStablecoinProxyActions {
       _data
     );
     uint256 _collateralAmountInWad = convertTo18(_tokenAdapter, _collateralAmount);
-    // Paybacks debt to the position and unlocks token amount from it
+
     adjustPosition(
       _manager,
       _positionId,
@@ -1044,6 +1045,7 @@ contract FathomStablecoinProxyActions {
       _tokenAdapter,
       _data
     );
+
     // Moves the amount from the position to proxy's address
     moveCollateral(_manager, _positionId, address(this), _collateralAmountInWad, _tokenAdapter, _data);
     // Withdraws token amount to the user's wallet as a token
