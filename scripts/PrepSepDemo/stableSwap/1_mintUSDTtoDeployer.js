@@ -18,6 +18,8 @@ async function main() {
     const signers = await ethers.getSigners();
     const deployerAddress = signers[0].address;
     await USDT.mint(deployerAddress, WeiPerWad.mul(3000000));
+    await USDT.mint(signers[1].address, WeiPerWad.mul(3000000));
+    await USDT.mint(signers[2].address, WeiPerWad.mul(3000000));
     console.log("Deployer's USDT balance is " + await USDT.balanceOf(deployerAddress));
 }
 

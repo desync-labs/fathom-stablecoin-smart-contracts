@@ -56,6 +56,8 @@ deploy:
 	npx hardhat run --network ganache scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role.js
 	npx hardhat run --network ganache scripts/deployment/1_collateral-pool-config/config/collateral-pool-config-USDT.js
 
+	npx hardhat run --network ganache scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role-USDT.js
+
 	npx hardhat run --network ganache scripts/deployment/9_fathom-token/config/fathom-token-ownership.js
 	
 	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/2_makeWallet.js
@@ -64,3 +66,4 @@ deploy:
 	npx hardhat run --network ganache scripts/PrepSepDemo/openClosePosition/5_liquidation.js
 
 	npx hardhat run --network ganache scripts/PrepSepDemo/stableSwap/1_mintUSDTtoDeployer.js
+	npx hardhat run --network ganache scripts/PrepSepDemo/stableSwap/2_swapThreeMilUSDT.js
