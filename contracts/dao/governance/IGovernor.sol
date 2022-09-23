@@ -156,6 +156,18 @@ abstract contract IGovernor is IERC165 {
         bytes32 s
     ) public virtual returns (uint256 balance);
 
+
+    /**
+     * @dev returns all proposal Ids
+     */
+    function getProposalIds() public view virtual returns(uint[] memory);
+    
+
+    /**
+     * @dev returns a proposals description given a proposalId
+     */
+    function getDescription(uint256 proposalId) public view virtual returns(string memory);
+
     /**
      * @notice module:core
      * @dev Name of the governor instance (used in building the ERC712 domain separator).

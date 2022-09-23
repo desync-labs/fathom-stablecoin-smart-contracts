@@ -42,8 +42,10 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor {
         keccak256("ExtendedBallot(uint256 proposalId,uint8 support,string reason,bytes params)");
 
     string private _name;
+    uint256[] private proposalIds;
 
-    mapping(uint256 => ProposalCore) private _proposals;
+    mapping(uint256 => ProposalCore) internal _proposals;
+    mapping(uint256 => string) internal proposalsDescriptions;
 
     // This queue keeps track of the governor operating on itself. Calls to functions protected by the
     // {onlyGovernance} modifier needs to be whitelisted in this queue. Whitelisting is set in {_beforeExecute},
@@ -243,6 +245,9 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor {
         proposal.voteStart.setDeadline(snapshot);
         proposal.voteEnd.setDeadline(deadline);
 
+        proposalIds.push(proposalId);
+        proposalsDescriptions[proposalId] = description;
+
         emit ProposalCreated(
             proposalId,
             _msgSender(),
@@ -256,6 +261,21 @@ abstract contract Governor is Context, ERC165, EIP712, IGovernor {
         );
 
         return proposalId;
+    }
+
+    /**
+     * @dev returns all proposal Ids
+     */
+    function getProposalIds()public view override returns(uint[] memory){
+        return proposalIds;
+    }
+    
+
+    /**
+     * @dev returns a proposals description given a proposalId
+     */
+    function getDescription(uint256 proposalId)public view override returns(string memory){
+        return proposalsDescriptions[proposalId];
     }
 
     /**

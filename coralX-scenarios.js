@@ -14,11 +14,12 @@ module.exports = {
     ['execute', '--path', 'scripts/custom/white-list-setup.js', '--network', 'kovan'],
   ],
   deployRopsten: [
-    ['execute', '--path', 'scripts/migrations/compliance-upgradability', '--network', 'ropsten'],
-    ['execute', '--path', 'scripts/migrations/tokens-creation-service', '--network', 'ropsten'],
-    ['execute', '--path', 'scripts/configurations/1_base_config.js', '--network', 'ropsten'],
-    ['execute', '--path', 'scripts/configurations/2_tokens_factory.js', '--network', 'ropsten'],
-    ['execute', '--path', 'scripts/custom/white-list-setup.js', '--network', 'ropsten'],
+    // ['execute', '--path', 'scripts/migrations/compliance-upgradability', '--network', 'ropsten'],
+    // ['execute', '--path', 'scripts/migrations/tokens-creation-service', '--network', 'ropsten'],
+    // ['execute', '--path', 'scripts/configurations/1_base_config.js', '--network', 'ropsten'],
+    // ['execute', '--path', 'scripts/configurations/2_tokens_factory.js', '--network', 'ropsten'],
+    // ['execute', '--path', 'scripts/custom/white-list-setup.js', '--network', 'ropsten'],
+    ['execute', '--path', 'scripts/migrations/governance', '--network', 'ropsten'],
   ],
   deployACMainnet: [
     ['execute', '--path', 'scripts/migrations/compliance-upgradability', '--network', 'mainnet'],
@@ -50,5 +51,6 @@ module.exports = {
   migrateAndConfigureForTests: [
     ['compile'],
     ['execute', '--path', 'scripts/migrations/governance'],
+    // ['execute', '--path', 'scripts/migrations/governance', '--network', 'ropsten'],
   ],
 }

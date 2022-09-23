@@ -188,7 +188,6 @@ describe("DAO Demo", () => {
         mainToken = await artifacts.initializeInterfaceAt("MainToken", "MainToken");
 
         multiSigWallet = await artifacts.initializeInterfaceAt("MultiSigWallet", "MultiSigWallet");
-
         treasury = multiSigWallet.address;
         
         proposer_role = await timelockController.PROPOSER_ROLE();
@@ -550,7 +549,7 @@ describe("DAO Demo", () => {
             
             var nextBlock = 1;
             while (nextBlock <= 2) {   
-                await blockchain.mineBlock(timestamp + nextBlock);    
+                await blockchain.mineBlock(timestamp + nextBlock);   
                 nextBlock++;              
             }
             // Vote:

@@ -22,7 +22,7 @@ const PROPOSAL_CREATED_EVENT = "ProposalCreated(uint256,address,address[],uint25
 const SUBMIT_TRANSACTION_EVENT = "SubmitTransaction(uint256,address,address,uint256,bytes)";
 
 // Token variables
-const T_TOKEN_TO_MINT = "10000000000000000000000";
+const T_TOKEN_TO_MINT = "100000000000000000000000";
 
 
 
@@ -278,6 +278,8 @@ describe('Proposal flow', () => {
             // Here Staker 1 and staker 2 receive veMainTokens for staking MainTokens
             await _stakeMainGetVe(STAKER_1);
             await _stakeMainGetVe(STAKER_2);
+
+
 
             // Wait 1 block
             const currentNumber = await web3.eth.getBlockNumber();
@@ -619,6 +621,30 @@ describe('Proposal flow', () => {
             await multiSigWallet.executeTransaction(txIndex, {"from": accounts[0]});
             // Balance of account 5 should reflect the funds distributed from treasury in proposal 2
             expect((await mainToken.balanceOf(STAKER_1, {"from": STAKER_1})).toString()).to.equal(AMOUNT_OUT_TREASURY);
+        });
+
+        it('Mint MainToken token to everyone', async() => {
+
+            // This test is in preperation for front end UI tests which need accounts[0] to have a balance of more than 1000 ve tokens
+
+            const _stakeMainGetVe = async (_account) => {
+
+                await mainTknToken.transfer(_account, T_TO_STAKE, {from: SYSTEM_ACC});
+    
+                await mainTknToken.approve(stakingService.address, T_TO_STAKE, {from: _account});
+    
+                await blockchain.increaseTime(20);
+    
+                let unlockTime = await _getTimeStamp() + lockingPeriod;
+    
+                await stakingService.createLock(T_TO_STAKE, unlockTime, {from: _account, gas: 600000});
+            }
+
+            await _stakeMainGetVe(accounts[0]);
+            await _stakeMainGetVe(accounts[0]);
+
+            await _stakeMainGetVe(accounts[9]);
+            await _stakeMainGetVe(accounts[9]);
         });
 
         
