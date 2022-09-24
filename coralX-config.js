@@ -13,8 +13,8 @@ module.exports = {
       private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },
-    ropsten: {
-      host: "https://ropsten.infura.io/v3/99c6910d87a34c688c79342177d37bbe",
+    gorli: {
+      host: "https://goerli.infura.io/v3/d85fb151be214d8eaee85c855d9d3dab",
       private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },
@@ -36,14 +36,14 @@ module.exports = {
   },
   compilers: {
     solc: {
-      version: 'native',
+      version: "0.8.17",
       settings: {
         optimizer: {
           enabled: true,
           details: { yul: false },
           runs: 200,
         },
-        evmVersion: 'constantinople',
+        // evmVersion: 'constantinople',
       },
     },
   },
