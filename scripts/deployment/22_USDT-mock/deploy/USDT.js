@@ -1,34 +1,29 @@
 const fs = require('fs');
 
-const { ethers } = require("hardhat");
+const USDT = artifacts.require('./8.17/mocks/BEP20.sol');
 
-const { parseEther } = require("ethers/lib/utils");
-
-const FATHOM_PER_BLOCK = parseEther("100");
-
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
 
-  const signers = await ethers.getSigners()
-  const AliceAddress = signers[1].address;
-  const BobAddress = signers[2].address;
-  
+// for testnet
+const walletDeployer = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
 
-  console.log(">> Deploying an not upgradable USDT contract")
+// for ganache
+const devAddress = "0x0CF4bC892112518f96506Df151185d0F572CfF5f";
 
-  const BEP20 = await hre.ethers.getContractFactory("BEP20");
-  const USDT = await BEP20.deploy("USDT", "USDT");
-  await USDT.deployed();
-  await USDT.mint(await AliceAddress, parseEther("1000000"))
-  await USDT.mint(await BobAddress, parseEther("1000000"))
+module.exports =  async function(deployer) {
 
-  console.log(`>> Deployed at ${USDT.address}`)
-  const tx = await USDT.deployTransaction.wait()
-  console.log(`>> Deploy block ${tx.blockNumber}`)
+  console.log(">> Deploying a USDT contract")
+  let promises = [
+      deployer.deploy(USDT, "USDT", "USDT", { gas: 4050000 }),
+  ];
+
+  await Promise.all(promises);
+
+  const deployed = artifacts.require('./8.17/mocks/BEP20.sol');
 
   let addressesUpdate = { 
-    USDT: USDT.address,
+    USDT: deployed.address,
   };
 
   const newAddresses = {
@@ -36,16 +31,10 @@ async function main() {
     ...addressesUpdate
   };
 
-  const newData = JSON.stringify(newAddresses);
-  fs.writeFile("./addresses.json", newData, err => {
-    if(err) throw err;
-    console.log("New address added");
-  })
-}
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('./addresses.json', data);
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  const USDTInstance = await USDT.at(stablecoinAddress.USDT);
+  await USDTInstance.mint(walletDeployer, parseEther("9000000"))
+  await USDTInstance.mint(devAddress, parseEther("9000000"))
+};

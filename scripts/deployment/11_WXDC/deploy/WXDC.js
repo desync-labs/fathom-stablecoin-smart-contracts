@@ -1,34 +1,30 @@
 const fs = require('fs');
 
-const { ethers } = require("hardhat");
+const WXDC = artifacts.require('./8.17/mocks/BEP20.sol');
 
-const { parseEther } = require("ethers/lib/utils");
-
-const FATHOM_PER_BLOCK = parseEther("100");
-
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
 
-  const signers = await ethers.getSigners()
-  const AliceAddress = signers[1].address;
-  const BobAddress = signers[2].address;
-  
+// for testnet
+const walletDeployer = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
 
-  console.log(">> Deploying an not upgradable WXDC contract")
+// for ganache
+const devAddress = "0x0CF4bC892112518f96506Df151185d0F572CfF5f";
 
-  const BEP20 = await hre.ethers.getContractFactory("BEP20");
-  const WXDC = await BEP20.deploy("WXDC", "WXDC");
-  await WXDC.deployed();
-  await WXDC.mint(await AliceAddress, parseEther("1000000"))
-  await WXDC.mint(await BobAddress, parseEther("1000000"))
 
-  console.log(`>> Deployed at ${WXDC.address}`)
-  const tx = await WXDC.deployTransaction.wait()
-  console.log(`>> Deploy block ${tx.blockNumber}`)
+module.exports =  async function(deployer) {
+
+  console.log(">> Deploying an FathomToken contract")
+  let promises = [
+      deployer.deploy(WXDC, "WXDC", "WXDC", { gas: 4050000 }),
+  ];
+
+  await Promise.all(promises);
+
+  const deployed = artifacts.require('./8.17/mocks/BEP20.sol');
 
   let addressesUpdate = { 
-    WXDC: WXDC.address,
+    WXDC: deployed.address,
   };
 
   const newAddresses = {
@@ -36,16 +32,11 @@ async function main() {
     ...addressesUpdate
   };
 
-  const newData = JSON.stringify(newAddresses);
-  fs.writeFile("./addresses.json", newData, err => {
-    if(err) throw err;
-    console.log("New address added");
-  })
-}
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('./addresses.json', data);
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  const WXDCInstance = await WXDC.at(stablecoinAddress.WXDC);
+  await WXDCInstance.mint()
+  await WXDC.mint(await walletDeployer, parseEther("9000000"))
+  await WXDC.mint(await devAddress, parseEther("9000000"))
+};

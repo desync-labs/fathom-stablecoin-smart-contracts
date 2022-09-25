@@ -1,45 +1,30 @@
 const fs = require('fs');
 
-const { ethers, upgrades } = require("hardhat");
+const FathomStablecoin = artifacts.require('./8.17/stablecoin-core/FathomStablecoin.sol');
 
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
-  const NAME = "Fathom USD"
-  const SYMBOL = "USXD"
 
+module.exports =  async function(deployer) {
   console.log(">> Deploying an upgradable FathomStablecoin contract")
-  const FathomStablecoin = (await ethers.getContractFactory(
-    "FathomStablecoin",
-    (
-      await ethers.getSigners()
-    )[0]
-  ))
-  const fathomStablecoin = await upgrades.deployProxy(FathomStablecoin, [NAME, SYMBOL])
-  await fathomStablecoin.deployed()
-  console.log(`>> Deployed at ${fathomStablecoin.address}`)
-  const tx = await fathomStablecoin.deployTransaction.wait()
-  console.log(`>> Deploy block ${tx.blockNumber}`)
+
+  let promises = [
+      deployer.deploy(FathomStablecoin, { gas: 4050000 }),
+  ];
+
+  await Promise.all(promises);
+
+  const deployed = artifacts.require('./8.17/stablecoin-core/FathomStablecoin.sol');
 
   let addressesUpdate = { 
-    fathomStablecoin: fathomStablecoin.address,
+    fathomStablecoin: deployed.address,
   };
-  
+
   const newAddresses = {
     ...stablecoinAddress,  
     ...addressesUpdate
   };
 
-  const newData = JSON.stringify(newAddresses);
-  fs.writeFile("./addresses.json", newData, err => {
-    if(err) throw err;
-    console.log("New address added");
-  })
-}
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('./addresses.json', data);
+};

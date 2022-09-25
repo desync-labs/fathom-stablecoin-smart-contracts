@@ -1,42 +1,30 @@
 const fs = require('fs');
 
-const { ethers, upgrades } = require("hardhat");
+const SystemDebtEngine = artifacts.require('./8.17/stablecoin-core/SystemDebtEngine.sol');
 
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
+
+module.exports =  async function(deployer) {
+
   console.log(">> Deploying an upgradable SystemDebtEngine contract")
-  const SystemDebtEngine = (await ethers.getContractFactory(
-    "SystemDebtEngine",
-    (
-      await ethers.getSigners()
-    )[0]
-  ))
-  const systemDebtEngine = await upgrades.deployProxy(SystemDebtEngine, [stablecoinAddress.bookKeeper])
-  await systemDebtEngine.deployed()
-  console.log(`>> Deployed at ${systemDebtEngine.address}`)
-  const tx = await systemDebtEngine.deployTransaction.wait()
-  console.log(`>> Deploy block ${tx.blockNumber}`)
+  let promises = [
+      deployer.deploy(SystemDebtEngine, { gas: 4050000 }),
+  ];
+
+  await Promise.all(promises);
+
+  const deployed = artifacts.require('./8.17/stablecoin-core/SystemDebtEngine.sol');
 
   let addressesUpdate = { 
-    systemDebtEngine: systemDebtEngine.address,
+    systemDebtEngine: deployed.address,
   };
-  
+
   const newAddresses = {
     ...stablecoinAddress,  
     ...addressesUpdate
   };
 
-  const newData = JSON.stringify(newAddresses);
-  fs.writeFile("./addresses.json", newData, err => {
-    if(err) throw err;
-    console.log("New address added");
-  })
-}
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('./addresses.json', data);
+};

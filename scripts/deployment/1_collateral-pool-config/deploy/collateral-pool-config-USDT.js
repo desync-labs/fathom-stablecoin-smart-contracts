@@ -1,43 +1,30 @@
 const fs = require('fs');
 
-const { ethers, upgrades } = require("hardhat");
+const CollateralPoolConfig = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
 
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
-  console.log(">> Deploying an upgradable CollateralPoolConfig contract")
-  const CollateralPoolConfig = await ethers.getContractFactory(
-    "CollateralPoolConfig",
-    (
-      await ethers.getSigners()
-    )[0]
-  )
-  const collateralPoolConfig = await upgrades.deployProxy(CollateralPoolConfig, [stablecoinAddress.accessControlConfig]);
-  await collateralPoolConfig.deployed()
 
-  console.log(`>> Deployed at ${collateralPoolConfig.address}`)
-  const tx = await collateralPoolConfig.deployTransaction.wait()
-  console.log(`>> Deploy block ${tx.blockNumber}`)
+module.exports =  async function(deployer) {
+  console.log(">> Deploying an upgradable CollateralPoolConfig contract")
+
+  let promises = [
+      deployer.deploy(CollateralPoolConfig, { gas: 3050000 }),
+  ];
+
+  await Promise.all(promises);
+
+  const deployed = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
 
   let addressesUpdate = { 
-    collateralPoolConfigUSDT: collateralPoolConfig.address,
+    collateralPoolConfigUSDT: deployed.address,
   };
-  
+
   const newAddresses = {
     ...stablecoinAddress,  
     ...addressesUpdate
   };
 
-  const newData = JSON.stringify(newAddresses);
-  fs.writeFile("./addresses.json", newData, err => {
-    if(err) throw err;
-    console.log("New address added");
-  })
-}
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('./addresses.json', data);
+};

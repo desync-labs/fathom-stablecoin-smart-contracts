@@ -1,35 +1,22 @@
 const fs = require('fs');
 
-const { ethers, upgrades } = require("hardhat");
+const AccessControlConfig = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
 
-async function main() {
+module.exports =  async function(deployer) {
+
   console.log(">> Deploying an upgradable AccessControlConfig contract")
-  const Box = await ethers.getContractFactory("AccessControlConfig");
-  const AccessControlConfig = await ethers.getContractFactory(
-    "AccessControlConfig",
-    (
-      await ethers.getSigners()
-    )[0]
-  )
-  const accessControlConfig = await upgrades.deployProxy(AccessControlConfig);
-  await accessControlConfig.deployed()
+  let promises = [
+      deployer.deploy(AccessControlConfig, { gas: 3050000 }),
+  ];
 
-  console.log(`>> Deployed at ${accessControlConfig.address}`)
-  const tx = await accessControlConfig.deployTransaction.wait()
-  console.log(`>> Deploy block ${tx.blockNumber}`)
+  await Promise.all(promises);
 
-  let addresses = { 
-    accessControlConfig: accessControlConfig.address,
+  const deployed = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
+
+  let addressesUpdate = { 
+    accessControlConfig: deployed.address,
   };
-  
-  let data = JSON.stringify(addresses);
+
+  let data = JSON.stringify(addressesUpdate);
   fs.writeFileSync('./addresses.json', data);
-
-}
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+};

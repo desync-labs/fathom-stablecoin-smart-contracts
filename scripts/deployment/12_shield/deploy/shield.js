@@ -1,26 +1,26 @@
 const fs = require('fs');
 
-const rawdata = fs.readFileSync('./addresses.json');
+const Shield = artifacts.require('./8.17/apis/fathom/Shield.sol');
 
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-async function main() {
+//for testnet
+const walletDeployer = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
 
-  const signers = await ethers.getSigners()
+module.exports =  async function(deployer) {
 
-  
-  console.log(">> Deploying an not upgradable Shield contract")
+  console.log(">> Deploying an Shield contract")
+  let promises = [
+      deployer.deploy(Shield, walletDeployer, stablecoinAddress.fairLaunch, { gas: 4050000 }),
+  ];
 
-  const Shield = await hre.ethers.getContractFactory("Shield");
-  const shield = await Shield.deploy(signers[0].address, stablecoinAddress.fairLaunch)
-  await shield.deployed()
+  await Promise.all(promises);
 
-  console.log(`>> Deployed at ${shield.address}`)
-  const tx = await shield.deployTransaction.wait()
-  console.log(`>> Deploy block ${tx.blockNumber}`)
+  const deployed = artifacts.require('./8.17/apis/fathom/Shield.sol');
 
   let addressesUpdate = { 
-    shield: shield.address,
+    shield: deployed.address,
   };
 
   const newAddresses = {
@@ -28,16 +28,6 @@ async function main() {
     ...addressesUpdate
   };
 
-  const newData = JSON.stringify(newAddresses);
-  fs.writeFile("./addresses.json", newData, err => {
-    if(err) throw err;
-    console.log("New address added");
-  })
-}
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('./addresses.json', data);
+};

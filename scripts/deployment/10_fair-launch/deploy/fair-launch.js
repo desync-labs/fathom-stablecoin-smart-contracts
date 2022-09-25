@@ -1,27 +1,33 @@
 const fs = require('fs');
 
-const { ethers } = require("hardhat");
+const FairLaunch = artifacts.require('./8.17/apis/fathom/FairLaunch.sol');
 
 const { parseEther } = require("ethers/lib/utils");
 
 const FATHOM_PER_BLOCK = parseEther("100");
 
-const rawdata = fs.readFileSync('./addresses.json');
+// for ganache
+const devAddress = "0x0CF4bC892112518f96506Df151185d0F572CfF5f";
+
+// for testnet
+// const devAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
+
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
-  
-  const signers = await ethers.getSigners()
-  const devAddress = signers[3].address;
-  console.log(">> Deploying an not upgradable FairLaunch contract")
-  const FairLaunch = await hre.ethers.getContractFactory("FairLaunch")
-  const fairLaunch = await FairLaunch.deploy(stablecoinAddress.fathomToken, devAddress, FATHOM_PER_BLOCK, 0, 0, 0)
-  await fairLaunch.deployed()
-  console.log(`>> Deployed at ${fairLaunch.address}`)
-  const tx = await fairLaunch.deployTransaction.wait()
-  console.log(`>> Deploy block ${tx.blockNumber}`)
+
+module.exports =  async function(deployer) {
+
+  console.log(">> Deploying an FairLaunch contract")
+  let promises = [
+      deployer.deploy(FairLaunch, stablecoinAddress.fathomToken, devAddress, FATHOM_PER_BLOCK, 0, 0, 0, { gas: 4050000 }),
+  ];
+
+  await Promise.all(promises);
+
+  const deployed = artifacts.require('./8.17/apis/fathom/FathomToken.sol');
 
   let addressesUpdate = { 
-    fairLaunch: fairLaunch.address,
+    fairLaunch: deployed.address,
   };
 
   const newAddresses = {
@@ -29,16 +35,6 @@ async function main() {
     ...addressesUpdate
   };
 
-  const newData = JSON.stringify(newAddresses);
-  fs.writeFile("./addresses.json", newData, err => {
-    if(err) throw err;
-    console.log("New address added");
-  })
-}
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('./addresses.json', data);
+};
