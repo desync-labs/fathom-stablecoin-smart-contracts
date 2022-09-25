@@ -1,1 +1,1 @@
-# Fathom DAO Smart Contracts
+# Fathom Stablecoin Smart Contracts
