@@ -118,6 +118,7 @@ contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, R
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
     // 2. Sanity checks
     (address _stakeToken, , , , ) = IFathomFairLaunch(_fairlaunch).poolInfo(_pid);
+
     require(_stakeToken == _collateralToken, "CollateralTokenAdapter/collateralToken-not-match");
     require(IFathomFairLaunch(_fairlaunch).fathom() == _rewardToken, "CollateralTokenAdapter/reward-token-not-match");
     require(IFathomFairLaunch(_fairlaunch).owner() == _shield, "CollateralTokenAdapter/shield-not-match");

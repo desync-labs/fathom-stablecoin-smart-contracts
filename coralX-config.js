@@ -40,7 +40,6 @@ module.exports = {
       settings: {
         optimizer: {
           enabled: true,
-          details: { yul: false },
           runs: 200,
         },
         // evmVersion: 'constantinople',

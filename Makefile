@@ -1,4 +1,8 @@
 
+check:
+	coralX execute --network development --path scripts/deployment/14_collateral-token-adapter/deploy/collateral-token-adapter.js
+	coralX execute --network development --path scripts/deployment/14_collateral-token-adapter/initialize/initialize_collateral-token-adapter.js
+
 deploy:
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
 	coralX execute --network development --path scripts/deployment/0_access-control-config/initialize/initialize_accessControlConfig.js
@@ -31,13 +35,19 @@ deploy:
 	coralX execute --network development --path scripts/deployment/9_fathom-token/deploy/fathom-token.js
 	coralX execute --network development --path scripts/deployment/10_fair-launch/deploy/fair-launch.js
 	coralX execute --network development --path scripts/deployment/11_WXDC/deploy/WXDC.js
-	coralX execute --network development --path scripts/deployment/12_shield/deploy/shield.js
+	coralX execute --network development --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
+
 	coralX execute --network development --path scripts/deployment/22_USDT-mock/deploy/USDT.js
+	coralX execute --network development --path scripts/deployment/22_USDT-mock/initialize/initialize_USDT.js
+
+	coralX execute --network development --path scripts/deployment/12_shield/deploy/shield.js
 	coralX execute --network development --path scripts/deployment/10_fair-launch/config/fair-launch-config.js
 	coralX execute --network development --path scripts/deployment/13_position-manager/deploy/position-manager.js
 	coralX execute --network development --path scripts/deployment/13_position-manager/initialize/initialize_position-manager.js
-next:
+
 	coralX execute --network development --path scripts/deployment/14_collateral-token-adapter/deploy/collateral-token-adapter.js
+	coralX execute --network development --path scripts/deployment/14_collateral-token-adapter/initialize/initialize_collateral-token-adapter.js
+next:
 	coralX execute --network development --path scripts/deployment/15_simple-price-feed/deploy/simple-price-feed.js
 	coralX execute --network development --path scripts/deployment/15_simple-price-feed/deploy/simple-price-feed-USDT.js
 	coralX execute --network development --path scripts/deployment/16_fixed-spread-liquidation-strategy/deploy/fixed-spread-liquidation-strategy.js

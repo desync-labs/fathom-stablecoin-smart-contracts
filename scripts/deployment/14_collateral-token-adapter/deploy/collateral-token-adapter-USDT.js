@@ -1,50 +1,23 @@
 const fs = require('fs');
 
-const { ethers, upgrades } = require("hardhat");
+const CollateralTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 
-const { BigNumber } = require("ethers");
-
-const { formatBytes32String } = require("ethers/lib/utils");
-
-const COLLATERAL_POOL_ID = formatBytes32String("USDT-STABLE")
-
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
 
-  const signers = await ethers.getSigners()
-  const deployerAddress = signers[0].address;
-  const devAddress = signers[3].address;
+module.exports =  async function(deployer) {
 
-  console.log(">> Deploying an upgradable CollateralTokenAdapter-USDT contract")
-  const CollateralTokenAdapter = (await ethers.getContractFactory(
-    "CollateralTokenAdapter",
-    (
-      await ethers.getSigners()
-    )[0]
-  ))
+  console.log(">> Deploying an upgradable CollateralTokenAdapter contract")
+  let promises = [
+      deployer.deploy(CollateralTokenAdapter, { gas: 4050000 }),
+  ];
 
-  const collateralTokenAdapter = await upgrades.deployProxy(CollateralTokenAdapter, [
-    stablecoinAddress.bookKeeper,
-    COLLATERAL_POOL_ID,
-    stablecoinAddress.USDT,             //COLLATERAL_TOKEN_ADDR
-    stablecoinAddress.fathomToken,  //Reward token addr
-    stablecoinAddress.fairLaunch,
-    1,  // Pool ID
-    stablecoinAddress.shield,   //  deployerAddress as sheild
-    deployerAddress,                 // deployer as TIME_LOCK
-    BigNumber.from(1000),                   //TREASURY_FEE_BPS 1000
-    devAddress,                 // deployer asTREASURY_ACCOUNT
-    stablecoinAddress.positionManager,
-  ])
-  
-  await collateralTokenAdapter.deployed()
-  console.log(`>> Deployed at ${collateralTokenAdapter.address}`)
-  const tx = await collateralTokenAdapter.deployTransaction.wait()
-  console.log(`>> Deploy block ${tx.blockNumber}`)
+  await Promise.all(promises);
+
+  const deployed = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 
   let addressesUpdate = { 
-    collateralTokenAdapterUSDT: collateralTokenAdapter.address,
+    collateralTokenAdapterUSDT: deployed.address,
   };
 
   const newAddresses = {
@@ -52,16 +25,6 @@ async function main() {
     ...addressesUpdate
   };
 
-  const newData = JSON.stringify(newAddresses);
-  fs.writeFile("./addresses.json", newData, err => {
-    if(err) throw err;
-    console.log("New address added");
-  })
-}
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('./addresses.json', data);
+};

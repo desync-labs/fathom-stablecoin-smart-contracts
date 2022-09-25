@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const USDT = artifacts.require('./8.17/mocks/BEP20.sol');
+const USDT = artifacts.require('./8.17/mocks/USDT.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -20,7 +20,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/mocks/BEP20.sol');
+  const deployed = artifacts.require('./8.17/mocks/USDT.sol');
 
   let addressesUpdate = { 
     USDT: deployed.address,
@@ -33,8 +33,4 @@ module.exports =  async function(deployer) {
 
   let data = JSON.stringify(newAddresses);
   fs.writeFileSync('./addresses.json', data);
-
-  const USDTInstance = await USDT.at(stablecoinAddress.USDT);
-  await USDTInstance.mint(walletDeployer, parseEther("9000000"))
-  await USDTInstance.mint(devAddress, parseEther("9000000"))
 };

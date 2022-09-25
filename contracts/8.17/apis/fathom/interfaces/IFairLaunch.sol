@@ -5,6 +5,7 @@ pragma solidity 0.8.17;
 interface IFairLaunch {
   function poolLength() external view returns (uint256);
 
+
   function addPool(
     uint256 _allocPoint,
     address _stakeToken,
