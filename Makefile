@@ -1,7 +1,7 @@
 
 check:
-	coralX execute --network development --path scripts/deployment/21_dex-price-oracle/deploy/dex-price-oracle.js
-	coralX execute --network development --path scripts/deployment/21_dex-price-oracle/initialize/initialize_dex-price-oracle.js
+	coralX execute --network development --path scripts/deployment/25_get-positions/deploy/get-positions.js
+	coralX execute --network development --path scripts/deployment/25_get-positions/initialize/initialize_get-positions.js
 
 deploy:
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
@@ -73,10 +73,16 @@ deploy:
 	coralX execute --network development --path scripts/deployment/21_dex-price-oracle/deploy/dex-price-oracle.js
 	coralX execute --network development --path scripts/deployment/21_dex-price-oracle/initialize/initialize_dex-price-oracle.js
 
-next:
 	coralX execute --network development --path scripts/deployment/23_auth-token-adapter/deploy/auth-token-adapter.js
+	coralX execute --network development --path scripts/deployment/23_auth-token-adapter/initialize/initialize_auth-token-adapter.js
+
 	coralX execute --network development --path scripts/deployment/24_stable-swap-module/deploy/stable-swap-module.js
+	coralX execute --network development --path scripts/deployment/24_stable-swap-module/initialize/initialize_stable-swap-module.js
+
 	coralX execute --network development --path scripts/deployment/25_get-positions/deploy/get-positions.js
+	coralX execute --network development --path scripts/deployment/25_get-positions/initialize/initialize_get-positions.js
+	
+next:
 	coralX execute --network development --path scripts/deployment/23_auth-token-adapter/config/auth-token-adapter-whitelist.js
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role.js
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-auth-token-adapter-role.js

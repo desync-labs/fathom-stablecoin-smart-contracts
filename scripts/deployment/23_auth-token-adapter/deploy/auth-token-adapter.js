@@ -1,35 +1,22 @@
 const fs = require('fs');
 
-const { ethers, upgrades } = require("hardhat");
+const AuthTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/AuthTokenAdapter.sol');
 
-const { formatBytes32String } = require("ethers/lib/utils");
-
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
-
-  const COLLATERAL_POOL_ID = formatBytes32String("USDT-STABLE")
-  const TOKEN_ADDR = stablecoinAddress.USDT // <- USDT address
+module.exports =  async function(deployer) {
 
   console.log(">> Deploying an upgradable AuthTokenAdapter contract")
-  const AuthTokenAdapter = (await ethers.getContractFactory(
-    "AuthTokenAdapter",
-    (
-      await ethers.getSigners()
-    )[0]
-  ))
-  const authTokenAdapter = await upgrades.deployProxy(AuthTokenAdapter, [
-    stablecoinAddress.bookKeeper,
-    COLLATERAL_POOL_ID,
-    TOKEN_ADDR,
-  ])
-  await authTokenAdapter.deployed()
-  console.log(`>> Deployed at ${authTokenAdapter.address}`)
-  const tx = await authTokenAdapter.deployTransaction.wait()
-  console.log(`>> Deploy block ${tx.blockNumber}`)
+  let promises = [
+    deployer.deploy(AuthTokenAdapter, { gas: 4050000 }),
+  ];
+
+  await Promise.all(promises);
+
+  const deployed = artifacts.require('./8.17/stablecoin-core/adapters/AuthTokenAdapter.sol');
 
   let addressesUpdate = { 
-    authTokenAdapter: authTokenAdapter.address,
+    authTokenAdapter: deployed.address,
   };
 
   const newAddresses = {
@@ -37,16 +24,6 @@ async function main() {
     ...addressesUpdate
   };
 
-  const newData = JSON.stringify(newAddresses);
-  fs.writeFile("./addresses.json", newData, err => {
-    if(err) throw err;
-    console.log("New address added");
-  })
-}
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('./addresses.json', data);
+};
