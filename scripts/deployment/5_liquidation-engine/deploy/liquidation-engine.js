@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/stablecoin-core/LiquidationEngine.sol');
 
   let addressesUpdate = { 
-    liquidationEngine: deployed.address,
+    liquidationEngine: ("xdc"+(deployed.address).slice(2)),
   };
 
   const newAddresses = {

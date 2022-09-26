@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 
   let addressesUpdate = { 
-    collateralTokenAdapter: deployed.address,
+    collateralTokenAdapter: ("xdc"+(deployed.address).slice(2)),
   };
 
   const newAddresses = {

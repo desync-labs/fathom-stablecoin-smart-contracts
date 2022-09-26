@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
 
   let addressesUpdate = { 
-    collateralPoolConfigUSDT: deployed.address,
+    collateralPoolConfigUSDT: ("xdc"+(deployed.address).slice(2)),
   };
 
   const newAddresses = {

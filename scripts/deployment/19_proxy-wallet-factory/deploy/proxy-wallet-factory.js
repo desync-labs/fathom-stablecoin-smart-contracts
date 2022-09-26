@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/proxy-wallet/ProxyWalletFactory.sol');
 
   let addressesUpdate = { 
-    proxyWalletFactory: deployed.address,
+    proxyWalletFactory: ("xdc"+(deployed.address).slice(2)),
   };
 
   const newAddresses = {

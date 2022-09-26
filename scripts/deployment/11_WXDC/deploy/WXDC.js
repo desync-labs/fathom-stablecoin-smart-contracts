@@ -20,7 +20,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/mocks/WXDC.sol');
 
   let addressesUpdate = { 
-    WXDC: deployed.address,
+    WXDC: ("xdc"+(deployed.address).slice(2)),
   };
 
   const newAddresses = {

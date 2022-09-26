@@ -1,20 +1,19 @@
-const hre = require("hardhat");
 require("dotenv").config();
 const fs = require('fs');
 
 const ProxyWalletRegistry = artifacts.require('./8.17/proxy-wallet/ProxyWalletRegistry.sol');
 
-let rawdata = fs.readFileSync('../../../../addresses.json');
+let rawdata = fs.readFileSync('../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
 module.exports = async function(deployer) {
-    const proxyWalletRegistryAbi = ProxyWalletRegistryArtifact.abi;
-    const ProxyWalletRegistry = await hre.ethers.getContractFactory("ProxyWalletRegistry");
-    const proxyWalletRegistry = await ProxyWalletRegistry.attach(
-        stablecoinAddress.proxyWalletRegistry // The deployed contract address
-    )
+
+    const AliceAddress = "0x4C5F0f90a2D4b518aFba11E22AC9b8F6B031d204" // <-ganache deployer address as Alice
+
+    const proxyWalletRegistry = await ProxyWalletRegistry.at(stablecoinAddress.proxyWalletRegistry);
+
     // ProxyWalletCreation for Alice
-    const proxyWalletAlice = await CreateProxyWallet(walletAlice, AliceAddress);
+    const proxyWalletAlice = await CreateProxyWallet(AliceAddress);
     console.log("Deployed proxyWallet of Alice is : "+ proxyWalletAlice);
 
     let proxyWalletAddresses = { 
@@ -29,10 +28,9 @@ module.exports = async function(deployer) {
     // @DEV fn names with same names causes collision issue in ethers.js
     // so fn name of build() w/o parameter changed to build0
     // const proxyWalletDeployer = await proxyWalletRegistryAsDeployer.proxies(DeployerAddress);
-    async function CreateProxyWallet(wallet, address) {
-        const proxyWalletRegistryAsUser = new hre.ethers.Contract(proxyWalletRegistry.address, proxyWalletRegistryAbi, wallet);
-        await proxyWalletRegistryAsUser.build(address);
-        const proxyWallet = await proxyWalletRegistryAsUser.proxies(address);
+    async function CreateProxyWallet(address) {
+        await proxyWalletRegistry.build(address);
+        const proxyWallet = await proxyWalletRegistry.proxies(address);
         // console.log("proxy Wallet of Alice is " + proxyWalletAlice);
         return proxyWallet;
     }

@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+require("dotenv").config();
 
 module.exports = {
   networks: {
@@ -25,14 +26,15 @@ module.exports = {
     },
     apothem: {
       host: "https://rpc.apothem.network",
-      private_key: fs.readFileSync("./privateKey").toString(),
+      // private_key: fs.readFileSync("./privateKey").toString(),
+      private_key: process.env.GORLI_DEPLOYER,
       gasPrice: '0x3b9aca00',
     },
-    fromEnv: {
-      host: process.env.ETH_HOST, // export ETH_HOST=...
-      private_key: process.env.ETH_PK, // export ETH_PK=...
-      gasPrice: process.env.GAS_PRICE, // export GAS_PRICE=...
-    },
+    // fromEnv: {
+      // host: process.env.ETH_HOST, // export ETH_HOST=...
+      // private_key: process.env.ETH_PK, // export ETH_PK=...
+      // gasPrice: process.env.GAS_PRICE, // export GAS_PRICE=...
+    // },
   },
   compilers: {
     solc: {

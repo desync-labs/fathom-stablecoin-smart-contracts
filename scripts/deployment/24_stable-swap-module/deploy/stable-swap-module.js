@@ -16,7 +16,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/stablecoin-core/StableSwapModule.sol');
 
   let addressesUpdate = { 
-    stableSwapModule: deployed.address,
+    stableSwapModule: ("xdc"+(deployed.address).slice(2)),
   };
 
   const newAddresses = {

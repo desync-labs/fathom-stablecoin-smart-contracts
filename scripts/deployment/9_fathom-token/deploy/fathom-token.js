@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/apis/fathom/FathomToken.sol');
 
   let addressesUpdate = { 
-    fathomToken: deployed.address,
+    fathomToken: ("xdc"+(deployed.address).slice(2)),
   };
 
   const newAddresses = {

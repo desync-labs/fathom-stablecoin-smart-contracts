@@ -1,78 +1,54 @@
-const hre = require("hardhat");
 require("dotenv").config();
 const fs = require('fs');
 
 const { parseEther, formatBytes32String, parseUnits } = require("ethers/lib/utils");
 const { BigNumber } = require("ethers");
-const ProxyWalletArtifact = require("../../../artifacts/contracts/8.17/proxy-wallet/ProxyWallet.sol/ProxyWallet.json");
-const WXDCArtifact = require("../../../artifacts/contracts/8.17/mocks/BEP20.sol/BEP20.json");
 
-const WeiPerWad = hre.ethers.constants.WeiPerEther
-const WeiPerRay = BigNumber.from(`1${"0".repeat(27)}`)
+const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
 
 const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 
-const privateKey1 = process.env.PRIVATE_KEY1;
-const privateKey2 = process.env.PRIVATE_KEY2;
-const privateKey3 = process.env.PRIVATE_KEY3;
-const privateKey4 = process.env.PRIVATE_KEY4;
-
-const url = "http://localhost:8545";
-let provider = new hre.ethers.providers.JsonRpcProvider(url);
-const walletAlice = new hre.ethers.Wallet(privateKey2,provider);
-
-// Contract addresses
-const AliceAddress = walletAlice.address;
+// Position Opener addresses
+const AliceAddress = "0x4C5F0f90a2D4b518aFba11E22AC9b8F6B031d204" // <-ganache deployer address as Alice
 
 var positionCounter = 0;
 
-let rawdata = fs.readFileSync('addresses.json');
+let rawdata = fs.readFileSync('../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
 let rawdata2 = fs.readFileSync('./scripts/PrepSepDemo/openClosePosition/cupcakes/2_proxyWalletAddresses.json');
 let proxyWallets = JSON.parse(rawdata2);
 
-const proxyWalletAlice = proxyWallets.proxyWalletAlice;
-const proxyWalletBob = proxyWallets.proxyWalletBob;
-const proxyWalletAbi = ProxyWalletArtifact.abi;
+const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
+const PositionManager = artifacts.require('./8.17/managers/PositionManager.sol');
+const FathomStablecoin = artifacts.require('./8.17/stablecoin-core/FathomStablecoin.sol');
+const WXDCArtifact = artifacts.require('./8.17/mocks/WXDC.sol');
+const ProxyWallet = artifacts.require('./8.17/proxy-wallet/ProxyWallet.sol');
 
 async function main() {
 
     //BookKeeper attach
-    const BookKeeper = await hre.ethers.getContractFactory("BookKeeper");
-    const bookKeeper = await BookKeeper.attach(
-        stablecoinAddress.bookKeeper // The deployed contract address
-    )
+    const bookKeeper = await BookKeeper.at(stablecoinAddress.bookKeeper);
 
     //Position Manager attach
-    const PositionManager = await hre.ethers.getContractFactory("PositionManager");
-    const positionManager = await PositionManager.attach(
-        stablecoinAddress.positionManager // The deployed contract address
-    )
+    const positionManager = await PositionManager.at(stablecoinAddress.positionManager);
 
     // Copyright Fathom 2022 stablecoin attach
-    const FathomStablecoin = await hre.ethers.getContractFactory("FathomStablecoin");
-    const fathomStablecoin = await FathomStablecoin.attach(
-        stablecoinAddress.fathomStablecoin // The deployed contract address
-    )
+    const fathomStablecoin = await FathomStablecoin.at(stablecoinAddress.fathomStablecoin);
 
-    // WXDC as signers
-    const WXDCAbi = WXDCArtifact.abi;
-    const WXDCAsAlice = new hre.ethers.Contract(stablecoinAddress.WXDC, WXDCAbi, walletAlice);
-
-    // proxyWallet as signers
-    const proxyWalletAsAlice = new hre.ethers.Contract(proxyWalletAlice, proxyWalletAbi, walletAlice);
+    // WXDC
+    const WXDC = WXDCArtifact.at(stablecoinAddress.WXDC);
     
     // 1. price of WXDC was set to 100 in the config script
 
     //Approve
-    await WXDCAsAlice.approve(proxyWalletAlice, WeiPerWad.mul(10000));
+    await WXDC.approve(proxyWalletAlice, WeiPerWad.mul(10000));
 
     // 2. Open a position as Alice twice
-    const alicePositionAddress1 = await openPosition(AliceAddress, proxyWalletAlice, proxyWalletAsAlice, "Alice");
+    const alicePositionAddress1 = await openPosition(AliceAddress, proxyWallets.proxyWalletAlice, proxyWalletAsAlice, "Alice");
     console.log("Position1 opened for Alice");
     const bobPositionAddress = "0x00"
-    const alicePositionAddress2 = await openPosition(AliceAddress, proxyWalletAlice, proxyWalletAsAlice, "Alice");
+    const alicePositionAddress2 = await openPosition(AliceAddress, proxyWallets.proxyWalletAlice, proxyWalletAsAlice, "Alice");
     console.log("Position2 opened for Alice");
 
     let positionHandlerAddresses = { 
