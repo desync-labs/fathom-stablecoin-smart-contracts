@@ -16,7 +16,7 @@ module.exports =  async function(deployer) {
 
   const deployed = artifacts.require('./8.17/proxy-actions/FathomStablecoinProxyActions.sol');
   let addressesUpdate = { 
-    fathomStablecoinProxyActions: ("xdc"+(deployed.address).slice(2)),
+    fathomStablecoinProxyActions:deployed.address,
   };
 
   const newAddresses = {

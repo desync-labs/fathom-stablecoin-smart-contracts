@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed= artifacts.require('./8.17/stablecoin-core/liquidation-strategies/FixedSpreadLiquidationStrategy.sol');
 
   let addressesUpdate = { 
-    fixedSpreadLiquidationStrategy: ("xdc"+(deployed.address).slice(2)),
+    fixedSpreadLiquidationStrategy:deployed.address,
   };
 
   const newAddresses = {

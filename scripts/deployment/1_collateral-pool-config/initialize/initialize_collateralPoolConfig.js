@@ -9,7 +9,9 @@ module.exports =  async function(deployer) {
 
   const collateralPoolConfig = await CollateralPoolConfig.at(stablecoinAddress.collateralPoolConfig);
 
+  // await collateralPoolConfig.initialize(stablecoinAddress.accessControlConfig)
+  await collateralPoolConfig.initialize("0xB7095Bb7837C4c4026e887E27B8AA23B81b2e48a")
 
-  await collateralPoolConfig.initialize(stablecoinAddress.accessControlConfig)
+  
 
 };

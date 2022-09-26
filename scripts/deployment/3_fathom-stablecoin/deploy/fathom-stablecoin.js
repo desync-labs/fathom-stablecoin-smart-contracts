@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/stablecoin-core/FathomStablecoin.sol');
 
   let addressesUpdate = { 
-    fathomStablecoin: ("xdc"+(deployed.address).slice(2)),
+    fathomStablecoin:deployed.address,
   };
 
   const newAddresses = {

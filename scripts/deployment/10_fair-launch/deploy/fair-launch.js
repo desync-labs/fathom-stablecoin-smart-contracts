@@ -26,7 +26,7 @@ module.exports =  async function(deployer) {
 
   const deployed = artifacts.require('./8.17/apis/fathom/FairLaunch.sol');
   let addressesUpdate = { 
-    fairLaunch: ("xdc"+(deployed.address).slice(2)),
+    fairLaunch:deployed.address,
   };
 
   const newAddresses = {

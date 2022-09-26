@@ -14,7 +14,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
 
   let addressesUpdate = { 
-    accessControlConfig: ("xdc"+(deployed.address).slice(2)),
+    accessControlConfig:deployed.address,
   };
 
   let data = JSON.stringify(addressesUpdate);

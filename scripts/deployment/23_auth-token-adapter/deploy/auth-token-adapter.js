@@ -16,7 +16,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/stablecoin-core/adapters/AuthTokenAdapter.sol');
 
   let addressesUpdate = { 
-    authTokenAdapter: ("xdc"+(deployed.address).slice(2)),
+    authTokenAdapter:deployed.address,
   };
 
   const newAddresses = {

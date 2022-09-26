@@ -20,7 +20,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/apis/fathom/Shield.sol');
 
   let addressesUpdate = { 
-    shield: ("xdc"+(deployed.address).slice(2)),
+    shield:deployed.address,
   };
 
   const newAddresses = {

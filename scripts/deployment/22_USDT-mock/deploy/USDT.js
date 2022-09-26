@@ -23,7 +23,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/mocks/USDT.sol');
 
   let addressesUpdate = { 
-    USDT: ("xdc"+(deployed.address).slice(2)),
+    USDT:deployed.address,
   };
 
   const newAddresses = {

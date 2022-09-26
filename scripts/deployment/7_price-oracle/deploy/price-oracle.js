@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
 
   let addressesUpdate = { 
-    priceOracle: ("xdc"+(deployed.address).slice(2)),
+    priceOracle:deployed.address,
   };
 
   const newAddresses = {

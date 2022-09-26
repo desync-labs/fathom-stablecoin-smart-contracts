@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/managers/PositionManager.sol');
 
   let addressesUpdate = { 
-    positionManager: ("xdc"+(deployed.address).slice(2)),
+    positionManager:deployed.address,
   };
 
   const newAddresses = {

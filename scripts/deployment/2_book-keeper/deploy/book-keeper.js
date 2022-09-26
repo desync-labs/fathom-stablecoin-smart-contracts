@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
 
   let addressesUpdate = { 
-    bookKeeper: ("xdc"+(deployed.address).slice(2)),
+    bookKeeper:deployed.address,
   };
 
   const newAddresses = {

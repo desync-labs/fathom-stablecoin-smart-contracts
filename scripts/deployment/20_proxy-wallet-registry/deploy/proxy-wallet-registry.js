@@ -18,7 +18,7 @@ module.exports =  async function(deployer) {
 
 
   let addressesUpdate = { 
-    proxyWalletRegistry: ("xdc"+(deployed.address).slice(2)),
+    proxyWalletRegistry:deployed.address,
   };
 
   const newAddresses = {

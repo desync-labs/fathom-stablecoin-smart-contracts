@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
 
   let addressesUpdate = { 
-    simplePriceFeedUSDT: ("xdc"+(deployed.address).slice(2)),
+    simplePriceFeedUSDT:deployed.address,
   };
 
   const newAddresses = {

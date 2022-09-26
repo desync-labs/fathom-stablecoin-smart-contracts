@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/stablecoin-core/StabilityFeeCollector.sol');
 
   let addressesUpdate = { 
-    stabilityFeeCollector: ("xdc"+(deployed.address).slice(2)),
+    stabilityFeeCollector:deployed.address,
   };
 
   const newAddresses = {

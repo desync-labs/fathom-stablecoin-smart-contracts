@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/stablecoin-core/SystemDebtEngine.sol');
 
   let addressesUpdate = { 
-    systemDebtEngine: ("xdc"+(deployed.address).slice(2)),
+    systemDebtEngine:deployed.address,
   };
 
   const newAddresses = {

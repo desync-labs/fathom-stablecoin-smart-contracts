@@ -24,7 +24,7 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./8.17/price-oracles/DexPriceOracle.sol');
 
   let addressesUpdate = { 
-    dexPriceOracle: ("xdc"+(deployed.address).slice(2)),
+    dexPriceOracle:deployed.address,
   };
 
   const newAddresses = {
