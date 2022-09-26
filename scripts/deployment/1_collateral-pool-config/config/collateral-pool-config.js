@@ -1,11 +1,10 @@
 const fs = require('fs');
 
-const { ethers, upgrades } = require("hardhat");
-
 const { BigNumber } = require("ethers");
 
+
 const { formatBytes32String } = require("ethers/lib/utils");
-const WeiPerWad = hre.ethers.constants.WeiPerEther
+const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
 const WeiPerRay = BigNumber.from(`1${"0".repeat(27)}`)
 const WeiPerRad = BigNumber.from(`1${"0".repeat(45)}`)
 const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
@@ -13,26 +12,24 @@ const CLOSE_FACTOR_BPS = BigNumber.from(5000)   // <- 0.5
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)  // <- 1.05
 const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
 
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
 
-  const signers = await ethers.getSigners()
-  const deployerAddress = signers[0].address;
-  const devAddress = signers[3].address;
+const CollateralPoolConfig = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
+const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
+const SimplePriceFeed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
+const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
+
+module.exports = async function(deployer) {
 
   console.log(">> Initializing collateral-pool-config with WXDC");
-  const CollateralPoolConfig = await hre.ethers.getContractFactory("CollateralPoolConfig");
-  const collateralPoolConfig = await CollateralPoolConfig.attach(stablecoinAddress.collateralPoolConfig);
+  const collateralPoolConfig = await CollateralPoolConfig.at(stablecoinAddress.collateralPoolConfig);
 
-  const BookKeeper = await hre.ethers.getContractFactory("BookKeeper");
-  const bookKeeper = await BookKeeper.attach(stablecoinAddress.bookKeeper);
+  const bookKeeper = await BookKeeper.at(stablecoinAddress.bookKeeper);
 
-  const SimplePriceFeed = await hre.ethers.getContractFactory("SimplePriceFeed");
-  const simplePriceFeed = await SimplePriceFeed.attach(stablecoinAddress.simplePriceFeed);
+  const simplePriceFeed = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeed);
 
-  const PriceOracle = await hre.ethers.getContractFactory("PriceOracle");
-  const priceOracle = await PriceOracle.attach(stablecoinAddress.priceOracle);
+  const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
 
   await collateralPoolConfig.initCollateralPool(
     COLLATERAL_POOL_ID,  //<-_collateralPoolId
@@ -45,22 +42,16 @@ async function main() {
     CLOSE_FACTOR_BPS.mul(2),   // <-_closeFactorBps    mul(2) therefore 100%
     LIQUIDATOR_INCENTIVE_BPS,  //<-_liquidatorIncentiveBps
     TREASURY_FEE_BPS,  //<-_treasuryFeesBps
-    stablecoinAddress.fixedSpreadLiquidationStrategy  //<-_strategy 
+    stablecoinAddress.fixedSpreadLiquidationStrategy  //<-_strategy
+    , { gasLimit: 1000000 } 
   )
 //   await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, fixedSpreadLiquidationStrategy.address)
   const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);
   const debtCeilingSetUpWXDC = WeiPerRad.mul(10000000).div(2);
-  await bookKeeper.setTotalDebtCeiling(debtCeilingSetUpTotal);
-  await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, debtCeilingSetUpWXDC);
+  await bookKeeper.setTotalDebtCeiling(debtCeilingSetUpTotal, { gasLimit: 1000000 });
+  await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, debtCeilingSetUpWXDC, { gasLimit: 1000000 });
 //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay);
   //setting _rawPrice and _priceWithSafetyMargin of WXDC to 100
-  await simplePriceFeed.setPrice(WeiPerWad.mul(100));
-  await priceOracle.setPrice(COLLATERAL_POOL_ID);
+  await simplePriceFeed.setPrice(WeiPerWad.mul(100), { gasLimit: 1000000 });
+  await priceOracle.setPrice(COLLATERAL_POOL_ID, { gasLimit: 1000000 });
 }
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});

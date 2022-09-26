@@ -1,7 +1,7 @@
 
 check:
-	coralX execute --network development --path scripts/deployment/16_fixed-spread-liquidation-strategy/deploy/fixed-spread-liquidation-strategy.js
-	coralX execute --network development --path scripts/deployment/16_fixed-spread-liquidation-strategy/initialize/initialize_fixed-spread-liquidation-strategy.js
+	coralX execute --network development --path scripts/deployment/18_stability-fee-collector/deploy/stability-fee-collector.js
+	coralX execute --network development --path scripts/deployment/18_stability-fee-collector/initialize/initialize_stability-fee-collector.js
 
 deploy:
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
@@ -56,12 +56,15 @@ deploy:
 
 	coralX execute --network development --path scripts/deployment/16_fixed-spread-liquidation-strategy/deploy/fixed-spread-liquidation-strategy.js
 	coralX execute --network development --path scripts/deployment/16_fixed-spread-liquidation-strategy/initialize/initialize_fixed-spread-liquidation-strategy.js
-	
-next:
+
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-price-oracle-role.js
 	coralX execute --network development --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config.js
+
 	coralX execute --network development --path scripts/deployment/17_proxy-actions/deploy/proxy-actions.js
+
 	coralX execute --network development --path scripts/deployment/18_stability-fee-collector/deploy/stability-fee-collector.js
+	coralX execute --network development --path scripts/deployment/18_stability-fee-collector/initialize/initialize_stability-fee-collector.js
+next:
 	coralX execute --network development --path scripts/deployment/19_proxy-wallet-factory/deploy/proxy-wallet-factory.js
 	coralX execute --network development --path scripts/deployment/20_proxy-wallet-registry/deploy/proxy-wallet-registry.js
 	coralX execute --network development --path scripts/deployment/21_dex-price-oracle/deploy/dex-price-oracle.js
