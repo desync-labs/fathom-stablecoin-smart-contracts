@@ -1,24 +1,16 @@
 const fs = require('fs');
-
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-async function main() {
+const FathomStablecoin = artifacts.require('./8.17/stablecoin-core/FathomStablecoin.sol');
 
-  const FATHOM_STABLECOIN_ADDR = stablecoinAddress.fathomStablecoin
-  const STABLECOIN_ADAPTER_ADDR = stablecoinAddress.stablecoinAdapter
-
-  const FathomStablecoin = await hre.ethers.getContractFactory("FathomStablecoin");
-  const fathomStablecoin = await FathomStablecoin.attach(FATHOM_STABLECOIN_ADDR);
-
+const STABLECOIN_ADAPTER_ADDR = stablecoinAddress.stablecoinAdapter
+module.exports =  async function(deployer) {
   console.log(`>> Grant MINTER_ROLE address: ${STABLECOIN_ADAPTER_ADDR}`)
-  await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), STABLECOIN_ADAPTER_ADDR);
+
+  const fathomStablecoin = await FathomStablecoin.at(stablecoinAddress.fathomStablecoin);
+
+  await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), STABLECOIN_ADAPTER_ADDR, { gasLimit: 1000000 });
   console.log("✅ Done")
 
-}
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+};

@@ -1,6 +1,6 @@
 
 check:
-	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role.js
+	coralX execute --network development --path scripts/deployment/2_book-keeper/config/whitelist-collateral-token-adapter.js
 
 deploy:
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
@@ -86,22 +86,37 @@ deploy:
 
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-auth-token-adapter-role.js
 
-next:
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-book-keeper-role.js
+
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-manager-role.js
+
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-gov-role.js
+
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-liquidation-engine-role.js
+
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-liquidation-strategy-role.js
+
 	# coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-mintable-role.js
+
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-position-manager-role.js
+
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-show-stopper-role.js
+
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-stability-fee-collector-role.js
+
 	coralX execute --network development --path scripts/deployment/3_fathom-stablecoin/config/grant-minter-role.js
+
 	coralX execute --network development --path scripts/deployment/2_book-keeper/config/set-total-debt-ceiling.js
+
 	coralX execute --network development --path scripts/deployment/24_stable-swap-module/config/set-fee-in.js
+	
 	coralX execute --network development --path scripts/deployment/24_stable-swap-module/config/set-fee-out.js
+
 	coralX execute --network development --path scripts/deployment/2_book-keeper/config/whitelist-collateral-token-adapter.js
+	
 	# coralX execute --network development --path scripts/deployment/10_fair-launch/config/fair-launch-config-USDT.js
+
+next:
 
 	coralX execute --network development --path scripts/deployment/14_collateral-token-adapter/deploy/collateral-token-adapter-USDT.js
 	coralX execute --network development --path scripts/deployment/2_book-keeper/config/whitelist-collateral-token-adapter-USDT.js

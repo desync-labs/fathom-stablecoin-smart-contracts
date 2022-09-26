@@ -1,22 +1,17 @@
 const fs = require('fs');
 
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
+const AccessControlConfig = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
 
+module.exports = async function(deployer) {
   const SHOW_STOPPER_ADDR = stablecoinAddress.showStopper;
 
-  const AccessControlConfig = await hre.ethers.getContractFactory("AccessControlConfig");
-  const accessControlConfig = await AccessControlConfig.attach(stablecoinAddress.accessControlConfig);
+  const accessControlConfig = await AccessControlConfig.at(stablecoinAddress.accessControlConfig);
 
   console.log(">> Grant SHOW_STOPPER_ROLE")
-  await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), SHOW_STOPPER_ADDR);
-  console.log("✅ Done")
-}
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), SHOW_STOPPER_ADDR, { gasLimit: 1000000 });
+
+  console.log("✅ Done")
+};

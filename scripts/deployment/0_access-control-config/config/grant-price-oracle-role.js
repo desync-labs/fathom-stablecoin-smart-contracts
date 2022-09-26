@@ -8,8 +8,6 @@ module.exports = async function(deployer) {
 
   const accessControlConfig = await AccessControlConfig.at(stablecoinAddress.accessControlConfig);
 
-  // const accessControlConfig = await artifacts.initializeInterfaceAt("IAccessControlConfig", stablecoinAddress.accessControlConfig);
-
   console.log(`>> Grant PRICE_ORACLE_ROLE address: ${stablecoinAddress.priceOracle}`)
 
   await accessControlConfig.grantRole(await accessControlConfig.PRICE_ORACLE_ROLE(), stablecoinAddress.priceOracle, { gasLimit: 1000000 })

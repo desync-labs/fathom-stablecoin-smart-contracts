@@ -1,22 +1,17 @@
 const fs = require('fs');
 
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
+const AccessControlConfig = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
 
+module.exports = async function(deployer) {
   const LIQUIDATION_ENGINE_ADDR = stablecoinAddress.liquidationEngine;
 
-  const AccessControlConfig = await hre.ethers.getContractFactory("AccessControlConfig");
-  const accessControlConfig = await AccessControlConfig.attach(stablecoinAddress.accessControlConfig);
+  const accessControlConfig = await AccessControlConfig.at(stablecoinAddress.accessControlConfig);
+
 
   console.log(`>> Grant LIQUIDATION_ENGINE_ROLE address: ${LIQUIDATION_ENGINE_ADDR}`)
-  await accessControlConfig.grantRole(await accessControlConfig.LIQUIDATION_ENGINE_ROLE(), LIQUIDATION_ENGINE_ADDR);
-  console.log("✅ Done")
-}
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  await accessControlConfig.grantRole(await accessControlConfig.LIQUIDATION_ENGINE_ROLE(), LIQUIDATION_ENGINE_ADDR, { gasLimit: 1000000 })
+  console.log("✅ Done")
+};

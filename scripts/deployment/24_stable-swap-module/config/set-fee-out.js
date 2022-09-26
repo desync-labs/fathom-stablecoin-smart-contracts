@@ -1,28 +1,18 @@
 const fs = require('fs');
-
-const WeiPerWad = hre.ethers.constants.WeiPerEther
-
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
 
-    const FEE_OUT = WeiPerWad.mul(2).div(1000); // [wad = 100%]
-    0.2
-  
-    const StableSwapModule = await hre.ethers.getContractFactory("StableSwapModule");
-    const stableSwapModule = await StableSwapModule.attach(stablecoinAddress.stableSwapModule);
-  
-    console.log(`>> setFeeIn to ${FEE_OUT}`)
-    const tx = await stableSwapModule.setFeeOut(FEE_OUT)
-    await tx.wait()
-    console.log(`tx hash: ${tx.hash}`)
-    console.log("✅ Done")
+const StableSwapModule = artifacts.require('./8.17/stablecoin-core/StableSwapModule.sol');
+const { BigNumber } = require("ethers");
 
-}
+const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+module.exports =  async function(deployer) {
+  const FEE_OUT = WeiPerWad.mul(2).div(1000); // [wad = 100%]
+
+  const stableSwapModule = await StableSwapModule.at(stablecoinAddress.stableSwapModule);
+
+  console.log(`>> setFeeOut to ${FEE_OUT}`)
+  await stableSwapModule.setFeeOut(FEE_OUT, { gasLimit: 1000000 })
+  console.log("✅ Done")
+};
