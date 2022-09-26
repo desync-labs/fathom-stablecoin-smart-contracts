@@ -1,26 +1,23 @@
 const fs = require('fs');
 
-const { ethers, upgrades } = require("hardhat");
+const SimplePriceFeed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
 
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-async function main() {
+
+module.exports =  async function(deployer) {
 
   console.log(">> Deploying an upgradable SimplePriceFeed contract")
-  const SimplePriceFeed = (await ethers.getContractFactory(
-    "SimplePriceFeed",
-    (
-      await ethers.getSigners()
-    )[0]
-  ))
-  const simplePriceFeed = await upgrades.deployProxy(SimplePriceFeed, [stablecoinAddress.accessControlConfig])
-  await simplePriceFeed.deployed()
-  console.log(`>> Deployed at ${simplePriceFeed.address}`)
-  const tx = await simplePriceFeed.deployTransaction.wait()
-  console.log(`>> Deploy block ${tx.blockNumber}`)
+  let promises = [
+      deployer.deploy(SimplePriceFeed, { gas: 4050000 }),
+  ];
+
+  await Promise.all(promises);
+
+  const deployed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
 
   let addressesUpdate = { 
-    simplePriceFeed: simplePriceFeed.address,
+    simplePriceFeed: deployed.address,
   };
 
   const newAddresses = {
@@ -28,16 +25,6 @@ async function main() {
     ...addressesUpdate
   };
 
-  const newData = JSON.stringify(newAddresses);
-  fs.writeFile("./addresses.json", newData, err => {
-    if(err) throw err;
-    console.log("New address added");
-  })
-}
-
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('./addresses.json', data);
+};

@@ -1,7 +1,7 @@
 
 check:
-	coralX execute --network development --path scripts/deployment/14_collateral-token-adapter/deploy/collateral-token-adapter.js
-	coralX execute --network development --path scripts/deployment/14_collateral-token-adapter/initialize/initialize_collateral-token-adapter.js
+	coralX execute --network development --path scripts/deployment/16_fixed-spread-liquidation-strategy/deploy/fixed-spread-liquidation-strategy.js
+	coralX execute --network development --path scripts/deployment/16_fixed-spread-liquidation-strategy/initialize/initialize_fixed-spread-liquidation-strategy.js
 
 deploy:
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
@@ -47,10 +47,17 @@ deploy:
 
 	coralX execute --network development --path scripts/deployment/14_collateral-token-adapter/deploy/collateral-token-adapter.js
 	coralX execute --network development --path scripts/deployment/14_collateral-token-adapter/initialize/initialize_collateral-token-adapter.js
-next:
+	
 	coralX execute --network development --path scripts/deployment/15_simple-price-feed/deploy/simple-price-feed.js
 	coralX execute --network development --path scripts/deployment/15_simple-price-feed/deploy/simple-price-feed-USDT.js
+
+	coralX execute --network development --path scripts/deployment/15_simple-price-feed/initialize/initialize_simple-price-feed.js
+	coralX execute --network development --path scripts/deployment/15_simple-price-feed/initialize/initialize_simple-price-feed-USDT.js
+
 	coralX execute --network development --path scripts/deployment/16_fixed-spread-liquidation-strategy/deploy/fixed-spread-liquidation-strategy.js
+	coralX execute --network development --path scripts/deployment/16_fixed-spread-liquidation-strategy/initialize/initialize_fixed-spread-liquidation-strategy.js
+	
+next:
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-price-oracle-role.js
 	coralX execute --network development --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config.js
 	coralX execute --network development --path scripts/deployment/17_proxy-actions/deploy/proxy-actions.js
@@ -98,3 +105,6 @@ next:
 
 	coralX execute --network development --path scripts/PrepSepDemo/stableSwap/1_mintUSDTtoDeployer.js
 	coralX execute --network development --path scripts/PrepSepDemo/stableSwap/2_swapThreeMilUSDT.js
+
+note:
+	# I might have to set price again, just like what happend with Goerli
