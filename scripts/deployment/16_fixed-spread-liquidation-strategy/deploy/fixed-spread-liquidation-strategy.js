@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const FixedSpreadLiquidationStrategy = artifacts.require('./8.17/stablecoin-core/liquidation-strategies/FixedSpreadLiquidationStrategy.sol');
+const FixedSpreadLiquidationStrategy = artifacts.require('./8.17/proxy-wallet/ProxyWalletRegistry.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);

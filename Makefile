@@ -1,7 +1,7 @@
 
 check:
-	coralX execute --network development --path scripts/deployment/18_stability-fee-collector/deploy/stability-fee-collector.js
-	coralX execute --network development --path scripts/deployment/18_stability-fee-collector/initialize/initialize_stability-fee-collector.js
+	coralX execute --network development --path scripts/deployment/20_proxy-wallet-registry/deploy/proxy-wallet-registry.js
+	coralX execute --network development --path scripts/deployment/20_proxy-wallet-registry/initialize/initialize_proxy-wallet-registry.js
 
 deploy:
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
@@ -64,11 +64,13 @@ deploy:
 
 	coralX execute --network development --path scripts/deployment/18_stability-fee-collector/deploy/stability-fee-collector.js
 	coralX execute --network development --path scripts/deployment/18_stability-fee-collector/initialize/initialize_stability-fee-collector.js
-next:
-	coralX execute --network development --path scripts/deployment/19_proxy-wallet-factory/deploy/proxy-wallet-factory.js
-	coralX execute --network development --path scripts/deployment/20_proxy-wallet-registry/deploy/proxy-wallet-registry.js
-	coralX execute --network development --path scripts/deployment/21_dex-price-oracle/deploy/dex-price-oracle.js
 
+	coralX execute --network development --path scripts/deployment/19_proxy-wallet-factory/deploy/proxy-wallet-factory.js
+
+	coralX execute --network development --path scripts/deployment/20_proxy-wallet-registry/deploy/proxy-wallet-registry.js
+	coralX execute --network development --path scripts/deployment/20_proxy-wallet-registry/initialize/initialize_proxy-wallet-registry.js
+next:
+	coralX execute --network development --path scripts/deployment/21_dex-price-oracle/deploy/dex-price-oracle.js
 	coralX execute --network development --path scripts/deployment/23_auth-token-adapter/deploy/auth-token-adapter.js
 	coralX execute --network development --path scripts/deployment/24_stable-swap-module/deploy/stable-swap-module.js
 	coralX execute --network development --path scripts/deployment/25_get-positions/deploy/get-positions.js
