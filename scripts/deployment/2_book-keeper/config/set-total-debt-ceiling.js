@@ -16,7 +16,7 @@ module.exports =  async function(deployer) {
   const bookKeeper = await BookKeeper.at(stablecoinAddress.bookKeeper);
 
   console.log(">> set TOTAL_DEBT_SHARE")
-  await bookKeeper.setTotalDebtCeiling(TOTAL_DEBT_CEILING)
+  await bookKeeper.setTotalDebtCeiling(TOTAL_DEBT_CEILING, { gasLimit: 1000000 })
   console.log("✅ Done")
 
 };

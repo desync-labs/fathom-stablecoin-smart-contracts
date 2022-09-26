@@ -6,7 +6,7 @@ let stablecoinAddress = JSON.parse(rawdata);
 const FixedSpreadLiquidationStrategy = artifacts.require('./8.17/stablecoin-core/liquidation-strategies/FixedSpreadLiquidationStrategy.sol');
 
 module.exports =  async function(deployer) {
-  console.log(">> Initializing SimplePriceFeed")
+  console.log(">> Initializing FixedSpreadLiquidationStrategy")
 
   const fixedSpreadLiquidationStrategy = await FixedSpreadLiquidationStrategy.at(stablecoinAddress.fixedSpreadLiquidationStrategy);
 

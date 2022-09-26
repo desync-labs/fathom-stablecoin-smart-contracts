@@ -2,32 +2,12 @@ const hre = require("hardhat");
 require("dotenv").config();
 const fs = require('fs');
 
-// getting artifact
-const ProxyWalletRegistryArtifact = require("../../../artifacts/contracts/8.17/proxy-wallet/ProxyWalletRegistry.sol/ProxyWalletRegistry.json");
+const ProxyWalletRegistry = artifacts.require('./8.17/proxy-wallet/ProxyWalletRegistry.sol');
 
-const privateKey1 = process.env.PRIVATE_KEY1;
-const privateKey2 = process.env.PRIVATE_KEY2;
-const privateKey3 = process.env.PRIVATE_KEY3;
-const privateKey4 = process.env.PRIVATE_KEY4;
-
-const url = "http://localhost:8545";
-let provider = new hre.ethers.providers.JsonRpcProvider(url);
-const walletDeployer = new hre.ethers.Wallet(privateKey1,provider);
-const walletAlice = new hre.ethers.Wallet(privateKey2,provider);
-const walletBob = new hre.ethers.Wallet(privateKey3,provider);
-const walletDev = new hre.ethers.Wallet(privateKey4,provider);
-
-
-// The second address from ganache
-const AliceAddress = walletAlice.address;
-// The third address from ganache
-const BobAddress = walletBob.address;
-
-
-let rawdata = fs.readFileSync('addresses.json');
+let rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-async function main() {
+module.exports = async function(deployer) {
     const proxyWalletRegistryAbi = ProxyWalletRegistryArtifact.abi;
     const ProxyWalletRegistry = await hre.ethers.getContractFactory("ProxyWalletRegistry");
     const proxyWalletRegistry = await ProxyWalletRegistry.attach(
@@ -57,8 +37,3 @@ async function main() {
         return proxyWallet;
     }
 }
-
-main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-});

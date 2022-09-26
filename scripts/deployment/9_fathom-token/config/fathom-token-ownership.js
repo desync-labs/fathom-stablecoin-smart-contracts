@@ -1,18 +1,13 @@
 const fs = require('fs');
 
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
+
 let stablecoinAddress = JSON.parse(rawdata);
 
-async function main() {
-    console.log(">> Initializing fairLaunch with WXDC");
-    const FathomToken = await hre.ethers.getContractFactory("FathomToken");
-    const fathomToken = await FathomToken.attach(stablecoinAddress.fathomToken);
+const FathomToken = artifacts.require('./8.17/apis/fathom/FathomToken.sol');
 
-    await fathomToken.transferOwnership(stablecoinAddress.fairLaunch);
-}
-
-main().catch((error) => {
-    console.error(error);
-    process.exitCode = 1;
-  });
-  
+module.exports = async function(deployer) {
+    console.log(">> transfering fathom token's ownership to fairLaunch");
+    const fathomToken = await FathomToken.at(stablecoinAddress.fathomToken);
+    await fathomToken.transferOwnership(stablecoinAddress.fairLaunch, { gasLimit: 1000000 });
+};

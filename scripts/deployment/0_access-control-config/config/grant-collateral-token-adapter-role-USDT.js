@@ -1,23 +1,16 @@
 const fs = require('fs');
 
-const rawdata = fs.readFileSync('./addresses.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
+const AccessControlConfig = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
 
-async function main() {
+module.exports = async function(deployer) {
+  const ADAPTER_ADDR = stablecoinAddress.collateralTokenAdapterUSDT;
 
-  const ADAPTER_ADDR2 = stablecoinAddress.collateralTokenAdapterUSDT;
+  const accessControlConfig = await AccessControlConfig.at(stablecoinAddress.accessControlConfig);
 
-  const AccessControlConfig = await hre.ethers.getContractFactory("AccessControlConfig");
-  const accessControlConfig = await AccessControlConfig.attach(stablecoinAddress.accessControlConfig);
+  console.log(`>> Grant ADAPTER_ROLE address: ${ADAPTER_ADDR}`)
 
-  console.log(`>> Grant ADAPTER_ROLE address: ${ADAPTER_ADDR2}`)
-
-  await accessControlConfig.grantRole(await accessControlConfig.ADAPTER_ROLE(), ADAPTER_ADDR2, { gasLimit: 1000000 })
+  await accessControlConfig.grantRole(await accessControlConfig.ADAPTER_ROLE(), ADAPTER_ADDR, { gasLimit: 1000000 })
   console.log("✅ Done")
-}
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+};

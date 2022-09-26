@@ -7,7 +7,7 @@ let stablecoinAddress = JSON.parse(rawdata);
 
 module.exports =  async function(deployer) {
 
-  console.log(">> Deploying an upgradable CollateralTokenAdapter contract")
+  console.log(">> Deploying an upgradable CollateralTokenAdapterUSDT contract")
   let promises = [
       deployer.deploy(CollateralTokenAdapter, { gas: 4050000 }),
   ];
