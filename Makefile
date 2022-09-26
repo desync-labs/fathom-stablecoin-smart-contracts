@@ -1,7 +1,6 @@
 
 check:
-	coralX execute --network development --path scripts/deployment/25_get-positions/deploy/get-positions.js
-	coralX execute --network development --path scripts/deployment/25_get-positions/initialize/initialize_get-positions.js
+	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role.js
 
 deploy:
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
@@ -81,11 +80,13 @@ deploy:
 
 	coralX execute --network development --path scripts/deployment/25_get-positions/deploy/get-positions.js
 	coralX execute --network development --path scripts/deployment/25_get-positions/initialize/initialize_get-positions.js
-	
-next:
+
 	coralX execute --network development --path scripts/deployment/23_auth-token-adapter/config/auth-token-adapter-whitelist.js
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role.js
+
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-auth-token-adapter-role.js
+
+next:
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-book-keeper-role.js
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-manager-role.js
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-gov-role.js
