@@ -12,7 +12,7 @@ module.exports =  async function(deployer) {
 
   await simplePriceFeedUSDT.initialize(
     stablecoinAddress.accessControlConfig,
-    {from:accounts[0]}
+   { gasLimit: 1000000 }
   )
 
 

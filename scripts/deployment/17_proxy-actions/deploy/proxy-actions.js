@@ -9,7 +9,7 @@ module.exports =  async function(deployer) {
 
   console.log(">> Deploying an FathomStablecoinProxyActions contract")
   let promises = [
-      deployer.deploy(FathomStablecoinProxyActions, { gas: 5050000 }),
+      deployer.deploy(FathomStablecoinProxyActions, { gaslimit: 5050000 }),
   ];
 
   await Promise.all(promises);

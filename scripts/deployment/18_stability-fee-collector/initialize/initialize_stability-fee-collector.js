@@ -12,7 +12,6 @@ module.exports =  async function(deployer) {
 
   await stabilityFeeCollector.initialize(
     stablecoinAddress.bookKeeper,
-    stablecoinAddress.systemDebtEngine,
-  )
+    stablecoinAddress.systemDebtEngine, { gaslimit : 4050000 })
 
 };

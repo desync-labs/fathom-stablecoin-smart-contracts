@@ -9,12 +9,11 @@ module.exports =  async function(deployer) {
   console.log(">> Initializing FixedSpreadLiquidationStrategy")
 
   const fixedSpreadLiquidationStrategy = await FixedSpreadLiquidationStrategy.at(stablecoinAddress.fixedSpreadLiquidationStrategy);
-
+  
   await fixedSpreadLiquidationStrategy.initialize(
     stablecoinAddress.bookKeeper,
     stablecoinAddress.priceOracle,
     stablecoinAddress.liquidationEngine,
     stablecoinAddress.systemDebtEngine,
-    {from:accounts[0]}
-  )
+  );
 };

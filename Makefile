@@ -1,4 +1,4 @@
-
+continue:
 check:
 	coralX execute --network apothem --path scripts/PrepSepDemo/openClosePosition/3_openPosition.js
 deploy:
@@ -7,76 +7,78 @@ deploy:
 
 	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/deploy/collateral-pool-config.js
 	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/deploy/collateral-pool-config-USDT.js
-
+# deploy1:
 	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/initialize/initialize_collateralPoolConfig.js
 	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/initialize/initialize_collateralPoolConfig-USDT.js
-
+# deploy2:
 	coralX execute --network apothem --path scripts/deployment/2_book-keeper/deploy/book-keeper.js
 	coralX execute --network apothem --path scripts/deployment/2_book-keeper/initialize/initialize_book-keeper.js
 	coralX execute --network apothem --path scripts/deployment/3_fathom-stablecoin/deploy/fathom-stablecoin.js
 	coralX execute --network apothem --path scripts/deployment/3_fathom-stablecoin/initialize/initialize_fathom-stablecoin.js
 	coralX execute --network apothem --path scripts/deployment/4_system-debt-engine/deploy/system-debt-engine.js
 	coralX execute --network apothem --path scripts/deployment/4_system-debt-engine/initialize/initialize_system-debt-engine.js
-
+# deploy3:
 	coralX execute --network apothem --path scripts/deployment/5_liquidation-engine/deploy/liquidation-engine.js
 	coralX execute --network apothem --path scripts/deployment/5_liquidation-engine/initialize/initialize_liquidation-engine.js
-
+# deploy4:
 	coralX execute --network apothem --path scripts/deployment/6_stablecoin-adapter/deploy/stablecoin-adapter.js
 	coralX execute --network apothem --path scripts/deployment/6_stablecoin-adapter/initialize/initialize_stablecoin-adapter.js
-
+# deploy5:
 	coralX execute --network apothem --path scripts/deployment/7_price-oracle/deploy/price-oracle.js
 	coralX execute --network apothem --path scripts/deployment/7_price-oracle/initialize/initialize_price-oracle.js
-
+# deploy6:
 	coralX execute --network apothem --path scripts/deployment/8_show-stopper/deploy/show-stopper.js
 	coralX execute --network apothem --path scripts/deployment/8_show-stopper/initialize/initialize_show-stopper.js
-
+# deploy7:
 	coralX execute --network apothem --path scripts/deployment/9_fathom-token/deploy/fathom-token.js
 	coralX execute --network apothem --path scripts/deployment/10_fair-launch/deploy/fair-launch.js
+# deploy8:
 	coralX execute --network apothem --path scripts/deployment/11_WXDC/deploy/WXDC.js
 	coralX execute --network apothem --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
-
+# deploy9:
 	coralX execute --network apothem --path scripts/deployment/22_USDT-mock/deploy/USDT.js
 	coralX execute --network apothem --path scripts/deployment/22_USDT-mock/initialize/initialize_USDT.js
-
+# deploy10:
 	coralX execute --network apothem --path scripts/deployment/12_shield/deploy/shield.js
 	coralX execute --network apothem --path scripts/deployment/10_fair-launch/config/fair-launch-config.js
+
 	coralX execute --network apothem --path scripts/deployment/13_position-manager/deploy/position-manager.js
 	coralX execute --network apothem --path scripts/deployment/13_position-manager/initialize/initialize_position-manager.js
-
+# deploy11:
 	coralX execute --network apothem --path scripts/deployment/14_collateral-token-adapter/deploy/collateral-token-adapter.js
 	coralX execute --network apothem --path scripts/deployment/14_collateral-token-adapter/initialize/initialize_collateral-token-adapter.js
-	
+
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/deploy/simple-price-feed.js
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/deploy/simple-price-feed-USDT.js
-
+# deploy12:
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/initialize/initialize_simple-price-feed.js
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/initialize/initialize_simple-price-feed-USDT.js
 
 	coralX execute --network apothem --path scripts/deployment/16_fixed-spread-liquidation-strategy/deploy/fixed-spread-liquidation-strategy.js
 	coralX execute --network apothem --path scripts/deployment/16_fixed-spread-liquidation-strategy/initialize/initialize_fixed-spread-liquidation-strategy.js
-
+# deploy13:
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-price-oracle-role.js
 	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config.js
-
+# deploy14:
 	coralX execute --network apothem --path scripts/deployment/17_proxy-actions/deploy/proxy-actions.js
-
+# deploy15:
 	coralX execute --network apothem --path scripts/deployment/18_stability-fee-collector/deploy/stability-fee-collector.js
 	coralX execute --network apothem --path scripts/deployment/18_stability-fee-collector/initialize/initialize_stability-fee-collector.js
 
 	coralX execute --network apothem --path scripts/deployment/19_proxy-wallet-factory/deploy/proxy-wallet-factory.js
-
+# deploy16:
 	coralX execute --network apothem --path scripts/deployment/20_proxy-wallet-registry/deploy/proxy-wallet-registry.js
 	coralX execute --network apothem --path scripts/deployment/20_proxy-wallet-registry/initialize/initialize_proxy-wallet-registry.js
-
+# deploy17:
 	coralX execute --network apothem --path scripts/deployment/21_dex-price-oracle/deploy/dex-price-oracle.js
 	coralX execute --network apothem --path scripts/deployment/21_dex-price-oracle/initialize/initialize_dex-price-oracle.js
-
+# deploy18:
 	coralX execute --network apothem --path scripts/deployment/23_auth-token-adapter/deploy/auth-token-adapter.js
 	coralX execute --network apothem --path scripts/deployment/23_auth-token-adapter/initialize/initialize_auth-token-adapter.js
-
+# deploy19:
 	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/deploy/stable-swap-module.js
 	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/initialize/initialize_stable-swap-module.js
-
+deploy20:
 	coralX execute --network apothem --path scripts/deployment/25_get-positions/deploy/get-positions.js
 	coralX execute --network apothem --path scripts/deployment/25_get-positions/initialize/initialize_get-positions.js
 

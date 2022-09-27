@@ -9,7 +9,7 @@ module.exports =  async function(deployer) {
 
   console.log(">> Deploying ProxyWalletFactory contract")
   let promises = [
-      deployer.deploy(ProxyWalletFactory, { gas: 4050000 }),
+      deployer.deploy(ProxyWalletFactory, { gaslimit: 4050000 }),
   ];
 
   await Promise.all(promises);

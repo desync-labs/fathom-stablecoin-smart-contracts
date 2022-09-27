@@ -9,7 +9,7 @@ module.exports =  async function(deployer) {
   console.log(">> Deploying an upgradable CollateralPoolConfig contract")
 
   let promises = [
-      deployer.deploy(CollateralPoolConfig, { gas: 3050000 }),
+      deployer.deploy(CollateralPoolConfig, { gas: 4050000 }),
   ];
 
   await Promise.all(promises);

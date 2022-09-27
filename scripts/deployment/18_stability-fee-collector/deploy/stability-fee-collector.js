@@ -9,7 +9,7 @@ module.exports =  async function(deployer) {
 
   console.log(">> Deploying an upgradable StabilityFeeCollector contract")
   let promises = [
-      deployer.deploy(StabilityFeeCollector, { gas: 4050000 }),
+      deployer.deploy(StabilityFeeCollector, { gaslimit : 4050000 }),
   ];
 
   await Promise.all(promises);

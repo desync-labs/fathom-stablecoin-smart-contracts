@@ -43,7 +43,7 @@ module.exports = async function(deployer) {
     LIQUIDATOR_INCENTIVE_BPS,  //<-_liquidatorIncentiveBps
     TREASURY_FEE_BPS,  //<-_treasuryFeesBps
     stablecoinAddress.fixedSpreadLiquidationStrategy  //<-_strategy
-    , { gasLimit: 1000000 } 
+    , { gas : 5000000 } 
   );
 //   await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, fixedSpreadLiquidationStrategy.address)
   const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);

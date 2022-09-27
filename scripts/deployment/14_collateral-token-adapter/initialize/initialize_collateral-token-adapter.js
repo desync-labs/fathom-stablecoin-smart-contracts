@@ -30,6 +30,6 @@ module.exports =  async function(deployer) {
     BigNumber.from(1000),                   //TREASURY_FEE_BPS 1000
     devAddress,                 // deployer asTREASURY_ACCOUNT
     stablecoinAddress.positionManager
-    , { gasLimit: 1000000 }
+    , { gasLimit: 5000000 }
     )
 };

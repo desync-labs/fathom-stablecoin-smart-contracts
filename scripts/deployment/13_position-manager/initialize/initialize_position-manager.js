@@ -12,6 +12,7 @@ module.exports =  async function(deployer) {
   await positionManager.initialize(
     stablecoinAddress.bookKeeper,
     stablecoinAddress.showStopper
+    , { gasLimit: 1000000 }
   )
 
 };

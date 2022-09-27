@@ -29,7 +29,6 @@ module.exports =  async function(deployer) {
     deployerAddress,                 // deployer as TIME_LOCK
     BigNumber.from(1000),                   //TREASURY_FEE_BPS 1000
     devAddress,                 // deployer asTREASURY_ACCOUNT
-    stablecoinAddress.positionManager,
-    {from:accounts[0]}
+    stablecoinAddress.positionManager, { gasLimit: 3000000 }
   );
 };

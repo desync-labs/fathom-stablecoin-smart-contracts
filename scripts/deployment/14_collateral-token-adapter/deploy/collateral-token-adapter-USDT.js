@@ -9,7 +9,7 @@ module.exports =  async function(deployer) {
 
   console.log(">> Deploying an upgradable CollateralTokenAdapterUSDT contract")
   let promises = [
-      deployer.deploy(CollateralTokenAdapter, { gas: 4050000 }),
+      deployer.deploy(CollateralTokenAdapter, { gas: 5050000 }),
   ];
 
   await Promise.all(promises);
