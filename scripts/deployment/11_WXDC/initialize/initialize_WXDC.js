@@ -17,11 +17,11 @@ module.exports =  async function(deployer) {
 
 
   await WXDCInstance.mint(
-    walletDeployer, BigNumber.from("10000000000000000000000000"), { gasLimit: 1000000 }
+    walletDeployer, BigNumber.from("90000000000000000000000000000000"), { gasLimit: 1000000 }
   )
 
-  await WXDCInstance.mint(
-    devAddress, BigNumber.from("10000000000000000000000000"), { gasLimit: 1000000 }
-  )
+  // await WXDCInstance.mint(
+  //   devAddress, BigNumber.from("10000000000000000000000000"), { gasLimit: 1000000 }
+  // )
 
 };

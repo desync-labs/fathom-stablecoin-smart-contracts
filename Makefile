@@ -1,4 +1,36 @@
-continue:
+dexInt99:
+	# mint more tokens    done
+	coralX execute --network apothem --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
+	coralX execute --network apothem --path scripts/deployment/22_USDT-mock/initialize/initialize_USDT.js
+dexInt98:
+	# add pool on DEX done
+	WXDC
+dexInt0:
+	#deploy DexPriceOracle  -done
+	# coralX execute --network apothem --path scripts/deployment/21_dex-price-oracle/deploy/dex-price-oracle.js
+	coralX execute --network apothem --path scripts/deployment/21_dex-price-oracle/initialize/initialize_dex-price-oracle.js
+dexInt1:
+	#deploy FathomOraclePriceFee -done
+	# coralX execute --network apothem --path scripts/deployment/26_fathom-oracle-price-feed/deploy/fathom-oracle-price-feed.js
+	coralX execute --network apothem --path scripts/deployment/26_fathom-oracle-price-feed/initialize/initialize_fathom-oracle-price-feed.js
+dexInt2:
+	#setPriceFeed to FathomOraclePriceFeed -done
+	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/config/setPriceFeed.js
+
+dexInt3:
+	# //change LTV --done -I need to do this for Gorli as well
+	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/config/ltv.js
+
+dexInt4:
+	# //SetPrice --done - Ineed to do this or Gorli as well.
+	coralX execute --network apothem --path scripts/deployment/7_price-oracle/config/setPrice.js
+
+
+fathomStats:
+	# coralX execute --network apothem --path scripts/deployment/27_stats/deploy/stats.js
+	coralX execute --network apothem --path scripts/deployment/27_stats/initialize/initialize_stats.js
+
+
 check:
 	coralX execute --network apothem --path scripts/PrepSepDemo/openClosePosition/3_openPosition.js
 deploy:
@@ -78,7 +110,7 @@ deploy:
 # deploy19:
 	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/deploy/stable-swap-module.js
 	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/initialize/initialize_stable-swap-module.js
-deploy20:
+# deploy20:
 	coralX execute --network apothem --path scripts/deployment/25_get-positions/deploy/get-positions.js
 	coralX execute --network apothem --path scripts/deployment/25_get-positions/initialize/initialize_get-positions.js
 

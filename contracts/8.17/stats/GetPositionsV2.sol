@@ -5,12 +5,16 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "./PositionManager.sol";
+import "../managers/PositionManager.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
+//added 2022 Sep 28th,  05:02 pm
+import "./interfaces/IFathomStats.sol";
 
-contract GetPositions is Initializable {
+
+contract GetPositionsV2 is Initializable {
   using SafeMathUpgradeable for uint256;
+  address public FathomStatsAddress;
 
   // --- Math ---
   uint256 constant WAD = 10**18;
@@ -18,7 +22,9 @@ contract GetPositions is Initializable {
   uint256 constant RAD = 10**45;
 
   // --- Init ---
-  function initialize() external initializer {}
+  function initialize(address fathomStatsAddress) external initializer {
+    FathomStatsAddress = fathomStatsAddress;
+  }
 
   function getAllPositionsAsc(address _manager, address _user)
     external
@@ -146,7 +152,12 @@ contract GetPositions is Initializable {
     returns (
       address[] memory _positions,
       uint256[] memory _debtShares,
-      uint256[] memory _safetyBuffers
+      // uint256[] memory _safetyBuffers,
+      uint256[] memory _lockedCollaterals,
+      uint256[] memory _lockedValues,
+      uint256[] memory _positionLTVs
+      // uint256[] memory _colPrices,
+      // uint256[] memory _liquidationPrices
     )
   {
     if (_startIndex.add(_offset) > PositionManager(_manager).lastPositionId())
@@ -155,7 +166,14 @@ contract GetPositions is Initializable {
     IBookKeeper _bookKeeper = IBookKeeper(PositionManager(_manager).bookKeeper());
     _positions = new address[](_offset);
     _debtShares = new uint256[](_offset);
-    _safetyBuffers = new uint256[](_offset);
+    // _safetyBuffers = new uint256[](_offset);
+
+    //2022 Sep 28th Wed 4:56 PM added
+    _lockedCollaterals = new uint256[](_offset);
+    _lockedValues = new uint256[](_offset);
+    _positionLTVs = new uint256[](_offset);
+    // _colPrices = new uint256[](_offset);
+    // _liquidationPrices = new uint256[](_offset);
     uint256 _resultIndex = 0;
     for (uint256 _positionIndex = _startIndex; _positionIndex < _startIndex.add(_offset); _positionIndex++) {
       if (PositionManager(_manager).positions(_positionIndex) == address(0)) break;
@@ -166,49 +184,64 @@ contract GetPositions is Initializable {
         _collateralPoolId,
         _positions[_resultIndex]
       );
+      //2022 Sep 28th Wed 4:57 PM added
+      _lockedCollaterals[_resultIndex] = _lockedCollateral;
+      uint256 _colPrice;
+      //PriceFetch from DexPriceOracle
+      if (_collateralPoolId == 0x5758444300000000000000000000000000000000000000000000000000000000) {
+        _colPrice = IFathomStats(FathomStatsAddress).getWXDCPrice();
+      } else {
+        _colPrice = 1000000000000000000;
+      }
+      // _colPrices[_resultIndex] = _colPrice;
+      //calculate LockedValue
+      _lockedValues[_resultIndex] = _lockedCollateral * _colPrice / WAD;
+      // we assume FXD is 1 dollar. 
+      _positionLTVs[_resultIndex] = (_debtShare * 1000 / _lockedValues[_resultIndex]);
 
-      ICollateralPoolConfig collateralPoolConfig = ICollateralPoolConfig(_bookKeeper.collateralPoolConfig());
+      // ICollateralPoolConfig collateralPoolConfig = ICollateralPoolConfig(_bookKeeper.collateralPoolConfig());
 
-      uint256 _safetyBuffer = calculateSafetyBuffer(
-        _debtShare,
-        collateralPoolConfig.getDebtAccumulatedRate(_collateralPoolId),
-        _lockedCollateral,
-        collateralPoolConfig.getPriceWithSafetyMargin(_collateralPoolId)
-      );
-
-      _safetyBuffers[_resultIndex] = _safetyBuffer;
+      // uint256 _safetyBuffer = calculateSafetyBuffer(
+      //   _debtShare,
+      //   collateralPoolConfig.getDebtAccumulatedRate(_collateralPoolId),
+      //   _lockedCollateral,
+      //   collateralPoolConfig.getPriceWithSafetyMargin(_collateralPoolId)
+        // _colPrice
+      // );
+      // _liquidationPrices[_resultIndex] = _liquidationPrice;
+      // _safetyBuffers[_resultIndex] = _safetyBuffer;
       _debtShares[_resultIndex] = _debtShare;
       _resultIndex++;
     }
   }
+
+
 
   function calculateSafetyBuffer(
     uint256 _debtShare, // [wad]
     uint256 _debtAccumulatedRate, // [ray]
     uint256 _lockedCollateral, // [wad]
     uint256 _priceWithSafetyMargin // [ray]
+    // uint256 _colPrice // [wad]
   )
     internal
-    view
+    pure
     returns (
       uint256 _safetyBuffer // [rad]
+      // uint256 _liquidationPrice // [ray]
     )
   {
     uint256 _collateralValue = _lockedCollateral.mul(_priceWithSafetyMargin);
     uint256 _debtValue = _debtShare.mul(_debtAccumulatedRate);
     _safetyBuffer = _collateralValue >= _debtValue ? _collateralValue.sub(_debtValue) : 0;
-  }
-
-    function calculateMaxStablecoinAmount(
-    uint256 _lockedCollateral, // [wad]
-    uint256 _priceWithSafetyMargin // [ray]
-  )
-    internal
-    view
-    returns (
-      uint256 _MaxStablecoinAmount // [rad]
-    )
-  {
-    uint256 _MaxStablecoinAmount = _lockedCollateral.mul(_priceWithSafetyMargin);
+    // _liquidationPrice = _colPrice - (_safetyBuffer / _lockedCollateral);
+    // if(_safetyBuffer == 0) {
+    //   _liquidationPrice = 0;
+    // }
+    // if(_colPrice * RAY < (_safetyBuffer / _lockedCollateral)) {
+    //   _liquidationPrice = 0;
+    // } else {
+    //   _liquidationPrice = _colPrice - (_safetyBuffer / _lockedCollateral);
+    // }
   }
 }
