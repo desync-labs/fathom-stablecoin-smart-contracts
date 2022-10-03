@@ -9,3 +9,7 @@ privateKey
 yarn.lock
 package-lock.json
 bin
+coverage
+coverage.json
+typechain
+typechain-types
