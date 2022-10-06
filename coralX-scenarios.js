@@ -53,4 +53,9 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/governance'],
     // ['execute', '--path', 'scripts/migrations/governance', '--network', 'ropsten'],
   ],
+  deployLocal: [
+    ['compile'],
+    ['execute', '--path', 'scripts/migrations/governance'],
+    // ['execute', '--path', 'scripts/migrations/governance', '--network', 'ropsten'],
+  ],
 }

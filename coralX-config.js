@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+require("dotenv").config();
 
 module.exports = {
   networks: {
@@ -13,8 +14,8 @@ module.exports = {
       private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },
-    ropsten: {
-      host: "https://ropsten.infura.io/v3/99c6910d87a34c688c79342177d37bbe",
+    gorli: {
+      host: "https://goerli.infura.io/v3/d85fb151be214d8eaee85c855d9d3dab",
       private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },
@@ -25,25 +26,25 @@ module.exports = {
     },
     apothem: {
       host: "https://rpc.apothem.network",
-      private_key: fs.readFileSync("./privateKey").toString(),
+      // private_key: fs.readFileSync("./privateKey").toString(),
+      private_key: process.env.GORLI_DEPLOYER,
       gasPrice: '0x3b9aca00',
     },
-    fromEnv: {
-      host: process.env.ETH_HOST, // export ETH_HOST=...
-      private_key: process.env.ETH_PK, // export ETH_PK=...
-      gasPrice: process.env.GAS_PRICE, // export GAS_PRICE=...
-    },
+    // fromEnv: {
+      // host: process.env.ETH_HOST, // export ETH_HOST=...
+      // private_key: process.env.ETH_PK, // export ETH_PK=...
+      // gasPrice: process.env.GAS_PRICE, // export GAS_PRICE=...
+    // },
   },
   compilers: {
     solc: {
-      version: 'native',
+      version: "0.8.17",
       settings: {
         optimizer: {
           enabled: true,
-          details: { yul: false },
           runs: 200,
         },
-        evmVersion: 'constantinople',
+        // evmVersion: 'constantinople',
       },
     },
   },
