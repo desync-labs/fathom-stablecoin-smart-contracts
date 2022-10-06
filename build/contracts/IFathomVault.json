@@ -1,0 +1,792 @@
+{
+  "contractName": "IFathomVault",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "config",
+      "outputs": [
+        {
+          "internalType": "contract IFathomVaultConfig",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalToken",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amountToken",
+          "type": "uint256"
+        }
+      ],
+      "name": "deposit",
+      "outputs": [],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "share",
+          "type": "uint256"
+        }
+      ],
+      "name": "withdraw",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "targetedToken",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "requestFunds",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "token",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "approve",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"spender\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"approve\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"config\",\"outputs\":[{\"internalType\":\"contract IFathomVaultConfig\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amountToken\",\"type\":\"uint256\"}],\"name\":\"deposit\",\"outputs\":[],\"stateMutability\":\"payable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"targetedToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"requestFunds\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"token\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalSupply\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"totalToken\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"share\",\"type\":\"uint256\"}],\"name\":\"withdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"deposit(uint256)\":{\"details\":\"Add more ERC20 to the bank. Hope to get some good returns.\"},\"requestFunds(address,uint256)\":{\"details\":\"Request funds from user through Vault\"},\"totalSupply()\":{\"details\":\"Returns the amount of tokens in existence.\"},\"totalToken()\":{\"details\":\"Return the total ERC20 entitled to the token holders. Be careful of unaccrued interests.\"},\"withdraw(uint256)\":{\"details\":\"Withdraw ERC20 from the bank by burning the share tokens.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/8.17/interfaces/IFathomVault.sol\":\"IFathomVault\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/8.17/interfaces/IFathomVault.sol\":{\"keccak256\":\"0x24a339216d35f7a23fc04700ab538bb1573c8f788c3ff98020f05e83a993cd36\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://cd5593d27860a405535c09ef5de5950599aaae50627ee496deb4761f669ecf27\",\"dweb:/ipfs/QmNStYVVKPU8yR7wg38ZpQMeCR6jz5psJ8h7i8hpDFwXoy\"]},\"project:/contracts/8.17/interfaces/IFathomVaultConfig.sol\":{\"keccak256\":\"0xf1e2f9dcf75f6291089f5510b2f08b9ba333c8ac92d8f9cac14ed16c642d4fc1\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://233110abeefbc8a1fef1334053ee08966ae460213530448b727508d8b108abcb\",\"dweb:/ipfs/QmNTda1D3sp3LQWTAJcfczQCRa7Gm3Asecq5PPPmimJMw6\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: AGPL-3.0-or-later\n\npragma solidity 0.8.17;\n\nimport \"./IFathomVaultConfig.sol\";\n\ninterface IFathomVault {\n  function config() external view returns (IFathomVaultConfig);\n\n  /// @dev Return the total ERC20 entitled to the token holders. Be careful of unaccrued interests.\n  function totalToken() external view returns (uint256);\n\n  /// @dev Returns the amount of tokens in existence.\n  function totalSupply() external view returns (uint256);\n\n  /// @dev Add more ERC20 to the bank. Hope to get some good returns.\n  function deposit(uint256 amountToken) external payable;\n\n  /// @dev Withdraw ERC20 from the bank by burning the share tokens.\n  function withdraw(uint256 share) external;\n\n  /// @dev Request funds from user through Vault\n  function requestFunds(address targetedToken, uint256 amount) external;\n\n  function token() external view returns (address);\n\n  function approve(address spender, uint256 amount) external virtual returns (bool);\n}\n",
+  "sourcePath": "/Users/sangjun.lee/Sangjun/fathom-stablecoin-smart-contracts/contracts/8.17/interfaces/IFathomVault.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/8.17/interfaces/IFathomVault.sol",
+    "exportedSymbols": {
+      "IFathomVault": [
+        18266
+      ],
+      "IFathomVaultConfig": [
+        18413
+      ]
+    },
+    "id": 18267,
+    "license": "AGPL-3.0-or-later",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 18212,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".17"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "47:23:46"
+      },
+      {
+        "absolutePath": "project:/contracts/8.17/interfaces/IFathomVaultConfig.sol",
+        "file": "./IFathomVaultConfig.sol",
+        "id": 18213,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 18267,
+        "sourceUnit": 18414,
+        "src": "72:34:46",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IFathomVault",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 18266,
+        "linearizedBaseContracts": [
+          18266
+        ],
+        "name": "IFathomVault",
+        "nameLocation": "118:12:46",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "79502c55",
+            "id": 18219,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "config",
+            "nameLocation": "144:6:46",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18214,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "150:2:46"
+            },
+            "returnParameters": {
+              "id": 18218,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18217,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18219,
+                  "src": "176:18:46",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IFathomVaultConfig_$18413",
+                    "typeString": "contract IFathomVaultConfig"
+                  },
+                  "typeName": {
+                    "id": 18216,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 18215,
+                      "name": "IFathomVaultConfig",
+                      "nameLocations": [
+                        "176:18:46"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 18413,
+                      "src": "176:18:46"
+                    },
+                    "referencedDeclaration": 18413,
+                    "src": "176:18:46",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IFathomVaultConfig_$18413",
+                      "typeString": "contract IFathomVaultConfig"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "175:20:46"
+            },
+            "scope": 18266,
+            "src": "135:61:46",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 18220,
+              "nodeType": "StructuredDocumentation",
+              "src": "200:97:46",
+              "text": "@dev Return the total ERC20 entitled to the token holders. Be careful of unaccrued interests."
+            },
+            "functionSelector": "626be567",
+            "id": 18225,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "totalToken",
+            "nameLocation": "309:10:46",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18221,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "319:2:46"
+            },
+            "returnParameters": {
+              "id": 18224,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18223,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18225,
+                  "src": "345:7:46",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 18222,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "345:7:46",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "344:9:46"
+            },
+            "scope": 18266,
+            "src": "300:54:46",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 18226,
+              "nodeType": "StructuredDocumentation",
+              "src": "358:51:46",
+              "text": "@dev Returns the amount of tokens in existence."
+            },
+            "functionSelector": "18160ddd",
+            "id": 18231,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "totalSupply",
+            "nameLocation": "421:11:46",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18227,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "432:2:46"
+            },
+            "returnParameters": {
+              "id": 18230,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18229,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18231,
+                  "src": "458:7:46",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 18228,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "458:7:46",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "457:9:46"
+            },
+            "scope": 18266,
+            "src": "412:55:46",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 18232,
+              "nodeType": "StructuredDocumentation",
+              "src": "471:67:46",
+              "text": "@dev Add more ERC20 to the bank. Hope to get some good returns."
+            },
+            "functionSelector": "b6b55f25",
+            "id": 18237,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "deposit",
+            "nameLocation": "550:7:46",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18235,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18234,
+                  "mutability": "mutable",
+                  "name": "amountToken",
+                  "nameLocation": "566:11:46",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18237,
+                  "src": "558:19:46",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 18233,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "558:7:46",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "557:21:46"
+            },
+            "returnParameters": {
+              "id": 18236,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "595:0:46"
+            },
+            "scope": 18266,
+            "src": "541:55:46",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 18238,
+              "nodeType": "StructuredDocumentation",
+              "src": "600:66:46",
+              "text": "@dev Withdraw ERC20 from the bank by burning the share tokens."
+            },
+            "functionSelector": "2e1a7d4d",
+            "id": 18243,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "withdraw",
+            "nameLocation": "678:8:46",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18241,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18240,
+                  "mutability": "mutable",
+                  "name": "share",
+                  "nameLocation": "695:5:46",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18243,
+                  "src": "687:13:46",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 18239,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "687:7:46",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "686:15:46"
+            },
+            "returnParameters": {
+              "id": 18242,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "710:0:46"
+            },
+            "scope": 18266,
+            "src": "669:42:46",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 18244,
+              "nodeType": "StructuredDocumentation",
+              "src": "715:46:46",
+              "text": "@dev Request funds from user through Vault"
+            },
+            "functionSelector": "494666b6",
+            "id": 18251,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "requestFunds",
+            "nameLocation": "773:12:46",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18249,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18246,
+                  "mutability": "mutable",
+                  "name": "targetedToken",
+                  "nameLocation": "794:13:46",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18251,
+                  "src": "786:21:46",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 18245,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "786:7:46",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 18248,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nameLocation": "817:6:46",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18251,
+                  "src": "809:14:46",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 18247,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "809:7:46",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "785:39:46"
+            },
+            "returnParameters": {
+              "id": 18250,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "833:0:46"
+            },
+            "scope": 18266,
+            "src": "764:70:46",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "fc0c546a",
+            "id": 18256,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "token",
+            "nameLocation": "847:5:46",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18252,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "852:2:46"
+            },
+            "returnParameters": {
+              "id": 18255,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18254,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18256,
+                  "src": "878:7:46",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 18253,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "878:7:46",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "877:9:46"
+            },
+            "scope": 18266,
+            "src": "838:49:46",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "095ea7b3",
+            "id": 18265,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "approve",
+            "nameLocation": "900:7:46",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18261,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18258,
+                  "mutability": "mutable",
+                  "name": "spender",
+                  "nameLocation": "916:7:46",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18265,
+                  "src": "908:15:46",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 18257,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "908:7:46",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 18260,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nameLocation": "933:6:46",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18265,
+                  "src": "925:14:46",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 18259,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "925:7:46",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "907:33:46"
+            },
+            "returnParameters": {
+              "id": 18264,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18263,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18265,
+                  "src": "967:4:46",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 18262,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "967:4:46",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "966:6:46"
+            },
+            "scope": 18266,
+            "src": "891:82:46",
+            "stateMutability": "nonpayable",
+            "virtual": true,
+            "visibility": "external"
+          }
+        ],
+        "scope": 18267,
+        "src": "108:867:46",
+        "usedErrors": []
+      }
+    ],
+    "src": "47:929:46"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.17+commit.8df45f5f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.10",
+  "updatedAt": "2022-10-06T11:28:50.095Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "deposit(uint256)": {
+        "details": "Add more ERC20 to the bank. Hope to get some good returns."
+      },
+      "requestFunds(address,uint256)": {
+        "details": "Request funds from user through Vault"
+      },
+      "totalSupply()": {
+        "details": "Returns the amount of tokens in existence."
+      },
+      "totalToken()": {
+        "details": "Return the total ERC20 entitled to the token holders. Be careful of unaccrued interests."
+      },
+      "withdraw(uint256)": {
+        "details": "Withdraw ERC20 from the bank by burning the share tokens."
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
