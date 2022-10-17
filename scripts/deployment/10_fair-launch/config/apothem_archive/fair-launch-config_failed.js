@@ -19,9 +19,8 @@ module.exports = async function (deployer) {
     await fairLaunch.addPool(1, stablecoinAddress.USDT, true);
 
     await fairLaunch.addPool(2, stablecoinAddress.USDT, true);
-
+    //fairLaunch cannot addPool with same token twice, thus, above fails.
     await fairLaunch.addPool(3, stablecoinAddress.fathomStablecoin, true);
-
 
     ITransferOwnership
     await fairLaunch.transferOwnership(stablecoinAddress.shield);

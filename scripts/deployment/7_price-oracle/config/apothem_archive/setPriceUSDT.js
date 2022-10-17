@@ -3,14 +3,14 @@ const fs = require('fs');
 // let stablecoinAddress = JSON.parse(rawdata);
 const { formatBytes32String } = require("ethers/lib/utils");
 
-const COLLATERAL_POOL_ID = formatBytes32String("FTHM")
+const COLLATERAL_POOL_ID = formatBytes32String("USDT-STABLE")
 
 const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
 
 module.exports =  async function(deployer) {
-  console.log(">> Set Price FTHM")
+  console.log(">> Initializing PriceOracle")
 
-  const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
+  const priceOracle = await PriceOracle.at("0x31Ee9Eb0f46f5142A4F848dA027F82A1282438ed");
 
 
   await priceOracle.setPrice(

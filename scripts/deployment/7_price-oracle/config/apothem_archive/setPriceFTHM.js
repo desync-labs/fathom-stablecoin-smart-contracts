@@ -10,7 +10,7 @@ const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
 module.exports =  async function(deployer) {
   console.log(">> Set Price FTHM")
 
-  const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
+  const priceOracle = await PriceOracle.at("0x32CCe8931422bca01dE1664fcD6A16a5f20585f6");
 
 
   await priceOracle.setPrice(

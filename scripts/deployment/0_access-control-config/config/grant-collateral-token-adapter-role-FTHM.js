@@ -5,9 +5,9 @@ const fs = require('fs');
 const AccessControlConfig = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
 
 module.exports = async function(deployer) {
-  const ADAPTER_ADDR = "0x86B2E78555fAEA58A522e72193935153D1bBF2Cc";
+  const ADAPTER_ADDR = stablecoinAddress.collateralTokenAdapterFTHM;
 
-  const accessControlConfig = await AccessControlConfig.at("0x93645Ef8A2d43E415aF92621d3b18f2e5E6e786D");
+  const accessControlConfig = await AccessControlConfig.at(stablecoinAddress.accessControlConfig);
 
   console.log(`>> Grant ADAPTER_ROLE address: ${ADAPTER_ADDR}`)
 

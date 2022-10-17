@@ -10,7 +10,7 @@ const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
 module.exports =  async function(deployer) {
   console.log(">> Initializing PriceOracle")
 
-  const priceOracle = await PriceOracle.at("0x31Ee9Eb0f46f5142A4F848dA027F82A1282438ed");
+  const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
 
 
   await priceOracle.setPrice(

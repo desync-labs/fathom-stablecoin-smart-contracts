@@ -13,9 +13,9 @@ const CollateralPoolConfig = artifacts.require('./8.17/stablecoin-core/config/Co
 module.exports =  async function(deployer) {
   console.log(">> USDT-STABLE PRICE TANK")
 
-  const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
+  const priceOracle = await PriceOracle.at("0x32CCe8931422bca01dE1664fcD6A16a5f20585f6");
 
-  const collateralPoolConfig = await CollateralPoolConfig.at(stablecoinAddress.collateralPoolConfig);
+  const collateralPoolConfig = await CollateralPoolConfig.at("0x48853e29341Bf581D56cF8Ff330a0F7371BFFFC6");
   await priceOracle.setPrice(
     COLLATERAL_POOL_ID
   )

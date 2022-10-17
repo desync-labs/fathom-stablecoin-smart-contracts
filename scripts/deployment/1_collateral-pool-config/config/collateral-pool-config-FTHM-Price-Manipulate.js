@@ -28,31 +28,31 @@ module.exports = async function(deployer) {
 
   const bookKeeper = await BookKeeper.at(stablecoinAddress.bookKeeper);
 
-  const simplePriceFeedUSDT = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeedUSDT);
+  const simplePriceFeedFTHM = await SimplePriceFeed.at("0x212d2fFcC949C84556F2eBcA5bDA37D83ba3e035");
 
   const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
 
-  await collateralPoolConfig.initCollateralPool(
-    COLLATERAL_POOL_ID,  //<-_collateralPoolId
-    0,   //<-_debtCeiling
-    0,   //<-_debtFloor
-    stablecoinAddress.simplePriceFeedFTHM,  //<-_priceFeed
-    WeiPerRay,  //<-_liquidationRatio   1 RAY, therefore MAX LTV rate of 100%
-    WeiPerRay,  //<-_stabilityFeeRate   Initially set as 1 RAY, which is 0 stability fee taken by the system from _usrs
-    stablecoinAddress.collateralTokenAdapterFTHM,   //<-_adapter
-    CLOSE_FACTOR_BPS.mul(2),   // <-_closeFactorBps    mul(2) therefore 100%
-    LIQUIDATOR_INCENTIVE_BPS,  //<-_liquidatorIncentiveBps
-    TREASURY_FEE_BPS,  //<-_treasuryFeesBps
-    stablecoinAddress.fixedSpreadLiquidationStrategy  //<-_strategy
-    , { gas : 5000000 } 
-  );
+  // await collateralPoolConfig.initCollateralPool(
+  //   COLLATERAL_POOL_ID,  //<-_collateralPoolId
+  //   0,   //<-_debtCeiling
+  //   0,   //<-_debtFloor
+  //   "0x212d2fFcC949C84556F2eBcA5bDA37D83ba3e035",  //<-_priceFeed // <- this one I need to deploy newly.
+  //   WeiPerRay.mul(133).div(100),  //<-_liquidationRatio   1 RAY, therefore MAX LTV rate of 100%
+  //   WeiPerRay,  //<-_stabilityFeeRate   Initially set as 1 RAY, which is 0 stability fee taken by the system from _usrs
+  //   "0x86B2E78555fAEA58A522e72193935153D1bBF2Cc",   //<-_adapter  <- this one I need to deploy newly.
+  //   CLOSE_FACTOR_BPS.mul(2),   // <-_closeFactorBps    mul(2) therefore 100%
+  //   LIQUIDATOR_INCENTIVE_BPS,  //<-_liquidatorIncentiveBps
+  //   TREASURY_FEE_BPS,  //<-_treasuryFeesBps
+  //   stablecoinAddress.fixedSpreadLiquidationStrategy  //<-_strategy
+  //   , { gas : 5000000 } 
+  // );
 //   await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, fixedSpreadLiquidationStrategy.address)
-  const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);
-  const debtCeilingSetUpUSDT = WeiPerRad.mul(10000000).div(2);
+  const debtCeilingSetUpTotal = WeiPerRad.mul(20000000);
+  const debtCeilingSetUpFTHM = WeiPerRad.mul(10000000).div(2);
   await bookKeeper.setTotalDebtCeiling(debtCeilingSetUpTotal, { gasLimit: 1000000 });
-  await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, debtCeilingSetUpUSDT, { gasLimit: 1000000 });
+  await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, debtCeilingSetUpFTHM, { gasLimit: 1000000 });
 //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay);
   //setting _rawPrice and _priceWithSafetyMargin of WXDC to 100
-  await simplePriceFeedUSDT.setPrice(WeiPerWad.mul(1), { gasLimit: 1000000 });
+  await simplePriceFeedFTHM.setPrice(WeiPerWad.mul(1), { gasLimit: 1000000 });
   await priceOracle.setPrice(COLLATERAL_POOL_ID, { gasLimit: 1000000 });
 }

@@ -6,7 +6,7 @@ const { BigNumber } = require("ethers");
 const walletDeployer = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
 
 // for ganache
-const devAddress = "0x0CF4bC892112518f96506Df151185d0F572CfF5f";
+const devAddress = accounts[0];
 
 const WXDC = artifacts.require('./8.17/mocks/WXDC.sol');
 
@@ -19,10 +19,8 @@ module.exports =  async function(deployer) {
   const WXDCInstance = await WXDC.at(WXDCAddress);
   // const WXDCInstance = await WXDC.at(stablecoinAddress.WXDC);
 
-
-
   await WXDCInstance.mint(
-    walletDeployer, BigNumber.from("90000000000000000000000000000000"), { gasLimit: 1000000 }
+    devAddress, BigNumber.from("90000000000000000000000000000000"), { gasLimit: 1000000 }
   )
 
   //mint to V1 faucet
@@ -30,8 +28,8 @@ module.exports =  async function(deployer) {
   //   "0x5ec5B77C512fBd7A32b8fb6aE78a5cFbB500eb2b", BigNumber.from("90000000000000000000000000000000"), { gasLimit: 1000000 }
   // )
 
-  const balanceFaucet = await WXDCInstance.balanceOf("0x5ec5B77C512fBd7A32b8fb6aE78a5cFbB500eb2b");
-  console.log("balanceFaucetWXDC is " + balanceFaucet);
+  // const balanceFaucet = await WXDCInstance.balanceOf("0x5ec5B77C512fBd7A32b8fb6aE78a5cFbB500eb2b");
+  // console.log("balanceFaucetWXDC is " + balanceFaucet);
 
   // await WXDCInstance.mint(
   //   devAddress, BigNumber.from("10000000000000000000000000"), { gasLimit: 1000000 }

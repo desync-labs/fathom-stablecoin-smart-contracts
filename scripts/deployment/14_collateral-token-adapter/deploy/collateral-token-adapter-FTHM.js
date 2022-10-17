@@ -2,12 +2,12 @@ const fs = require('fs');
 
 const CollateralTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 
-// const rawdata = fs.readFileSync('../../../../addresses_ApothemV1.json');
-// let stablecoinAddress = JSON.parse(rawdata);
+const rawdata = fs.readFileSync('../../../../addresses.json');
+let stablecoinAddress = JSON.parse(rawdata);
 
 module.exports =  async function(deployer) {
 
-  console.log(">> Deploying an upgradable CollateralTokenAdapterFTHM contract")
+  console.log(">> Deploying an upgradable CollateralTokenAdapterUSDT contract")
   let promises = [
       deployer.deploy(CollateralTokenAdapter, { gas: 5050000 }),
   ];
@@ -16,15 +16,15 @@ module.exports =  async function(deployer) {
 
   const deployed = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 
-  // let addressesUpdate = { 
-    // collateralTokenAdapterFTHM:deployed.address,
-  // };
-console.log("collateralTokenAdapterFTHM is " + deployed.address);
-  // const newAddresses = {
-  //   ...stablecoinAddress,  
-  //   ...addressesUpdate
-  // };
+  let addressesUpdate = { 
+    collateralTokenAdapterFTHM:deployed.address,
+  };
 
-  // let data = JSON.stringify(newAddresses);
-  // fs.writeFileSync('./addresses.json', data);
+  const newAddresses = {
+    ...stablecoinAddress,  
+    ...addressesUpdate
+  };
+
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('./addresses.json', data);
 };
