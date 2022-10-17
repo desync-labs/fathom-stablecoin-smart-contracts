@@ -22,6 +22,7 @@ contract FathomStats is PausableUpgradeable{
   address public WXDC;
   address public USDT;
   address public FXD;
+  address public FTHM;
   address public DEXPriceOracle;
   bytes32 public CollateralPoolId;
   address public CollateralPoolConfig;
@@ -52,7 +53,7 @@ contract FathomStats is PausableUpgradeable{
       uint256 positionLTV;
   }
 
-  function initialize(address bookKeeper, address fairLaunch, address wxdc, address usdt, address fxd, address dEXPriceOracle, bytes32 collateralPoolId, address collateralPoolConfig) external initializer {
+  function initialize(address bookKeeper, address fairLaunch, address wxdc, address usdt, address fxd, address dEXPriceOracle, bytes32 collateralPoolId, address collateralPoolConfig, address fthm) external initializer {
       BookKeeper = bookKeeper;
       FairLaunch = fairLaunch;
       WXDC = wxdc;
@@ -61,6 +62,7 @@ contract FathomStats is PausableUpgradeable{
       DEXPriceOracle = dEXPriceOracle;
       CollateralPoolId = collateralPoolId;
       CollateralPoolConfig = collateralPoolConfig;
+      FTHM = fthm;
   }
 
   function getFathomInfo() external view returns (FathomInfo memory) {
@@ -71,8 +73,8 @@ contract FathomStats is PausableUpgradeable{
       uint256 USDTLocked = IERC20(USDT).balanceOf(FairLaunch);
       fathomInfo.totalValueLocked = WXDCLocked * WXDCPrice / WAD + USDTLocked;
                                     //WAD          WAD      WAD    WAD
-    //   (uint256 FXDPrice, ) = IDEXPriceOracle(DEXPriceOracle).getPrice(USDT, FXD);
-      uint256 FXDPrice = 987000000000000000;
+      (uint256 FXDPrice, ) = IDEXPriceOracle(DEXPriceOracle).getPrice(USDT, FXD);
+    //   uint256 FXDPrice = 987000000000000000;
 
       fathomInfo.FXDPriceFromDex = FXDPrice;
       fathomInfo.liquidationRatio =  ICollateralPoolConfig(CollateralPoolConfig).getLiquidationRatio(CollateralPoolId);
@@ -85,6 +87,10 @@ contract FathomStats is PausableUpgradeable{
   function getWXDCPrice() external view returns (uint256) {
       (uint256 WXDCPrice, ) = IDEXPriceOracle(DEXPriceOracle).getPrice(USDT, WXDC);
       return WXDCPrice;
+  }
+  function getFTHMPrice() external view returns (uint256) {
+      (uint256 FTHMPrice, ) = IDEXPriceOracle(DEXPriceOracle).getPrice(USDT, FTHM);
+      return FTHMPrice;
   }
 }
 

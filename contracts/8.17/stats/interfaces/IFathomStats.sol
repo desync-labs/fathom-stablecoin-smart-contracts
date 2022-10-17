@@ -6,5 +6,5 @@ pragma experimental ABIEncoderV2;
 interface IFathomStats {
   // Information query functions
   function getWXDCPrice() external view returns (uint256);
-  function getUSDTPrice() external view returns (uint256);
+  function getFTHMPrice() external view returns (uint256);
 }

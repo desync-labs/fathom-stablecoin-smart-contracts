@@ -24,7 +24,7 @@ module.exports =  async function(deployer) {
     ...stablecoinAddress,  
     ...addressesUpdate
   };
-  console.log("SimplePriceFeedFTHM is " + deployed.address);
+
   let data = JSON.stringify(newAddresses);
   fs.writeFileSync('./addresses.json', data);
 };

@@ -1,29 +1,33 @@
 const fs = require('fs');
 
-const GetPositionsV2 = artifacts.require('./8.17/stats/GetPositionsV2.sol');
+const FTHM = artifacts.require('./8.17/mocks/FTHM.sol');
 
 // const rawdata = fs.readFileSync('../../../../addresses.json');
 // let stablecoinAddress = JSON.parse(rawdata);
+
+
+
+
 module.exports =  async function(deployer) {
 
-  console.log(">> Deploying an upgradable GetPositionsV2 contract")
+  console.log(">> Deploying an FTHM contract")
   let promises = [
-    deployer.deploy(GetPositionsV2, { gas: 4050000 }),
+      deployer.deploy(FTHM, "FTHM", "FTHM", { gas: 4050000 }),
   ];
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/stats/GetPositionsV2.sol');
+  const deployed = artifacts.require('./8.17/mocks/WXDC.sol');
 
-  console.log(deployed.address);
   // let addressesUpdate = { 
-  //   getPositionsV2:deployed.address,
+  //   WXDC:deployed.address,
   // };
 
   // const newAddresses = {
   //   ...stablecoinAddress,  
   //   ...addressesUpdate
   // };
+  console.log("new FTHM is " + deployed.address);
 
   // let data = JSON.stringify(newAddresses);
   // fs.writeFileSync('./addresses.json', data);

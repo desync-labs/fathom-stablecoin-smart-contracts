@@ -190,6 +190,8 @@ contract GetPositionsV2 is Initializable {
       //PriceFetch from DexPriceOracle
       if (_collateralPoolId == 0x5758444300000000000000000000000000000000000000000000000000000000) {
         _colPrice = IFathomStats(FathomStatsAddress).getWXDCPrice();
+      } else if (_collateralPoolId == 0x4654484d00000000000000000000000000000000000000000000000000000000) {
+        _colPrice = IFathomStats(FathomStatsAddress).getFTHMPrice();
       } else {
         _colPrice = 1000000000000000000;
       }
@@ -197,8 +199,11 @@ contract GetPositionsV2 is Initializable {
       //calculate LockedValue
       _lockedValues[_resultIndex] = _lockedCollateral * _colPrice / WAD;
       // we assume FXD is 1 dollar. 
+      if ( _lockedValues[_resultIndex] != 0){
       _positionLTVs[_resultIndex] = (_debtShare * 1000 / _lockedValues[_resultIndex]);
-
+      } else {
+        _positionLTVs[_resultIndex] = 0;
+      }
       // ICollateralPoolConfig collateralPoolConfig = ICollateralPoolConfig(_bookKeeper.collateralPoolConfig());
 
       // uint256 _safetyBuffer = calculateSafetyBuffer(
