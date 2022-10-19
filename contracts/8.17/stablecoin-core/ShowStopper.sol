@@ -280,7 +280,7 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
   /// @dev Set the cage price of the collateral pool with the latest price from the price oracle
   /// @param _collateralPoolId Collateral pool id
   /// @dev access: OWNER_ROLE
-  function cage(bytes32 _collateralPoolId) external onlyOwner {
+  function cagePool(bytes32 _collateralPoolId) external onlyOwner {
     require(live == 0, "ShowStopper/still-live");
     require(cagePrice[_collateralPoolId] == 0, "ShowStopper/cage-price-collateral-pool-id-already-defined");
     uint256 _totalDebtShare = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getTotalDebtShare(
