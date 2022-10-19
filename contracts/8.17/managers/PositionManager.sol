@@ -11,6 +11,7 @@ import "../interfaces/IManager.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/IShowStopper.sol";
+import "../interfaces/ISetPrice.sol";
 
 /// @title PositionManager is a contract for manging positions
 contract PositionManager is PausableUpgradeable, IManager {
@@ -18,6 +19,8 @@ contract PositionManager is PausableUpgradeable, IManager {
   address public override bookKeeper;
 
   address public showStopper;
+
+  address public priceOracle;
 
   /// @dev The lastest id that has been used
   uint256 public lastPositionId;
@@ -152,6 +155,9 @@ contract PositionManager is PausableUpgradeable, IManager {
   /// @param _collateralPoolId The collateral pool id that will be used for this position
   /// @param _user The user address that is owned this position
   function open(bytes32 _collateralPoolId, address _user) external override whenNotPaused returns (uint256) {
+
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
+
     require(_user != address(0), "PositionManager/user-address(0)");
     uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig())
       .getDebtAccumulatedRate(_collateralPoolId);
@@ -245,6 +251,10 @@ contract PositionManager is PausableUpgradeable, IManager {
     address _adapter,
     bytes calldata _data
   ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
+    bytes32 _collateralPoolId = collateralPools[_positionId];
+
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
+
     address _positionAddress = positions[_positionId];
     IBookKeeper(bookKeeper).adjustPosition(
       collateralPools[_positionId],
@@ -276,6 +286,10 @@ contract PositionManager is PausableUpgradeable, IManager {
     address _adapter,
     bytes calldata _data
   ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
+    bytes32 _collateralPoolId = collateralPools[_positionId];
+
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
+
     IBookKeeper(bookKeeper).moveCollateral(collateralPools[_positionId], positions[_positionId], _destination, _wad);
     IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
   }
@@ -296,6 +310,8 @@ contract PositionManager is PausableUpgradeable, IManager {
     address _adapter,
     bytes calldata _data
   ) external whenNotPaused onlyOwnerAllowed(_positionId) {
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
+
     IBookKeeper(bookKeeper).moveCollateral(_collateralPoolId, positions[_positionId], _destination, _wad);
     IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
   }
@@ -402,6 +418,11 @@ contract PositionManager is PausableUpgradeable, IManager {
     );
     _tokenAdapter.onMoveCollateral(positions[_sourceId], positions[_destinationId], _debtShare, abi.encode());
     emit LogMovePosition(_sourceId, _destinationId, _lockedCollateral, _debtShare);
+  }
+
+  function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
+    require(_priceOracle != address(0), "_priceOracle cannot be zero address");
+    priceOracle = _priceOracle;
   }
 
   // --- pause ---

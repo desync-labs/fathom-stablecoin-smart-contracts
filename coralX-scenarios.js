@@ -50,7 +50,7 @@ module.exports = {
   ],
   migrateAndConfigureForTests: [
     ['compile'],
-    ['execute', '--path', 'scripts/migrations/tests'],
+    ['execute', '--path', 'scripts/migrations/governance'],
     // ['execute', '--path', 'scripts/migrations/governance', '--network', 'ropsten'],
   ],
   deployLocal: [

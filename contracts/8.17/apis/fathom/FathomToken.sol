@@ -7,13 +7,13 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // FathomToken with Governance.
-contract FathomToken is ERC20("FathomToken", "FATHOM"), Ownable {
-  uint256 private constant CAP = 188000000e18;
+contract FathomToken is ERC20("FathomToken", "FTHM"), Ownable {
+  uint256 private constant CAP = 18800000000000000000000e18;
   uint256 private _totalLock;
 
   uint256 public startReleaseBlock;
   uint256 public endReleaseBlock;
-  uint256 public constant MANUAL_MINT_LIMIT = 8000000e18;
+  uint256 public constant MANUAL_MINT_LIMIT = 18800000000000000000000e18;
   uint256 public manualMinted = 0;
 
   mapping(address => uint256) private _locks;
@@ -27,7 +27,7 @@ contract FathomToken is ERC20("FathomToken", "FATHOM"), Ownable {
     endReleaseBlock = _endReleaseBlock;
 
     // maunalMint 250k for seeding liquidity
-    manualMint(msg.sender, 250000e18);
+    manualMint(msg.sender, 5000000000000e18);
   }
 
   function cap() public pure returns (uint256) {

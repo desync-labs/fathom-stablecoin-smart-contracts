@@ -13,6 +13,7 @@ import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/ILiquidationStrategy.sol";
 import "../interfaces/ICagable.sol";
+import "../interfaces/ISetPrice.sol";
 
 /// @title LiquidationEngine
 /** @notice A contract which is the manager for all of the liquidations of the protocol.
@@ -21,6 +22,7 @@ import "../interfaces/ICagable.sol";
 
 contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable, ILiquidationEngine {
   using SafeMathUpgradeable for uint256;
+  address public priceOracle;
 
   struct LocalVars {
     uint256 positionLockedCollateral;
@@ -86,6 +88,9 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     address _collateralRecipient,
     bytes calldata _data
   ) external override nonReentrant whenNotPaused {
+
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
+
     require(live == 1, "LiquidationEngine/not-live");
     require(_debtShareToBeLiquidated != 0, "LiquidationEngine/zero-debt-value-to-be-liquidated");
     require(_maxDebtShareToBeLiquidated != 0, "LiquidationEngine/zero-max-debt-value-to-be-liquidated");
@@ -162,6 +167,12 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         -int256(_vars.newPositionDebtShare)
       );
     }
+  }
+
+  function setPriceOracle(address _priceOracle) external onlyOwnerOrShowStopper {
+    require(_priceOracle != address(0), "_priceOracle cannot be zero address");
+    require(live == 1, "LiquidationEngine/not-live");
+    priceOracle = _priceOracle;
   }
 
   /// @dev access: OWNER_ROLE, SHOW_STOPPER_ROLE

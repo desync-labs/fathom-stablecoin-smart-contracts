@@ -7,15 +7,16 @@ const { formatBytes32String } = require("ethers/lib/utils");
 const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
 const WeiPerRay = BigNumber.from(`1${"0".repeat(27)}`)
 const WeiPerRad = BigNumber.from(`1${"0".repeat(45)}`)
-const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
+const COLLATERAL_POOL_ID_WXDC = formatBytes32String("WXDC")
+const COLLATERAL_POOL_ID_FTHM = formatBytes32String("FTHM")
 const CLOSE_FACTOR_BPS = BigNumber.from(5000)   // <- 0.5
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)  // <- 1.05
 const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
 // const LIQUIDATIONRATIO = BigNumber.from(1.33e+27); 
 const LIQUIDATIONRATIO = WeiPerRay.mul(133).div(100).toString();
 // LTV 75%
-// const rawdata = fs.readFileSync('../../../../addresses.json');
-// let stablecoinAddress = JSON.parse(rawdata);
+const rawdata = fs.readFileSync('../../../../addresses_ApothemV1.json');
+let stablecoinAddress = JSON.parse(rawdata);
 
 const CollateralPoolConfig = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
 const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
@@ -25,18 +26,41 @@ const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
 module.exports = async function(deployer) {
 
   console.log(">> Resetting collateral-pool-config with LTV");
-  const collateralPoolConfig = await CollateralPoolConfig.at("0x48853e29341Bf581D56cF8Ff330a0F7371BFFFC6");
+  const collateralPoolConfig = await CollateralPoolConfig.at(stablecoinAddress.collateralPoolConfig);
 
   // const bookKeeper = await BookKeeper.at(stablecoinAddress.bookKeeper);
 
   // const simplePriceFeed = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeed);
+  // const LTV = await collateralPoolConfig.getLiquidationRatio(COLLATERAL_POOL_ID_WXDC);
+  // console.log("Liquidation ratio WXDC is " + LTV);
+  // const PriceWithSafetyMargin = await collateralPoolConfig.getPriceWithSafetyMargin(COLLATERAL_POOL_ID_WXDC);
+  // console.log("PriceWithSafetyMargin WXDC is " + PriceWithSafetyMargin);
+
+  // const LTVFTHM1 = await collateralPoolConfig.getLiquidationRatio(COLLATERAL_POOL_ID_FTHM);
+  // console.log("Liquidation ratio FTHM is " + LTVFTHM1);
+  // const PriceWithSafetyMarginFTHM1 = await collateralPoolConfig.getPriceWithSafetyMargin(COLLATERAL_POOL_ID_FTHM);
+  // console.log("PriceWithSafetyMargin FTHM is " + PriceWithSafetyMarginFTHM1);
+
+  // await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID_WXDC, LIQUIDATIONRATIO);
+  // await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID_FTHM, LIQUIDATIONRATIO);
+
+  // const LTV3 = await collateralPoolConfig.getLiquidationRatio(COLLATERAL_POOL_ID_WXDC);
+  // console.log("Liquidation ratio WXDC AFTER LTV change is " + LTV3);
+  // const PriceWithSafetyMargin2 = await collateralPoolConfig.getPriceWithSafetyMargin(COLLATERAL_POOL_ID_WXDC);
+  // console.log("PriceWithSafetyMargin WXDC AFTER LTV change is " + PriceWithSafetyMargin2);
+
+  // const LTVFTHM2 = await collateralPoolConfig.getLiquidationRatio(COLLATERAL_POOL_ID_FTHM);
+  // console.log("Liquidation ratio WXDC after LTV change is " + LTVFTHM2);
+  const PriceWithSafetyMarginFTHM2 = await collateralPoolConfig.getPriceWithSafetyMargin(COLLATERAL_POOL_ID_FTHM);
+  console.log("PriceWithSafetyMargin FTHM after LTV change is " + PriceWithSafetyMarginFTHM2);
+
+  // const getPriceFeedWXDC = await collateralPoolConfig.getPriceFeed(COLLATERAL_POOL_ID_WXDC);
+  // console.log("FathomPriceOraclePriceFeed is " + getPriceFeedWXDC);
+
+  // const getPriceFeedFTHM = await collateralPoolConfig.getPriceFeed(COLLATERAL_POOL_ID_FTHM);
+  // console.log("FathomPriceOraclePriceFeed is " + getPriceFeedFTHM);
 
   // const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
-  // await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, LIQUIDATIONRATIO);
-  const LTV = await collateralPoolConfig.getLiquidationRatio(COLLATERAL_POOL_ID);
-  console.log("Liquidation ratio is " + LTV);
-  const PriceWithSafetyMargin = await collateralPoolConfig.getPriceWithSafetyMargin(COLLATERAL_POOL_ID);
-  console.log("PriceWithSafetyMargin is " + PriceWithSafetyMargin);
 //   await collateralPoolConfig.initCollateralPool(
 //     COLLATERAL_POOL_ID,  //<-_collateralPoolId
 //     0,   //<-_debtCeiling

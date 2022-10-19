@@ -1,0 +1,488 @@
+{
+  "contractName": "IStableSwapModule",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "usr",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "swapTokenToStablecoin",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "usr",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "tokenAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "swapStablecoinToToken",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "authTokenAdapter",
+      "outputs": [
+        {
+          "internalType": "contract IAuthTokenAdapter",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "stablecoinAdapter",
+      "outputs": [
+        {
+          "internalType": "contract IStablecoinAdapter",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"authTokenAdapter\",\"outputs\":[{\"internalType\":\"contract IAuthTokenAdapter\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"stablecoinAdapter\",\"outputs\":[{\"internalType\":\"contract IStablecoinAdapter\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenAmount\",\"type\":\"uint256\"}],\"name\":\"swapStablecoinToToken\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"usr\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"tokenAmount\",\"type\":\"uint256\"}],\"name\":\"swapTokenToStablecoin\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/8.17/interfaces/IStableSwapModule.sol\":\"IStableSwapModule\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/8.17/interfaces/IAccessControlConfig.sol\":{\"keccak256\":\"0x61f358cfd3158a7190ae3ea50ef8d271ef9f93699fb43465fc8a163e0feef70e\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://6c6b6abaf548275e36801422a3c35128e95646767f43286674b1a58d32b19d9e\",\"dweb:/ipfs/QmcN6w3PbQBSdm5NHbZ8p7JTKQNabyDSD9sjNtLtvuD7Hy\"]},\"project:/contracts/8.17/interfaces/IAuthTokenAdapter.sol\":{\"keccak256\":\"0x8a4c392536f699f559b2e28ddcc6f3a5b389f51dff9e2834af8be602f2cbba91\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://92cdae65f88ce88d7546be95638570d6189c46100d5dd59c8a3e7d941d1684da\",\"dweb:/ipfs/QmUmhja7dSmpDHPoZRFu4JJazqPHQsPYBXoFj9HEkBXznM\"]},\"project:/contracts/8.17/interfaces/IBookKeeper.sol\":{\"keccak256\":\"0x422ad2961c48da6738fea30faee73fc1e5f563728b7a3046f8d3310fb65c9e0d\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://1d105bba3afeb7cf63ebd634316caf702ec9c2b615e88c878803857bad9c495d\",\"dweb:/ipfs/QmahkUGJJNq1aGyxVXTQQjGK6mSw9zr4ZB1SAEDD3gxpHU\"]},\"project:/contracts/8.17/interfaces/ICollateralPoolConfig.sol\":{\"keccak256\":\"0xf56fe0fa00517feac0e0a7489597e9c58e899ff7ef87ff8a26a8894c1dc515e7\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://dcee183e93566c7481e0bcdda893aa2388ee250f157d15389b130cef811566ff\",\"dweb:/ipfs/Qme3hvj47Z4XuAANAv13zthErNZkTfsAmHwJRF46C6LRsH\"]},\"project:/contracts/8.17/interfaces/IGenericTokenAdapter.sol\":{\"keccak256\":\"0x8758367c9fde335ba438dddf56b2948db0cd19403a6f02c554f0ae6d9b43b1a0\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://fb5ded98689085a8454e8232d8d29f85d22f569adbdd2e7dadb119e82b8a8219\",\"dweb:/ipfs/QmciUWMu4KVCPPRTJizghQZdEmf9RvJrpubfFFWRg8byR2\"]},\"project:/contracts/8.17/interfaces/ILiquidationStrategy.sol\":{\"keccak256\":\"0x0bfc7cd8ada7d3610828ca263a6e6e2150692adaba40fca773830c5d6ddda7f1\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://cccd40459b75b97c91dd5735356afc66b3dd86cff2757287af6bb3886581a642\",\"dweb:/ipfs/QmPHVmz7sfRH4rSgadndw5tiks9VSr8AmwFeETeo3Pg8kH\"]},\"project:/contracts/8.17/interfaces/IPriceFeed.sol\":{\"keccak256\":\"0x7104712b38c56e5532f3731b32f7f6210b57561ce500e18947986f5a8b629505\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://a92803116f1b7bd3c38a45c9b7360ae4a8a4936105ec265f8ddd1f379c76b3be\",\"dweb:/ipfs/QmR2Ur7hh5FEpnMd4DfVdp6SnbF3q9RJUvZAf18byp2Xhd\"]},\"project:/contracts/8.17/interfaces/IStableSwapModule.sol\":{\"keccak256\":\"0xbd2b26ad5dce5ed0b8c1c0ba508c9bc8e6fc01485cefe3a9af7d1c95b737592f\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://e5741a186733f62bdf91430742c2bf3fc324c8bd42e13968047d0b0d1a8bd116\",\"dweb:/ipfs/QmTkBr5kxroAhDMEFDP56pnAYnCYY2yg4Te7SQrH9su8Fy\"]},\"project:/contracts/8.17/interfaces/IStablecoin.sol\":{\"keccak256\":\"0x7de44275dc105180a167c87678a5150e86fda2557b3726262fec1104e20c48cd\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://df441d9d8dc48aef5ffe2c92cd7808d4d293a5f7e28a5f37ac356619bd8a0549\",\"dweb:/ipfs/QmTrmf26nfD9C67Eca2ho7GYxTrSn9HhdhzHqvSCJWRX8S\"]},\"project:/contracts/8.17/interfaces/IStablecoinAdapter.sol\":{\"keccak256\":\"0x4c6d3bbe9e3f5525d0ba857a1158905a661effb48bcec2cf185c4183687e7aff\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://ad9a579a99879e76bee4a2f389dcafeb85a48d6ab21d95fd7a183c75a92923f3\",\"dweb:/ipfs/QmQUKazzb4NC9BomQQLDsGyL2u3Thy1nNcMT4St72KGi2q\"]},\"project:/contracts/8.17/interfaces/IToken.sol\":{\"keccak256\":\"0xa2864fef50b8cf58c1192b02c6fec92698abf8f3c9b1e4651834f4a74a103c94\",\"license\":\"AGPL-3.0-or-later\",\"urls\":[\"bzz-raw://b93e5e85902a1def43fe6041db0665d05d6f8f82014237e0cfb64b693e3da675\",\"dweb:/ipfs/QmS9XNi1E7HQbpBQpW6jdtGEAFptHqMyzrpncGCrU9DxF6\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: AGPL-3.0-or-later\n\npragma solidity 0.8.17;\n\nimport \"../interfaces/IAuthTokenAdapter.sol\";\nimport \"../interfaces/IStablecoinAdapter.sol\";\n\ninterface IStableSwapModule {\n  function swapTokenToStablecoin(address usr, uint256 tokenAmount) external;\n\n  function swapStablecoinToToken(address usr, uint256 tokenAmount) external;\n\n  function authTokenAdapter() external view returns (IAuthTokenAdapter);\n\n  function stablecoinAdapter() external view returns (IStablecoinAdapter);\n}\n",
+  "sourcePath": "/Users/sangjun.lee/Sangjun/fathom-stablecoin-smart-contracts/contracts/8.17/interfaces/IStableSwapModule.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/8.17/interfaces/IStableSwapModule.sol",
+    "exportedSymbols": {
+      "IAccessControlConfig": [
+        17559
+      ],
+      "IAuthTokenAdapter": [
+        17616
+      ],
+      "IBookKeeper": [
+        17785
+      ],
+      "ICollateralPoolConfig": [
+        18019
+      ],
+      "IGenericTokenAdapter": [
+        18488
+      ],
+      "ILiquidationStrategy": [
+        18535
+      ],
+      "IPriceFeed": [
+        18704
+      ],
+      "IStableSwapModule": [
+        18818
+      ],
+      "IStablecoin": [
+        18838
+      ],
+      "IStablecoinAdapter": [
+        18873
+      ],
+      "IToken": [
+        19012
+      ]
+    },
+    "id": 18819,
+    "license": "AGPL-3.0-or-later",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 18789,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".17"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "47:23:62"
+      },
+      {
+        "absolutePath": "project:/contracts/8.17/interfaces/IAuthTokenAdapter.sol",
+        "file": "../interfaces/IAuthTokenAdapter.sol",
+        "id": 18790,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 18819,
+        "sourceUnit": 17617,
+        "src": "72:45:62",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "absolutePath": "project:/contracts/8.17/interfaces/IStablecoinAdapter.sol",
+        "file": "../interfaces/IStablecoinAdapter.sol",
+        "id": 18791,
+        "nameLocation": "-1:-1:-1",
+        "nodeType": "ImportDirective",
+        "scope": 18819,
+        "sourceUnit": 18874,
+        "src": "118:46:62",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IStableSwapModule",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 18818,
+        "linearizedBaseContracts": [
+          18818
+        ],
+        "name": "IStableSwapModule",
+        "nameLocation": "176:17:62",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "40853dce",
+            "id": 18798,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "swapTokenToStablecoin",
+            "nameLocation": "207:21:62",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18796,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18793,
+                  "mutability": "mutable",
+                  "name": "usr",
+                  "nameLocation": "237:3:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18798,
+                  "src": "229:11:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 18792,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "229:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 18795,
+                  "mutability": "mutable",
+                  "name": "tokenAmount",
+                  "nameLocation": "250:11:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18798,
+                  "src": "242:19:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 18794,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "242:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "228:34:62"
+            },
+            "returnParameters": {
+              "id": 18797,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "271:0:62"
+            },
+            "scope": 18818,
+            "src": "198:74:62",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "81e28cc7",
+            "id": 18805,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "swapStablecoinToToken",
+            "nameLocation": "285:21:62",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18803,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18800,
+                  "mutability": "mutable",
+                  "name": "usr",
+                  "nameLocation": "315:3:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18805,
+                  "src": "307:11:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 18799,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "307:7:62",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 18802,
+                  "mutability": "mutable",
+                  "name": "tokenAmount",
+                  "nameLocation": "328:11:62",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18805,
+                  "src": "320:19:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 18801,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "320:7:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "306:34:62"
+            },
+            "returnParameters": {
+              "id": 18804,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "349:0:62"
+            },
+            "scope": 18818,
+            "src": "276:74:62",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "e723b977",
+            "id": 18811,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "authTokenAdapter",
+            "nameLocation": "363:16:62",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18806,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "379:2:62"
+            },
+            "returnParameters": {
+              "id": 18810,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18809,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18811,
+                  "src": "405:17:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IAuthTokenAdapter_$17616",
+                    "typeString": "contract IAuthTokenAdapter"
+                  },
+                  "typeName": {
+                    "id": 18808,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 18807,
+                      "name": "IAuthTokenAdapter",
+                      "nameLocations": [
+                        "405:17:62"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 17616,
+                      "src": "405:17:62"
+                    },
+                    "referencedDeclaration": 17616,
+                    "src": "405:17:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IAuthTokenAdapter_$17616",
+                      "typeString": "contract IAuthTokenAdapter"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "404:19:62"
+            },
+            "scope": 18818,
+            "src": "354:70:62",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "46a311d3",
+            "id": 18817,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "stablecoinAdapter",
+            "nameLocation": "437:17:62",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 18812,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "454:2:62"
+            },
+            "returnParameters": {
+              "id": 18816,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 18815,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18817,
+                  "src": "480:18:62",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IStablecoinAdapter_$18873",
+                    "typeString": "contract IStablecoinAdapter"
+                  },
+                  "typeName": {
+                    "id": 18814,
+                    "nodeType": "UserDefinedTypeName",
+                    "pathNode": {
+                      "id": 18813,
+                      "name": "IStablecoinAdapter",
+                      "nameLocations": [
+                        "480:18:62"
+                      ],
+                      "nodeType": "IdentifierPath",
+                      "referencedDeclaration": 18873,
+                      "src": "480:18:62"
+                    },
+                    "referencedDeclaration": 18873,
+                    "src": "480:18:62",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IStablecoinAdapter_$18873",
+                      "typeString": "contract IStablecoinAdapter"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "479:20:62"
+            },
+            "scope": 18818,
+            "src": "428:72:62",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 18819,
+        "src": "166:336:62",
+        "usedErrors": []
+      }
+    ],
+    "src": "47:456:62"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.17+commit.8df45f5f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.10",
+  "updatedAt": "2022-10-06T11:28:50.101Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

@@ -2,8 +2,8 @@ const fs = require('fs');
 
 const DexPriceOracle = artifacts.require('./8.17/price-oracles/DexPriceOracle.sol');
 
-// const rawdata = fs.readFileSync('../../../../addresses.json');
-// let stablecoinAddress = JSON.parse(rawdata);
+const rawdata = fs.readFileSync('../../../../addresses.json');
+let stablecoinAddress = JSON.parse(rawdata);
 module.exports =  async function(deployer) {
 
   // const DEX_FACTORY_ADDR = "" //<- please fill in after deploying a DEX smart contract
@@ -23,15 +23,15 @@ module.exports =  async function(deployer) {
 
   const deployed = artifacts.require('./8.17/price-oracles/DexPriceOracle.sol');
 
-  // let addressesUpdate = { 
-  //   dexPriceOracle:deployed.address,
-  // };
+  let addressesUpdate = { 
+    dexPriceOracle:deployed.address,
+  };
   console.log(deployed.address);
-  // const newAddresses = {
-  //   // ...stablecoinAddress,  
-  //   ...addressesUpdate
-  // };
+  const newAddresses = {
+    ...stablecoinAddress,  
+    ...addressesUpdate
+  };
 
-  // let data = JSON.stringify(newAddresses);
-  // fs.writeFileSync('../../../../addresses.json', data);
+  let data = JSON.stringify(newAddresses);
+  fs.writeFileSync('../../../../addresses.json', data);
 };

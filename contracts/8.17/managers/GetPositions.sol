@@ -189,7 +189,7 @@ contract GetPositions is Initializable {
     uint256 _priceWithSafetyMargin // [ray]
   )
     internal
-    view
+    pure
     returns (
       uint256 _safetyBuffer // [rad]
     )
@@ -199,16 +199,16 @@ contract GetPositions is Initializable {
     _safetyBuffer = _collateralValue >= _debtValue ? _collateralValue.sub(_debtValue) : 0;
   }
 
-    function calculateMaxStablecoinAmount(
-    uint256 _lockedCollateral, // [wad]
-    uint256 _priceWithSafetyMargin // [ray]
-  )
-    internal
-    view
-    returns (
-      uint256 _MaxStablecoinAmount // [rad]
-    )
-  {
-    uint256 _MaxStablecoinAmount = _lockedCollateral.mul(_priceWithSafetyMargin);
-  }
+  //   function calculateMaxStablecoinAmount(
+  //   uint256 _lockedCollateral, // [wad]
+  //   uint256 _priceWithSafetyMargin // [ray]
+  // )
+  //   internal
+  //   view
+  //   returns (
+  //     uint256 _MaxStablecoinAmount // [rad]
+  //   )
+  // {
+  //   uint256 _MaxStablecoinAmount = _lockedCollateral.mul(_priceWithSafetyMargin);
+  // }
 }
