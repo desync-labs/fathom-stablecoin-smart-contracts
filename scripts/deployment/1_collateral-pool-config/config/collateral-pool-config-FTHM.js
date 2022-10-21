@@ -28,7 +28,7 @@ module.exports = async function(deployer) {
 
   const bookKeeper = await BookKeeper.at(stablecoinAddress.bookKeeper);
 
-  const simplePriceFeedUSDT = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeedUSDT);
+  const simplePriceFeedFTHM = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeedFTHM);
 
   const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
 
@@ -58,6 +58,6 @@ module.exports = async function(deployer) {
   await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, debtCeilingSetUpUSDT, { gasLimit: 1000000 });
 //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay);
   //setting _rawPrice and _priceWithSafetyMargin of WXDC to 100
-  await simplePriceFeedUSDT.setPrice(WeiPerWad.mul(1), { gasLimit: 1000000 });
+  await simplePriceFeedFTHM.setPrice(WeiPerWad.mul(1), { gasLimit: 1000000 });
   await priceOracle.setPrice(COLLATERAL_POOL_ID, { gasLimit: 1000000 });
 }
