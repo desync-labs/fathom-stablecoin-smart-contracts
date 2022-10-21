@@ -107,7 +107,7 @@ contract PositionManager is PausableUpgradeable, IManager {
 
   /// @dev Initializer for intializing PositionManager
   /// @param _bookKeeper The address of the Book Keeper
-  function initialize(address _bookKeeper, address _showStopper) external initializer {
+  function initialize(address _bookKeeper, address _showStopper, address _priceOracle) external initializer {
     PausableUpgradeable.__Pausable_init();
 
     IBookKeeper(_bookKeeper).totalStablecoinIssued(); // Sanity Check Call
@@ -115,6 +115,8 @@ contract PositionManager is PausableUpgradeable, IManager {
 
     IShowStopper(_showStopper).live(); // Sanity Check Call
     showStopper = _showStopper;
+
+    priceOracle = _priceOracle;
   }
 
   function _safeAdd(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {

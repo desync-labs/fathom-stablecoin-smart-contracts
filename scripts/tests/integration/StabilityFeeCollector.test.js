@@ -1,5 +1,3 @@
-require("@openzeppelin/test-helpers")
-
 const { BigNumber } = require("ethers");
 const chai = require('chai');
 const { solidity } = require("ethereum-waffle");
@@ -31,6 +29,7 @@ describe("Stability Fee", () => {
   let stabilityFeeCollector
   let fathomStablecoin
   let collateralPoolConfig
+  let simplePriceFeed
 
   beforeEach(async () => {
     await snapshot.revertToSnapshot();
@@ -44,7 +43,7 @@ describe("Stability Fee", () => {
     fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
     positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
     stablecoinAdapter = await artifacts.initializeInterfaceAt("StablecoinAdapter", "StablecoinAdapter");
-    const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
+    simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
     const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
 
     const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
@@ -55,9 +54,7 @@ describe("Stability Fee", () => {
 
     await collateralPoolConfig.initCollateralPool(
       COLLATERAL_POOL_ID,
-      // set pool debt ceiling 100 rad
       WeiPerRad.mul(100),
-      // set position debt floor 1 rad
       WeiPerRad.mul(1),
       simplePriceFeed.address,
       WeiPerRay,
@@ -69,7 +66,8 @@ describe("Stability Fee", () => {
       AddressZero
     )
 
-    await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
+    await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
+
     await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(100), { gasLimit: 1000000 })
     await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress })
     await fathomStablecoin.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress })
@@ -77,19 +75,11 @@ describe("Stability Fee", () => {
   describe("#collect", () => {
     context("when call collect directly and call deposit", () => {
       it("should be success", async () => {
-        // set stability fee rate 20% per year
-        // await collateralPoolConfig.setStabilityFeeRate(
-        //   COLLATERAL_POOL_ID,
-        //   BigNumber.from("1000000005781378656804591713"),
-        //   { gasLimit: 1000000 }
-
-
-    await collateralPoolConfig.setStabilityFeeRate(COLLATERAL_POOL_ID, BigNumber.from("1000000005781378656804591713"), { gasLimit: 1000000 })
-
-        // var rate = await collateralPoolConfig.getStabilityFeeRate(COLLATERAL_POOL_ID, { gasLimit: 1000000 });
+        await collateralPoolConfig.setStabilityFeeRate(COLLATERAL_POOL_ID, BigNumber.from("1000000005781378656804591713"), { gasLimit: 1000000 })
 
         // time increase 6 month
         await TimeHelpers.increase(TimeHelpers.duration.seconds(BigNumber.from("15768000")))
+        await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
         await stabilityFeeCollector.collect(COLLATERAL_POOL_ID, { gasLimit: 1000000 })
         const debtAccumulatedRate = await collateralPoolConfig.collateralPools(COLLATERAL_POOL_ID)
         // debtAccumulatedRate = RAY(1000000005781378656804591713^15768000) = 1095445115010332226911367294
@@ -123,6 +113,7 @@ describe("Stability Fee", () => {
 
         // time increase 1 year
         await TimeHelpers.increase(TimeHelpers.duration.seconds(BigNumber.from("31536000")))
+        await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
 
         // position 2
         //  a. open a new position
@@ -157,6 +148,7 @@ describe("Stability Fee", () => {
 
         // time increase 1 year
         await TimeHelpers.increase(TimeHelpers.duration.seconds(BigNumber.from("31536000")))
+        await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
 
         // debtAccumulatedRate ~ 20%
         await stabilityFeeCollector.collect(COLLATERAL_POOL_ID, { gasLimit: 1000000 })

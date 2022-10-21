@@ -36,6 +36,7 @@ module.exports = async function (deployer) {
         liquidationEngine.initialize(
             bookKeeper.address,
             systemDebtEngine.address,
+            priceOracle.address,
             { gasLimit: 1000000 }
         ),
         stablecoinAdapter.initialize(
@@ -54,6 +55,7 @@ module.exports = async function (deployer) {
         positionManager.initialize(
             bookKeeper.address,
             showStopper.address,
+            priceOracle.address,
             { gasLimit: 1000000 }
         ),
         simplePriceFeed.initialize(

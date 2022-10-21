@@ -1,5 +1,3 @@
-require("@openzeppelin/test-helpers")
-
 const chai = require('chai');
 const { ethers, BigNumber } = require("ethers");
 
@@ -30,6 +28,7 @@ describe("GetPositions", () => {
     let WXDC
     let collateralPoolConfig
     let positionManager
+    let simplePriceFeed
     let getPositions
 
     beforeEach(async () => {
@@ -43,7 +42,7 @@ describe("GetPositions", () => {
         WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
         getPositions = await artifacts.initializeInterfaceAt("GetPositions", "GetPositions");
 
-        const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
+        simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
         const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
         const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
         const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
@@ -63,13 +62,13 @@ describe("GetPositions", () => {
         )
         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10000000), { gasLimit: 1000000 })
 
-        await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
+        await simplePriceFeed.setPrice(WeiPerWad, { gasLimit: 1000000 });
     })
 
     describe("#getPositionWithSafetyBuffer", async () => {
         context("multiple positions at risks", async () => {
             it("should query all positions at risks", async () => {
-                await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay.mul(2), { gasLimit: 1000000 })
+                await simplePriceFeed.setPrice(WeiPerRay.mul(2), { gasLimit: 1000000 })
 
                 await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress, gasLimit: 1000000 })
 

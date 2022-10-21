@@ -3,5 +3,5 @@
 pragma solidity 0.8.17;
 
 interface ISetPrice {
-  function setPrice(bytes32 _collateralPoolId) external view;
+  function setPrice(bytes32 _collateralPoolId) external;
 }

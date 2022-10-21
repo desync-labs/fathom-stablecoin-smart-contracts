@@ -1,5 +1,3 @@
-require("@openzeppelin/test-helpers")
-
 const chai = require('chai');
 const { ethers } = require("ethers");
 
@@ -90,8 +88,7 @@ describe("PositionPermissions", () => {
             AddressZero
         )
 
-        await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID_WXDC, WeiPerRay, { gasLimit: 1000000 })
-        await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID_USDT, WeiPerRay, { gasLimit: 1000000 })
+        await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
 
         await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID_WXDC, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
         await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID_USDT, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
