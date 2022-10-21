@@ -15,7 +15,9 @@ const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
 // const LIQUIDATIONRATIO = BigNumber.from(1.33e+27); 
 const LIQUIDATIONRATIO = WeiPerRay.mul(133).div(100).toString();
 // LTV 75%
-const rawdata = fs.readFileSync('../../../../addresses_ApothemV1.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
+
+// const rawdata = fs.readFileSync('../../../../addresses_ApothemV1.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
 const CollateralPoolConfig = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');

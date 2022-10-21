@@ -134,41 +134,45 @@ deploy:
 	coralX execute --network development --path scripts/deployment/2_book-keeper/config/whitelist-collateral-token-adapter-FTHM.js
 
 
-	
+# grant adapter role to collateralTokenAdapterUSDT/USDT-COL/FTHM
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role-USDT.js
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role-USDT-COL.js
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role-FTHM.js
 
-	# collateral-pool-config-USDT, USDT-COL, FTHM
+# collateral-pool-config-USDT, USDT-COL, FTHM
 	coralX execute --network development --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config-USDT.js
-
 	coralX execute --network development --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config-USDT-COL.js
-
 	coralX execute --network development --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config-FTHM.js
 
-	#Granting collateral-token-adapter-USDT, FTHM, USDT-COL
-	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role-USDT.js
-
-	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role-USDT-COL.js
-
-	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role-FTHM.js
-
-
+#Grant stablecoin's ownership to fairLaunch
 	coralX execute --network development --path scripts/deployment/9_fathom-token/config/fathom-token-ownership.js
 
-	# Adding priceOracle address to liquidation-engine's storage
+# Adding priceOracle address to liquidation-engine's storage
 	coralX execute --network development --path scripts/deployment/5_liquidation-engine/config/config_liquidation-engine.js
-	# Adding priceOracle address to Position Manager's storage
+# Adding priceOracle address to Position Manager's storage
 	coralX execute --network development --path scripts/deployment/13_position-manager/config/config_position-manager.js
-
-	# mint more tokens
+# mint more tokens
 	coralX execute --network development --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
 	coralX execute --network development --path scripts/deployment/22_USDT-mock/initialize/initialize_USDT.js
 
-next:
-	coralX execute --network development --path scripts/PrepSepDemo/stableSwap/1_mintUSDTtoDeployer.js
-	coralX execute --network development --path scripts/PrepSepDemo/stableSwap/2_swapThreeMilUSDT.js
+# DEX Integration Scripts
 
+# better check if scripts above work, then move on to DEX Integration Scripts
+
+# fathomStats can be deployed after DEXPriceOracle is set.
+gorliPM:
+	coralX execute --network gorli --path scripts/deployment/25_get-positions/deploy/get-positions.js
+gorliPMInit:
+		coralX execute --network gorli --path scripts/deployment/25_get-positions/initialize/initialize_get-positionsGorli.js
+
+fathomStats:
+	coralX execute --network development --path scripts/deployment/27_stats/deploy/stats.js
+	coralX execute --network development --path scripts/deployment/27_stats/initialize/initialize_stats.js
+# getPositionV2, made for positionsInfo, will be deployed below
+
+checkProxyWallet:
+
+	coralX execute --network development --path scripts/tests/0_makeWallet/2_makeWallet.js
 
 bot:
 	# give minter role to liquidation bot 0xe7B11F39E08089B1d76A79D6272AC7Ad11E8eFe9
@@ -201,13 +205,16 @@ dexIntegration:
 	coralX execute --network development --path scripts/deployment/7_price-oracle/config/setPrice.js
 
 tankUSDT:
-	# First set price in simplePriceFeed
+	# for quick price manipulation, running scripts below will make your life easier.
+	# First set price to change prce in simplePriceFeed
 	coralX execute --network development --path scripts/deployment/15_simple-price-feed/config/config_simple-price-feed-USDT.js
-	# Second set price in PriceOracle for USDT
+	# Second set price to update priceWithSafetyMargin in PriceOracle for USDT
 	coralX execute --network development --path scripts/deployment/7_price-oracle/config/setPriceUSDT.js
 
-fathomStats:
-	# coralX execute --network development --path scripts/deployment/27_stats/deploy/stats.js
-	coralX execute --network development --path scripts/deployment/27_stats/initialize/initialize_stats.js
+
 check:
 	coralX execute --network development --path scripts/PrepSepDemo/openClosePosition/3_openPosition.js
+stableSwap to generate FXD for providing liquidity:
+	# needs to be adjusted in coralX syntax
+	coralX execute --network development --path scripts/PrepSepDemo/stableSwap/1_mintUSDTtoDeployer.js
+	coralX execute --network development --path scripts/PrepSepDemo/stableSwap/2_swapThreeMilUSDT.js

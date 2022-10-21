@@ -14,7 +14,7 @@ module.exports =  async function(deployer) {
   await Promise.all(promises);
 
   const deployed = artifacts.require('./8.17/managers/GetPositions.sol');
-
+  console.log("getPositions is "+ deployed.address);
   let addressesUpdate = { 
     getPositions:deployed.address,
   };

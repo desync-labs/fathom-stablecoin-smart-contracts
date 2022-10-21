@@ -40,22 +40,22 @@
     "absolutePath": "project:/contracts/8.17/interfaces/IFathomDEXPair.sol",
     "exportedSymbols": {
       "IFathomDEXPair": [
-        18120
+        18364
       ]
     },
-    "id": 18121,
+    "id": 18365,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 18109,
+        "id": 18353,
         "literals": [
           "solidity",
           "0.8",
           ".17"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:43"
+        "src": "33:23:44"
       },
       {
         "abstract": false,
@@ -64,42 +64,42 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 18120,
+        "id": 18364,
         "linearizedBaseContracts": [
-          18120
+          18364
         ],
         "name": "IFathomDEXPair",
-        "nameLocation": "68:14:43",
+        "nameLocation": "68:14:44",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "documentation": {
-              "id": 18110,
+              "id": 18354,
               "nodeType": "StructuredDocumentation",
-              "src": "87:137:43",
+              "src": "87:137:44",
               "text": "@dev Return the wad price of token0/token1, multiplied by 1e18\n NOTE: (if you have 1 token0 how much you can sell it for token1)"
             },
             "functionSelector": "e6a43905",
-            "id": 18119,
+            "id": 18363,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getPair",
-            "nameLocation": "236:7:43",
+            "nameLocation": "236:7:44",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 18115,
+              "id": 18359,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18112,
+                  "id": 18356,
                   "mutability": "mutable",
                   "name": "token0",
-                  "nameLocation": "252:6:43",
+                  "nameLocation": "252:6:44",
                   "nodeType": "VariableDeclaration",
-                  "scope": 18119,
-                  "src": "244:14:43",
+                  "scope": 18363,
+                  "src": "244:14:44",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -107,10 +107,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18111,
+                    "id": 18355,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "244:7:43",
+                    "src": "244:7:44",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -121,13 +121,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 18114,
+                  "id": 18358,
                   "mutability": "mutable",
                   "name": "token1",
-                  "nameLocation": "268:6:43",
+                  "nameLocation": "268:6:44",
                   "nodeType": "VariableDeclaration",
-                  "scope": 18119,
-                  "src": "260:14:43",
+                  "scope": 18363,
+                  "src": "260:14:44",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -135,10 +135,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18113,
+                    "id": 18357,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "260:7:43",
+                    "src": "260:7:44",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -148,21 +148,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "243:32:43"
+              "src": "243:32:44"
             },
             "returnParameters": {
-              "id": 18118,
+              "id": 18362,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18117,
+                  "id": 18361,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 18119,
-                  "src": "294:7:43",
+                  "scope": 18363,
+                  "src": "294:7:44",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -170,10 +170,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18116,
+                    "id": 18360,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "294:7:43",
+                    "src": "294:7:44",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -183,21 +183,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "293:9:43"
+              "src": "293:9:44"
             },
-            "scope": 18120,
-            "src": "227:76:43",
+            "scope": 18364,
+            "src": "227:76:44",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 18121,
-        "src": "58:247:43",
+        "scope": 18365,
+        "src": "58:247:44",
         "usedErrors": []
       }
     ],
-    "src": "33:273:43"
+    "src": "33:273:44"
   },
   "compiler": {
     "name": "solc",
@@ -205,7 +205,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-06T11:28:50.094Z",
+  "updatedAt": "2022-10-21T07:57:44.979Z",
   "devdoc": {
     "kind": "dev",
     "methods": {

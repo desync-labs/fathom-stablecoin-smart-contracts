@@ -117,9 +117,6 @@ contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, R
     PausableUpgradeable.__Pausable_init();
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
     // 2. Sanity checks
-    //2022 Oct 7th, 11:57 PM;
-    //failing right below. when I clal this with xdc remix it deos not break
-    //2022 Oct 8th 12:04 AM; now it doesn't. wtf?
     (address _stakeToken, , , , ) = IFathomFairLaunch(_fairlaunch).poolInfo(_pid);
     require(_stakeToken == _collateralToken, "CollateralTokenAdapter/collateralToken-not-match");
     require(IFathomFairLaunch(_fairlaunch).fathom() == _rewardToken, "CollateralTokenAdapter/reward-token-not-match");

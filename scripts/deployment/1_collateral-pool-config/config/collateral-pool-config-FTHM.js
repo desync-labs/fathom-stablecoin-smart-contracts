@@ -12,8 +12,8 @@ const CLOSE_FACTOR_BPS = BigNumber.from(5000)   // <- 0.5
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)  // <- 1.05
 const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
 
-// const rawdata = fs.readFileSync('../../../../addresses.json');
-const rawdata = fs.readFileSync('../../../../addresses_ApothemV1.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
+// const rawdata = fs.readFileSync('../../../../addresses_ApothemV1.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
 const CollateralPoolConfig = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
@@ -31,6 +31,11 @@ module.exports = async function(deployer) {
   const simplePriceFeedUSDT = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeedUSDT);
 
   const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
+
+  console.log("stablecoinAddress.simplePriceFeedFTHM is " + stablecoinAddress.simplePriceFeedFTHM);
+  console.log("stablecoinAddress.collateralTokenAdapterFTHM is " + stablecoinAddress.collateralTokenAdapterFTHM);
+  console.log("stablecoinAddress.fixedSpreadLiquidationStrategy is " +   stablecoinAddress.fixedSpreadLiquidationStrategy);
+
 
   await collateralPoolConfig.initCollateralPool(
     COLLATERAL_POOL_ID,  //<-_collateralPoolId

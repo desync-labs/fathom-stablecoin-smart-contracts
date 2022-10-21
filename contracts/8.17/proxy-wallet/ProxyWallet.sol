@@ -37,7 +37,6 @@ contract ProxyWallet is FathomAuth, FathomNote {
 
   function execute2(address _target, bytes memory _data) public payable auth note returns (bytes memory _response) {
     require(_target != address(0), "proxy-wallet-target-address-required");
-
     // call contract in current context
     assembly {
       let _succeeded := delegatecall(sub(gas(), 5000), _target, add(_data, 0x20), mload(_data), 0, 0)

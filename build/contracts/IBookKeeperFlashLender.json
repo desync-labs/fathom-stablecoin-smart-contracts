@@ -45,35 +45,35 @@
     "absolutePath": "project:/contracts/8.17/interfaces/IBookKeeperFlashLender.sol",
     "exportedSymbols": {
       "IBookKeeperFlashBorrower": [
-        17802
+        18046
       ],
       "IBookKeeperFlashLender": [
-        17819
+        18063
       ]
     },
-    "id": 17820,
+    "id": 18064,
     "license": "AGPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 17804,
+        "id": 18048,
         "literals": [
           "solidity",
           "0.8",
           ".17"
         ],
         "nodeType": "PragmaDirective",
-        "src": "47:23:36"
+        "src": "47:23:37"
       },
       {
         "absolutePath": "project:/contracts/8.17/interfaces/IBookKeeperFlashBorrower.sol",
         "file": "./IBookKeeperFlashBorrower.sol",
-        "id": 17805,
+        "id": 18049,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 17820,
-        "sourceUnit": 17803,
-        "src": "72:40:36",
+        "scope": 18064,
+        "sourceUnit": 18047,
+        "src": "72:40:37",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -84,65 +84,65 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 17819,
+        "id": 18063,
         "linearizedBaseContracts": [
-          17819
+          18063
         ],
         "name": "IBookKeeperFlashLender",
-        "nameLocation": "124:22:36",
+        "nameLocation": "124:22:37",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "documentation": {
-              "id": 17806,
+              "id": 18050,
               "nodeType": "StructuredDocumentation",
-              "src": "151:277:36",
+              "src": "151:277:37",
               "text": " @dev Initiate a flash loan.\n @param receiver The receiver of the tokens in the loan, and the receiver of the callback.\n @param amount The amount of tokens lent. [rad]\n @param data Arbitrary data structure, intended to contain user-defined parameters."
             },
             "functionSelector": "c3bd2849",
-            "id": 17818,
+            "id": 18062,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "bookKeeperFlashLoan",
-            "nameLocation": "440:19:36",
+            "nameLocation": "440:19:37",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 17814,
+              "id": 18058,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 17809,
+                  "id": 18053,
                   "mutability": "mutable",
                   "name": "receiver",
-                  "nameLocation": "490:8:36",
+                  "nameLocation": "490:8:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 17818,
-                  "src": "465:33:36",
+                  "scope": 18062,
+                  "src": "465:33:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_IBookKeeperFlashBorrower_$17802",
+                    "typeIdentifier": "t_contract$_IBookKeeperFlashBorrower_$18046",
                     "typeString": "contract IBookKeeperFlashBorrower"
                   },
                   "typeName": {
-                    "id": 17808,
+                    "id": 18052,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 17807,
+                      "id": 18051,
                       "name": "IBookKeeperFlashBorrower",
                       "nameLocations": [
-                        "465:24:36"
+                        "465:24:37"
                       ],
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 17802,
-                      "src": "465:24:36"
+                      "referencedDeclaration": 18046,
+                      "src": "465:24:37"
                     },
-                    "referencedDeclaration": 17802,
-                    "src": "465:24:36",
+                    "referencedDeclaration": 18046,
+                    "src": "465:24:37",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IBookKeeperFlashBorrower_$17802",
+                      "typeIdentifier": "t_contract$_IBookKeeperFlashBorrower_$18046",
                       "typeString": "contract IBookKeeperFlashBorrower"
                     }
                   },
@@ -150,13 +150,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 17811,
+                  "id": 18055,
                   "mutability": "mutable",
                   "name": "amount",
-                  "nameLocation": "512:6:36",
+                  "nameLocation": "512:6:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 17818,
-                  "src": "504:14:36",
+                  "scope": 18062,
+                  "src": "504:14:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -164,10 +164,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 17810,
+                    "id": 18054,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "504:7:36",
+                    "src": "504:7:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -177,13 +177,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 17813,
+                  "id": 18057,
                   "mutability": "mutable",
                   "name": "data",
-                  "nameLocation": "539:4:36",
+                  "nameLocation": "539:4:37",
                   "nodeType": "VariableDeclaration",
-                  "scope": 17818,
-                  "src": "524:19:36",
+                  "scope": 18062,
+                  "src": "524:19:37",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
@@ -191,10 +191,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 17812,
+                    "id": 18056,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "524:5:36",
+                    "src": "524:5:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -203,21 +203,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "459:88:36"
+              "src": "459:88:37"
             },
             "returnParameters": {
-              "id": 17817,
+              "id": 18061,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 17816,
+                  "id": 18060,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 17818,
-                  "src": "566:4:36",
+                  "scope": 18062,
+                  "src": "566:4:37",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -225,10 +225,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 17815,
+                    "id": 18059,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "566:4:36",
+                    "src": "566:4:37",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -237,21 +237,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "565:6:36"
+              "src": "565:6:37"
             },
-            "scope": 17819,
-            "src": "431:141:36",
+            "scope": 18063,
+            "src": "431:141:37",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 17820,
-        "src": "114:460:36",
+        "scope": 18064,
+        "src": "114:460:37",
         "usedErrors": []
       }
     ],
-    "src": "47:528:36"
+    "src": "47:528:37"
   },
   "compiler": {
     "name": "solc",
@@ -259,7 +259,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-06T11:28:50.092Z",
+  "updatedAt": "2022-10-21T07:57:44.978Z",
   "devdoc": {
     "kind": "dev",
     "methods": {

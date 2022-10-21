@@ -29,35 +29,35 @@
     "absolutePath": "project:/contracts/8.17/interfaces/IPriceOracle.sol",
     "exportedSymbols": {
       "IPriceFeed": [
-        18704
+        18948
       ],
       "IPriceOracle": [
-        18713
+        18957
       ]
     },
-    "id": 18714,
+    "id": 18958,
     "license": "AGPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 18706,
+        "id": 18950,
         "literals": [
           "solidity",
           "0.8",
           ".17"
         ],
         "nodeType": "PragmaDirective",
-        "src": "47:23:55"
+        "src": "47:23:56"
       },
       {
         "absolutePath": "project:/contracts/8.17/interfaces/IPriceFeed.sol",
         "file": "./IPriceFeed.sol",
-        "id": 18707,
+        "id": 18951,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 18714,
-        "sourceUnit": 18705,
-        "src": "72:26:55",
+        "scope": 18958,
+        "sourceUnit": 18949,
+        "src": "72:26:56",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -68,42 +68,42 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 18713,
+        "id": 18957,
         "linearizedBaseContracts": [
-          18713
+          18957
         ],
         "name": "IPriceOracle",
-        "nameLocation": "110:12:55",
+        "nameLocation": "110:12:56",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "9d1eea78",
-            "id": 18712,
+            "id": 18956,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "stableCoinReferencePrice",
-            "nameLocation": "136:24:55",
+            "nameLocation": "136:24:56",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 18708,
+              "id": 18952,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "160:2:55"
+              "src": "160:2:56"
             },
             "returnParameters": {
-              "id": 18711,
+              "id": 18955,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18710,
+                  "id": 18954,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 18712,
-                  "src": "186:7:55",
+                  "scope": 18956,
+                  "src": "186:7:56",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -111,10 +111,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 18709,
+                    "id": 18953,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "186:7:55",
+                    "src": "186:7:56",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -123,21 +123,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "185:9:55"
+              "src": "185:9:56"
             },
-            "scope": 18713,
-            "src": "127:68:55",
+            "scope": 18957,
+            "src": "127:68:56",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 18714,
-        "src": "100:97:55",
+        "scope": 18958,
+        "src": "100:97:56",
         "usedErrors": []
       }
     ],
-    "src": "47:151:55"
+    "src": "47:151:56"
   },
   "compiler": {
     "name": "solc",
@@ -145,7 +145,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-06T11:28:50.099Z",
+  "updatedAt": "2022-10-21T07:57:44.982Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
