@@ -13,7 +13,7 @@ import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/ILiquidationStrategy.sol";
 import "../interfaces/ICagable.sol";
-// import "../interfaces/ISetPrice.sol";
+import "../interfaces/ISetPrice.sol";
 
 /// @title LiquidationEngine
 /** @notice A contract which is the manager for all of the liquidations of the protocol.
@@ -89,7 +89,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     bytes calldata _data
   ) external override nonReentrant whenNotPaused {
 
-    // ISetPrice(priceOracle).setPrice(_collateralPoolId);
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
 
     require(live == 1, "LiquidationEngine/not-live");
     require(_debtShareToBeLiquidated != 0, "LiquidationEngine/zero-debt-value-to-be-liquidated");

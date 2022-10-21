@@ -632,7 +632,7 @@
                                 }
                             ]
                         },
-                        "name": "abi_encode_tuple_t_contract$_ProxyWalletCache_$28907__to_t_address__fromStack_reversed",
+                        "name": "abi_encode_tuple_t_contract$_ProxyWalletCache_$28936__to_t_address__fromStack_reversed",
                         "nodeType": "YulFunctionDefinition",
                         "parameters": [
                             {
@@ -1180,7 +1180,7 @@
                     }
                 ]
             },
-            "contents": "{\n    { }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n        value0 := value\n    }\n    function abi_encode_tuple_t_bool__to_t_bool__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, iszero(iszero(value0)))\n    }\n    function abi_encode_tuple_t_contract$_ProxyWalletCache_$28907__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address_payable__to_t_address_payable__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address_t_address__to_t_address_t_address__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n    }\n}",
+            "contents": "{\n    { }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n        value0 := value\n    }\n    function abi_encode_tuple_t_bool__to_t_bool__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, iszero(iszero(value0)))\n    }\n    function abi_encode_tuple_t_contract$_ProxyWalletCache_$28936__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address_payable__to_t_address_payable__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_address_t_address__to_t_address_t_address__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        tail := add(headStart, 64)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n    }\n}",
             "id": 134,
             "language": "Yul",
             "name": "#utility.yul"
@@ -1194,33 +1194,33 @@
         "absolutePath": "project:/contracts/8.17/proxy-wallet/ProxyWalletFactory.sol",
         "exportedSymbols": {
             "FathomAuth": [
-                28695
+                28724
             ],
             "FathomAuthEvents": [
-                28572
+                28601
             ],
             "FathomNote": [
-                28738
+                28767
             ],
             "IAuthority": [
                 17817
             ],
             "ProxyWallet": [
-                28861
+                28890
             ],
             "ProxyWalletCache": [
-                28907
+                28936
             ],
             "ProxyWalletFactory": [
-                29005
+                29034
             ]
         },
-        "id": 29006,
+        "id": 29035,
         "license": "AGPL-3.0-or-later",
         "nodeType": "SourceUnit",
         "nodes": [
             {
-                "id": 28909,
+                "id": 28938,
                 "literals": [
                     "solidity",
                     "0.8",
@@ -1232,11 +1232,11 @@
             {
                 "absolutePath": "project:/contracts/8.17/proxy-wallet/ProxyWallet.sol",
                 "file": "./ProxyWallet.sol",
-                "id": 28910,
+                "id": 28939,
                 "nameLocation": "-1:-1:-1",
                 "nodeType": "ImportDirective",
-                "scope": 29006,
-                "sourceUnit": 28862,
+                "scope": 29035,
+                "sourceUnit": 28891,
                 "src": "72:27:104",
                 "symbolAliases": [],
                 "unitAlias": ""
@@ -1244,11 +1244,11 @@
             {
                 "absolutePath": "project:/contracts/8.17/proxy-wallet/ProxyWalletCache.sol",
                 "file": "./ProxyWalletCache.sol",
-                "id": 28911,
+                "id": 28940,
                 "nameLocation": "-1:-1:-1",
                 "nodeType": "ImportDirective",
-                "scope": 29006,
-                "sourceUnit": 28908,
+                "scope": 29035,
+                "sourceUnit": 28937,
                 "src": "100:32:104",
                 "symbolAliases": [],
                 "unitAlias": ""
@@ -1258,14 +1258,14 @@
                 "baseContracts": [],
                 "canonicalName": "ProxyWalletFactory",
                 "contractDependencies": [
-                    28861,
-                    28907
+                    28890,
+                    28936
                 ],
                 "contractKind": "contract",
                 "fullyImplemented": true,
-                "id": 29005,
+                "id": 29034,
                 "linearizedBaseContracts": [
-                    29005
+                    29034
                 ],
                 "name": "ProxyWalletFactory",
                 "nameLocation": "264:18:104",
@@ -1274,23 +1274,23 @@
                     {
                         "anonymous": false,
                         "eventSelector": "460d1004ae97c08315a739e456cdf01eb3bb7a6d76b6a5f422f5f42a25c9e865",
-                        "id": 28921,
+                        "id": 28950,
                         "name": "LogCreated",
                         "nameLocation": "293:10:104",
                         "nodeType": "EventDefinition",
                         "parameters": {
-                            "id": 28920,
+                            "id": 28949,
                             "nodeType": "ParameterList",
                             "parameters": [
                                 {
                                     "constant": false,
-                                    "id": 28913,
+                                    "id": 28942,
                                     "indexed": true,
                                     "mutability": "mutable",
                                     "name": "_sender",
                                     "nameLocation": "320:7:104",
                                     "nodeType": "VariableDeclaration",
-                                    "scope": 28921,
+                                    "scope": 28950,
                                     "src": "304:23:104",
                                     "stateVariable": false,
                                     "storageLocation": "default",
@@ -1299,7 +1299,7 @@
                                         "typeString": "address"
                                     },
                                     "typeName": {
-                                        "id": 28912,
+                                        "id": 28941,
                                         "name": "address",
                                         "nodeType": "ElementaryTypeName",
                                         "src": "304:7:104",
@@ -1313,13 +1313,13 @@
                                 },
                                 {
                                     "constant": false,
-                                    "id": 28915,
+                                    "id": 28944,
                                     "indexed": true,
                                     "mutability": "mutable",
                                     "name": "_owner",
                                     "nameLocation": "345:6:104",
                                     "nodeType": "VariableDeclaration",
-                                    "scope": 28921,
+                                    "scope": 28950,
                                     "src": "329:22:104",
                                     "stateVariable": false,
                                     "storageLocation": "default",
@@ -1328,7 +1328,7 @@
                                         "typeString": "address"
                                     },
                                     "typeName": {
-                                        "id": 28914,
+                                        "id": 28943,
                                         "name": "address",
                                         "nodeType": "ElementaryTypeName",
                                         "src": "329:7:104",
@@ -1342,13 +1342,13 @@
                                 },
                                 {
                                     "constant": false,
-                                    "id": 28917,
+                                    "id": 28946,
                                     "indexed": false,
                                     "mutability": "mutable",
                                     "name": "_proxy",
                                     "nameLocation": "361:6:104",
                                     "nodeType": "VariableDeclaration",
-                                    "scope": 28921,
+                                    "scope": 28950,
                                     "src": "353:14:104",
                                     "stateVariable": false,
                                     "storageLocation": "default",
@@ -1357,7 +1357,7 @@
                                         "typeString": "address"
                                     },
                                     "typeName": {
-                                        "id": 28916,
+                                        "id": 28945,
                                         "name": "address",
                                         "nodeType": "ElementaryTypeName",
                                         "src": "353:7:104",
@@ -1371,13 +1371,13 @@
                                 },
                                 {
                                     "constant": false,
-                                    "id": 28919,
+                                    "id": 28948,
                                     "indexed": false,
                                     "mutability": "mutable",
                                     "name": "_cache",
                                     "nameLocation": "377:6:104",
                                     "nodeType": "VariableDeclaration",
-                                    "scope": 28921,
+                                    "scope": 28950,
                                     "src": "369:14:104",
                                     "stateVariable": false,
                                     "storageLocation": "default",
@@ -1386,7 +1386,7 @@
                                         "typeString": "address"
                                     },
                                     "typeName": {
-                                        "id": 28918,
+                                        "id": 28947,
                                         "name": "address",
                                         "nodeType": "ElementaryTypeName",
                                         "src": "369:7:104",
@@ -1406,12 +1406,12 @@
                     {
                         "constant": false,
                         "functionSelector": "29710388",
-                        "id": 28925,
+                        "id": 28954,
                         "mutability": "mutable",
                         "name": "isProxy",
                         "nameLocation": "420:7:104",
                         "nodeType": "VariableDeclaration",
-                        "scope": 29005,
+                        "scope": 29034,
                         "src": "388:39:104",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -1420,9 +1420,9 @@
                             "typeString": "mapping(address => bool)"
                         },
                         "typeName": {
-                            "id": 28924,
+                            "id": 28953,
                             "keyType": {
-                                "id": 28922,
+                                "id": 28951,
                                 "name": "address",
                                 "nodeType": "ElementaryTypeName",
                                 "src": "396:7:104",
@@ -1438,7 +1438,7 @@
                                 "typeString": "mapping(address => bool)"
                             },
                             "valueType": {
-                                "id": 28923,
+                                "id": 28952,
                                 "name": "bool",
                                 "nodeType": "ElementaryTypeName",
                                 "src": "407:4:104",
@@ -1453,36 +1453,36 @@
                     {
                         "constant": false,
                         "functionSelector": "60c7d295",
-                        "id": 28928,
+                        "id": 28957,
                         "mutability": "mutable",
                         "name": "cache",
                         "nameLocation": "455:5:104",
                         "nodeType": "VariableDeclaration",
-                        "scope": 29005,
+                        "scope": 29034,
                         "src": "431:29:104",
                         "stateVariable": true,
                         "storageLocation": "default",
                         "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                            "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                             "typeString": "contract ProxyWalletCache"
                         },
                         "typeName": {
-                            "id": 28927,
+                            "id": 28956,
                             "nodeType": "UserDefinedTypeName",
                             "pathNode": {
-                                "id": 28926,
+                                "id": 28955,
                                 "name": "ProxyWalletCache",
                                 "nameLocations": [
                                     "431:16:104"
                                 ],
                                 "nodeType": "IdentifierPath",
-                                "referencedDeclaration": 28907,
+                                "referencedDeclaration": 28936,
                                 "src": "431:16:104"
                             },
-                            "referencedDeclaration": 28907,
+                            "referencedDeclaration": 28936,
                             "src": "431:16:104",
                             "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                                "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                                 "typeString": "contract ProxyWalletCache"
                             }
                         },
@@ -1490,26 +1490,26 @@
                     },
                     {
                         "body": {
-                            "id": 28938,
+                            "id": 28967,
                             "nodeType": "Block",
                             "src": "479:41:104",
                             "statements": [
                                 {
                                     "expression": {
-                                        "id": 28936,
+                                        "id": 28965,
                                         "isConstant": false,
                                         "isLValue": false,
                                         "isPure": false,
                                         "lValueRequested": false,
                                         "leftHandSide": {
-                                            "id": 28931,
+                                            "id": 28960,
                                             "name": "cache",
                                             "nodeType": "Identifier",
                                             "overloadedDeclarations": [],
-                                            "referencedDeclaration": 28928,
+                                            "referencedDeclaration": 28957,
                                             "src": "485:5:104",
                                             "typeDescriptions": {
-                                                "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                                                "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                                                 "typeString": "contract ProxyWalletCache"
                                             }
                                         },
@@ -1519,7 +1519,7 @@
                                             "arguments": [],
                                             "expression": {
                                                 "argumentTypes": [],
-                                                "id": 28934,
+                                                "id": 28963,
                                                 "isConstant": false,
                                                 "isLValue": false,
                                                 "isPure": false,
@@ -1527,31 +1527,31 @@
                                                 "nodeType": "NewExpression",
                                                 "src": "493:20:104",
                                                 "typeDescriptions": {
-                                                    "typeIdentifier": "t_function_creation_nonpayable$__$returns$_t_contract$_ProxyWalletCache_$28907_$",
+                                                    "typeIdentifier": "t_function_creation_nonpayable$__$returns$_t_contract$_ProxyWalletCache_$28936_$",
                                                     "typeString": "function () returns (contract ProxyWalletCache)"
                                                 },
                                                 "typeName": {
-                                                    "id": 28933,
+                                                    "id": 28962,
                                                     "nodeType": "UserDefinedTypeName",
                                                     "pathNode": {
-                                                        "id": 28932,
+                                                        "id": 28961,
                                                         "name": "ProxyWalletCache",
                                                         "nameLocations": [
                                                             "497:16:104"
                                                         ],
                                                         "nodeType": "IdentifierPath",
-                                                        "referencedDeclaration": 28907,
+                                                        "referencedDeclaration": 28936,
                                                         "src": "497:16:104"
                                                     },
-                                                    "referencedDeclaration": 28907,
+                                                    "referencedDeclaration": 28936,
                                                     "src": "497:16:104",
                                                     "typeDescriptions": {
-                                                        "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                                                        "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                                                         "typeString": "contract ProxyWalletCache"
                                                     }
                                                 }
                                             },
-                                            "id": 28935,
+                                            "id": 28964,
                                             "isConstant": false,
                                             "isLValue": false,
                                             "isPure": false,
@@ -1563,23 +1563,23 @@
                                             "src": "493:22:104",
                                             "tryCall": false,
                                             "typeDescriptions": {
-                                                "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                                                "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                                                 "typeString": "contract ProxyWalletCache"
                                             }
                                         },
                                         "src": "485:30:104",
                                         "typeDescriptions": {
-                                            "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                                            "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                                             "typeString": "contract ProxyWalletCache"
                                         }
                                     },
-                                    "id": 28937,
+                                    "id": 28966,
                                     "nodeType": "ExpressionStatement",
                                     "src": "485:30:104"
                                 }
                             ]
                         },
-                        "id": 28939,
+                        "id": 28968,
                         "implemented": true,
                         "kind": "constructor",
                         "modifiers": [],
@@ -1587,18 +1587,18 @@
                         "nameLocation": "-1:-1:-1",
                         "nodeType": "FunctionDefinition",
                         "parameters": {
-                            "id": 28929,
+                            "id": 28958,
                             "nodeType": "ParameterList",
                             "parameters": [],
                             "src": "476:2:104"
                         },
                         "returnParameters": {
-                            "id": 28930,
+                            "id": 28959,
                             "nodeType": "ParameterList",
                             "parameters": [],
                             "src": "479:0:104"
                         },
-                        "scope": 29005,
+                        "scope": 29034,
                         "src": "465:55:104",
                         "stateMutability": "nonpayable",
                         "virtual": false,
@@ -1606,23 +1606,23 @@
                     },
                     {
                         "body": {
-                            "id": 28951,
+                            "id": 28980,
                             "nodeType": "Block",
                             "src": "653:37:104",
                             "statements": [
                                 {
                                     "expression": {
-                                        "id": 28949,
+                                        "id": 28978,
                                         "isConstant": false,
                                         "isLValue": false,
                                         "isPure": false,
                                         "lValueRequested": false,
                                         "leftHandSide": {
-                                            "id": 28944,
+                                            "id": 28973,
                                             "name": "_proxy",
                                             "nodeType": "Identifier",
                                             "overloadedDeclarations": [],
-                                            "referencedDeclaration": 28942,
+                                            "referencedDeclaration": 28971,
                                             "src": "659:6:104",
                                             "typeDescriptions": {
                                                 "typeIdentifier": "t_address_payable",
@@ -1635,7 +1635,7 @@
                                             "arguments": [
                                                 {
                                                     "expression": {
-                                                        "id": 28946,
+                                                        "id": 28975,
                                                         "name": "msg",
                                                         "nodeType": "Identifier",
                                                         "overloadedDeclarations": [],
@@ -1646,7 +1646,7 @@
                                                             "typeString": "msg"
                                                         }
                                                     },
-                                                    "id": 28947,
+                                                    "id": 28976,
                                                     "isConstant": false,
                                                     "isLValue": false,
                                                     "isPure": false,
@@ -1668,18 +1668,18 @@
                                                         "typeString": "address"
                                                     }
                                                 ],
-                                                "id": 28945,
+                                                "id": 28974,
                                                 "name": "build",
                                                 "nodeType": "Identifier",
                                                 "overloadedDeclarations": [],
-                                                "referencedDeclaration": 29004,
+                                                "referencedDeclaration": 29033,
                                                 "src": "668:5:104",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$_t_address_payable_$",
                                                     "typeString": "function (address) returns (address payable)"
                                                 }
                                             },
-                                            "id": 28948,
+                                            "id": 28977,
                                             "isConstant": false,
                                             "isLValue": false,
                                             "isPure": false,
@@ -1701,14 +1701,14 @@
                                             "typeString": "address payable"
                                         }
                                     },
-                                    "id": 28950,
+                                    "id": 28979,
                                     "nodeType": "ExpressionStatement",
                                     "src": "659:26:104"
                                 }
                             ]
                         },
                         "functionSelector": "7748f425",
-                        "id": 28952,
+                        "id": 28981,
                         "implemented": true,
                         "kind": "function",
                         "modifiers": [],
@@ -1716,23 +1716,23 @@
                         "nameLocation": "602:6:104",
                         "nodeType": "FunctionDefinition",
                         "parameters": {
-                            "id": 28940,
+                            "id": 28969,
                             "nodeType": "ParameterList",
                             "parameters": [],
                             "src": "608:2:104"
                         },
                         "returnParameters": {
-                            "id": 28943,
+                            "id": 28972,
                             "nodeType": "ParameterList",
                             "parameters": [
                                 {
                                     "constant": false,
-                                    "id": 28942,
+                                    "id": 28971,
                                     "mutability": "mutable",
                                     "name": "_proxy",
                                     "nameLocation": "645:6:104",
                                     "nodeType": "VariableDeclaration",
-                                    "scope": 28952,
+                                    "scope": 28981,
                                     "src": "629:22:104",
                                     "stateVariable": false,
                                     "storageLocation": "default",
@@ -1741,7 +1741,7 @@
                                         "typeString": "address payable"
                                     },
                                     "typeName": {
-                                        "id": 28941,
+                                        "id": 28970,
                                         "name": "address",
                                         "nodeType": "ElementaryTypeName",
                                         "src": "629:15:104",
@@ -1756,7 +1756,7 @@
                             ],
                             "src": "628:24:104"
                         },
-                        "scope": 29005,
+                        "scope": 29034,
                         "src": "593:97:104",
                         "stateMutability": "nonpayable",
                         "virtual": false,
@@ -1764,23 +1764,23 @@
                     },
                     {
                         "body": {
-                            "id": 29003,
+                            "id": 29032,
                             "nodeType": "Block",
                             "src": "831:213:104",
                             "statements": [
                                 {
                                     "expression": {
-                                        "id": 28974,
+                                        "id": 29003,
                                         "isConstant": false,
                                         "isLValue": false,
                                         "isPure": false,
                                         "lValueRequested": false,
                                         "leftHandSide": {
-                                            "id": 28959,
+                                            "id": 28988,
                                             "name": "_proxy",
                                             "nodeType": "Identifier",
                                             "overloadedDeclarations": [],
-                                            "referencedDeclaration": 28957,
+                                            "referencedDeclaration": 28986,
                                             "src": "837:6:104",
                                             "typeDescriptions": {
                                                 "typeIdentifier": "t_address_payable",
@@ -1798,14 +1798,14 @@
                                                                 {
                                                                     "arguments": [
                                                                         {
-                                                                            "id": 28969,
+                                                                            "id": 28998,
                                                                             "name": "cache",
                                                                             "nodeType": "Identifier",
                                                                             "overloadedDeclarations": [],
-                                                                            "referencedDeclaration": 28928,
+                                                                            "referencedDeclaration": 28957,
                                                                             "src": "886:5:104",
                                                                             "typeDescriptions": {
-                                                                                "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                                                                                "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                                                                                 "typeString": "contract ProxyWalletCache"
                                                                             }
                                                                         }
@@ -1813,11 +1813,11 @@
                                                                     "expression": {
                                                                         "argumentTypes": [
                                                                             {
-                                                                                "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                                                                                "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                                                                                 "typeString": "contract ProxyWalletCache"
                                                                             }
                                                                         ],
-                                                                        "id": 28968,
+                                                                        "id": 28997,
                                                                         "isConstant": false,
                                                                         "isLValue": false,
                                                                         "isPure": true,
@@ -1829,14 +1829,14 @@
                                                                             "typeString": "type(address)"
                                                                         },
                                                                         "typeName": {
-                                                                            "id": 28967,
+                                                                            "id": 28996,
                                                                             "name": "address",
                                                                             "nodeType": "ElementaryTypeName",
                                                                             "src": "878:7:104",
                                                                             "typeDescriptions": {}
                                                                         }
                                                                     },
-                                                                    "id": 28970,
+                                                                    "id": 28999,
                                                                     "isConstant": false,
                                                                     "isLValue": false,
                                                                     "isPure": false,
@@ -1860,7 +1860,7 @@
                                                                         "typeString": "address"
                                                                     }
                                                                 ],
-                                                                "id": 28966,
+                                                                "id": 28995,
                                                                 "isConstant": false,
                                                                 "isLValue": false,
                                                                 "isPure": false,
@@ -1868,31 +1868,31 @@
                                                                 "nodeType": "NewExpression",
                                                                 "src": "862:15:104",
                                                                 "typeDescriptions": {
-                                                                    "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_ProxyWallet_$28861_$",
+                                                                    "typeIdentifier": "t_function_creation_nonpayable$_t_address_$returns$_t_contract$_ProxyWallet_$28890_$",
                                                                     "typeString": "function (address) returns (contract ProxyWallet)"
                                                                 },
                                                                 "typeName": {
-                                                                    "id": 28965,
+                                                                    "id": 28994,
                                                                     "nodeType": "UserDefinedTypeName",
                                                                     "pathNode": {
-                                                                        "id": 28964,
+                                                                        "id": 28993,
                                                                         "name": "ProxyWallet",
                                                                         "nameLocations": [
                                                                             "866:11:104"
                                                                         ],
                                                                         "nodeType": "IdentifierPath",
-                                                                        "referencedDeclaration": 28861,
+                                                                        "referencedDeclaration": 28890,
                                                                         "src": "866:11:104"
                                                                     },
-                                                                    "referencedDeclaration": 28861,
+                                                                    "referencedDeclaration": 28890,
                                                                     "src": "866:11:104",
                                                                     "typeDescriptions": {
-                                                                        "typeIdentifier": "t_contract$_ProxyWallet_$28861",
+                                                                        "typeIdentifier": "t_contract$_ProxyWallet_$28890",
                                                                         "typeString": "contract ProxyWallet"
                                                                     }
                                                                 }
                                                             },
-                                                            "id": 28971,
+                                                            "id": 29000,
                                                             "isConstant": false,
                                                             "isLValue": false,
                                                             "isPure": false,
@@ -1904,7 +1904,7 @@
                                                             "src": "862:31:104",
                                                             "tryCall": false,
                                                             "typeDescriptions": {
-                                                                "typeIdentifier": "t_contract$_ProxyWallet_$28861",
+                                                                "typeIdentifier": "t_contract$_ProxyWallet_$28890",
                                                                 "typeString": "contract ProxyWallet"
                                                             }
                                                         }
@@ -1912,11 +1912,11 @@
                                                     "expression": {
                                                         "argumentTypes": [
                                                             {
-                                                                "typeIdentifier": "t_contract$_ProxyWallet_$28861",
+                                                                "typeIdentifier": "t_contract$_ProxyWallet_$28890",
                                                                 "typeString": "contract ProxyWallet"
                                                             }
                                                         ],
-                                                        "id": 28963,
+                                                        "id": 28992,
                                                         "isConstant": false,
                                                         "isLValue": false,
                                                         "isPure": true,
@@ -1928,14 +1928,14 @@
                                                             "typeString": "type(address)"
                                                         },
                                                         "typeName": {
-                                                            "id": 28962,
+                                                            "id": 28991,
                                                             "name": "address",
                                                             "nodeType": "ElementaryTypeName",
                                                             "src": "854:7:104",
                                                             "typeDescriptions": {}
                                                         }
                                                     },
-                                                    "id": 28972,
+                                                    "id": 29001,
                                                     "isConstant": false,
                                                     "isLValue": false,
                                                     "isPure": false,
@@ -1959,7 +1959,7 @@
                                                         "typeString": "address"
                                                     }
                                                 ],
-                                                "id": 28961,
+                                                "id": 28990,
                                                 "isConstant": false,
                                                 "isLValue": false,
                                                 "isPure": true,
@@ -1971,7 +1971,7 @@
                                                     "typeString": "type(address payable)"
                                                 },
                                                 "typeName": {
-                                                    "id": 28960,
+                                                    "id": 28989,
                                                     "name": "address",
                                                     "nodeType": "ElementaryTypeName",
                                                     "src": "846:8:104",
@@ -1979,7 +1979,7 @@
                                                     "typeDescriptions": {}
                                                 }
                                             },
-                                            "id": 28973,
+                                            "id": 29002,
                                             "isConstant": false,
                                             "isLValue": false,
                                             "isPure": false,
@@ -2001,7 +2001,7 @@
                                             "typeString": "address payable"
                                         }
                                     },
-                                    "id": 28975,
+                                    "id": 29004,
                                     "nodeType": "ExpressionStatement",
                                     "src": "837:58:104"
                                 },
@@ -2010,7 +2010,7 @@
                                         "arguments": [
                                             {
                                                 "expression": {
-                                                    "id": 28977,
+                                                    "id": 29006,
                                                     "name": "msg",
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
@@ -2021,7 +2021,7 @@
                                                         "typeString": "msg"
                                                     }
                                                 },
-                                                "id": 28978,
+                                                "id": 29007,
                                                 "isConstant": false,
                                                 "isLValue": false,
                                                 "isPure": false,
@@ -2036,11 +2036,11 @@
                                                 }
                                             },
                                             {
-                                                "id": 28979,
+                                                "id": 29008,
                                                 "name": "_owner",
                                                 "nodeType": "Identifier",
                                                 "overloadedDeclarations": [],
-                                                "referencedDeclaration": 28954,
+                                                "referencedDeclaration": 28983,
                                                 "src": "929:6:104",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_address",
@@ -2050,11 +2050,11 @@
                                             {
                                                 "arguments": [
                                                     {
-                                                        "id": 28982,
+                                                        "id": 29011,
                                                         "name": "_proxy",
                                                         "nodeType": "Identifier",
                                                         "overloadedDeclarations": [],
-                                                        "referencedDeclaration": 28957,
+                                                        "referencedDeclaration": 28986,
                                                         "src": "945:6:104",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_address_payable",
@@ -2069,7 +2069,7 @@
                                                             "typeString": "address payable"
                                                         }
                                                     ],
-                                                    "id": 28981,
+                                                    "id": 29010,
                                                     "isConstant": false,
                                                     "isLValue": false,
                                                     "isPure": true,
@@ -2081,14 +2081,14 @@
                                                         "typeString": "type(address)"
                                                     },
                                                     "typeName": {
-                                                        "id": 28980,
+                                                        "id": 29009,
                                                         "name": "address",
                                                         "nodeType": "ElementaryTypeName",
                                                         "src": "937:7:104",
                                                         "typeDescriptions": {}
                                                     }
                                                 },
-                                                "id": 28983,
+                                                "id": 29012,
                                                 "isConstant": false,
                                                 "isLValue": false,
                                                 "isPure": false,
@@ -2107,14 +2107,14 @@
                                             {
                                                 "arguments": [
                                                     {
-                                                        "id": 28986,
+                                                        "id": 29015,
                                                         "name": "cache",
                                                         "nodeType": "Identifier",
                                                         "overloadedDeclarations": [],
-                                                        "referencedDeclaration": 28928,
+                                                        "referencedDeclaration": 28957,
                                                         "src": "962:5:104",
                                                         "typeDescriptions": {
-                                                            "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                                                            "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                                                             "typeString": "contract ProxyWalletCache"
                                                         }
                                                     }
@@ -2122,11 +2122,11 @@
                                                 "expression": {
                                                     "argumentTypes": [
                                                         {
-                                                            "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                                                            "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                                                             "typeString": "contract ProxyWalletCache"
                                                         }
                                                     ],
-                                                    "id": 28985,
+                                                    "id": 29014,
                                                     "isConstant": false,
                                                     "isLValue": false,
                                                     "isPure": true,
@@ -2138,14 +2138,14 @@
                                                         "typeString": "type(address)"
                                                     },
                                                     "typeName": {
-                                                        "id": 28984,
+                                                        "id": 29013,
                                                         "name": "address",
                                                         "nodeType": "ElementaryTypeName",
                                                         "src": "954:7:104",
                                                         "typeDescriptions": {}
                                                     }
                                                 },
-                                                "id": 28987,
+                                                "id": 29016,
                                                 "isConstant": false,
                                                 "isLValue": false,
                                                 "isPure": false,
@@ -2181,18 +2181,18 @@
                                                     "typeString": "address"
                                                 }
                                             ],
-                                            "id": 28976,
+                                            "id": 29005,
                                             "name": "LogCreated",
                                             "nodeType": "Identifier",
                                             "overloadedDeclarations": [],
-                                            "referencedDeclaration": 28921,
+                                            "referencedDeclaration": 28950,
                                             "src": "906:10:104",
                                             "typeDescriptions": {
                                                 "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$_t_address_$_t_address_$returns$__$",
                                                 "typeString": "function (address,address,address,address)"
                                             }
                                         },
-                                        "id": 28988,
+                                        "id": 29017,
                                         "isConstant": false,
                                         "isLValue": false,
                                         "isPure": false,
@@ -2208,7 +2208,7 @@
                                             "typeString": "tuple()"
                                         }
                                     },
-                                    "id": 28989,
+                                    "id": 29018,
                                     "nodeType": "EmitStatement",
                                     "src": "901:68:104"
                                 },
@@ -2216,11 +2216,11 @@
                                     "expression": {
                                         "arguments": [
                                             {
-                                                "id": 28994,
+                                                "id": 29023,
                                                 "name": "_owner",
                                                 "nodeType": "Identifier",
                                                 "overloadedDeclarations": [],
-                                                "referencedDeclaration": 28954,
+                                                "referencedDeclaration": 28983,
                                                 "src": "1004:6:104",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_address",
@@ -2238,11 +2238,11 @@
                                             "expression": {
                                                 "arguments": [
                                                     {
-                                                        "id": 28991,
+                                                        "id": 29020,
                                                         "name": "_proxy",
                                                         "nodeType": "Identifier",
                                                         "overloadedDeclarations": [],
-                                                        "referencedDeclaration": 28957,
+                                                        "referencedDeclaration": 28986,
                                                         "src": "987:6:104",
                                                         "typeDescriptions": {
                                                             "typeIdentifier": "t_address_payable",
@@ -2257,18 +2257,18 @@
                                                             "typeString": "address payable"
                                                         }
                                                     ],
-                                                    "id": 28990,
+                                                    "id": 29019,
                                                     "name": "ProxyWallet",
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
-                                                    "referencedDeclaration": 28861,
+                                                    "referencedDeclaration": 28890,
                                                     "src": "975:11:104",
                                                     "typeDescriptions": {
-                                                        "typeIdentifier": "t_type$_t_contract$_ProxyWallet_$28861_$",
+                                                        "typeIdentifier": "t_type$_t_contract$_ProxyWallet_$28890_$",
                                                         "typeString": "type(contract ProxyWallet)"
                                                     }
                                                 },
-                                                "id": 28992,
+                                                "id": 29021,
                                                 "isConstant": false,
                                                 "isLValue": false,
                                                 "isPure": false,
@@ -2280,11 +2280,11 @@
                                                 "src": "975:19:104",
                                                 "tryCall": false,
                                                 "typeDescriptions": {
-                                                    "typeIdentifier": "t_contract$_ProxyWallet_$28861",
+                                                    "typeIdentifier": "t_contract$_ProxyWallet_$28890",
                                                     "typeString": "contract ProxyWallet"
                                                 }
                                             },
-                                            "id": 28993,
+                                            "id": 29022,
                                             "isConstant": false,
                                             "isLValue": false,
                                             "isPure": false,
@@ -2292,14 +2292,14 @@
                                             "memberLocation": "995:8:104",
                                             "memberName": "setOwner",
                                             "nodeType": "MemberAccess",
-                                            "referencedDeclaration": 28609,
+                                            "referencedDeclaration": 28638,
                                             "src": "975:28:104",
                                             "typeDescriptions": {
                                                 "typeIdentifier": "t_function_external_nonpayable$_t_address_$returns$__$",
                                                 "typeString": "function (address) external"
                                             }
                                         },
-                                        "id": 28995,
+                                        "id": 29024,
                                         "isConstant": false,
                                         "isLValue": false,
                                         "isPure": false,
@@ -2315,37 +2315,37 @@
                                             "typeString": "tuple()"
                                         }
                                     },
-                                    "id": 28996,
+                                    "id": 29025,
                                     "nodeType": "ExpressionStatement",
                                     "src": "975:36:104"
                                 },
                                 {
                                     "expression": {
-                                        "id": 29001,
+                                        "id": 29030,
                                         "isConstant": false,
                                         "isLValue": false,
                                         "isPure": false,
                                         "lValueRequested": false,
                                         "leftHandSide": {
                                             "baseExpression": {
-                                                "id": 28997,
+                                                "id": 29026,
                                                 "name": "isProxy",
                                                 "nodeType": "Identifier",
                                                 "overloadedDeclarations": [],
-                                                "referencedDeclaration": 28925,
+                                                "referencedDeclaration": 28954,
                                                 "src": "1017:7:104",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_mapping$_t_address_$_t_bool_$",
                                                     "typeString": "mapping(address => bool)"
                                                 }
                                             },
-                                            "id": 28999,
+                                            "id": 29028,
                                             "indexExpression": {
-                                                "id": 28998,
+                                                "id": 29027,
                                                 "name": "_proxy",
                                                 "nodeType": "Identifier",
                                                 "overloadedDeclarations": [],
-                                                "referencedDeclaration": 28957,
+                                                "referencedDeclaration": 28986,
                                                 "src": "1025:6:104",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_address_payable",
@@ -2367,7 +2367,7 @@
                                         "operator": "=",
                                         "rightHandSide": {
                                             "hexValue": "74727565",
-                                            "id": 29000,
+                                            "id": 29029,
                                             "isConstant": false,
                                             "isLValue": false,
                                             "isPure": true,
@@ -2387,14 +2387,14 @@
                                             "typeString": "bool"
                                         }
                                     },
-                                    "id": 29002,
+                                    "id": 29031,
                                     "nodeType": "ExpressionStatement",
                                     "src": "1017:22:104"
                                 }
                             ]
                         },
                         "functionSelector": "f3701da2",
-                        "id": 29004,
+                        "id": 29033,
                         "implemented": true,
                         "kind": "function",
                         "modifiers": [],
@@ -2402,17 +2402,17 @@
                         "nameLocation": "769:5:104",
                         "nodeType": "FunctionDefinition",
                         "parameters": {
-                            "id": 28955,
+                            "id": 28984,
                             "nodeType": "ParameterList",
                             "parameters": [
                                 {
                                     "constant": false,
-                                    "id": 28954,
+                                    "id": 28983,
                                     "mutability": "mutable",
                                     "name": "_owner",
                                     "nameLocation": "783:6:104",
                                     "nodeType": "VariableDeclaration",
-                                    "scope": 29004,
+                                    "scope": 29033,
                                     "src": "775:14:104",
                                     "stateVariable": false,
                                     "storageLocation": "default",
@@ -2421,7 +2421,7 @@
                                         "typeString": "address"
                                     },
                                     "typeName": {
-                                        "id": 28953,
+                                        "id": 28982,
                                         "name": "address",
                                         "nodeType": "ElementaryTypeName",
                                         "src": "775:7:104",
@@ -2437,17 +2437,17 @@
                             "src": "774:16:104"
                         },
                         "returnParameters": {
-                            "id": 28958,
+                            "id": 28987,
                             "nodeType": "ParameterList",
                             "parameters": [
                                 {
                                     "constant": false,
-                                    "id": 28957,
+                                    "id": 28986,
                                     "mutability": "mutable",
                                     "name": "_proxy",
                                     "nameLocation": "823:6:104",
                                     "nodeType": "VariableDeclaration",
-                                    "scope": 29004,
+                                    "scope": 29033,
                                     "src": "807:22:104",
                                     "stateVariable": false,
                                     "storageLocation": "default",
@@ -2456,7 +2456,7 @@
                                         "typeString": "address payable"
                                     },
                                     "typeName": {
-                                        "id": 28956,
+                                        "id": 28985,
                                         "name": "address",
                                         "nodeType": "ElementaryTypeName",
                                         "src": "807:15:104",
@@ -2471,14 +2471,14 @@
                             ],
                             "src": "806:24:104"
                         },
-                        "scope": 29005,
+                        "scope": 29034,
                         "src": "760:284:104",
                         "stateMutability": "nonpayable",
                         "virtual": false,
                         "visibility": "public"
                     }
                 ],
-                "scope": 29006,
+                "scope": 29035,
                 "src": "255:791:104",
                 "usedErrors": []
             }
@@ -2496,7 +2496,7 @@
         }
     },
     "schemaVersion": "3.4.10",
-    "updatedAt": "2022-10-21T07:57:45.055Z",
+    "updatedAt": "2022-10-21T12:59:12.588Z",
     "devdoc": {
         "kind": "dev",
         "methods": {},

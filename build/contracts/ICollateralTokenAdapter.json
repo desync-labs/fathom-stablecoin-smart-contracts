@@ -41,15 +41,15 @@
     "absolutePath": "project:/contracts/8.17/stablecoin-core/config/interfaces/IAccessControlConfig.sol",
     "exportedSymbols": {
       "ICollateralTokenAdapter": [
-        39138
+        39175
       ]
     },
-    "id": 39139,
+    "id": 39176,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 39127,
+        "id": 39164,
         "literals": [
           "solidity",
           "0.8",
@@ -65,9 +65,9 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 39138,
+        "id": 39175,
         "linearizedBaseContracts": [
-          39138
+          39175
         ],
         "name": "ICollateralTokenAdapter",
         "nameLocation": "67:23:121",
@@ -75,7 +75,7 @@
         "nodes": [
           {
             "functionSelector": "2f2ff15d",
-            "id": 39134,
+            "id": 39171,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -83,17 +83,17 @@
             "nameLocation": "104:9:121",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 39132,
+              "id": 39169,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 39129,
+                  "id": 39166,
                   "mutability": "mutable",
                   "name": "role",
                   "nameLocation": "122:4:121",
                   "nodeType": "VariableDeclaration",
-                  "scope": 39134,
+                  "scope": 39171,
                   "src": "114:12:121",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -102,7 +102,7 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 39128,
+                    "id": 39165,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "114:7:121",
@@ -115,12 +115,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 39131,
+                  "id": 39168,
                   "mutability": "mutable",
                   "name": "account",
                   "nameLocation": "136:7:121",
                   "nodeType": "VariableDeclaration",
-                  "scope": 39134,
+                  "scope": 39171,
                   "src": "128:15:121",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -129,7 +129,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 39130,
+                    "id": 39167,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "128:7:121",
@@ -145,12 +145,12 @@
               "src": "113:31:121"
             },
             "returnParameters": {
-              "id": 39133,
+              "id": 39170,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "153:0:121"
             },
-            "scope": 39138,
+            "scope": 39175,
             "src": "95:59:121",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -158,7 +158,7 @@
           },
           {
             "functionSelector": "b998902f",
-            "id": 39137,
+            "id": 39174,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -166,25 +166,25 @@
             "nameLocation": "166:17:121",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 39135,
+              "id": 39172,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "183:2:121"
             },
             "returnParameters": {
-              "id": 39136,
+              "id": 39173,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "194:0:121"
             },
-            "scope": 39138,
+            "scope": 39175,
             "src": "157:38:121",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 39139,
+        "scope": 39176,
         "src": "57:140:121",
         "usedErrors": []
       }
@@ -197,7 +197,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-21T07:57:45.110Z",
+  "updatedAt": "2022-10-21T12:59:12.643Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

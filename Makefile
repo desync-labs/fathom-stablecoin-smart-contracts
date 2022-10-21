@@ -143,9 +143,7 @@ deploy:
 	coralX execute --network development --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config-USDT.js
 	coralX execute --network development --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config-USDT-COL.js
 	coralX execute --network development --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config-FTHM.js
-# callsetPriceFTHM:
-	# coralX execute --network development --path scripts/deployment/15_simple-price-feed/config/config_simple-price-feed-FTHM.js
-	# coralX execute --network development --path scripts/deployment/7_price-oracle/config/setPriceFTHM.js
+
 #Grant stablecoin's ownership to fairLaunch
 	coralX execute --network development --path scripts/deployment/9_fathom-token/config/fathom-token-ownership.js
 
@@ -171,6 +169,12 @@ fathomStats:
 	coralX execute --network development --path scripts/deployment/27_stats/deploy/stats.js
 	coralX execute --network development --path scripts/deployment/27_stats/initialize/initialize_stats.js
 # getPositionV2, made for positionsInfo, will be deployed below
+
+callsetPriceFTHM:
+	coralX execute --network development --path scripts/deployment/15_simple-price-feed/config/config_simple-price-feed-FTHM.js
+	coralX execute --network development --path scripts/deployment/15_simple-price-feed/config/config_simple-price-feed-WXDC.js
+
+	# coralX execute --network development --path scripts/deployment/7_price-oracle/config/setPriceFTHM.js
 
 checkProxyWallet:
 

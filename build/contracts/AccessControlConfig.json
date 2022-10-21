@@ -3951,7 +3951,7 @@
         "absolutePath": "project:/contracts/8.17/stablecoin-core/config/AccessControlConfig.sol",
         "exportedSymbols": {
             "AccessControlConfig": [
-                38078
+                38115
             ],
             "AccessControlUpgradeable": [
                 339
@@ -3978,12 +3978,12 @@
                 1392
             ]
         },
-        "id": 38079,
+        "id": 38116,
         "license": "AGPL-3.0-or-later",
         "nodeType": "SourceUnit",
         "nodes": [
             {
-                "id": 38004,
+                "id": 38041,
                 "literals": [
                     "solidity",
                     "0.8",
@@ -3995,10 +3995,10 @@
             {
                 "absolutePath": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
                 "file": "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol",
-                "id": 38005,
+                "id": 38042,
                 "nameLocation": "-1:-1:-1",
                 "nodeType": "ImportDirective",
-                "scope": 38079,
+                "scope": 38116,
                 "sourceUnit": 340,
                 "src": "72:81:119",
                 "symbolAliases": [],
@@ -4009,7 +4009,7 @@
                 "baseContracts": [
                     {
                         "baseName": {
-                            "id": 38006,
+                            "id": 38043,
                             "name": "AccessControlUpgradeable",
                             "nameLocations": [
                                 "187:24:119"
@@ -4018,7 +4018,7 @@
                             "referencedDeclaration": 339,
                             "src": "187:24:119"
                         },
-                        "id": 38007,
+                        "id": 38044,
                         "nodeType": "InheritanceSpecifier",
                         "src": "187:24:119"
                     }
@@ -4027,9 +4027,9 @@
                 "contractDependencies": [],
                 "contractKind": "contract",
                 "fullyImplemented": true,
-                "id": 38078,
+                "id": 38115,
                 "linearizedBaseContracts": [
-                    38078,
+                    38115,
                     339,
                     1436,
                     1448,
@@ -4044,12 +4044,12 @@
                     {
                         "constant": true,
                         "functionSelector": "e58378bb",
-                        "id": 38010,
+                        "id": 38047,
                         "mutability": "constant",
                         "name": "OWNER_ROLE",
                         "nameLocation": "240:10:119",
                         "nodeType": "VariableDeclaration",
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "216:55:119",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -4058,7 +4058,7 @@
                             "typeString": "bytes32"
                         },
                         "typeName": {
-                            "id": 38008,
+                            "id": 38045,
                             "name": "bytes32",
                             "nodeType": "ElementaryTypeName",
                             "src": "216:7:119",
@@ -4068,7 +4068,7 @@
                             }
                         },
                         "value": {
-                            "id": 38009,
+                            "id": 38046,
                             "name": "DEFAULT_ADMIN_ROLE",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
@@ -4084,12 +4084,12 @@
                     {
                         "constant": true,
                         "functionSelector": "b536818a",
-                        "id": 38015,
+                        "id": 38052,
                         "mutability": "constant",
                         "name": "GOV_ROLE",
                         "nameLocation": "299:8:119",
                         "nodeType": "VariableDeclaration",
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "275:56:119",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -4098,7 +4098,7 @@
                             "typeString": "bytes32"
                         },
                         "typeName": {
-                            "id": 38011,
+                            "id": 38048,
                             "name": "bytes32",
                             "nodeType": "ElementaryTypeName",
                             "src": "275:7:119",
@@ -4111,7 +4111,7 @@
                             "arguments": [
                                 {
                                     "hexValue": "474f565f524f4c45",
-                                    "id": 38013,
+                                    "id": 38050,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
@@ -4133,7 +4133,7 @@
                                         "typeString": "literal_string \"GOV_ROLE\""
                                     }
                                 ],
-                                "id": 38012,
+                                "id": 38049,
                                 "name": "keccak256",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
@@ -4144,7 +4144,7 @@
                                     "typeString": "function (bytes memory) pure returns (bytes32)"
                                 }
                             },
-                            "id": 38014,
+                            "id": 38051,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -4165,12 +4165,12 @@
                     {
                         "constant": true,
                         "functionSelector": "b998902f",
-                        "id": 38020,
+                        "id": 38057,
                         "mutability": "constant",
                         "name": "PRICE_ORACLE_ROLE",
                         "nameLocation": "359:17:119",
                         "nodeType": "VariableDeclaration",
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "335:74:119",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -4179,7 +4179,7 @@
                             "typeString": "bytes32"
                         },
                         "typeName": {
-                            "id": 38016,
+                            "id": 38053,
                             "name": "bytes32",
                             "nodeType": "ElementaryTypeName",
                             "src": "335:7:119",
@@ -4192,7 +4192,7 @@
                             "arguments": [
                                 {
                                     "hexValue": "50524943455f4f5241434c455f524f4c45",
-                                    "id": 38018,
+                                    "id": 38055,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
@@ -4214,7 +4214,7 @@
                                         "typeString": "literal_string \"PRICE_ORACLE_ROLE\""
                                     }
                                 ],
-                                "id": 38017,
+                                "id": 38054,
                                 "name": "keccak256",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
@@ -4225,7 +4225,7 @@
                                     "typeString": "function (bytes memory) pure returns (bytes32)"
                                 }
                             },
-                            "id": 38019,
+                            "id": 38056,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -4246,12 +4246,12 @@
                     {
                         "constant": true,
                         "functionSelector": "02a882e6",
-                        "id": 38025,
+                        "id": 38062,
                         "mutability": "constant",
                         "name": "ADAPTER_ROLE",
                         "nameLocation": "437:12:119",
                         "nodeType": "VariableDeclaration",
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "413:64:119",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -4260,7 +4260,7 @@
                             "typeString": "bytes32"
                         },
                         "typeName": {
-                            "id": 38021,
+                            "id": 38058,
                             "name": "bytes32",
                             "nodeType": "ElementaryTypeName",
                             "src": "413:7:119",
@@ -4273,7 +4273,7 @@
                             "arguments": [
                                 {
                                     "hexValue": "414441505445525f524f4c45",
-                                    "id": 38023,
+                                    "id": 38060,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
@@ -4295,7 +4295,7 @@
                                         "typeString": "literal_string \"ADAPTER_ROLE\""
                                     }
                                 ],
-                                "id": 38022,
+                                "id": 38059,
                                 "name": "keccak256",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
@@ -4306,7 +4306,7 @@
                                     "typeString": "function (bytes memory) pure returns (bytes32)"
                                 }
                             },
-                            "id": 38024,
+                            "id": 38061,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -4327,12 +4327,12 @@
                     {
                         "constant": true,
                         "functionSelector": "e8ff193d",
-                        "id": 38030,
+                        "id": 38067,
                         "mutability": "constant",
                         "name": "LIQUIDATION_ENGINE_ROLE",
                         "nameLocation": "505:23:119",
                         "nodeType": "VariableDeclaration",
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "481:86:119",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -4341,7 +4341,7 @@
                             "typeString": "bytes32"
                         },
                         "typeName": {
-                            "id": 38026,
+                            "id": 38063,
                             "name": "bytes32",
                             "nodeType": "ElementaryTypeName",
                             "src": "481:7:119",
@@ -4354,7 +4354,7 @@
                             "arguments": [
                                 {
                                     "hexValue": "4c49515549444154494f4e5f454e47494e455f524f4c45",
-                                    "id": 38028,
+                                    "id": 38065,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
@@ -4376,7 +4376,7 @@
                                         "typeString": "literal_string \"LIQUIDATION_ENGINE_ROLE\""
                                     }
                                 ],
-                                "id": 38027,
+                                "id": 38064,
                                 "name": "keccak256",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
@@ -4387,7 +4387,7 @@
                                     "typeString": "function (bytes memory) pure returns (bytes32)"
                                 }
                             },
-                            "id": 38029,
+                            "id": 38066,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -4408,12 +4408,12 @@
                     {
                         "constant": true,
                         "functionSelector": "23868800",
-                        "id": 38035,
+                        "id": 38072,
                         "mutability": "constant",
                         "name": "STABILITY_FEE_COLLECTOR_ROLE",
                         "nameLocation": "595:28:119",
                         "nodeType": "VariableDeclaration",
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "571:96:119",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -4422,7 +4422,7 @@
                             "typeString": "bytes32"
                         },
                         "typeName": {
-                            "id": 38031,
+                            "id": 38068,
                             "name": "bytes32",
                             "nodeType": "ElementaryTypeName",
                             "src": "571:7:119",
@@ -4435,7 +4435,7 @@
                             "arguments": [
                                 {
                                     "hexValue": "53544142494c4954595f4645455f434f4c4c4543544f525f524f4c45",
-                                    "id": 38033,
+                                    "id": 38070,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
@@ -4457,7 +4457,7 @@
                                         "typeString": "literal_string \"STABILITY_FEE_COLLECTOR_ROLE\""
                                     }
                                 ],
-                                "id": 38032,
+                                "id": 38069,
                                 "name": "keccak256",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
@@ -4468,7 +4468,7 @@
                                     "typeString": "function (bytes memory) pure returns (bytes32)"
                                 }
                             },
-                            "id": 38034,
+                            "id": 38071,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -4489,12 +4489,12 @@
                     {
                         "constant": true,
                         "functionSelector": "d7a47a69",
-                        "id": 38040,
+                        "id": 38077,
                         "mutability": "constant",
                         "name": "SHOW_STOPPER_ROLE",
                         "nameLocation": "695:17:119",
                         "nodeType": "VariableDeclaration",
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "671:74:119",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -4503,7 +4503,7 @@
                             "typeString": "bytes32"
                         },
                         "typeName": {
-                            "id": 38036,
+                            "id": 38073,
                             "name": "bytes32",
                             "nodeType": "ElementaryTypeName",
                             "src": "671:7:119",
@@ -4516,7 +4516,7 @@
                             "arguments": [
                                 {
                                     "hexValue": "53484f575f53544f505045525f524f4c45",
-                                    "id": 38038,
+                                    "id": 38075,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
@@ -4538,7 +4538,7 @@
                                         "typeString": "literal_string \"SHOW_STOPPER_ROLE\""
                                     }
                                 ],
-                                "id": 38037,
+                                "id": 38074,
                                 "name": "keccak256",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
@@ -4549,7 +4549,7 @@
                                     "typeString": "function (bytes memory) pure returns (bytes32)"
                                 }
                             },
-                            "id": 38039,
+                            "id": 38076,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -4570,12 +4570,12 @@
                     {
                         "constant": true,
                         "functionSelector": "6e19aa59",
-                        "id": 38045,
+                        "id": 38082,
                         "mutability": "constant",
                         "name": "POSITION_MANAGER_ROLE",
                         "nameLocation": "773:21:119",
                         "nodeType": "VariableDeclaration",
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "749:82:119",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -4584,7 +4584,7 @@
                             "typeString": "bytes32"
                         },
                         "typeName": {
-                            "id": 38041,
+                            "id": 38078,
                             "name": "bytes32",
                             "nodeType": "ElementaryTypeName",
                             "src": "749:7:119",
@@ -4597,7 +4597,7 @@
                             "arguments": [
                                 {
                                     "hexValue": "504f534954494f4e5f4d414e414745525f524f4c45",
-                                    "id": 38043,
+                                    "id": 38080,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
@@ -4619,7 +4619,7 @@
                                         "typeString": "literal_string \"POSITION_MANAGER_ROLE\""
                                     }
                                 ],
-                                "id": 38042,
+                                "id": 38079,
                                 "name": "keccak256",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
@@ -4630,7 +4630,7 @@
                                     "typeString": "function (bytes memory) pure returns (bytes32)"
                                 }
                             },
-                            "id": 38044,
+                            "id": 38081,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -4651,12 +4651,12 @@
                     {
                         "constant": true,
                         "functionSelector": "08e45bc5",
-                        "id": 38050,
+                        "id": 38087,
                         "mutability": "constant",
                         "name": "MINTABLE_ROLE",
                         "nameLocation": "859:13:119",
                         "nodeType": "VariableDeclaration",
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "835:66:119",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -4665,7 +4665,7 @@
                             "typeString": "bytes32"
                         },
                         "typeName": {
-                            "id": 38046,
+                            "id": 38083,
                             "name": "bytes32",
                             "nodeType": "ElementaryTypeName",
                             "src": "835:7:119",
@@ -4678,7 +4678,7 @@
                             "arguments": [
                                 {
                                     "hexValue": "4d494e5441424c455f524f4c45",
-                                    "id": 38048,
+                                    "id": 38085,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
@@ -4700,7 +4700,7 @@
                                         "typeString": "literal_string \"MINTABLE_ROLE\""
                                     }
                                 ],
-                                "id": 38047,
+                                "id": 38084,
                                 "name": "keccak256",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
@@ -4711,7 +4711,7 @@
                                     "typeString": "function (bytes memory) pure returns (bytes32)"
                                 }
                             },
-                            "id": 38049,
+                            "id": 38086,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -4732,12 +4732,12 @@
                     {
                         "constant": true,
                         "functionSelector": "6792166f",
-                        "id": 38055,
+                        "id": 38092,
                         "mutability": "constant",
                         "name": "BOOK_KEEPER_ROLE",
                         "nameLocation": "929:16:119",
                         "nodeType": "VariableDeclaration",
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "905:72:119",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -4746,7 +4746,7 @@
                             "typeString": "bytes32"
                         },
                         "typeName": {
-                            "id": 38051,
+                            "id": 38088,
                             "name": "bytes32",
                             "nodeType": "ElementaryTypeName",
                             "src": "905:7:119",
@@ -4759,7 +4759,7 @@
                             "arguments": [
                                 {
                                     "hexValue": "424f4f4b5f4b45455045525f524f4c45",
-                                    "id": 38053,
+                                    "id": 38090,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
@@ -4781,7 +4781,7 @@
                                         "typeString": "literal_string \"BOOK_KEEPER_ROLE\""
                                     }
                                 ],
-                                "id": 38052,
+                                "id": 38089,
                                 "name": "keccak256",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
@@ -4792,7 +4792,7 @@
                                     "typeString": "function (bytes memory) pure returns (bytes32)"
                                 }
                             },
-                            "id": 38054,
+                            "id": 38091,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -4813,12 +4813,12 @@
                     {
                         "constant": true,
                         "functionSelector": "2e718ab7",
-                        "id": 38060,
+                        "id": 38097,
                         "mutability": "constant",
                         "name": "COLLATERAL_MANAGER_ROLE",
                         "nameLocation": "1005:23:119",
                         "nodeType": "VariableDeclaration",
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "981:86:119",
                         "stateVariable": true,
                         "storageLocation": "default",
@@ -4827,7 +4827,7 @@
                             "typeString": "bytes32"
                         },
                         "typeName": {
-                            "id": 38056,
+                            "id": 38093,
                             "name": "bytes32",
                             "nodeType": "ElementaryTypeName",
                             "src": "981:7:119",
@@ -4840,7 +4840,7 @@
                             "arguments": [
                                 {
                                     "hexValue": "434f4c4c41544552414c5f4d414e414745525f524f4c45",
-                                    "id": 38058,
+                                    "id": 38095,
                                     "isConstant": false,
                                     "isLValue": false,
                                     "isPure": true,
@@ -4862,7 +4862,7 @@
                                         "typeString": "literal_string \"COLLATERAL_MANAGER_ROLE\""
                                     }
                                 ],
-                                "id": 38057,
+                                "id": 38094,
                                 "name": "keccak256",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
@@ -4873,7 +4873,7 @@
                                     "typeString": "function (bytes memory) pure returns (bytes32)"
                                 }
                             },
-                            "id": 38059,
+                            "id": 38096,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -4893,7 +4893,7 @@
                     },
                     {
                         "body": {
-                            "id": 38076,
+                            "id": 38113,
                             "nodeType": "Block",
                             "src": "1115:203:119",
                             "statements": [
@@ -4903,7 +4903,7 @@
                                         "expression": {
                                             "argumentTypes": [],
                                             "expression": {
-                                                "id": 38065,
+                                                "id": 38102,
                                                 "name": "AccessControlUpgradeable",
                                                 "nodeType": "Identifier",
                                                 "overloadedDeclarations": [],
@@ -4914,7 +4914,7 @@
                                                     "typeString": "type(contract AccessControlUpgradeable)"
                                                 }
                                             },
-                                            "id": 38067,
+                                            "id": 38104,
                                             "isConstant": false,
                                             "isLValue": false,
                                             "isPure": false,
@@ -4929,7 +4929,7 @@
                                                 "typeString": "function ()"
                                             }
                                         },
-                                        "id": 38068,
+                                        "id": 38105,
                                         "isConstant": false,
                                         "isLValue": false,
                                         "isPure": false,
@@ -4945,7 +4945,7 @@
                                             "typeString": "tuple()"
                                         }
                                     },
-                                    "id": 38069,
+                                    "id": 38106,
                                     "nodeType": "ExpressionStatement",
                                     "src": "1121:47:119"
                                 },
@@ -4953,11 +4953,11 @@
                                     "expression": {
                                         "arguments": [
                                             {
-                                                "id": 38071,
+                                                "id": 38108,
                                                 "name": "OWNER_ROLE",
                                                 "nodeType": "Identifier",
                                                 "overloadedDeclarations": [],
-                                                "referencedDeclaration": 38010,
+                                                "referencedDeclaration": 38047,
                                                 "src": "1290:10:119",
                                                 "typeDescriptions": {
                                                     "typeIdentifier": "t_bytes32",
@@ -4966,7 +4966,7 @@
                                             },
                                             {
                                                 "expression": {
-                                                    "id": 38072,
+                                                    "id": 38109,
                                                     "name": "msg",
                                                     "nodeType": "Identifier",
                                                     "overloadedDeclarations": [],
@@ -4977,7 +4977,7 @@
                                                         "typeString": "msg"
                                                     }
                                                 },
-                                                "id": 38073,
+                                                "id": 38110,
                                                 "isConstant": false,
                                                 "isLValue": false,
                                                 "isPure": false,
@@ -5003,7 +5003,7 @@
                                                     "typeString": "address"
                                                 }
                                             ],
-                                            "id": 38070,
+                                            "id": 38107,
                                             "name": "_setupRole",
                                             "nodeType": "Identifier",
                                             "overloadedDeclarations": [],
@@ -5014,7 +5014,7 @@
                                                 "typeString": "function (bytes32,address)"
                                             }
                                         },
-                                        "id": 38074,
+                                        "id": 38111,
                                         "isConstant": false,
                                         "isLValue": false,
                                         "isPure": false,
@@ -5030,22 +5030,22 @@
                                             "typeString": "tuple()"
                                         }
                                     },
-                                    "id": 38075,
+                                    "id": 38112,
                                     "nodeType": "ExpressionStatement",
                                     "src": "1279:34:119"
                                 }
                             ]
                         },
                         "functionSelector": "8129fc1c",
-                        "id": 38077,
+                        "id": 38114,
                         "implemented": true,
                         "kind": "function",
                         "modifiers": [
                             {
-                                "id": 38063,
+                                "id": 38100,
                                 "kind": "modifierInvocation",
                                 "modifierName": {
-                                    "id": 38062,
+                                    "id": 38099,
                                     "name": "initializer",
                                     "nameLocations": [
                                         "1103:11:119"
@@ -5062,25 +5062,25 @@
                         "nameLocation": "1081:10:119",
                         "nodeType": "FunctionDefinition",
                         "parameters": {
-                            "id": 38061,
+                            "id": 38098,
                             "nodeType": "ParameterList",
                             "parameters": [],
                             "src": "1091:2:119"
                         },
                         "returnParameters": {
-                            "id": 38064,
+                            "id": 38101,
                             "nodeType": "ParameterList",
                             "parameters": [],
                             "src": "1115:0:119"
                         },
-                        "scope": 38078,
+                        "scope": 38115,
                         "src": "1072:246:119",
                         "stateMutability": "nonpayable",
                         "virtual": false,
                         "visibility": "external"
                     }
                 ],
-                "scope": 38079,
+                "scope": 38116,
                 "src": "155:1165:119",
                 "usedErrors": []
             }
@@ -5098,7 +5098,7 @@
         }
     },
     "schemaVersion": "3.4.10",
-    "updatedAt": "2022-10-21T07:57:45.110Z",
+    "updatedAt": "2022-10-21T12:59:12.644Z",
     "devdoc": {
         "kind": "dev",
         "methods": {

@@ -29,15 +29,15 @@
     "absolutePath": "project:/contracts/8.17/stats/interfaces/IBookKeeper.sol",
     "exportedSymbols": {
       "IBookKeeper": [
-        41276
+        41313
       ]
     },
-    "id": 41277,
+    "id": 41314,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 41269,
+        "id": 41306,
         "literals": [
           "solidity",
           "0.8",
@@ -47,7 +47,7 @@
         "src": "33:23:126"
       },
       {
-        "id": 41270,
+        "id": 41307,
         "literals": [
           "experimental",
           "ABIEncoderV2"
@@ -62,9 +62,9 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 41276,
+        "id": 41313,
         "linearizedBaseContracts": [
-          41276
+          41313
         ],
         "name": "IBookKeeper",
         "nameLocation": "102:11:126",
@@ -72,7 +72,7 @@
         "nodes": [
           {
             "functionSelector": "5b2a5121",
-            "id": 41275,
+            "id": 41312,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -80,23 +80,23 @@
             "nameLocation": "160:16:126",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 41271,
+              "id": 41308,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "176:2:126"
             },
             "returnParameters": {
-              "id": 41274,
+              "id": 41311,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 41273,
+                  "id": 41310,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 41275,
+                  "scope": 41312,
                   "src": "202:7:126",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -105,7 +105,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 41272,
+                    "id": 41309,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
                     "src": "202:7:126",
@@ -119,14 +119,14 @@
               ],
               "src": "201:9:126"
             },
-            "scope": 41276,
+            "scope": 41313,
             "src": "151:60:126",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 41277,
+        "scope": 41314,
         "src": "92:121:126",
         "usedErrors": []
       }
@@ -139,7 +139,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-21T07:57:44.978Z",
+  "updatedAt": "2022-10-21T12:59:12.513Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

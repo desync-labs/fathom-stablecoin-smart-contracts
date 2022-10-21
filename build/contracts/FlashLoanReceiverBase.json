@@ -140,7 +140,7 @@
         1436
       ],
       "ERC20Interface": [
-        42835
+        42872
       ],
       "FlashLoanReceiverBase": [
         15526
@@ -200,7 +200,7 @@
         822
       ],
       "SafeToken": [
-        43028
+        43065
       ],
       "StringsUpgradeable": [
         1392
@@ -263,7 +263,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 15527,
-        "sourceUnit": 43029,
+        "sourceUnit": 43066,
         "src": "214:35:30",
         "symbolAliases": [],
         "unitAlias": ""
@@ -326,7 +326,7 @@
                 "352:9:30"
               ],
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 43028,
+              "referencedDeclaration": 43065,
               "src": "352:9:30"
             },
             "nodeType": "UsingForDirective",
@@ -1756,7 +1756,7 @@
                       "memberLocation": "1299:11:30",
                       "memberName": "safeApprove",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 42913,
+                      "referencedDeclaration": 42950,
                       "src": "1271:39:30",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_address_$_t_uint256_$returns$__$bound_to$_t_address_$",
@@ -2140,7 +2140,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-21T07:57:44.970Z",
+  "updatedAt": "2022-10-21T12:59:12.505Z",
   "devdoc": {
     "kind": "dev",
     "methods": {

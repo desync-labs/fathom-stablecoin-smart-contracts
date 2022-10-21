@@ -4706,7 +4706,7 @@
                 }
               ]
             },
-            "name": "abi_encode_tuple_t_contract$_ProxyWalletCache_$28907__to_t_address__fromStack_reversed",
+            "name": "abi_encode_tuple_t_contract$_ProxyWalletCache_$28936__to_t_address__fromStack_reversed",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -7044,7 +7044,7 @@
           }
         ]
       },
-      "contents": "{\n    { }\n    function validator_revert_address(value)\n    {\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n    }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function panic_error_0x41()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x41)\n        revert(0, 0x24)\n    }\n    function abi_decode_bytes(offset, end) -> array\n    {\n        if iszero(slt(add(offset, 0x1f), end)) { revert(0, 0) }\n        let _1 := calldataload(offset)\n        let _2 := 0xffffffffffffffff\n        if gt(_1, _2) { panic_error_0x41() }\n        let _3 := not(31)\n        let memPtr := mload(64)\n        let newFreePtr := add(memPtr, and(add(and(add(_1, 0x1f), _3), 63), _3))\n        if or(gt(newFreePtr, _2), lt(newFreePtr, memPtr)) { panic_error_0x41() }\n        mstore(64, newFreePtr)\n        mstore(memPtr, _1)\n        if gt(add(add(offset, _1), 0x20), end) { revert(0, 0) }\n        calldatacopy(add(memPtr, 0x20), add(offset, 0x20), _1)\n        mstore(add(add(memPtr, _1), 0x20), 0)\n        array := memPtr\n    }\n    function abi_decode_tuple_t_bytes_memory_ptrt_bytes_memory_ptr(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        let _1 := 0xffffffffffffffff\n        if gt(offset, _1) { revert(0, 0) }\n        value0 := abi_decode_bytes(add(headStart, offset), dataEnd)\n        let offset_1 := calldataload(add(headStart, 32))\n        if gt(offset_1, _1) { revert(0, 0) }\n        value1 := abi_decode_bytes(add(headStart, offset_1), dataEnd)\n    }\n    function abi_encode_bytes(value, pos) -> end\n    {\n        let length := mload(value)\n        mstore(pos, length)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 0x20) }\n        {\n            let _1 := 0x20\n            mstore(add(add(pos, i), _1), mload(add(add(value, i), _1)))\n        }\n        mstore(add(add(pos, length), 0x20), 0)\n        end := add(add(pos, and(add(length, 31), not(31))), 0x20)\n    }\n    function abi_encode_tuple_t_address_t_bytes_memory_ptr__to_t_address_t_bytes_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), 64)\n        tail := abi_encode_bytes(value1, add(headStart, 64))\n    }\n    function abi_decode_tuple_t_addresst_bytes_memory_ptr(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let offset := calldataload(add(headStart, 32))\n        if gt(offset, 0xffffffffffffffff) { revert(0, 0) }\n        value1 := abi_decode_bytes(add(headStart, offset), dataEnd)\n    }\n    function abi_encode_tuple_t_bytes_memory_ptr__to_t_bytes_memory_ptr__fromStack_reversed(headStart, value0) -> tail\n    {\n        mstore(headStart, 32)\n        tail := abi_encode_bytes(value0, add(headStart, 32))\n    }\n    function abi_encode_tuple_t_contract$_ProxyWalletCache_$28907__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_decode_tuple_t_contract$_IAuthority_$17817(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_bool__to_t_bool__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, iszero(iszero(value0)))\n    }\n    function abi_encode_tuple_t_contract$_IAuthority_$17817__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_stringliteral_efaebd19655b8ead3f8c7de068b6ab3adcab1ddf1a7ecc266f9fff4c81ce73ee__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 24)\n        mstore(add(headStart, 64), \"fathom-auth-unauthorized\")\n        tail := add(headStart, 96)\n    }\n    function abi_decode_tuple_t_address_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_encode_tuple_t_stringliteral_b9e3fabcec583457295e0f248136e8c0fc71360f966d6d88512c2333a2673fd4__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 36)\n        mstore(add(headStart, 64), \"proxy-wallet-target-address-requ\")\n        mstore(add(headStart, 96), \"ired\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_uint256_t_bytes_calldata_ptr__to_t_uint256_t_bytes_memory_ptr__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), 64)\n        mstore(add(headStart, 64), value2)\n        calldatacopy(add(headStart, 96), value1, value2)\n        mstore(add(add(headStart, value2), 96), 0)\n        tail := add(add(headStart, and(add(value2, 31), not(31))), 96)\n    }\n    function abi_encode_tuple_t_stringliteral_90a67584405687c1d0be3447d8e61528f197087a33e2c3d225676b2b2b985220__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 35)\n        mstore(add(headStart, 64), \"proxy-wallet-cache-address-requi\")\n        mstore(add(headStart, 96), \"red\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_address_t_address_t_bytes4__to_t_address_t_address_t_bytes4__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n        mstore(add(headStart, 64), and(value2, shl(224, 0xffffffff)))\n    }\n    function abi_decode_tuple_t_bool_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        if iszero(eq(value, iszero(iszero(value)))) { revert(0, 0) }\n        value0 := value\n    }\n}",
+      "contents": "{\n    { }\n    function validator_revert_address(value)\n    {\n        if iszero(eq(value, and(value, sub(shl(160, 1), 1)))) { revert(0, 0) }\n    }\n    function abi_decode_tuple_t_address(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function panic_error_0x41()\n    {\n        mstore(0, shl(224, 0x4e487b71))\n        mstore(4, 0x41)\n        revert(0, 0x24)\n    }\n    function abi_decode_bytes(offset, end) -> array\n    {\n        if iszero(slt(add(offset, 0x1f), end)) { revert(0, 0) }\n        let _1 := calldataload(offset)\n        let _2 := 0xffffffffffffffff\n        if gt(_1, _2) { panic_error_0x41() }\n        let _3 := not(31)\n        let memPtr := mload(64)\n        let newFreePtr := add(memPtr, and(add(and(add(_1, 0x1f), _3), 63), _3))\n        if or(gt(newFreePtr, _2), lt(newFreePtr, memPtr)) { panic_error_0x41() }\n        mstore(64, newFreePtr)\n        mstore(memPtr, _1)\n        if gt(add(add(offset, _1), 0x20), end) { revert(0, 0) }\n        calldatacopy(add(memPtr, 0x20), add(offset, 0x20), _1)\n        mstore(add(add(memPtr, _1), 0x20), 0)\n        array := memPtr\n    }\n    function abi_decode_tuple_t_bytes_memory_ptrt_bytes_memory_ptr(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(0, 0) }\n        let offset := calldataload(headStart)\n        let _1 := 0xffffffffffffffff\n        if gt(offset, _1) { revert(0, 0) }\n        value0 := abi_decode_bytes(add(headStart, offset), dataEnd)\n        let offset_1 := calldataload(add(headStart, 32))\n        if gt(offset_1, _1) { revert(0, 0) }\n        value1 := abi_decode_bytes(add(headStart, offset_1), dataEnd)\n    }\n    function abi_encode_bytes(value, pos) -> end\n    {\n        let length := mload(value)\n        mstore(pos, length)\n        let i := 0\n        for { } lt(i, length) { i := add(i, 0x20) }\n        {\n            let _1 := 0x20\n            mstore(add(add(pos, i), _1), mload(add(add(value, i), _1)))\n        }\n        mstore(add(add(pos, length), 0x20), 0)\n        end := add(add(pos, and(add(length, 31), not(31))), 0x20)\n    }\n    function abi_encode_tuple_t_address_t_bytes_memory_ptr__to_t_address_t_bytes_memory_ptr__fromStack_reversed(headStart, value1, value0) -> tail\n    {\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n        mstore(add(headStart, 32), 64)\n        tail := abi_encode_bytes(value1, add(headStart, 64))\n    }\n    function abi_decode_tuple_t_addresst_bytes_memory_ptr(headStart, dataEnd) -> value0, value1\n    {\n        if slt(sub(dataEnd, headStart), 64) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n        let offset := calldataload(add(headStart, 32))\n        if gt(offset, 0xffffffffffffffff) { revert(0, 0) }\n        value1 := abi_decode_bytes(add(headStart, offset), dataEnd)\n    }\n    function abi_encode_tuple_t_bytes_memory_ptr__to_t_bytes_memory_ptr__fromStack_reversed(headStart, value0) -> tail\n    {\n        mstore(headStart, 32)\n        tail := abi_encode_bytes(value0, add(headStart, 32))\n    }\n    function abi_encode_tuple_t_contract$_ProxyWalletCache_$28936__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_decode_tuple_t_contract$_IAuthority_$17817(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := calldataload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_bool__to_t_bool__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, iszero(iszero(value0)))\n    }\n    function abi_encode_tuple_t_contract$_IAuthority_$17817__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_stringliteral_efaebd19655b8ead3f8c7de068b6ab3adcab1ddf1a7ecc266f9fff4c81ce73ee__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 24)\n        mstore(add(headStart, 64), \"fathom-auth-unauthorized\")\n        tail := add(headStart, 96)\n    }\n    function abi_decode_tuple_t_address_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        validator_revert_address(value)\n        value0 := value\n    }\n    function abi_encode_tuple_t_stringliteral_b9e3fabcec583457295e0f248136e8c0fc71360f966d6d88512c2333a2673fd4__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 36)\n        mstore(add(headStart, 64), \"proxy-wallet-target-address-requ\")\n        mstore(add(headStart, 96), \"ired\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_uint256_t_bytes_calldata_ptr__to_t_uint256_t_bytes_memory_ptr__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        mstore(headStart, value0)\n        mstore(add(headStart, 32), 64)\n        mstore(add(headStart, 64), value2)\n        calldatacopy(add(headStart, 96), value1, value2)\n        mstore(add(add(headStart, value2), 96), 0)\n        tail := add(add(headStart, and(add(value2, 31), not(31))), 96)\n    }\n    function abi_encode_tuple_t_stringliteral_90a67584405687c1d0be3447d8e61528f197087a33e2c3d225676b2b2b985220__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 35)\n        mstore(add(headStart, 64), \"proxy-wallet-cache-address-requi\")\n        mstore(add(headStart, 96), \"red\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_address_t_address_t_bytes4__to_t_address_t_address_t_bytes4__fromStack_reversed(headStart, value2, value1, value0) -> tail\n    {\n        tail := add(headStart, 96)\n        let _1 := sub(shl(160, 1), 1)\n        mstore(headStart, and(value0, _1))\n        mstore(add(headStart, 32), and(value1, _1))\n        mstore(add(headStart, 64), and(value2, shl(224, 0xffffffff)))\n    }\n    function abi_decode_tuple_t_bool_fromMemory(headStart, dataEnd) -> value0\n    {\n        if slt(sub(dataEnd, headStart), 32) { revert(0, 0) }\n        let value := mload(headStart)\n        if iszero(eq(value, iszero(iszero(value)))) { revert(0, 0) }\n        value0 := value\n    }\n}",
       "id": 134,
       "language": "Yul",
       "name": "#utility.yul"
@@ -7058,30 +7058,30 @@
     "absolutePath": "project:/contracts/8.17/proxy-wallet/ProxyWallet.sol",
     "exportedSymbols": {
       "FathomAuth": [
-        28695
+        28724
       ],
       "FathomAuthEvents": [
-        28572
+        28601
       ],
       "FathomNote": [
-        28738
+        28767
       ],
       "IAuthority": [
         17817
       ],
       "ProxyWallet": [
-        28861
+        28890
       ],
       "ProxyWalletCache": [
-        28907
+        28936
       ]
     },
-    "id": 28862,
+    "id": 28891,
     "license": "AGPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 28740,
+        "id": 28769,
         "literals": [
           "solidity",
           "0.8",
@@ -7093,11 +7093,11 @@
       {
         "absolutePath": "project:/contracts/8.17/proxy-wallet/FathomAuth.sol",
         "file": "./FathomAuth.sol",
-        "id": 28741,
+        "id": 28770,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 28862,
-        "sourceUnit": 28696,
+        "scope": 28891,
+        "sourceUnit": 28725,
         "src": "72:26:102",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7105,11 +7105,11 @@
       {
         "absolutePath": "project:/contracts/8.17/proxy-wallet/FathomNote.sol",
         "file": "./FathomNote.sol",
-        "id": 28742,
+        "id": 28771,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 28862,
-        "sourceUnit": 28739,
+        "scope": 28891,
+        "sourceUnit": 28768,
         "src": "99:26:102",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7117,11 +7117,11 @@
       {
         "absolutePath": "project:/contracts/8.17/proxy-wallet/ProxyWalletCache.sol",
         "file": "./ProxyWalletCache.sol",
-        "id": 28743,
+        "id": 28772,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 28862,
-        "sourceUnit": 28908,
+        "scope": 28891,
+        "sourceUnit": 28937,
         "src": "126:32:102",
         "symbolAliases": [],
         "unitAlias": ""
@@ -7131,31 +7131,31 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 28744,
+              "id": 28773,
               "name": "FathomAuth",
               "nameLocations": [
                 "428:10:102"
               ],
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 28695,
+              "referencedDeclaration": 28724,
               "src": "428:10:102"
             },
-            "id": 28745,
+            "id": 28774,
             "nodeType": "InheritanceSpecifier",
             "src": "428:10:102"
           },
           {
             "baseName": {
-              "id": 28746,
+              "id": 28775,
               "name": "FathomNote",
               "nameLocations": [
                 "440:10:102"
               ],
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 28738,
+              "referencedDeclaration": 28767,
               "src": "440:10:102"
             },
-            "id": 28747,
+            "id": 28776,
             "nodeType": "InheritanceSpecifier",
             "src": "440:10:102"
           }
@@ -7164,12 +7164,12 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 28861,
+        "id": 28890,
         "linearizedBaseContracts": [
-          28861,
-          28738,
-          28695,
-          28572
+          28890,
+          28767,
+          28724,
+          28601
         ],
         "name": "ProxyWallet",
         "nameLocation": "413:11:102",
@@ -7178,36 +7178,36 @@
           {
             "constant": false,
             "functionSelector": "60c7d295",
-            "id": 28750,
+            "id": 28779,
             "mutability": "mutable",
             "name": "cache",
             "nameLocation": "479:5:102",
             "nodeType": "VariableDeclaration",
-            "scope": 28861,
+            "scope": 28890,
             "src": "455:29:102",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+              "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
               "typeString": "contract ProxyWalletCache"
             },
             "typeName": {
-              "id": 28749,
+              "id": 28778,
               "nodeType": "UserDefinedTypeName",
               "pathNode": {
-                "id": 28748,
+                "id": 28777,
                 "name": "ProxyWalletCache",
                 "nameLocations": [
                   "455:16:102"
                 ],
                 "nodeType": "IdentifierPath",
-                "referencedDeclaration": 28907,
+                "referencedDeclaration": 28936,
                 "src": "455:16:102"
               },
-              "referencedDeclaration": 28907,
+              "referencedDeclaration": 28936,
               "src": "455:16:102",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                 "typeString": "contract ProxyWalletCache"
               }
             },
@@ -7215,7 +7215,7 @@
           },
           {
             "body": {
-              "id": 28759,
+              "id": 28788,
               "nodeType": "Block",
               "src": "551:31:102",
               "statements": [
@@ -7223,11 +7223,11 @@
                   "expression": {
                     "arguments": [
                       {
-                        "id": 28756,
+                        "id": 28785,
                         "name": "_cacheAddr",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 28752,
+                        "referencedDeclaration": 28781,
                         "src": "566:10:102",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -7242,18 +7242,18 @@
                           "typeString": "address"
                         }
                       ],
-                      "id": 28755,
+                      "id": 28784,
                       "name": "setCache",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 28860,
+                      "referencedDeclaration": 28889,
                       "src": "557:8:102",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$returns$_t_bool_$",
                         "typeString": "function (address) returns (bool)"
                       }
                     },
-                    "id": 28757,
+                    "id": 28786,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -7269,13 +7269,13 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 28758,
+                  "id": 28787,
                   "nodeType": "ExpressionStatement",
                   "src": "557:20:102"
                 }
               ]
             },
-            "id": 28760,
+            "id": 28789,
             "implemented": true,
             "kind": "constructor",
             "modifiers": [],
@@ -7283,17 +7283,17 @@
             "nameLocation": "-1:-1:-1",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 28753,
+              "id": 28782,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 28752,
+                  "id": 28781,
                   "mutability": "mutable",
                   "name": "_cacheAddr",
                   "nameLocation": "539:10:102",
                   "nodeType": "VariableDeclaration",
-                  "scope": 28760,
+                  "scope": 28789,
                   "src": "531:18:102",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -7302,7 +7302,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 28751,
+                    "id": 28780,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "531:7:102",
@@ -7318,12 +7318,12 @@
               "src": "530:20:102"
             },
             "returnParameters": {
-              "id": 28754,
+              "id": 28783,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "551:0:102"
             },
-            "scope": 28861,
+            "scope": 28890,
             "src": "519:63:102",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -7331,12 +7331,12 @@
           },
           {
             "body": {
-              "id": 28763,
+              "id": 28792,
               "nodeType": "Block",
               "src": "613:2:102",
               "statements": []
             },
-            "id": 28764,
+            "id": 28793,
             "implemented": true,
             "kind": "receive",
             "modifiers": [],
@@ -7344,18 +7344,18 @@
             "nameLocation": "-1:-1:-1",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 28761,
+              "id": 28790,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "593:2:102"
             },
             "returnParameters": {
-              "id": 28762,
+              "id": 28791,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "613:0:102"
             },
-            "scope": 28861,
+            "scope": 28890,
             "src": "586:29:102",
             "stateMutability": "payable",
             "virtual": false,
@@ -7363,23 +7363,23 @@
           },
           {
             "body": {
-              "id": 28804,
+              "id": 28833,
               "nodeType": "Block",
               "src": "820:210:102",
               "statements": [
                 {
                   "expression": {
-                    "id": 28780,
+                    "id": 28809,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 28775,
+                      "id": 28804,
                       "name": "_target",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 28771,
+                      "referencedDeclaration": 28800,
                       "src": "826:7:102",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
@@ -7391,11 +7391,11 @@
                     "rightHandSide": {
                       "arguments": [
                         {
-                          "id": 28778,
+                          "id": 28807,
                           "name": "_code",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 28766,
+                          "referencedDeclaration": 28795,
                           "src": "847:5:102",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bytes_memory_ptr",
@@ -7411,18 +7411,18 @@
                           }
                         ],
                         "expression": {
-                          "id": 28776,
+                          "id": 28805,
                           "name": "cache",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 28750,
+                          "referencedDeclaration": 28779,
                           "src": "836:5:102",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                            "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                             "typeString": "contract ProxyWalletCache"
                           }
                         },
-                        "id": 28777,
+                        "id": 28806,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -7430,14 +7430,14 @@
                         "memberLocation": "842:4:102",
                         "memberName": "read",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 28885,
+                        "referencedDeclaration": 28914,
                         "src": "836:10:102",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_external_view$_t_bytes_memory_ptr_$returns$_t_address_$",
                           "typeString": "function (bytes memory) view external returns (address)"
                         }
                       },
-                      "id": 28779,
+                      "id": 28808,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -7459,7 +7459,7 @@
                       "typeString": "address"
                     }
                   },
-                  "id": 28781,
+                  "id": 28810,
                   "nodeType": "ExpressionStatement",
                   "src": "826:27:102"
                 },
@@ -7469,17 +7469,17 @@
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     },
-                    "id": 28787,
+                    "id": 28816,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
-                      "id": 28782,
+                      "id": 28811,
                       "name": "_target",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 28771,
+                      "referencedDeclaration": 28800,
                       "src": "863:7:102",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
@@ -7492,7 +7492,7 @@
                       "arguments": [
                         {
                           "hexValue": "30",
-                          "id": 28785,
+                          "id": 28814,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -7514,7 +7514,7 @@
                             "typeString": "int_const 0"
                           }
                         ],
-                        "id": 28784,
+                        "id": 28813,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -7526,14 +7526,14 @@
                           "typeString": "type(address)"
                         },
                         "typeName": {
-                          "id": 28783,
+                          "id": 28812,
                           "name": "address",
                           "nodeType": "ElementaryTypeName",
                           "src": "874:7:102",
                           "typeDescriptions": {}
                         }
                       },
-                      "id": 28786,
+                      "id": 28815,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -7555,27 +7555,27 @@
                       "typeString": "bool"
                     }
                   },
-                  "id": 28796,
+                  "id": 28825,
                   "nodeType": "IfStatement",
                   "src": "859:124:102",
                   "trueBody": {
-                    "id": 28795,
+                    "id": 28824,
                     "nodeType": "Block",
                     "src": "886:97:102",
                     "statements": [
                       {
                         "expression": {
-                          "id": 28793,
+                          "id": 28822,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
                           "lValueRequested": false,
                           "leftHandSide": {
-                            "id": 28788,
+                            "id": 28817,
                             "name": "_target",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 28771,
+                            "referencedDeclaration": 28800,
                             "src": "948:7:102",
                             "typeDescriptions": {
                               "typeIdentifier": "t_address",
@@ -7587,11 +7587,11 @@
                           "rightHandSide": {
                             "arguments": [
                               {
-                                "id": 28791,
+                                "id": 28820,
                                 "name": "_code",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 28766,
+                                "referencedDeclaration": 28795,
                                 "src": "970:5:102",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_bytes_memory_ptr",
@@ -7607,18 +7607,18 @@
                                 }
                               ],
                               "expression": {
-                                "id": 28789,
+                                "id": 28818,
                                 "name": "cache",
                                 "nodeType": "Identifier",
                                 "overloadedDeclarations": [],
-                                "referencedDeclaration": 28750,
+                                "referencedDeclaration": 28779,
                                 "src": "958:5:102",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                                  "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                                   "typeString": "contract ProxyWalletCache"
                                 }
                               },
-                              "id": 28790,
+                              "id": 28819,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": false,
@@ -7626,14 +7626,14 @@
                               "memberLocation": "964:5:102",
                               "memberName": "write",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 28906,
+                              "referencedDeclaration": 28935,
                               "src": "958:11:102",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_function_external_nonpayable$_t_bytes_memory_ptr_$returns$_t_address_$",
                                 "typeString": "function (bytes memory) external returns (address)"
                               }
                             },
-                            "id": 28792,
+                            "id": 28821,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
@@ -7655,7 +7655,7 @@
                             "typeString": "address"
                           }
                         },
-                        "id": 28794,
+                        "id": 28823,
                         "nodeType": "ExpressionStatement",
                         "src": "948:28:102"
                       }
@@ -7664,17 +7664,17 @@
                 },
                 {
                   "expression": {
-                    "id": 28802,
+                    "id": 28831,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 28797,
+                      "id": 28826,
                       "name": "_response",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 28773,
+                      "referencedDeclaration": 28802,
                       "src": "989:9:102",
                       "typeDescriptions": {
                         "typeIdentifier": "t_bytes_memory_ptr",
@@ -7686,11 +7686,11 @@
                     "rightHandSide": {
                       "arguments": [
                         {
-                          "id": 28799,
+                          "id": 28828,
                           "name": "_target",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 28771,
+                          "referencedDeclaration": 28800,
                           "src": "1010:7:102",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -7698,11 +7698,11 @@
                           }
                         },
                         {
-                          "id": 28800,
+                          "id": 28829,
                           "name": "_data",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 28768,
+                          "referencedDeclaration": 28797,
                           "src": "1019:5:102",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bytes_memory_ptr",
@@ -7721,18 +7721,18 @@
                             "typeString": "bytes memory"
                           }
                         ],
-                        "id": 28798,
+                        "id": 28827,
                         "name": "execute2",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 28830,
+                        "referencedDeclaration": 28859,
                         "src": "1001:8:102",
                         "typeDescriptions": {
                           "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_bytes_memory_ptr_$returns$_t_bytes_memory_ptr_$",
                           "typeString": "function (address,bytes memory) returns (bytes memory)"
                         }
                       },
-                      "id": 28801,
+                      "id": 28830,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -7754,14 +7754,14 @@
                       "typeString": "bytes memory"
                     }
                   },
-                  "id": 28803,
+                  "id": 28832,
                   "nodeType": "ExpressionStatement",
                   "src": "989:36:102"
                 }
               ]
             },
             "functionSelector": "1f6a1eb9",
-            "id": 28805,
+            "id": 28834,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -7769,17 +7769,17 @@
             "nameLocation": "691:7:102",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 28769,
+              "id": 28798,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 28766,
+                  "id": 28795,
                   "mutability": "mutable",
                   "name": "_code",
                   "nameLocation": "712:5:102",
                   "nodeType": "VariableDeclaration",
-                  "scope": 28805,
+                  "scope": 28834,
                   "src": "699:18:102",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -7788,7 +7788,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 28765,
+                    "id": 28794,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "699:5:102",
@@ -7801,12 +7801,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 28768,
+                  "id": 28797,
                   "mutability": "mutable",
                   "name": "_data",
                   "nameLocation": "732:5:102",
                   "nodeType": "VariableDeclaration",
-                  "scope": 28805,
+                  "scope": 28834,
                   "src": "719:18:102",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -7815,7 +7815,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 28767,
+                    "id": 28796,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "719:5:102",
@@ -7830,17 +7830,17 @@
               "src": "698:40:102"
             },
             "returnParameters": {
-              "id": 28774,
+              "id": 28803,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 28771,
+                  "id": 28800,
                   "mutability": "mutable",
                   "name": "_target",
                   "nameLocation": "785:7:102",
                   "nodeType": "VariableDeclaration",
-                  "scope": 28805,
+                  "scope": 28834,
                   "src": "777:15:102",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -7849,7 +7849,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 28770,
+                    "id": 28799,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "777:7:102",
@@ -7863,12 +7863,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 28773,
+                  "id": 28802,
                   "mutability": "mutable",
                   "name": "_response",
                   "nameLocation": "807:9:102",
                   "nodeType": "VariableDeclaration",
-                  "scope": 28805,
+                  "scope": 28834,
                   "src": "794:22:102",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -7877,7 +7877,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 28772,
+                    "id": 28801,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "794:5:102",
@@ -7891,7 +7891,7 @@
               ],
               "src": "776:41:102"
             },
-            "scope": 28861,
+            "scope": 28890,
             "src": "682:348:102",
             "stateMutability": "payable",
             "virtual": false,
@@ -7899,7 +7899,7 @@
           },
           {
             "body": {
-              "id": 28829,
+              "id": 28858,
               "nodeType": "Block",
               "src": "1147:616:102",
               "statements": [
@@ -7911,17 +7911,17 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 28824,
+                        "id": 28853,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
-                          "id": 28819,
+                          "id": 28848,
                           "name": "_target",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 28807,
+                          "referencedDeclaration": 28836,
                           "src": "1161:7:102",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -7934,7 +7934,7 @@
                           "arguments": [
                             {
                               "hexValue": "30",
-                              "id": 28822,
+                              "id": 28851,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
@@ -7956,7 +7956,7 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 28821,
+                            "id": 28850,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -7968,14 +7968,14 @@
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 28820,
+                              "id": 28849,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
                               "src": "1172:7:102",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 28823,
+                          "id": 28852,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -7999,7 +7999,7 @@
                       },
                       {
                         "hexValue": "70726f78792d77616c6c65742d7461726765742d616464726573732d7265717569726564",
-                        "id": 28825,
+                        "id": 28854,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -8025,7 +8025,7 @@
                           "typeString": "literal_string \"proxy-wallet-target-address-required\""
                         }
                       ],
-                      "id": 28818,
+                      "id": 28847,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -8039,7 +8039,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 28826,
+                    "id": 28855,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -8055,7 +8055,7 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 28827,
+                  "id": 28856,
                   "nodeType": "ExpressionStatement",
                   "src": "1153:70:102"
                 },
@@ -8494,100 +8494,100 @@
                   "evmVersion": "london",
                   "externalReferences": [
                     {
-                      "declaration": 28809,
+                      "declaration": 28838,
                       "isOffset": false,
                       "isSlot": false,
                       "src": "1348:5:102",
                       "valueSize": 1
                     },
                     {
-                      "declaration": 28809,
+                      "declaration": 28838,
                       "isOffset": false,
                       "isSlot": false,
                       "src": "1368:5:102",
                       "valueSize": 1
                     },
                     {
-                      "declaration": 28816,
+                      "declaration": 28845,
                       "isOffset": false,
                       "isSlot": false,
                       "src": "1425:9:102",
                       "valueSize": 1
                     },
                     {
-                      "declaration": 28816,
+                      "declaration": 28845,
                       "isOffset": false,
                       "isSlot": false,
                       "src": "1473:9:102",
                       "valueSize": 1
                     },
                     {
-                      "declaration": 28816,
+                      "declaration": 28845,
                       "isOffset": false,
                       "isSlot": false,
                       "src": "1543:9:102",
                       "valueSize": 1
                     },
                     {
-                      "declaration": 28816,
+                      "declaration": 28845,
                       "isOffset": false,
                       "isSlot": false,
                       "src": "1586:9:102",
                       "valueSize": 1
                     },
                     {
-                      "declaration": 28816,
+                      "declaration": 28845,
                       "isOffset": false,
                       "isSlot": false,
                       "src": "1721:9:102",
                       "valueSize": 1
                     },
                     {
-                      "declaration": 28807,
+                      "declaration": 28836,
                       "isOffset": false,
                       "isSlot": false,
                       "src": "1335:7:102",
                       "valueSize": 1
                     }
                   ],
-                  "id": 28828,
+                  "id": 28857,
                   "nodeType": "InlineAssembly",
                   "src": "1269:490:102"
                 }
               ]
             },
             "functionSelector": "2282ccf8",
-            "id": 28830,
+            "id": 28859,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
-                "id": 28812,
+                "id": 28841,
                 "kind": "modifierInvocation",
                 "modifierName": {
-                  "id": 28811,
+                  "id": 28840,
                   "name": "auth",
                   "nameLocations": [
                     "1104:4:102"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 28643,
+                  "referencedDeclaration": 28672,
                   "src": "1104:4:102"
                 },
                 "nodeType": "ModifierInvocation",
                 "src": "1104:4:102"
               },
               {
-                "id": 28814,
+                "id": 28843,
                 "kind": "modifierInvocation",
                 "modifierName": {
-                  "id": 28813,
+                  "id": 28842,
                   "name": "note",
                   "nameLocations": [
                     "1109:4:102"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 28737,
+                  "referencedDeclaration": 28766,
                   "src": "1109:4:102"
                 },
                 "nodeType": "ModifierInvocation",
@@ -8598,17 +8598,17 @@
             "nameLocation": "1043:8:102",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 28810,
+              "id": 28839,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 28807,
+                  "id": 28836,
                   "mutability": "mutable",
                   "name": "_target",
                   "nameLocation": "1060:7:102",
                   "nodeType": "VariableDeclaration",
-                  "scope": 28830,
+                  "scope": 28859,
                   "src": "1052:15:102",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -8617,7 +8617,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 28806,
+                    "id": 28835,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "1052:7:102",
@@ -8631,12 +8631,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 28809,
+                  "id": 28838,
                   "mutability": "mutable",
                   "name": "_data",
                   "nameLocation": "1082:5:102",
                   "nodeType": "VariableDeclaration",
-                  "scope": 28830,
+                  "scope": 28859,
                   "src": "1069:18:102",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -8645,7 +8645,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 28808,
+                    "id": 28837,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "1069:5:102",
@@ -8660,17 +8660,17 @@
               "src": "1051:37:102"
             },
             "returnParameters": {
-              "id": 28817,
+              "id": 28846,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 28816,
+                  "id": 28845,
                   "mutability": "mutable",
                   "name": "_response",
                   "nameLocation": "1136:9:102",
                   "nodeType": "VariableDeclaration",
-                  "scope": 28830,
+                  "scope": 28859,
                   "src": "1123:22:102",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -8679,7 +8679,7 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 28815,
+                    "id": 28844,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
                     "src": "1123:5:102",
@@ -8693,7 +8693,7 @@
               ],
               "src": "1122:24:102"
             },
-            "scope": 28861,
+            "scope": 28890,
             "src": "1034:729:102",
             "stateMutability": "payable",
             "virtual": false,
@@ -8701,7 +8701,7 @@
           },
           {
             "body": {
-              "id": 28859,
+              "id": 28888,
               "nodeType": "Block",
               "src": "1855:161:102",
               "statements": [
@@ -8713,17 +8713,17 @@
                           "typeIdentifier": "t_address",
                           "typeString": "address"
                         },
-                        "id": 28847,
+                        "id": 28876,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
                         "lValueRequested": false,
                         "leftExpression": {
-                          "id": 28842,
+                          "id": 28871,
                           "name": "_cacheAddr",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 28832,
+                          "referencedDeclaration": 28861,
                           "src": "1869:10:102",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -8736,7 +8736,7 @@
                           "arguments": [
                             {
                               "hexValue": "30",
-                              "id": 28845,
+                              "id": 28874,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
@@ -8758,7 +8758,7 @@
                                 "typeString": "int_const 0"
                               }
                             ],
-                            "id": 28844,
+                            "id": 28873,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -8770,14 +8770,14 @@
                               "typeString": "type(address)"
                             },
                             "typeName": {
-                              "id": 28843,
+                              "id": 28872,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
                               "src": "1883:7:102",
                               "typeDescriptions": {}
                             }
                           },
-                          "id": 28846,
+                          "id": 28875,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -8801,7 +8801,7 @@
                       },
                       {
                         "hexValue": "70726f78792d77616c6c65742d63616368652d616464726573732d7265717569726564",
-                        "id": 28848,
+                        "id": 28877,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -8827,7 +8827,7 @@
                           "typeString": "literal_string \"proxy-wallet-cache-address-required\""
                         }
                       ],
-                      "id": 28841,
+                      "id": 28870,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -8841,7 +8841,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 28849,
+                    "id": 28878,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -8857,26 +8857,26 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 28850,
+                  "id": 28879,
                   "nodeType": "ExpressionStatement",
                   "src": "1861:72:102"
                 },
                 {
                   "expression": {
-                    "id": 28855,
+                    "id": 28884,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 28851,
+                      "id": 28880,
                       "name": "cache",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 28750,
+                      "referencedDeclaration": 28779,
                       "src": "1939:5:102",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                        "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                         "typeString": "contract ProxyWalletCache"
                       }
                     },
@@ -8885,11 +8885,11 @@
                     "rightHandSide": {
                       "arguments": [
                         {
-                          "id": 28853,
+                          "id": 28882,
                           "name": "_cacheAddr",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 28832,
+                          "referencedDeclaration": 28861,
                           "src": "1964:10:102",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
@@ -8904,18 +8904,18 @@
                             "typeString": "address"
                           }
                         ],
-                        "id": 28852,
+                        "id": 28881,
                         "name": "ProxyWalletCache",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 28907,
+                        "referencedDeclaration": 28936,
                         "src": "1947:16:102",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_ProxyWalletCache_$28907_$",
+                          "typeIdentifier": "t_type$_t_contract$_ProxyWalletCache_$28936_$",
                           "typeString": "type(contract ProxyWalletCache)"
                         }
                       },
-                      "id": 28854,
+                      "id": 28883,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -8927,24 +8927,24 @@
                       "src": "1947:28:102",
                       "tryCall": false,
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                        "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                         "typeString": "contract ProxyWalletCache"
                       }
                     },
                     "src": "1939:36:102",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_ProxyWalletCache_$28907",
+                      "typeIdentifier": "t_contract$_ProxyWalletCache_$28936",
                       "typeString": "contract ProxyWalletCache"
                     }
                   },
-                  "id": 28856,
+                  "id": 28885,
                   "nodeType": "ExpressionStatement",
                   "src": "1939:36:102"
                 },
                 {
                   "expression": {
                     "hexValue": "74727565",
-                    "id": 28857,
+                    "id": 28886,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": true,
@@ -8958,45 +8958,45 @@
                     },
                     "value": "true"
                   },
-                  "functionReturnParameters": 28840,
-                  "id": 28858,
+                  "functionReturnParameters": 28869,
+                  "id": 28887,
                   "nodeType": "Return",
                   "src": "2000:11:102"
                 }
               ]
             },
             "functionSelector": "948f5076",
-            "id": 28860,
+            "id": 28889,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
-                "id": 28835,
+                "id": 28864,
                 "kind": "modifierInvocation",
                 "modifierName": {
-                  "id": 28834,
+                  "id": 28863,
                   "name": "auth",
                   "nameLocations": [
                     "1830:4:102"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 28643,
+                  "referencedDeclaration": 28672,
                   "src": "1830:4:102"
                 },
                 "nodeType": "ModifierInvocation",
                 "src": "1830:4:102"
               },
               {
-                "id": 28837,
+                "id": 28866,
                 "kind": "modifierInvocation",
                 "modifierName": {
-                  "id": 28836,
+                  "id": 28865,
                   "name": "note",
                   "nameLocations": [
                     "1835:4:102"
                   ],
                   "nodeType": "IdentifierPath",
-                  "referencedDeclaration": 28737,
+                  "referencedDeclaration": 28766,
                   "src": "1835:4:102"
                 },
                 "nodeType": "ModifierInvocation",
@@ -9007,17 +9007,17 @@
             "nameLocation": "1794:8:102",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 28833,
+              "id": 28862,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 28832,
+                  "id": 28861,
                   "mutability": "mutable",
                   "name": "_cacheAddr",
                   "nameLocation": "1811:10:102",
                   "nodeType": "VariableDeclaration",
-                  "scope": 28860,
+                  "scope": 28889,
                   "src": "1803:18:102",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -9026,7 +9026,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 28831,
+                    "id": 28860,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "1803:7:102",
@@ -9042,17 +9042,17 @@
               "src": "1802:20:102"
             },
             "returnParameters": {
-              "id": 28840,
+              "id": 28869,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 28839,
+                  "id": 28868,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 28860,
+                  "scope": 28889,
                   "src": "1849:4:102",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -9061,7 +9061,7 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 28838,
+                    "id": 28867,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
                     "src": "1849:4:102",
@@ -9075,14 +9075,14 @@
               ],
               "src": "1848:6:102"
             },
-            "scope": 28861,
+            "scope": 28890,
             "src": "1785:231:102",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 28862,
+        "scope": 28891,
         "src": "404:1614:102",
         "usedErrors": []
       }
@@ -9095,7 +9095,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-21T07:57:45.051Z",
+  "updatedAt": "2022-10-21T12:59:12.585Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

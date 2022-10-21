@@ -1566,19 +1566,19 @@
         1124
       ],
       "CheckPairAddress": [
-        24508
+        24537
       ],
       "FathomSwapLibrary": [
-        24878
+        24907
       ],
       "IFathomDEXPair": [
         18364
       ],
       "IFathomSwapFactory": [
-        24941
+        24970
       ],
       "IFathomSwapPair": [
-        25183
+        25212
       ],
       "Initializable": [
         695
@@ -1587,12 +1587,12 @@
         1760
       ]
     },
-    "id": 24509,
+    "id": 24538,
     "license": "AGPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 24459,
+        "id": 24488,
         "literals": [
           "solidity",
           "0.8",
@@ -1604,10 +1604,10 @@
       {
         "absolutePath": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
         "file": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
-        "id": 24460,
+        "id": 24489,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 24509,
+        "scope": 24538,
         "sourceUnit": 696,
         "src": "72:75:93",
         "symbolAliases": [],
@@ -1616,10 +1616,10 @@
       {
         "absolutePath": "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol",
         "file": "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol",
-        "id": 24461,
+        "id": 24490,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 24509,
+        "scope": 24538,
         "sourceUnit": 1761,
         "src": "148:80:93",
         "symbolAliases": [],
@@ -1628,11 +1628,11 @@
       {
         "absolutePath": "project:/contracts/8.17/price-oracles/lib/FathomSwapLibrary.sol",
         "file": "./lib/FathomSwapLibrary.sol",
-        "id": 24462,
+        "id": 24491,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 24509,
-        "sourceUnit": 24879,
+        "scope": 24538,
+        "sourceUnit": 24908,
         "src": "230:37:93",
         "symbolAliases": [],
         "unitAlias": ""
@@ -1640,10 +1640,10 @@
       {
         "absolutePath": "project:/contracts/8.17/interfaces/IFathomDEXPair.sol",
         "file": "../interfaces/IFathomDEXPair.sol",
-        "id": 24463,
+        "id": 24492,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 24509,
+        "scope": 24538,
         "sourceUnit": 18365,
         "src": "268:42:93",
         "symbolAliases": [],
@@ -1654,7 +1654,7 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 24464,
+              "id": 24493,
               "name": "Initializable",
               "nameLocations": [
                 "341:13:93"
@@ -1663,13 +1663,13 @@
               "referencedDeclaration": 695,
               "src": "341:13:93"
             },
-            "id": 24465,
+            "id": 24494,
             "nodeType": "InheritanceSpecifier",
             "src": "341:13:93"
           },
           {
             "baseName": {
-              "id": 24466,
+              "id": 24495,
               "name": "IFathomDEXPair",
               "nameLocations": [
                 "356:14:93"
@@ -1678,7 +1678,7 @@
               "referencedDeclaration": 18364,
               "src": "356:14:93"
             },
-            "id": 24467,
+            "id": 24496,
             "nodeType": "InheritanceSpecifier",
             "src": "356:14:93"
           }
@@ -1687,9 +1687,9 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 24508,
+        "id": 24537,
         "linearizedBaseContracts": [
-          24508,
+          24537,
           18364,
           695
         ],
@@ -1699,9 +1699,9 @@
         "nodes": [
           {
             "global": false,
-            "id": 24470,
+            "id": 24499,
             "libraryName": {
-              "id": 24468,
+              "id": 24497,
               "name": "SafeMathUpgradeable",
               "nameLocations": [
                 "381:19:93"
@@ -1713,7 +1713,7 @@
             "nodeType": "UsingForDirective",
             "src": "375:38:93",
             "typeName": {
-              "id": 24469,
+              "id": 24498,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
               "src": "405:7:93",
@@ -1726,12 +1726,12 @@
           {
             "constant": false,
             "functionSelector": "b8d8fbb4",
-            "id": 24472,
+            "id": 24501,
             "mutability": "mutable",
             "name": "dexFactory",
             "nameLocation": "431:10:93",
             "nodeType": "VariableDeclaration",
-            "scope": 24508,
+            "scope": 24537,
             "src": "416:25:93",
             "stateVariable": true,
             "storageLocation": "default",
@@ -1740,7 +1740,7 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 24471,
+              "id": 24500,
               "name": "address",
               "nodeType": "ElementaryTypeName",
               "src": "416:7:93",
@@ -1754,23 +1754,23 @@
           },
           {
             "body": {
-              "id": 24483,
+              "id": 24512,
               "nodeType": "Block",
               "src": "508:35:93",
               "statements": [
                 {
                   "expression": {
-                    "id": 24481,
+                    "id": 24510,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 24479,
+                      "id": 24508,
                       "name": "dexFactory",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 24472,
+                      "referencedDeclaration": 24501,
                       "src": "514:10:93",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
@@ -1780,11 +1780,11 @@
                     "nodeType": "Assignment",
                     "operator": "=",
                     "rightHandSide": {
-                      "id": 24480,
+                      "id": 24509,
                       "name": "_dexFactory",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 24474,
+                      "referencedDeclaration": 24503,
                       "src": "527:11:93",
                       "typeDescriptions": {
                         "typeIdentifier": "t_address",
@@ -1797,22 +1797,22 @@
                       "typeString": "address"
                     }
                   },
-                  "id": 24482,
+                  "id": 24511,
                   "nodeType": "ExpressionStatement",
                   "src": "514:24:93"
                 }
               ]
             },
             "functionSelector": "c4d66de8",
-            "id": 24484,
+            "id": 24513,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
-                "id": 24477,
+                "id": 24506,
                 "kind": "modifierInvocation",
                 "modifierName": {
-                  "id": 24476,
+                  "id": 24505,
                   "name": "initializer",
                   "nameLocations": [
                     "496:11:93"
@@ -1829,17 +1829,17 @@
             "nameLocation": "455:10:93",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 24475,
+              "id": 24504,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24474,
+                  "id": 24503,
                   "mutability": "mutable",
                   "name": "_dexFactory",
                   "nameLocation": "474:11:93",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24484,
+                  "scope": 24513,
                   "src": "466:19:93",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1848,7 +1848,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24473,
+                    "id": 24502,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "466:7:93",
@@ -1864,12 +1864,12 @@
               "src": "465:21:93"
             },
             "returnParameters": {
-              "id": 24478,
+              "id": 24507,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "508:0:93"
             },
-            "scope": 24508,
+            "scope": 24537,
             "src": "446:97:93",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -1880,23 +1880,23 @@
               18363
             ],
             "body": {
-              "id": 24506,
+              "id": 24535,
               "nodeType": "Block",
               "src": "777:96:93",
               "statements": [
                 {
                   "assignments": [
-                    24496
+                    24525
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 24496,
+                      "id": 24525,
                       "mutability": "mutable",
                       "name": "pair",
                       "nameLocation": "791:4:93",
                       "nodeType": "VariableDeclaration",
-                      "scope": 24506,
+                      "scope": 24535,
                       "src": "783:12:93",
                       "stateVariable": false,
                       "storageLocation": "default",
@@ -1905,7 +1905,7 @@
                         "typeString": "address"
                       },
                       "typeName": {
-                        "id": 24495,
+                        "id": 24524,
                         "name": "address",
                         "nodeType": "ElementaryTypeName",
                         "src": "783:7:93",
@@ -1918,15 +1918,15 @@
                       "visibility": "internal"
                     }
                   ],
-                  "id": 24503,
+                  "id": 24532,
                   "initialValue": {
                     "arguments": [
                       {
-                        "id": 24499,
+                        "id": 24528,
                         "name": "dexFactory",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 24472,
+                        "referencedDeclaration": 24501,
                         "src": "824:10:93",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -1934,11 +1934,11 @@
                         }
                       },
                       {
-                        "id": 24500,
+                        "id": 24529,
                         "name": "token0",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 24487,
+                        "referencedDeclaration": 24516,
                         "src": "836:6:93",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -1946,11 +1946,11 @@
                         }
                       },
                       {
-                        "id": 24501,
+                        "id": 24530,
                         "name": "token1",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 24489,
+                        "referencedDeclaration": 24518,
                         "src": "844:6:93",
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -1974,18 +1974,18 @@
                         }
                       ],
                       "expression": {
-                        "id": 24497,
+                        "id": 24526,
                         "name": "FathomSwapLibrary",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 24878,
+                        "referencedDeclaration": 24907,
                         "src": "798:17:93",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_type$_t_contract$_FathomSwapLibrary_$24878_$",
+                          "typeIdentifier": "t_type$_t_contract$_FathomSwapLibrary_$24907_$",
                           "typeString": "type(library FathomSwapLibrary)"
                         }
                       },
-                      "id": 24498,
+                      "id": 24527,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -1993,14 +1993,14 @@
                       "memberLocation": "816:7:93",
                       "memberName": "pairFor",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 24805,
+                      "referencedDeclaration": 24834,
                       "src": "798:25:93",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_view$_t_address_$_t_address_$_t_address_$returns$_t_address_$",
                         "typeString": "function (address,address,address) view returns (address)"
                       }
                     },
-                    "id": 24502,
+                    "id": 24531,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2021,32 +2021,32 @@
                 },
                 {
                   "expression": {
-                    "id": 24504,
+                    "id": 24533,
                     "name": "pair",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 24496,
+                    "referencedDeclaration": 24525,
                     "src": "864:4:93",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
                     }
                   },
-                  "functionReturnParameters": 24494,
-                  "id": 24505,
+                  "functionReturnParameters": 24523,
+                  "id": 24534,
                   "nodeType": "Return",
                   "src": "857:11:93"
                 }
               ]
             },
             "documentation": {
-              "id": 24485,
+              "id": 24514,
               "nodeType": "StructuredDocumentation",
               "src": "547:137:93",
               "text": "@dev Return the wad price of token0/token1, multiplied by 1e18\n NOTE: (if you have 1 token0 how much you can sell it for token1)"
             },
             "functionSelector": "e6a43905",
-            "id": 24507,
+            "id": 24536,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -2054,23 +2054,23 @@
             "nameLocation": "696:7:93",
             "nodeType": "FunctionDefinition",
             "overrides": {
-              "id": 24491,
+              "id": 24520,
               "nodeType": "OverrideSpecifier",
               "overrides": [],
               "src": "750:8:93"
             },
             "parameters": {
-              "id": 24490,
+              "id": 24519,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24487,
+                  "id": 24516,
                   "mutability": "mutable",
                   "name": "token0",
                   "nameLocation": "712:6:93",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24507,
+                  "scope": 24536,
                   "src": "704:14:93",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2079,7 +2079,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24486,
+                    "id": 24515,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "704:7:93",
@@ -2093,12 +2093,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 24489,
+                  "id": 24518,
                   "mutability": "mutable",
                   "name": "token1",
                   "nameLocation": "728:6:93",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24507,
+                  "scope": 24536,
                   "src": "720:14:93",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2107,7 +2107,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24488,
+                    "id": 24517,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "720:7:93",
@@ -2123,17 +2123,17 @@
               "src": "703:32:93"
             },
             "returnParameters": {
-              "id": 24494,
+              "id": 24523,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24493,
+                  "id": 24522,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24507,
+                  "scope": 24536,
                   "src": "768:7:93",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -2142,7 +2142,7 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24492,
+                    "id": 24521,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
                     "src": "768:7:93",
@@ -2157,14 +2157,14 @@
               ],
               "src": "767:9:93"
             },
-            "scope": 24508,
+            "scope": 24537,
             "src": "687:186:93",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 24509,
+        "scope": 24538,
         "src": "312:563:93",
         "usedErrors": []
       }
@@ -2177,7 +2177,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-21T07:57:45.028Z",
+  "updatedAt": "2022-10-21T12:59:12.563Z",
   "devdoc": {
     "kind": "dev",
     "methods": {

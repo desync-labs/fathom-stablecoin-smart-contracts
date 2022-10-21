@@ -1040,7 +1040,7 @@
                 }
               ]
             },
-            "name": "abi_encode_tuple_t_struct$_PoolInfo_$40485_memory_ptr__to_t_struct$_PoolInfo_$40485_memory_ptr__fromStack_reversed",
+            "name": "abi_encode_tuple_t_struct$_PoolInfo_$40522_memory_ptr__to_t_struct$_PoolInfo_$40522_memory_ptr__fromStack_reversed",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -1523,7 +1523,7 @@
                 }
               ]
             },
-            "name": "abi_encode_tuple_t_struct$_FathomInfo_$40470_memory_ptr__to_t_struct$_FathomInfo_$40470_memory_ptr__fromStack_reversed",
+            "name": "abi_encode_tuple_t_struct$_FathomInfo_$40507_memory_ptr__to_t_struct$_FathomInfo_$40507_memory_ptr__fromStack_reversed",
             "nodeType": "YulFunctionDefinition",
             "parameters": [
               {
@@ -2337,7 +2337,7 @@
           }
         ]
       },
-      "contents": "{\n    { }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_bool__to_t_bool__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, iszero(iszero(value0)))\n    }\n    function abi_encode_tuple_t_struct$_PoolInfo_$40485_memory_ptr__to_t_struct$_PoolInfo_$40485_memory_ptr__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 224)\n        mstore(headStart, mload(value0))\n        mstore(add(headStart, 0x20), mload(add(value0, 0x20)))\n        mstore(add(headStart, 0x40), mload(add(value0, 0x40)))\n        mstore(add(headStart, 0x60), mload(add(value0, 0x60)))\n        mstore(add(headStart, 0x80), mload(add(value0, 0x80)))\n        mstore(add(headStart, 0xa0), mload(add(value0, 0xa0)))\n        mstore(add(headStart, 0xc0), mload(add(value0, 0xc0)))\n    }\n    function abi_encode_tuple_t_bytes32__to_t_bytes32__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_struct$_FathomInfo_$40470_memory_ptr__to_t_struct$_FathomInfo_$40470_memory_ptr__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 160)\n        mstore(headStart, mload(value0))\n        mstore(add(headStart, 0x20), mload(add(value0, 0x20)))\n        mstore(add(headStart, 0x40), mload(add(value0, 0x40)))\n        mstore(add(headStart, 0x60), mload(add(value0, 0x60)))\n        mstore(add(headStart, 0x80), mload(add(value0, 0x80)))\n    }\n    function checked_mul_t_uint256(x, y) -> product\n    {\n        product := mul(x, y)\n        if iszero(or(iszero(x), eq(y, div(product, x))))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x11)\n            revert(0, 0x24)\n        }\n    }\n    function checked_div_t_uint256(x, y) -> r\n    {\n        if iszero(y)\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x12)\n            revert(0, 0x24)\n        }\n        r := div(x, y)\n    }\n    function abi_encode_tuple_t_stringliteral_7a2a4e26842155ea933fe6eb6e3137eb5a296dcdf55721c552be7b4c3cc23759__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 46)\n        mstore(add(headStart, 64), \"Initializable: contract is alrea\")\n        mstore(add(headStart, 96), \"dy initialized\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_rational_1_by_1__to_t_uint8__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, 0xff))\n    }\n}",
+      "contents": "{\n    { }\n    function abi_encode_tuple_t_address__to_t_address__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, sub(shl(160, 1), 1)))\n    }\n    function abi_encode_tuple_t_bool__to_t_bool__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, iszero(iszero(value0)))\n    }\n    function abi_encode_tuple_t_struct$_PoolInfo_$40522_memory_ptr__to_t_struct$_PoolInfo_$40522_memory_ptr__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 224)\n        mstore(headStart, mload(value0))\n        mstore(add(headStart, 0x20), mload(add(value0, 0x20)))\n        mstore(add(headStart, 0x40), mload(add(value0, 0x40)))\n        mstore(add(headStart, 0x60), mload(add(value0, 0x60)))\n        mstore(add(headStart, 0x80), mload(add(value0, 0x80)))\n        mstore(add(headStart, 0xa0), mload(add(value0, 0xa0)))\n        mstore(add(headStart, 0xc0), mload(add(value0, 0xc0)))\n    }\n    function abi_encode_tuple_t_bytes32__to_t_bytes32__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, value0)\n    }\n    function abi_encode_tuple_t_struct$_FathomInfo_$40507_memory_ptr__to_t_struct$_FathomInfo_$40507_memory_ptr__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 160)\n        mstore(headStart, mload(value0))\n        mstore(add(headStart, 0x20), mload(add(value0, 0x20)))\n        mstore(add(headStart, 0x40), mload(add(value0, 0x40)))\n        mstore(add(headStart, 0x60), mload(add(value0, 0x60)))\n        mstore(add(headStart, 0x80), mload(add(value0, 0x80)))\n    }\n    function checked_mul_t_uint256(x, y) -> product\n    {\n        product := mul(x, y)\n        if iszero(or(iszero(x), eq(y, div(product, x))))\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x11)\n            revert(0, 0x24)\n        }\n    }\n    function checked_div_t_uint256(x, y) -> r\n    {\n        if iszero(y)\n        {\n            mstore(0, shl(224, 0x4e487b71))\n            mstore(4, 0x12)\n            revert(0, 0x24)\n        }\n        r := div(x, y)\n    }\n    function abi_encode_tuple_t_stringliteral_7a2a4e26842155ea933fe6eb6e3137eb5a296dcdf55721c552be7b4c3cc23759__to_t_string_memory_ptr__fromStack_reversed(headStart) -> tail\n    {\n        mstore(headStart, 32)\n        mstore(add(headStart, 32), 46)\n        mstore(add(headStart, 64), \"Initializable: contract is alrea\")\n        mstore(add(headStart, 96), \"dy initialized\")\n        tail := add(headStart, 128)\n    }\n    function abi_encode_tuple_t_rational_1_by_1__to_t_uint8__fromStack_reversed(headStart, value0) -> tail\n    {\n        tail := add(headStart, 32)\n        mstore(headStart, and(value0, 0xff))\n    }\n}",
       "id": 134,
       "language": "Yul",
       "name": "#utility.yul"
@@ -2357,19 +2357,19 @@
         1166
       ],
       "FathomStatsMock": [
-        40598
+        40635
       ],
       "IBookKeeper": [
-        41276
+        41313
       ],
       "ICollateralPoolConfig": [
-        41308
+        41345
       ],
       "IDEXPriceOracle": [
-        41323
+        41360
       ],
       "IERC20": [
-        41334
+        41371
       ],
       "Initializable": [
         695
@@ -2378,12 +2378,12 @@
         822
       ]
     },
-    "id": 40599,
+    "id": 40636,
     "license": "AGPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 40420,
+        "id": 40457,
         "literals": [
           "solidity",
           "0.8",
@@ -2393,7 +2393,7 @@
         "src": "47:23:124"
       },
       {
-        "id": 40421,
+        "id": 40458,
         "literals": [
           "experimental",
           "ABIEncoderV2"
@@ -2404,10 +2404,10 @@
       {
         "absolutePath": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
         "file": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
-        "id": 40422,
+        "id": 40459,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 40599,
+        "scope": 40636,
         "sourceUnit": 823,
         "src": "105:78:124",
         "symbolAliases": [],
@@ -2416,11 +2416,11 @@
       {
         "absolutePath": "project:/contracts/8.17/stats/interfaces/IBookKeeper.sol",
         "file": "./interfaces/IBookKeeper.sol",
-        "id": 40423,
+        "id": 40460,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 40599,
-        "sourceUnit": 41277,
+        "scope": 40636,
+        "sourceUnit": 41314,
         "src": "186:38:124",
         "symbolAliases": [],
         "unitAlias": ""
@@ -2428,11 +2428,11 @@
       {
         "absolutePath": "project:/contracts/8.17/stats/interfaces/IDEXPriceOracle.sol",
         "file": "./interfaces/IDEXPriceOracle.sol",
-        "id": 40424,
+        "id": 40461,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 40599,
-        "sourceUnit": 41324,
+        "scope": 40636,
+        "sourceUnit": 41361,
         "src": "225:42:124",
         "symbolAliases": [],
         "unitAlias": ""
@@ -2440,11 +2440,11 @@
       {
         "absolutePath": "project:/contracts/8.17/stats/interfaces/IERC20.sol",
         "file": "./interfaces/IERC20.sol",
-        "id": 40425,
+        "id": 40462,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 40599,
-        "sourceUnit": 41335,
+        "scope": 40636,
+        "sourceUnit": 41372,
         "src": "268:33:124",
         "symbolAliases": [],
         "unitAlias": ""
@@ -2452,11 +2452,11 @@
       {
         "absolutePath": "project:/contracts/8.17/stats/interfaces/ICollateralPoolConfig.sol",
         "file": "./interfaces/ICollateralPoolConfig.sol",
-        "id": 40426,
+        "id": 40463,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 40599,
-        "sourceUnit": 41309,
+        "scope": 40636,
+        "sourceUnit": 41346,
         "src": "302:48:124",
         "symbolAliases": [],
         "unitAlias": ""
@@ -2466,7 +2466,7 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 40427,
+              "id": 40464,
               "name": "PausableUpgradeable",
               "nameLocations": [
                 "380:19:124"
@@ -2475,7 +2475,7 @@
               "referencedDeclaration": 822,
               "src": "380:19:124"
             },
-            "id": 40428,
+            "id": 40465,
             "nodeType": "InheritanceSpecifier",
             "src": "380:19:124"
           }
@@ -2484,9 +2484,9 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 40598,
+        "id": 40635,
         "linearizedBaseContracts": [
-          40598,
+          40635,
           822,
           1166,
           695
@@ -2497,12 +2497,12 @@
         "nodes": [
           {
             "constant": true,
-            "id": 40433,
+            "id": 40470,
             "mutability": "constant",
             "name": "WAD",
             "nameLocation": "438:3:124",
             "nodeType": "VariableDeclaration",
-            "scope": 40598,
+            "scope": 40635,
             "src": "421:29:124",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2511,7 +2511,7 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 40429,
+              "id": 40466,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
               "src": "421:7:124",
@@ -2525,14 +2525,14 @@
                 "typeIdentifier": "t_rational_1000000000000000000_by_1",
                 "typeString": "int_const 1000000000000000000"
               },
-              "id": 40432,
+              "id": 40469,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "lValueRequested": false,
               "leftExpression": {
                 "hexValue": "3130",
-                "id": 40430,
+                "id": 40467,
                 "isConstant": false,
                 "isLValue": false,
                 "isPure": true,
@@ -2550,7 +2550,7 @@
               "operator": "**",
               "rightExpression": {
                 "hexValue": "3138",
-                "id": 40431,
+                "id": 40468,
                 "isConstant": false,
                 "isLValue": false,
                 "isPure": true,
@@ -2574,12 +2574,12 @@
           },
           {
             "constant": true,
-            "id": 40438,
+            "id": 40475,
             "mutability": "constant",
             "name": "RAY",
             "nameLocation": "471:3:124",
             "nodeType": "VariableDeclaration",
-            "scope": 40598,
+            "scope": 40635,
             "src": "454:29:124",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2588,7 +2588,7 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 40434,
+              "id": 40471,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
               "src": "454:7:124",
@@ -2602,14 +2602,14 @@
                 "typeIdentifier": "t_rational_1000000000000000000000000000_by_1",
                 "typeString": "int_const 1000000000000000000000000000"
               },
-              "id": 40437,
+              "id": 40474,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "lValueRequested": false,
               "leftExpression": {
                 "hexValue": "3130",
-                "id": 40435,
+                "id": 40472,
                 "isConstant": false,
                 "isLValue": false,
                 "isPure": true,
@@ -2627,7 +2627,7 @@
               "operator": "**",
               "rightExpression": {
                 "hexValue": "3237",
-                "id": 40436,
+                "id": 40473,
                 "isConstant": false,
                 "isLValue": false,
                 "isPure": true,
@@ -2651,12 +2651,12 @@
           },
           {
             "constant": true,
-            "id": 40443,
+            "id": 40480,
             "mutability": "constant",
             "name": "RAD",
             "nameLocation": "504:3:124",
             "nodeType": "VariableDeclaration",
-            "scope": 40598,
+            "scope": 40635,
             "src": "487:29:124",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2665,7 +2665,7 @@
               "typeString": "uint256"
             },
             "typeName": {
-              "id": 40439,
+              "id": 40476,
               "name": "uint256",
               "nodeType": "ElementaryTypeName",
               "src": "487:7:124",
@@ -2679,14 +2679,14 @@
                 "typeIdentifier": "t_rational_1000000000000000000000000000000000000000000000_by_1",
                 "typeString": "int_const 1000...(38 digits omitted)...0000"
               },
-              "id": 40442,
+              "id": 40479,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
               "lValueRequested": false,
               "leftExpression": {
                 "hexValue": "3130",
-                "id": 40440,
+                "id": 40477,
                 "isConstant": false,
                 "isLValue": false,
                 "isPure": true,
@@ -2704,7 +2704,7 @@
               "operator": "**",
               "rightExpression": {
                 "hexValue": "3435",
-                "id": 40441,
+                "id": 40478,
                 "isConstant": false,
                 "isLValue": false,
                 "isPure": true,
@@ -2729,12 +2729,12 @@
           {
             "constant": false,
             "functionSelector": "9dc57e66",
-            "id": 40445,
+            "id": 40482,
             "mutability": "mutable",
             "name": "BookKeeper",
             "nameLocation": "554:10:124",
             "nodeType": "VariableDeclaration",
-            "scope": 40598,
+            "scope": 40635,
             "src": "539:25:124",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2743,7 +2743,7 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 40444,
+              "id": 40481,
               "name": "address",
               "nodeType": "ElementaryTypeName",
               "src": "539:7:124",
@@ -2758,12 +2758,12 @@
           {
             "constant": false,
             "functionSelector": "48994a9e",
-            "id": 40447,
+            "id": 40484,
             "mutability": "mutable",
             "name": "FairLaunch",
             "nameLocation": "583:10:124",
             "nodeType": "VariableDeclaration",
-            "scope": 40598,
+            "scope": 40635,
             "src": "568:25:124",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2772,7 +2772,7 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 40446,
+              "id": 40483,
               "name": "address",
               "nodeType": "ElementaryTypeName",
               "src": "568:7:124",
@@ -2787,12 +2787,12 @@
           {
             "constant": false,
             "functionSelector": "dd9149e1",
-            "id": 40449,
+            "id": 40486,
             "mutability": "mutable",
             "name": "WXDC",
             "nameLocation": "612:4:124",
             "nodeType": "VariableDeclaration",
-            "scope": 40598,
+            "scope": 40635,
             "src": "597:19:124",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2801,7 +2801,7 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 40448,
+              "id": 40485,
               "name": "address",
               "nodeType": "ElementaryTypeName",
               "src": "597:7:124",
@@ -2816,12 +2816,12 @@
           {
             "constant": false,
             "functionSelector": "c54e44eb",
-            "id": 40451,
+            "id": 40488,
             "mutability": "mutable",
             "name": "USDT",
             "nameLocation": "635:4:124",
             "nodeType": "VariableDeclaration",
-            "scope": 40598,
+            "scope": 40635,
             "src": "620:19:124",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2830,7 +2830,7 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 40450,
+              "id": 40487,
               "name": "address",
               "nodeType": "ElementaryTypeName",
               "src": "620:7:124",
@@ -2845,12 +2845,12 @@
           {
             "constant": false,
             "functionSelector": "908eb621",
-            "id": 40453,
+            "id": 40490,
             "mutability": "mutable",
             "name": "FXD",
             "nameLocation": "658:3:124",
             "nodeType": "VariableDeclaration",
-            "scope": 40598,
+            "scope": 40635,
             "src": "643:18:124",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2859,7 +2859,7 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 40452,
+              "id": 40489,
               "name": "address",
               "nodeType": "ElementaryTypeName",
               "src": "643:7:124",
@@ -2874,12 +2874,12 @@
           {
             "constant": false,
             "functionSelector": "abac618f",
-            "id": 40455,
+            "id": 40492,
             "mutability": "mutable",
             "name": "DEXPriceOracle",
             "nameLocation": "680:14:124",
             "nodeType": "VariableDeclaration",
-            "scope": 40598,
+            "scope": 40635,
             "src": "665:29:124",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2888,7 +2888,7 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 40454,
+              "id": 40491,
               "name": "address",
               "nodeType": "ElementaryTypeName",
               "src": "665:7:124",
@@ -2903,12 +2903,12 @@
           {
             "constant": false,
             "functionSelector": "88734cf0",
-            "id": 40457,
+            "id": 40494,
             "mutability": "mutable",
             "name": "CollateralPoolId",
             "nameLocation": "713:16:124",
             "nodeType": "VariableDeclaration",
-            "scope": 40598,
+            "scope": 40635,
             "src": "698:31:124",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2917,7 +2917,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 40456,
+              "id": 40493,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "698:7:124",
@@ -2931,12 +2931,12 @@
           {
             "constant": false,
             "functionSelector": "a23794e5",
-            "id": 40459,
+            "id": 40496,
             "mutability": "mutable",
             "name": "CollateralPoolConfig",
             "nameLocation": "748:20:124",
             "nodeType": "VariableDeclaration",
-            "scope": 40598,
+            "scope": 40635,
             "src": "733:35:124",
             "stateVariable": true,
             "storageLocation": "default",
@@ -2945,7 +2945,7 @@
               "typeString": "address"
             },
             "typeName": {
-              "id": 40458,
+              "id": 40495,
               "name": "address",
               "nodeType": "ElementaryTypeName",
               "src": "733:7:124",
@@ -2959,16 +2959,16 @@
           },
           {
             "canonicalName": "FathomStatsMock.FathomInfo",
-            "id": 40470,
+            "id": 40507,
             "members": [
               {
                 "constant": false,
-                "id": 40461,
+                "id": 40498,
                 "mutability": "mutable",
                 "name": "fathomSupplyCap",
                 "nameLocation": "827:15:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40470,
+                "scope": 40507,
                 "src": "819:23:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -2977,7 +2977,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40460,
+                  "id": 40497,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "819:7:124",
@@ -2990,12 +2990,12 @@
               },
               {
                 "constant": false,
-                "id": 40463,
+                "id": 40500,
                 "mutability": "mutable",
                 "name": "totalValueLocked",
                 "nameLocation": "910:16:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40470,
+                "scope": 40507,
                 "src": "902:24:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3004,7 +3004,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40462,
+                  "id": 40499,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "902:7:124",
@@ -3017,12 +3017,12 @@
               },
               {
                 "constant": false,
-                "id": 40465,
+                "id": 40502,
                 "mutability": "mutable",
                 "name": "FXDPriceFromDex",
                 "nameLocation": "962:15:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40470,
+                "scope": 40507,
                 "src": "954:23:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3031,7 +3031,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40464,
+                  "id": 40501,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "954:7:124",
@@ -3044,12 +3044,12 @@
               },
               {
                 "constant": false,
-                "id": 40467,
+                "id": 40504,
                 "mutability": "mutable",
                 "name": "liquidationRatio",
                 "nameLocation": "1013:16:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40470,
+                "scope": 40507,
                 "src": "1005:24:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3058,7 +3058,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40466,
+                  "id": 40503,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "1005:7:124",
@@ -3071,12 +3071,12 @@
               },
               {
                 "constant": false,
-                "id": 40469,
+                "id": 40506,
                 "mutability": "mutable",
                 "name": "closeFactor",
                 "nameLocation": "1068:11:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40470,
+                "scope": 40507,
                 "src": "1060:19:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3085,7 +3085,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40468,
+                  "id": 40505,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "1060:7:124",
@@ -3100,22 +3100,22 @@
             "name": "FathomInfo",
             "nameLocation": "800:10:124",
             "nodeType": "StructDefinition",
-            "scope": 40598,
+            "scope": 40635,
             "src": "793:291:124",
             "visibility": "public"
           },
           {
             "canonicalName": "FathomStatsMock.PoolInfo",
-            "id": 40485,
+            "id": 40522,
             "members": [
               {
                 "constant": false,
-                "id": 40472,
+                "id": 40509,
                 "mutability": "mutable",
                 "name": "collateralLockedInPool",
                 "nameLocation": "1266:22:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40485,
+                "scope": 40522,
                 "src": "1258:30:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3124,7 +3124,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40471,
+                  "id": 40508,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "1258:7:124",
@@ -3137,12 +3137,12 @@
               },
               {
                 "constant": false,
-                "id": 40474,
+                "id": 40511,
                 "mutability": "mutable",
                 "name": "collateralAvailableToWithdraw",
                 "nameLocation": "1304:29:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40485,
+                "scope": 40522,
                 "src": "1296:37:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3151,7 +3151,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40473,
+                  "id": 40510,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "1296:7:124",
@@ -3164,12 +3164,12 @@
               },
               {
                 "constant": false,
-                "id": 40476,
+                "id": 40513,
                 "mutability": "mutable",
                 "name": "FXDBorrowed",
                 "nameLocation": "1349:11:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40485,
+                "scope": 40522,
                 "src": "1341:19:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3178,7 +3178,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40475,
+                  "id": 40512,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "1341:7:124",
@@ -3191,12 +3191,12 @@
               },
               {
                 "constant": false,
-                "id": 40478,
+                "id": 40515,
                 "mutability": "mutable",
                 "name": "FXDAvailableToBorrow",
                 "nameLocation": "1376:20:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40485,
+                "scope": 40522,
                 "src": "1368:28:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3205,7 +3205,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40477,
+                  "id": 40514,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "1368:7:124",
@@ -3218,12 +3218,12 @@
               },
               {
                 "constant": false,
-                "id": 40480,
+                "id": 40517,
                 "mutability": "mutable",
                 "name": "debtRatio",
                 "nameLocation": "1412:9:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40485,
+                "scope": 40522,
                 "src": "1404:17:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3232,7 +3232,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40479,
+                  "id": 40516,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "1404:7:124",
@@ -3245,12 +3245,12 @@
               },
               {
                 "constant": false,
-                "id": 40482,
+                "id": 40519,
                 "mutability": "mutable",
                 "name": "liquidationRatio",
                 "nameLocation": "1471:16:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40485,
+                "scope": 40522,
                 "src": "1463:24:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3259,7 +3259,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40481,
+                  "id": 40518,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "1463:7:124",
@@ -3272,12 +3272,12 @@
               },
               {
                 "constant": false,
-                "id": 40484,
+                "id": 40521,
                 "mutability": "mutable",
                 "name": "liquidatorIncentiveBps",
                 "nameLocation": "1524:22:124",
                 "nodeType": "VariableDeclaration",
-                "scope": 40485,
+                "scope": 40522,
                 "src": "1516:30:124",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3286,7 +3286,7 @@
                   "typeString": "uint256"
                 },
                 "typeName": {
-                  "id": 40483,
+                  "id": 40520,
                   "name": "uint256",
                   "nodeType": "ElementaryTypeName",
                   "src": "1516:7:124",
@@ -3301,27 +3301,27 @@
             "name": "PoolInfo",
             "nameLocation": "1241:8:124",
             "nodeType": "StructDefinition",
-            "scope": 40598,
+            "scope": 40635,
             "src": "1234:354:124",
             "visibility": "public"
           },
           {
             "body": {
-              "id": 40490,
+              "id": 40527,
               "nodeType": "Block",
               "src": "1634:5:124",
               "statements": []
             },
             "functionSelector": "8129fc1c",
-            "id": 40491,
+            "id": 40528,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
-                "id": 40488,
+                "id": 40525,
                 "kind": "modifierInvocation",
                 "modifierName": {
-                  "id": 40487,
+                  "id": 40524,
                   "name": "initializer",
                   "nameLocations": [
                     "1622:11:124"
@@ -3338,18 +3338,18 @@
             "nameLocation": "1600:10:124",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 40486,
+              "id": 40523,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1610:2:124"
             },
             "returnParameters": {
-              "id": 40489,
+              "id": 40526,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1634:0:124"
             },
-            "scope": 40598,
+            "scope": 40635,
             "src": "1591:48:124",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -3357,78 +3357,78 @@
           },
           {
             "body": {
-              "id": 40533,
+              "id": 40570,
               "nodeType": "Block",
               "src": "1710:501:124",
               "statements": [
                 {
                   "assignments": [
-                    40499
+                    40536
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 40499,
+                      "id": 40536,
                       "mutability": "mutable",
                       "name": "fathomInfo",
                       "nameLocation": "1736:10:124",
                       "nodeType": "VariableDeclaration",
-                      "scope": 40533,
+                      "scope": 40570,
                       "src": "1718:28:124",
                       "stateVariable": false,
                       "storageLocation": "memory",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_FathomInfo_$40470_memory_ptr",
+                        "typeIdentifier": "t_struct$_FathomInfo_$40507_memory_ptr",
                         "typeString": "struct FathomStatsMock.FathomInfo"
                       },
                       "typeName": {
-                        "id": 40498,
+                        "id": 40535,
                         "nodeType": "UserDefinedTypeName",
                         "pathNode": {
-                          "id": 40497,
+                          "id": 40534,
                           "name": "FathomInfo",
                           "nameLocations": [
                             "1718:10:124"
                           ],
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 40470,
+                          "referencedDeclaration": 40507,
                           "src": "1718:10:124"
                         },
-                        "referencedDeclaration": 40470,
+                        "referencedDeclaration": 40507,
                         "src": "1718:10:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_FathomInfo_$40470_storage_ptr",
+                          "typeIdentifier": "t_struct$_FathomInfo_$40507_storage_ptr",
                           "typeString": "struct FathomStatsMock.FathomInfo"
                         }
                       },
                       "visibility": "internal"
                     }
                   ],
-                  "id": 40500,
+                  "id": 40537,
                   "nodeType": "VariableDeclarationStatement",
                   "src": "1718:28:124"
                 },
                 {
                   "expression": {
-                    "id": 40505,
+                    "id": 40542,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 40501,
+                        "id": 40538,
                         "name": "fathomInfo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40499,
+                        "referencedDeclaration": 40536,
                         "src": "1754:10:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_FathomInfo_$40470_memory_ptr",
+                          "typeIdentifier": "t_struct$_FathomInfo_$40507_memory_ptr",
                           "typeString": "struct FathomStatsMock.FathomInfo memory"
                         }
                       },
-                      "id": 40503,
+                      "id": 40540,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
@@ -3436,7 +3436,7 @@
                       "memberLocation": "1765:15:124",
                       "memberName": "fathomSupplyCap",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 40461,
+                      "referencedDeclaration": 40498,
                       "src": "1754:26:124",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -3447,7 +3447,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "3130303030303030",
-                      "id": 40504,
+                      "id": 40541,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -3467,31 +3467,31 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 40506,
+                  "id": 40543,
                   "nodeType": "ExpressionStatement",
                   "src": "1754:37:124"
                 },
                 {
                   "expression": {
-                    "id": 40511,
+                    "id": 40548,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 40507,
+                        "id": 40544,
                         "name": "fathomInfo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40499,
+                        "referencedDeclaration": 40536,
                         "src": "1799:10:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_FathomInfo_$40470_memory_ptr",
+                          "typeIdentifier": "t_struct$_FathomInfo_$40507_memory_ptr",
                           "typeString": "struct FathomStatsMock.FathomInfo memory"
                         }
                       },
-                      "id": 40509,
+                      "id": 40546,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
@@ -3499,7 +3499,7 @@
                       "memberLocation": "1810:16:124",
                       "memberName": "totalValueLocked",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 40463,
+                      "referencedDeclaration": 40500,
                       "src": "1799:27:124",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -3510,7 +3510,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "3530303030303030303030303030303030303030",
-                      "id": 40510,
+                      "id": 40547,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -3530,31 +3530,31 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 40512,
+                  "id": 40549,
                   "nodeType": "ExpressionStatement",
                   "src": "1799:50:124"
                 },
                 {
                   "expression": {
-                    "id": 40517,
+                    "id": 40554,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 40513,
+                        "id": 40550,
                         "name": "fathomInfo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40499,
+                        "referencedDeclaration": 40536,
                         "src": "1929:10:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_FathomInfo_$40470_memory_ptr",
+                          "typeIdentifier": "t_struct$_FathomInfo_$40507_memory_ptr",
                           "typeString": "struct FathomStatsMock.FathomInfo memory"
                         }
                       },
-                      "id": 40515,
+                      "id": 40552,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
@@ -3562,7 +3562,7 @@
                       "memberLocation": "1940:15:124",
                       "memberName": "FXDPriceFromDex",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 40465,
+                      "referencedDeclaration": 40502,
                       "src": "1929:26:124",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -3573,7 +3573,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "393738303030303030303030303030303030303030303030303030",
-                      "id": 40516,
+                      "id": 40553,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -3593,31 +3593,31 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 40518,
+                  "id": 40555,
                   "nodeType": "ExpressionStatement",
                   "src": "1929:56:124"
                 },
                 {
                   "expression": {
-                    "id": 40523,
+                    "id": 40560,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 40519,
+                        "id": 40556,
                         "name": "fathomInfo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40499,
+                        "referencedDeclaration": 40536,
                         "src": "1993:10:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_FathomInfo_$40470_memory_ptr",
+                          "typeIdentifier": "t_struct$_FathomInfo_$40507_memory_ptr",
                           "typeString": "struct FathomStatsMock.FathomInfo memory"
                         }
                       },
-                      "id": 40521,
+                      "id": 40558,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
@@ -3625,7 +3625,7 @@
                       "memberLocation": "2004:16:124",
                       "memberName": "liquidationRatio",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 40467,
+                      "referencedDeclaration": 40504,
                       "src": "1993:27:124",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -3636,7 +3636,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "31303030303030303030303030303030303030303030303030303030",
-                      "id": 40522,
+                      "id": 40559,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -3656,31 +3656,31 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 40524,
+                  "id": 40561,
                   "nodeType": "ExpressionStatement",
                   "src": "1993:58:124"
                 },
                 {
                   "expression": {
-                    "id": 40529,
+                    "id": 40566,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 40525,
+                        "id": 40562,
                         "name": "fathomInfo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40499,
+                        "referencedDeclaration": 40536,
                         "src": "2143:10:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_FathomInfo_$40470_memory_ptr",
+                          "typeIdentifier": "t_struct$_FathomInfo_$40507_memory_ptr",
                           "typeString": "struct FathomStatsMock.FathomInfo memory"
                         }
                       },
-                      "id": 40527,
+                      "id": 40564,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
@@ -3688,7 +3688,7 @@
                       "memberLocation": "2154:11:124",
                       "memberName": "closeFactor",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 40469,
+                      "referencedDeclaration": 40506,
                       "src": "2143:22:124",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -3699,7 +3699,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "3130303030",
-                      "id": 40528,
+                      "id": 40565,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -3719,32 +3719,32 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 40530,
+                  "id": 40567,
                   "nodeType": "ExpressionStatement",
                   "src": "2143:30:124"
                 },
                 {
                   "expression": {
-                    "id": 40531,
+                    "id": 40568,
                     "name": "fathomInfo",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 40499,
+                    "referencedDeclaration": 40536,
                     "src": "2196:10:124",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_FathomInfo_$40470_memory_ptr",
+                      "typeIdentifier": "t_struct$_FathomInfo_$40507_memory_ptr",
                       "typeString": "struct FathomStatsMock.FathomInfo memory"
                     }
                   },
-                  "functionReturnParameters": 40496,
-                  "id": 40532,
+                  "functionReturnParameters": 40533,
+                  "id": 40569,
                   "nodeType": "Return",
                   "src": "2189:17:124"
                 }
               ]
             },
             "functionSelector": "cd64e420",
-            "id": 40534,
+            "id": 40571,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -3752,47 +3752,47 @@
             "nameLocation": "1652:13:124",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 40492,
+              "id": 40529,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1665:2:124"
             },
             "returnParameters": {
-              "id": 40496,
+              "id": 40533,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 40495,
+                  "id": 40532,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 40534,
+                  "scope": 40571,
                   "src": "1691:17:124",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_struct$_FathomInfo_$40470_memory_ptr",
+                    "typeIdentifier": "t_struct$_FathomInfo_$40507_memory_ptr",
                     "typeString": "struct FathomStatsMock.FathomInfo"
                   },
                   "typeName": {
-                    "id": 40494,
+                    "id": 40531,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 40493,
+                      "id": 40530,
                       "name": "FathomInfo",
                       "nameLocations": [
                         "1691:10:124"
                       ],
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 40470,
+                      "referencedDeclaration": 40507,
                       "src": "1691:10:124"
                     },
-                    "referencedDeclaration": 40470,
+                    "referencedDeclaration": 40507,
                     "src": "1691:10:124",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_FathomInfo_$40470_storage_ptr",
+                      "typeIdentifier": "t_struct$_FathomInfo_$40507_storage_ptr",
                       "typeString": "struct FathomStatsMock.FathomInfo"
                     }
                   },
@@ -3801,7 +3801,7 @@
               ],
               "src": "1690:19:124"
             },
-            "scope": 40598,
+            "scope": 40635,
             "src": "1643:568:124",
             "stateMutability": "pure",
             "virtual": false,
@@ -3809,78 +3809,78 @@
           },
           {
             "body": {
-              "id": 40596,
+              "id": 40633,
               "nodeType": "Block",
               "src": "2277:725:124",
               "statements": [
                 {
                   "assignments": [
-                    40542
+                    40579
                   ],
                   "declarations": [
                     {
                       "constant": false,
-                      "id": 40542,
+                      "id": 40579,
                       "mutability": "mutable",
                       "name": "poolInfo",
                       "nameLocation": "2301:8:124",
                       "nodeType": "VariableDeclaration",
-                      "scope": 40596,
+                      "scope": 40633,
                       "src": "2285:24:124",
                       "stateVariable": false,
                       "storageLocation": "memory",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_PoolInfo_$40485_memory_ptr",
+                        "typeIdentifier": "t_struct$_PoolInfo_$40522_memory_ptr",
                         "typeString": "struct FathomStatsMock.PoolInfo"
                       },
                       "typeName": {
-                        "id": 40541,
+                        "id": 40578,
                         "nodeType": "UserDefinedTypeName",
                         "pathNode": {
-                          "id": 40540,
+                          "id": 40577,
                           "name": "PoolInfo",
                           "nameLocations": [
                             "2285:8:124"
                           ],
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 40485,
+                          "referencedDeclaration": 40522,
                           "src": "2285:8:124"
                         },
-                        "referencedDeclaration": 40485,
+                        "referencedDeclaration": 40522,
                         "src": "2285:8:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_PoolInfo_$40485_storage_ptr",
+                          "typeIdentifier": "t_struct$_PoolInfo_$40522_storage_ptr",
                           "typeString": "struct FathomStatsMock.PoolInfo"
                         }
                       },
                       "visibility": "internal"
                     }
                   ],
-                  "id": 40543,
+                  "id": 40580,
                   "nodeType": "VariableDeclarationStatement",
                   "src": "2285:24:124"
                 },
                 {
                   "expression": {
-                    "id": 40550,
+                    "id": 40587,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 40544,
+                        "id": 40581,
                         "name": "poolInfo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40542,
+                        "referencedDeclaration": 40579,
                         "src": "2317:8:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_PoolInfo_$40485_memory_ptr",
+                          "typeIdentifier": "t_struct$_PoolInfo_$40522_memory_ptr",
                           "typeString": "struct FathomStatsMock.PoolInfo memory"
                         }
                       },
-                      "id": 40546,
+                      "id": 40583,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
@@ -3888,7 +3888,7 @@
                       "memberLocation": "2326:22:124",
                       "memberName": "collateralLockedInPool",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 40472,
+                      "referencedDeclaration": 40509,
                       "src": "2317:31:124",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -3902,14 +3902,14 @@
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       },
-                      "id": 40549,
+                      "id": 40586,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "lValueRequested": false,
                       "leftExpression": {
                         "hexValue": "33",
-                        "id": 40547,
+                        "id": 40584,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -3926,11 +3926,11 @@
                       "nodeType": "BinaryOperation",
                       "operator": "*",
                       "rightExpression": {
-                        "id": 40548,
+                        "id": 40585,
                         "name": "WAD",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40433,
+                        "referencedDeclaration": 40470,
                         "src": "2355:3:124",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -3949,31 +3949,31 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 40551,
+                  "id": 40588,
                   "nodeType": "ExpressionStatement",
                   "src": "2317:41:124"
                 },
                 {
                   "expression": {
-                    "id": 40558,
+                    "id": 40595,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 40552,
+                        "id": 40589,
                         "name": "poolInfo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40542,
+                        "referencedDeclaration": 40579,
                         "src": "2366:8:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_PoolInfo_$40485_memory_ptr",
+                          "typeIdentifier": "t_struct$_PoolInfo_$40522_memory_ptr",
                           "typeString": "struct FathomStatsMock.PoolInfo memory"
                         }
                       },
-                      "id": 40554,
+                      "id": 40591,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
@@ -3981,7 +3981,7 @@
                       "memberLocation": "2375:29:124",
                       "memberName": "collateralAvailableToWithdraw",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 40474,
+                      "referencedDeclaration": 40511,
                       "src": "2366:38:124",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -3995,14 +3995,14 @@
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       },
-                      "id": 40557,
+                      "id": 40594,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "lValueRequested": false,
                       "leftExpression": {
                         "hexValue": "31",
-                        "id": 40555,
+                        "id": 40592,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -4019,11 +4019,11 @@
                       "nodeType": "BinaryOperation",
                       "operator": "*",
                       "rightExpression": {
-                        "id": 40556,
+                        "id": 40593,
                         "name": "WAD",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40433,
+                        "referencedDeclaration": 40470,
                         "src": "2411:3:124",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -4042,31 +4042,31 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 40559,
+                  "id": 40596,
                   "nodeType": "ExpressionStatement",
                   "src": "2366:48:124"
                 },
                 {
                   "expression": {
-                    "id": 40566,
+                    "id": 40603,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 40560,
+                        "id": 40597,
                         "name": "poolInfo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40542,
+                        "referencedDeclaration": 40579,
                         "src": "2422:8:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_PoolInfo_$40485_memory_ptr",
+                          "typeIdentifier": "t_struct$_PoolInfo_$40522_memory_ptr",
                           "typeString": "struct FathomStatsMock.PoolInfo memory"
                         }
                       },
-                      "id": 40562,
+                      "id": 40599,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
@@ -4074,7 +4074,7 @@
                       "memberLocation": "2431:11:124",
                       "memberName": "FXDBorrowed",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 40476,
+                      "referencedDeclaration": 40513,
                       "src": "2422:20:124",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -4088,14 +4088,14 @@
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       },
-                      "id": 40565,
+                      "id": 40602,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "lValueRequested": false,
                       "leftExpression": {
                         "hexValue": "32",
-                        "id": 40563,
+                        "id": 40600,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -4112,11 +4112,11 @@
                       "nodeType": "BinaryOperation",
                       "operator": "*",
                       "rightExpression": {
-                        "id": 40564,
+                        "id": 40601,
                         "name": "WAD",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40433,
+                        "referencedDeclaration": 40470,
                         "src": "2449:3:124",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -4135,31 +4135,31 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 40567,
+                  "id": 40604,
                   "nodeType": "ExpressionStatement",
                   "src": "2422:30:124"
                 },
                 {
                   "expression": {
-                    "id": 40580,
+                    "id": 40617,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 40568,
+                        "id": 40605,
                         "name": "poolInfo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40542,
+                        "referencedDeclaration": 40579,
                         "src": "2460:8:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_PoolInfo_$40485_memory_ptr",
+                          "typeIdentifier": "t_struct$_PoolInfo_$40522_memory_ptr",
                           "typeString": "struct FathomStatsMock.PoolInfo memory"
                         }
                       },
-                      "id": 40570,
+                      "id": 40607,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
@@ -4167,7 +4167,7 @@
                       "memberLocation": "2469:9:124",
                       "memberName": "debtRatio",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 40480,
+                      "referencedDeclaration": 40517,
                       "src": "2460:18:124",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -4181,7 +4181,7 @@
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
                       },
-                      "id": 40579,
+                      "id": 40616,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -4191,7 +4191,7 @@
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
                         },
-                        "id": 40577,
+                        "id": 40614,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -4201,7 +4201,7 @@
                             "typeIdentifier": "t_uint256",
                             "typeString": "uint256"
                           },
-                          "id": 40575,
+                          "id": 40612,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -4211,14 +4211,14 @@
                               "typeIdentifier": "t_uint256",
                               "typeString": "uint256"
                             },
-                            "id": 40573,
+                            "id": 40610,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "lValueRequested": false,
                             "leftExpression": {
                               "hexValue": "32",
-                              "id": 40571,
+                              "id": 40608,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": true,
@@ -4235,11 +4235,11 @@
                             "nodeType": "BinaryOperation",
                             "operator": "*",
                             "rightExpression": {
-                              "id": 40572,
+                              "id": 40609,
                               "name": "WAD",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 40433,
+                              "referencedDeclaration": 40470,
                               "src": "2485:3:124",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_uint256",
@@ -4256,7 +4256,7 @@
                           "operator": "*",
                           "rightExpression": {
                             "hexValue": "31303030",
-                            "id": 40574,
+                            "id": 40611,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
@@ -4280,7 +4280,7 @@
                         "operator": "/",
                         "rightExpression": {
                           "hexValue": "33",
-                          "id": 40576,
+                          "id": 40613,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -4303,11 +4303,11 @@
                       "nodeType": "BinaryOperation",
                       "operator": "*",
                       "rightExpression": {
-                        "id": 40578,
+                        "id": 40615,
                         "name": "WAD",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40433,
+                        "referencedDeclaration": 40470,
                         "src": "2502:3:124",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
@@ -4326,31 +4326,31 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 40581,
+                  "id": 40618,
                   "nodeType": "ExpressionStatement",
                   "src": "2460:45:124"
                 },
                 {
                   "expression": {
-                    "id": 40586,
+                    "id": 40623,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 40582,
+                        "id": 40619,
                         "name": "poolInfo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40542,
+                        "referencedDeclaration": 40579,
                         "src": "2513:8:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_PoolInfo_$40485_memory_ptr",
+                          "typeIdentifier": "t_struct$_PoolInfo_$40522_memory_ptr",
                           "typeString": "struct FathomStatsMock.PoolInfo memory"
                         }
                       },
-                      "id": 40584,
+                      "id": 40621,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
@@ -4358,7 +4358,7 @@
                       "memberLocation": "2522:16:124",
                       "memberName": "liquidationRatio",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 40482,
+                      "referencedDeclaration": 40519,
                       "src": "2513:25:124",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -4369,7 +4369,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "31303030303030303030303030303030303030303030303030303030",
-                      "id": 40585,
+                      "id": 40622,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -4389,31 +4389,31 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 40587,
+                  "id": 40624,
                   "nodeType": "ExpressionStatement",
                   "src": "2513:56:124"
                 },
                 {
                   "expression": {
-                    "id": 40592,
+                    "id": 40629,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
                       "expression": {
-                        "id": 40588,
+                        "id": 40625,
                         "name": "poolInfo",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 40542,
+                        "referencedDeclaration": 40579,
                         "src": "2577:8:124",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_PoolInfo_$40485_memory_ptr",
+                          "typeIdentifier": "t_struct$_PoolInfo_$40522_memory_ptr",
                           "typeString": "struct FathomStatsMock.PoolInfo memory"
                         }
                       },
-                      "id": 40590,
+                      "id": 40627,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
@@ -4421,7 +4421,7 @@
                       "memberLocation": "2586:22:124",
                       "memberName": "liquidatorIncentiveBps",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 40484,
+                      "referencedDeclaration": 40521,
                       "src": "2577:31:124",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
@@ -4432,7 +4432,7 @@
                     "operator": "=",
                     "rightHandSide": {
                       "hexValue": "3130353030",
-                      "id": 40591,
+                      "id": 40628,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
@@ -4452,32 +4452,32 @@
                       "typeString": "uint256"
                     }
                   },
-                  "id": 40593,
+                  "id": 40630,
                   "nodeType": "ExpressionStatement",
                   "src": "2577:39:124"
                 },
                 {
                   "expression": {
-                    "id": 40594,
+                    "id": 40631,
                     "name": "poolInfo",
                     "nodeType": "Identifier",
                     "overloadedDeclarations": [],
-                    "referencedDeclaration": 40542,
+                    "referencedDeclaration": 40579,
                     "src": "2631:8:124",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_PoolInfo_$40485_memory_ptr",
+                      "typeIdentifier": "t_struct$_PoolInfo_$40522_memory_ptr",
                       "typeString": "struct FathomStatsMock.PoolInfo memory"
                     }
                   },
-                  "functionReturnParameters": 40539,
-                  "id": 40595,
+                  "functionReturnParameters": 40576,
+                  "id": 40632,
                   "nodeType": "Return",
                   "src": "2624:15:124"
                 }
               ]
             },
             "functionSelector": "60246c88",
-            "id": 40597,
+            "id": 40634,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -4485,47 +4485,47 @@
             "nameLocation": "2223:11:124",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 40535,
+              "id": 40572,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "2234:2:124"
             },
             "returnParameters": {
-              "id": 40539,
+              "id": 40576,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 40538,
+                  "id": 40575,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 40597,
+                  "scope": 40634,
                   "src": "2260:15:124",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_struct$_PoolInfo_$40485_memory_ptr",
+                    "typeIdentifier": "t_struct$_PoolInfo_$40522_memory_ptr",
                     "typeString": "struct FathomStatsMock.PoolInfo"
                   },
                   "typeName": {
-                    "id": 40537,
+                    "id": 40574,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 40536,
+                      "id": 40573,
                       "name": "PoolInfo",
                       "nameLocations": [
                         "2260:8:124"
                       ],
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 40485,
+                      "referencedDeclaration": 40522,
                       "src": "2260:8:124"
                     },
-                    "referencedDeclaration": 40485,
+                    "referencedDeclaration": 40522,
                     "src": "2260:8:124",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_PoolInfo_$40485_storage_ptr",
+                      "typeIdentifier": "t_struct$_PoolInfo_$40522_storage_ptr",
                       "typeString": "struct FathomStatsMock.PoolInfo"
                     }
                   },
@@ -4534,14 +4534,14 @@
               ],
               "src": "2259:17:124"
             },
-            "scope": 40598,
+            "scope": 40635,
             "src": "2214:788:124",
             "stateMutability": "pure",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 40599,
+        "scope": 40636,
         "src": "352:2652:124",
         "usedErrors": []
       }
@@ -4554,7 +4554,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-21T07:57:45.123Z",
+  "updatedAt": "2022-10-21T12:59:12.657Z",
   "devdoc": {
     "kind": "dev",
     "methods": {
