@@ -12,8 +12,8 @@ const CLOSE_FACTOR_BPS = BigNumber.from(5000)   // <- 0.5
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)  // <- 1.05
 const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
 
-// const rawdata = fs.readFileSync('../../../../addresses.json');
-const rawdata = fs.readFileSync('../../../../addresses_ApothemV1.json');
+const rawdata = fs.readFileSync('../../../../addresses.json');
+// const rawdata = fs.readFileSync('../../../../addresses_ApothemV1.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
 const CollateralPoolConfig = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
@@ -28,9 +28,14 @@ module.exports = async function(deployer) {
 
   const bookKeeper = await BookKeeper.at(stablecoinAddress.bookKeeper);
 
-  const simplePriceFeedUSDT = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeedUSDT);
+  const simplePriceFeedFTHM = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeedFTHM);
 
   const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
+
+  console.log("stablecoinAddress.simplePriceFeedFTHM is " + stablecoinAddress.simplePriceFeedFTHM);
+  console.log("stablecoinAddress.collateralTokenAdapterFTHM is " + stablecoinAddress.collateralTokenAdapterFTHM);
+  console.log("stablecoinAddress.fixedSpreadLiquidationStrategy is " +   stablecoinAddress.fixedSpreadLiquidationStrategy);
+
 
   await collateralPoolConfig.initCollateralPool(
     COLLATERAL_POOL_ID,  //<-_collateralPoolId
@@ -53,6 +58,6 @@ module.exports = async function(deployer) {
   await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, debtCeilingSetUpUSDT, { gasLimit: 1000000 });
 //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay);
   //setting _rawPrice and _priceWithSafetyMargin of WXDC to 100
-  await simplePriceFeedUSDT.setPrice(WeiPerWad.mul(1), { gasLimit: 1000000 });
+  await simplePriceFeedFTHM.setPrice(WeiPerWad.mul(1), { gasLimit: 1000000 });
   await priceOracle.setPrice(COLLATERAL_POOL_ID, { gasLimit: 1000000 });
 }

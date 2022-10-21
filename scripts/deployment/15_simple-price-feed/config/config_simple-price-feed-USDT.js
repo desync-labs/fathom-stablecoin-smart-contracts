@@ -1,6 +1,6 @@
 const fs = require('fs');
-// const rawdata = fs.readFileSync('../../../../addresses.json');
-// let stablecoinAddress = JSON.parse(rawdata);
+const rawdata = fs.readFileSync('../../../../addresses.json');
+let stablecoinAddress = JSON.parse(rawdata);
 
 const { BigNumber } = require("ethers");
 
@@ -11,7 +11,7 @@ const SimplePriceFeed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.
 module.exports =  async function(deployer) {
   console.log(">> Initializing SimplePriceFeedUSDT")
 
-  const simplePriceFeedUSDT = await SimplePriceFeed.at("0xDd05E583E625928A6cddbBc6050a82d3D3446C0a");
+  const simplePriceFeedUSDT = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeedUSDT);
 
   // await simplePriceFeedUSDT.setPrice(WeiPerWad.div(100).toString());
 

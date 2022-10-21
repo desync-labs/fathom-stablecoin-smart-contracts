@@ -1,0 +1,10 @@
+{
+    "0x5d6d53ce6cbb040d5c10a5aeab32ebb0ba177e86efc2277fa646c9f96e72b069": {
+        "interface": "/Users/sangjun.lee/Sangjun/fathom-stablecoin-smart-contracts/contracts/8.17/price-feeders/SimplePriceFeed.sol",
+        "address": "0x01Bc4D3fc20e27CaC45f109b841bad073BE9fCcD",
+        "action": "setPrice",
+        "args": "[\"200000000000000000000\"]",
+        "txHash": "0x1c5af31893662a714d3c4f928c60355f58b1b2266214372061ec13d1610815ee",
+        "nonce": 128
+    }
+}

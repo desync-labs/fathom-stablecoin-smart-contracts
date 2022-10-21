@@ -78,74 +78,74 @@
     "absolutePath": "project:/contracts/8.17/interfaces/IStableSwapModule.sol",
     "exportedSymbols": {
       "IAccessControlConfig": [
-        17559
+        17803
       ],
       "IAuthTokenAdapter": [
-        17616
+        17860
       ],
       "IBookKeeper": [
-        17785
+        18029
       ],
       "ICollateralPoolConfig": [
-        18019
+        18263
       ],
       "IGenericTokenAdapter": [
-        18488
+        18732
       ],
       "ILiquidationStrategy": [
-        18535
+        18779
       ],
       "IPriceFeed": [
-        18704
+        18948
       ],
       "IStableSwapModule": [
-        18818
+        19062
       ],
       "IStablecoin": [
-        18838
+        19082
       ],
       "IStablecoinAdapter": [
-        18873
+        19117
       ],
       "IToken": [
-        19012
+        19256
       ]
     },
-    "id": 18819,
+    "id": 19063,
     "license": "AGPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 18789,
+        "id": 19033,
         "literals": [
           "solidity",
           "0.8",
           ".17"
         ],
         "nodeType": "PragmaDirective",
-        "src": "47:23:62"
+        "src": "47:23:63"
       },
       {
         "absolutePath": "project:/contracts/8.17/interfaces/IAuthTokenAdapter.sol",
         "file": "../interfaces/IAuthTokenAdapter.sol",
-        "id": 18790,
+        "id": 19034,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 18819,
-        "sourceUnit": 17617,
-        "src": "72:45:62",
+        "scope": 19063,
+        "sourceUnit": 17861,
+        "src": "72:45:63",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
         "absolutePath": "project:/contracts/8.17/interfaces/IStablecoinAdapter.sol",
         "file": "../interfaces/IStablecoinAdapter.sol",
-        "id": 18791,
+        "id": 19035,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 18819,
-        "sourceUnit": 18874,
-        "src": "118:46:62",
+        "scope": 19063,
+        "sourceUnit": 19118,
+        "src": "118:46:63",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -156,36 +156,36 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 18818,
+        "id": 19062,
         "linearizedBaseContracts": [
-          18818
+          19062
         ],
         "name": "IStableSwapModule",
-        "nameLocation": "176:17:62",
+        "nameLocation": "176:17:63",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "40853dce",
-            "id": 18798,
+            "id": 19042,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "swapTokenToStablecoin",
-            "nameLocation": "207:21:62",
+            "nameLocation": "207:21:63",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 18796,
+              "id": 19040,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18793,
+                  "id": 19037,
                   "mutability": "mutable",
                   "name": "usr",
-                  "nameLocation": "237:3:62",
+                  "nameLocation": "237:3:63",
                   "nodeType": "VariableDeclaration",
-                  "scope": 18798,
-                  "src": "229:11:62",
+                  "scope": 19042,
+                  "src": "229:11:63",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -193,10 +193,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18792,
+                    "id": 19036,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "229:7:62",
+                    "src": "229:7:63",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -207,13 +207,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 18795,
+                  "id": 19039,
                   "mutability": "mutable",
                   "name": "tokenAmount",
-                  "nameLocation": "250:11:62",
+                  "nameLocation": "250:11:63",
                   "nodeType": "VariableDeclaration",
-                  "scope": 18798,
-                  "src": "242:19:62",
+                  "scope": 19042,
+                  "src": "242:19:63",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -221,10 +221,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 18794,
+                    "id": 19038,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "242:7:62",
+                    "src": "242:7:63",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -233,42 +233,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "228:34:62"
+              "src": "228:34:63"
             },
             "returnParameters": {
-              "id": 18797,
+              "id": 19041,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "271:0:62"
+              "src": "271:0:63"
             },
-            "scope": 18818,
-            "src": "198:74:62",
+            "scope": 19062,
+            "src": "198:74:63",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "81e28cc7",
-            "id": 18805,
+            "id": 19049,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "swapStablecoinToToken",
-            "nameLocation": "285:21:62",
+            "nameLocation": "285:21:63",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 18803,
+              "id": 19047,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18800,
+                  "id": 19044,
                   "mutability": "mutable",
                   "name": "usr",
-                  "nameLocation": "315:3:62",
+                  "nameLocation": "315:3:63",
                   "nodeType": "VariableDeclaration",
-                  "scope": 18805,
-                  "src": "307:11:62",
+                  "scope": 19049,
+                  "src": "307:11:63",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -276,10 +276,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 18799,
+                    "id": 19043,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "307:7:62",
+                    "src": "307:7:63",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -290,13 +290,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 18802,
+                  "id": 19046,
                   "mutability": "mutable",
                   "name": "tokenAmount",
-                  "nameLocation": "328:11:62",
+                  "nameLocation": "328:11:63",
                   "nodeType": "VariableDeclaration",
-                  "scope": 18805,
-                  "src": "320:19:62",
+                  "scope": 19049,
+                  "src": "320:19:63",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -304,10 +304,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 18801,
+                    "id": 19045,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "320:7:62",
+                    "src": "320:7:63",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -316,157 +316,157 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "306:34:62"
+              "src": "306:34:63"
             },
             "returnParameters": {
-              "id": 18804,
+              "id": 19048,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "349:0:62"
+              "src": "349:0:63"
             },
-            "scope": 18818,
-            "src": "276:74:62",
+            "scope": 19062,
+            "src": "276:74:63",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "e723b977",
-            "id": 18811,
+            "id": 19055,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "authTokenAdapter",
-            "nameLocation": "363:16:62",
+            "nameLocation": "363:16:63",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 18806,
+              "id": 19050,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "379:2:62"
+              "src": "379:2:63"
             },
             "returnParameters": {
-              "id": 18810,
+              "id": 19054,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18809,
+                  "id": 19053,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 18811,
-                  "src": "405:17:62",
+                  "scope": 19055,
+                  "src": "405:17:63",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_IAuthTokenAdapter_$17616",
+                    "typeIdentifier": "t_contract$_IAuthTokenAdapter_$17860",
                     "typeString": "contract IAuthTokenAdapter"
                   },
                   "typeName": {
-                    "id": 18808,
+                    "id": 19052,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 18807,
+                      "id": 19051,
                       "name": "IAuthTokenAdapter",
                       "nameLocations": [
-                        "405:17:62"
+                        "405:17:63"
                       ],
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 17616,
-                      "src": "405:17:62"
+                      "referencedDeclaration": 17860,
+                      "src": "405:17:63"
                     },
-                    "referencedDeclaration": 17616,
-                    "src": "405:17:62",
+                    "referencedDeclaration": 17860,
+                    "src": "405:17:63",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IAuthTokenAdapter_$17616",
+                      "typeIdentifier": "t_contract$_IAuthTokenAdapter_$17860",
                       "typeString": "contract IAuthTokenAdapter"
                     }
                   },
                   "visibility": "internal"
                 }
               ],
-              "src": "404:19:62"
+              "src": "404:19:63"
             },
-            "scope": 18818,
-            "src": "354:70:62",
+            "scope": 19062,
+            "src": "354:70:63",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "46a311d3",
-            "id": 18817,
+            "id": 19061,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "stablecoinAdapter",
-            "nameLocation": "437:17:62",
+            "nameLocation": "437:17:63",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 18812,
+              "id": 19056,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "454:2:62"
+              "src": "454:2:63"
             },
             "returnParameters": {
-              "id": 18816,
+              "id": 19060,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18815,
+                  "id": 19059,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 18817,
-                  "src": "480:18:62",
+                  "scope": 19061,
+                  "src": "480:18:63",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_contract$_IStablecoinAdapter_$18873",
+                    "typeIdentifier": "t_contract$_IStablecoinAdapter_$19117",
                     "typeString": "contract IStablecoinAdapter"
                   },
                   "typeName": {
-                    "id": 18814,
+                    "id": 19058,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 18813,
+                      "id": 19057,
                       "name": "IStablecoinAdapter",
                       "nameLocations": [
-                        "480:18:62"
+                        "480:18:63"
                       ],
                       "nodeType": "IdentifierPath",
-                      "referencedDeclaration": 18873,
-                      "src": "480:18:62"
+                      "referencedDeclaration": 19117,
+                      "src": "480:18:63"
                     },
-                    "referencedDeclaration": 18873,
-                    "src": "480:18:62",
+                    "referencedDeclaration": 19117,
+                    "src": "480:18:63",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IStablecoinAdapter_$18873",
+                      "typeIdentifier": "t_contract$_IStablecoinAdapter_$19117",
                       "typeString": "contract IStablecoinAdapter"
                     }
                   },
                   "visibility": "internal"
                 }
               ],
-              "src": "479:20:62"
+              "src": "479:20:63"
             },
-            "scope": 18818,
-            "src": "428:72:62",
+            "scope": 19062,
+            "src": "428:72:63",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 18819,
-        "src": "166:336:62",
+        "scope": 19063,
+        "src": "166:336:63",
         "usedErrors": []
       }
     ],
-    "src": "47:456:62"
+    "src": "47:456:63"
   },
   "compiler": {
     "name": "solc",
@@ -474,7 +474,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-06T11:28:50.101Z",
+  "updatedAt": "2022-10-21T12:59:12.519Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

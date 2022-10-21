@@ -179,22 +179,22 @@
     "absolutePath": "project:/contracts/8.17/price-oracles/lib/IFathomSwapFactory.sol",
     "exportedSymbols": {
       "IFathomSwapFactory": [
-        24690
+        24970
       ]
     },
-    "id": 24691,
+    "id": 24971,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 24629,
+        "id": 24909,
         "literals": [
           "solidity",
           "0.8",
           ".17"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:95"
+        "src": "33:23:97"
       },
       {
         "abstract": false,
@@ -203,35 +203,35 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 24690,
+        "id": 24970,
         "linearizedBaseContracts": [
-          24690
+          24970
         ],
         "name": "IFathomSwapFactory",
-        "nameLocation": "68:18:95",
+        "nameLocation": "68:18:97",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "anonymous": false,
             "eventSelector": "0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9",
-            "id": 24639,
+            "id": 24919,
             "name": "PairCreated",
-            "nameLocation": "99:11:95",
+            "nameLocation": "99:11:97",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 24638,
+              "id": 24918,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24631,
+                  "id": 24911,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "token0",
-                  "nameLocation": "127:6:95",
+                  "nameLocation": "127:6:97",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24639,
-                  "src": "111:22:95",
+                  "scope": 24919,
+                  "src": "111:22:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -239,10 +239,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24630,
+                    "id": 24910,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "111:7:95",
+                    "src": "111:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -253,14 +253,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 24633,
+                  "id": 24913,
                   "indexed": true,
                   "mutability": "mutable",
                   "name": "token1",
-                  "nameLocation": "151:6:95",
+                  "nameLocation": "151:6:97",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24639,
-                  "src": "135:22:95",
+                  "scope": 24919,
+                  "src": "135:22:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -268,10 +268,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24632,
+                    "id": 24912,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "135:7:95",
+                    "src": "135:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -282,14 +282,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 24635,
+                  "id": 24915,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "pair",
-                  "nameLocation": "167:4:95",
+                  "nameLocation": "167:4:97",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24639,
-                  "src": "159:12:95",
+                  "scope": 24919,
+                  "src": "159:12:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -297,10 +297,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24634,
+                    "id": 24914,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "159:7:95",
+                    "src": "159:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -311,14 +311,14 @@
                 },
                 {
                   "constant": false,
-                  "id": 24637,
+                  "id": 24917,
                   "indexed": false,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24639,
-                  "src": "173:4:95",
+                  "scope": 24919,
+                  "src": "173:4:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -326,10 +326,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 24636,
+                    "id": 24916,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "173:4:95",
+                    "src": "173:4:97",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -338,38 +338,38 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "110:68:95"
+              "src": "110:68:97"
             },
-            "src": "93:86:95"
+            "src": "93:86:97"
           },
           {
             "functionSelector": "017e7e58",
-            "id": 24644,
+            "id": 24924,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "feeTo",
-            "nameLocation": "194:5:95",
+            "nameLocation": "194:5:97",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 24640,
+              "id": 24920,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "199:2:95"
+              "src": "199:2:97"
             },
             "returnParameters": {
-              "id": 24643,
+              "id": 24923,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24642,
+                  "id": 24922,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24644,
-                  "src": "225:7:95",
+                  "scope": 24924,
+                  "src": "225:7:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -377,10 +377,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24641,
+                    "id": 24921,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "225:7:95",
+                    "src": "225:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -390,42 +390,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "224:9:95"
+              "src": "224:9:97"
             },
-            "scope": 24690,
-            "src": "185:49:95",
+            "scope": 24970,
+            "src": "185:49:97",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "094b7415",
-            "id": 24649,
+            "id": 24929,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "feeToSetter",
-            "nameLocation": "248:11:95",
+            "nameLocation": "248:11:97",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 24645,
+              "id": 24925,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "259:2:95"
+              "src": "259:2:97"
             },
             "returnParameters": {
-              "id": 24648,
+              "id": 24928,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24647,
+                  "id": 24927,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24649,
-                  "src": "285:7:95",
+                  "scope": 24929,
+                  "src": "285:7:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -433,10 +433,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24646,
+                    "id": 24926,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "285:7:95",
+                    "src": "285:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -446,36 +446,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "284:9:95"
+              "src": "284:9:97"
             },
-            "scope": 24690,
-            "src": "239:55:95",
+            "scope": 24970,
+            "src": "239:55:97",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "e6a43905",
-            "id": 24658,
+            "id": 24938,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getPair",
-            "nameLocation": "309:7:95",
+            "nameLocation": "309:7:97",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 24654,
+              "id": 24934,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24651,
+                  "id": 24931,
                   "mutability": "mutable",
                   "name": "tokenA",
-                  "nameLocation": "325:6:95",
+                  "nameLocation": "325:6:97",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24658,
-                  "src": "317:14:95",
+                  "scope": 24938,
+                  "src": "317:14:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -483,10 +483,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24650,
+                    "id": 24930,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "317:7:95",
+                    "src": "317:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -497,13 +497,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 24653,
+                  "id": 24933,
                   "mutability": "mutable",
                   "name": "tokenB",
-                  "nameLocation": "341:6:95",
+                  "nameLocation": "341:6:97",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24658,
-                  "src": "333:14:95",
+                  "scope": 24938,
+                  "src": "333:14:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -511,10 +511,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24652,
+                    "id": 24932,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "333:7:95",
+                    "src": "333:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -524,21 +524,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "316:32:95"
+              "src": "316:32:97"
             },
             "returnParameters": {
-              "id": 24657,
+              "id": 24937,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24656,
+                  "id": 24936,
                   "mutability": "mutable",
                   "name": "pair",
-                  "nameLocation": "380:4:95",
+                  "nameLocation": "380:4:97",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24658,
-                  "src": "372:12:95",
+                  "scope": 24938,
+                  "src": "372:12:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -546,10 +546,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24655,
+                    "id": 24935,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "372:7:95",
+                    "src": "372:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -559,36 +559,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "371:14:95"
+              "src": "371:14:97"
             },
-            "scope": 24690,
-            "src": "300:86:95",
+            "scope": 24970,
+            "src": "300:86:97",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "1e3dd18b",
-            "id": 24665,
+            "id": 24945,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "allPairs",
-            "nameLocation": "400:8:95",
+            "nameLocation": "400:8:97",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 24661,
+              "id": 24941,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24660,
+                  "id": 24940,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24665,
-                  "src": "409:4:95",
+                  "scope": 24945,
+                  "src": "409:4:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -596,10 +596,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 24659,
+                    "id": 24939,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "409:4:95",
+                    "src": "409:4:97",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -608,21 +608,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "408:6:95"
+              "src": "408:6:97"
             },
             "returnParameters": {
-              "id": 24664,
+              "id": 24944,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24663,
+                  "id": 24943,
                   "mutability": "mutable",
                   "name": "pair",
-                  "nameLocation": "446:4:95",
+                  "nameLocation": "446:4:97",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24665,
-                  "src": "438:12:95",
+                  "scope": 24945,
+                  "src": "438:12:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -630,10 +630,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24662,
+                    "id": 24942,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "438:7:95",
+                    "src": "438:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -643,42 +643,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "437:14:95"
+              "src": "437:14:97"
             },
-            "scope": 24690,
-            "src": "391:61:95",
+            "scope": 24970,
+            "src": "391:61:97",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "574f2ba3",
-            "id": 24670,
+            "id": 24950,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "allPairsLength",
-            "nameLocation": "466:14:95",
+            "nameLocation": "466:14:97",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 24666,
+              "id": 24946,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "480:2:95"
+              "src": "480:2:97"
             },
             "returnParameters": {
-              "id": 24669,
+              "id": 24949,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24668,
+                  "id": 24948,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24670,
-                  "src": "506:4:95",
+                  "scope": 24950,
+                  "src": "506:4:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -686,10 +686,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 24667,
+                    "id": 24947,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "506:4:95",
+                    "src": "506:4:97",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -698,36 +698,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "505:6:95"
+              "src": "505:6:97"
             },
-            "scope": 24690,
-            "src": "457:55:95",
+            "scope": 24970,
+            "src": "457:55:97",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "c9c65396",
-            "id": 24679,
+            "id": 24959,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "createPair",
-            "nameLocation": "527:10:95",
+            "nameLocation": "527:10:97",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 24675,
+              "id": 24955,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24672,
+                  "id": 24952,
                   "mutability": "mutable",
                   "name": "tokenA",
-                  "nameLocation": "546:6:95",
+                  "nameLocation": "546:6:97",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24679,
-                  "src": "538:14:95",
+                  "scope": 24959,
+                  "src": "538:14:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -735,10 +735,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24671,
+                    "id": 24951,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "538:7:95",
+                    "src": "538:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -749,13 +749,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 24674,
+                  "id": 24954,
                   "mutability": "mutable",
                   "name": "tokenB",
-                  "nameLocation": "562:6:95",
+                  "nameLocation": "562:6:97",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24679,
-                  "src": "554:14:95",
+                  "scope": 24959,
+                  "src": "554:14:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -763,10 +763,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24673,
+                    "id": 24953,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "554:7:95",
+                    "src": "554:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -776,21 +776,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "537:32:95"
+              "src": "537:32:97"
             },
             "returnParameters": {
-              "id": 24678,
+              "id": 24958,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24677,
+                  "id": 24957,
                   "mutability": "mutable",
                   "name": "pair",
-                  "nameLocation": "596:4:95",
+                  "nameLocation": "596:4:97",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24679,
-                  "src": "588:12:95",
+                  "scope": 24959,
+                  "src": "588:12:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -798,10 +798,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24676,
+                    "id": 24956,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "588:7:95",
+                    "src": "588:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -811,36 +811,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "587:14:95"
+              "src": "587:14:97"
             },
-            "scope": 24690,
-            "src": "518:84:95",
+            "scope": 24970,
+            "src": "518:84:97",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "f46901ed",
-            "id": 24684,
+            "id": 24964,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "setFeeTo",
-            "nameLocation": "617:8:95",
+            "nameLocation": "617:8:97",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 24682,
+              "id": 24962,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24681,
+                  "id": 24961,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24684,
-                  "src": "626:7:95",
+                  "scope": 24964,
+                  "src": "626:7:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -848,10 +848,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24680,
+                    "id": 24960,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "626:7:95",
+                    "src": "626:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -861,42 +861,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "625:9:95"
+              "src": "625:9:97"
             },
             "returnParameters": {
-              "id": 24683,
+              "id": 24963,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "643:0:95"
+              "src": "643:0:97"
             },
-            "scope": 24690,
-            "src": "608:36:95",
+            "scope": 24970,
+            "src": "608:36:97",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "a2e74af6",
-            "id": 24689,
+            "id": 24969,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "setFeeToSetter",
-            "nameLocation": "658:14:95",
+            "nameLocation": "658:14:97",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 24687,
+              "id": 24967,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 24686,
+                  "id": 24966,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 24689,
-                  "src": "673:7:95",
+                  "scope": 24969,
+                  "src": "673:7:97",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -904,10 +904,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 24685,
+                    "id": 24965,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "673:7:95",
+                    "src": "673:7:97",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -917,27 +917,27 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "672:9:95"
+              "src": "672:9:97"
             },
             "returnParameters": {
-              "id": 24688,
+              "id": 24968,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "690:0:95"
+              "src": "690:0:97"
             },
-            "scope": 24690,
-            "src": "649:42:95",
+            "scope": 24970,
+            "src": "649:42:97",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 24691,
-        "src": "58:635:95",
+        "scope": 24971,
+        "src": "58:635:97",
         "usedErrors": []
       }
     ],
-    "src": "33:661:95"
+    "src": "33:661:97"
   },
   "compiler": {
     "name": "solc",
@@ -945,7 +945,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-06T11:28:50.177Z",
+  "updatedAt": "2022-10-21T12:59:12.566Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

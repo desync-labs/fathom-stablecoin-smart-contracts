@@ -16,7 +16,7 @@
     },
     {
       "inputs": [],
-      "name": "getUSDTPrice",
+      "name": "getFTHMPrice",
       "outputs": [
         {
           "internalType": "uint256",
@@ -28,7 +28,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"getUSDTPrice\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getWXDCPrice\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/8.17/stats/interfaces/IFathomStats.sol\":\"IFathomStats\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/8.17/stats/interfaces/IFathomStats.sol\":{\"keccak256\":\"0x3678de666de706fdc0c62ebb95014b1dc5b4c49d1917c59f3175464904bc7fa5\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://2b4c876c617e045f0c36757a45e3fc15a63fc925a7e3f617e12164ef431e66c3\",\"dweb:/ipfs/QmYg98epe8NNaxePproWZkxRmn4za7nc7LScRrpyPU4GSJ\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"getFTHMPrice\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getWXDCPrice\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/8.17/stats/interfaces/IFathomStats.sol\":\"IFathomStats\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/8.17/stats/interfaces/IFathomStats.sol\":{\"keccak256\":\"0xe3b15c1f116d77cff721695d6a78255c22f008ddee35472ab09f11034f7f80a4\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://ef31ba9648cee265aa5937af92f2a34d9dde492b7f12ec4c2e4a0ff288813a41\",\"dweb:/ipfs/QmfJkxK5w4tdjAjicdEwNpjL4FZjbK2wo99LEZNHqybLnh\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -36,37 +36,37 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity 0.8.17;\npragma experimental ABIEncoderV2;\n\ninterface IFathomStats {\n  // Information query functions\n  function getWXDCPrice() external view returns (uint256);\n  function getUSDTPrice() external view returns (uint256);\n}\n",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity 0.8.17;\npragma experimental ABIEncoderV2;\n\ninterface IFathomStats {\n  // Information query functions\n  function getWXDCPrice() external view returns (uint256);\n  function getFTHMPrice() external view returns (uint256);\n}\n",
   "sourcePath": "/Users/sangjun.lee/Sangjun/fathom-stablecoin-smart-contracts/contracts/8.17/stats/interfaces/IFathomStats.sol",
   "ast": {
     "absolutePath": "project:/contracts/8.17/stats/interfaces/IFathomStats.sol",
     "exportedSymbols": {
       "IFathomStats": [
-        41046
+        41385
       ]
     },
-    "id": 41047,
+    "id": 41386,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 41034,
+        "id": 41373,
         "literals": [
           "solidity",
           "0.8",
           ".17"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:128"
+        "src": "33:23:130"
       },
       {
-        "id": 41035,
+        "id": 41374,
         "literals": [
           "experimental",
           "ABIEncoderV2"
         ],
         "nodeType": "PragmaDirective",
-        "src": "57:33:128"
+        "src": "57:33:130"
       },
       {
         "abstract": false,
@@ -75,42 +75,42 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 41046,
+        "id": 41385,
         "linearizedBaseContracts": [
-          41046
+          41385
         ],
         "name": "IFathomStats",
-        "nameLocation": "102:12:128",
+        "nameLocation": "102:12:130",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "1616d75c",
-            "id": 41040,
+            "id": 41379,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getWXDCPrice",
-            "nameLocation": "161:12:128",
+            "nameLocation": "161:12:130",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 41036,
+              "id": 41375,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "173:2:128"
+              "src": "173:2:130"
             },
             "returnParameters": {
-              "id": 41039,
+              "id": 41378,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 41038,
+                  "id": 41377,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 41040,
-                  "src": "199:7:128",
+                  "scope": 41379,
+                  "src": "199:7:130",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -118,10 +118,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 41037,
+                    "id": 41376,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "199:7:128",
+                    "src": "199:7:130",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -130,42 +130,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "198:9:128"
+              "src": "198:9:130"
             },
-            "scope": 41046,
-            "src": "152:56:128",
+            "scope": 41385,
+            "src": "152:56:130",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
-            "functionSelector": "046ad71d",
-            "id": 41045,
+            "functionSelector": "2929e796",
+            "id": 41384,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
-            "name": "getUSDTPrice",
-            "nameLocation": "220:12:128",
+            "name": "getFTHMPrice",
+            "nameLocation": "220:12:130",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 41041,
+              "id": 41380,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "232:2:128"
+              "src": "232:2:130"
             },
             "returnParameters": {
-              "id": 41044,
+              "id": 41383,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 41043,
+                  "id": 41382,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 41045,
-                  "src": "258:7:128",
+                  "scope": 41384,
+                  "src": "258:7:130",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -173,10 +173,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 41042,
+                    "id": 41381,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "258:7:128",
+                    "src": "258:7:130",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -185,21 +185,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "257:9:128"
+              "src": "257:9:130"
             },
-            "scope": 41046,
-            "src": "211:56:128",
+            "scope": 41385,
+            "src": "211:56:130",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 41047,
-        "src": "92:177:128",
+        "scope": 41386,
+        "src": "92:177:130",
         "usedErrors": []
       }
     ],
-    "src": "33:237:128"
+    "src": "33:237:130"
   },
   "compiler": {
     "name": "solc",
@@ -207,7 +207,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-06T11:28:50.357Z",
+  "updatedAt": "2022-10-21T12:59:12.663Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

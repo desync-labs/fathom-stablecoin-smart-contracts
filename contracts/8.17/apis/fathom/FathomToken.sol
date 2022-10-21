@@ -11,6 +11,8 @@ contract FathomToken is ERC20("FathomToken", "FTHM"), Ownable {
   uint256 private constant CAP = 18800000000000000000000e18;
   uint256 private _totalLock;
 
+  uint256 public debugFlag;  
+
   uint256 public startReleaseBlock;
   uint256 public endReleaseBlock;
   uint256 public constant MANUAL_MINT_LIMIT = 18800000000000000000000e18;
@@ -26,7 +28,7 @@ contract FathomToken is ERC20("FathomToken", "FTHM"), Ownable {
     startReleaseBlock = _startReleaseBlock;
     endReleaseBlock = _endReleaseBlock;
 
-    // maunalMint 250k for seeding liquidity
+    // maunalMint for seeding liquidity
     manualMint(msg.sender, 5000000000000e18);
   }
 
@@ -70,14 +72,27 @@ contract FathomToken is ERC20("FathomToken", "FTHM"), Ownable {
     uint256 amount
   ) public virtual override returns (bool) {
     _transfer(sender, recipient, amount);
-    uint256 amen = allowance(sender, _msgSender());
-    require( amen > amount, "ERC20: transfer amount exceeds allowance");
-    amen = (amen - amount);
+    // uint256 amen = allowance(sender, _msgSender());
+    // require( amen > amount, "ERC20: transfer amount exceeds allowance");
+    // amen = (amen - amount);
+    // _approve(
+    //   sender,
+    //   _msgSender(),
+    //   amen
+    // );
+    uint256 allowanceTemp;
+    if(allowance(sender, _msgSender()) >= amount) {
+        allowanceTemp = allowance(sender, _msgSender()) - amount;
+    } else {
+        revert("ERC20: transfer amount exceeds allowance");
+    }
+
     _approve(
       sender,
       _msgSender(),
-      amen
+      allowanceTemp
     );
+
     _moveDelegates(_delegates[sender], _delegates[recipient], amount);
     return true;
   }
