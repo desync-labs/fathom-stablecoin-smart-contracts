@@ -1,6 +1,6 @@
 const fs = require('fs');
-// const rawdata = fs.readFileSync('../../../../addresses.json');
-// let stablecoinAddress = JSON.parse(rawdata);
+const rawdata = fs.readFileSync('../../../../addresses.json');
+let stablecoinAddress = JSON.parse(rawdata);
 const { formatBytes32String } = require("ethers/lib/utils");
 
 const COLLATERAL_POOL_ID = formatBytes32String("WXDC")

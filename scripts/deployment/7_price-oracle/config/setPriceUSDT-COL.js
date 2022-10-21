@@ -1,6 +1,6 @@
-// const fs = require('fs');
-// const rawdata = fs.readFileSync('../../../../addresses.json');
-// let stablecoinAddress = JSON.parse(rawdata);
+const fs = require('fs');
+const rawdata = fs.readFileSync('../../../../addresses.json');
+let stablecoinAddress = JSON.parse(rawdata);
 const { formatBytes32String } = require("ethers/lib/utils");
 
 const COLLATERAL_POOL_ID = formatBytes32String("USDT-COL")
@@ -19,7 +19,7 @@ module.exports =  async function(deployer) {
   await priceOracle.setPrice(
     COLLATERAL_POOL_ID
   )
-
   const priceWithSafetyMargin = await collateralPoolConfig.getPriceWithSafetyMargin(COLLATERAL_POOL_ID);
   console.log("priceWithSafetyMargin is " + priceWithSafetyMargin);
+
 };
