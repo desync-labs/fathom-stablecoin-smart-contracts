@@ -64,7 +64,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
   }
 
   // --- Init ---
-  function initialize(address _bookKeeper, address _systemDebtEngine) external initializer {
+  function initialize(address _bookKeeper, address _systemDebtEngine, address _priceOracle) external initializer {
     PausableUpgradeable.__Pausable_init();
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
@@ -73,6 +73,8 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
 
     ISystemDebtEngine(_systemDebtEngine).surplusBuffer(); // Sanity Check Call
     systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
+
+    priceOracle = _priceOracle;
 
     live = 1;
   }
