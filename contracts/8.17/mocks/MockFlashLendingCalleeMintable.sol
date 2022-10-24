@@ -6,8 +6,6 @@ import "../interfaces/IFlashLendingCallee.sol";
 import "../interfaces/IBookKeeper.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "hardhat/console.sol";
-
 contract MockFlashLendingCalleeMintable is IFlashLendingCallee, PausableUpgradeable {
   IBookKeeper public bookKeeper;
 
