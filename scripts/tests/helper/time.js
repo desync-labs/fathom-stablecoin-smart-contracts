@@ -1,12 +1,12 @@
 const { ethers } = require("ethers");
 
 async function latest() {
-  const block = await ethers.provider.getBlock("latest")
+  const block = await web3.eth.getBlock('latest')
   return ethers.BigNumber.from(block.timestamp)
 }
 
 async function latestBlockNumber() {
-  const block = await ethers.provider.getBlock("latest")
+  const block = await web3.eth.getBlock('latest')
   return ethers.BigNumber.from(block.number)
 }
 

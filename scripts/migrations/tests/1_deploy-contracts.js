@@ -42,7 +42,7 @@ module.exports =  async function(deployer) {
       deployer.deploy(ProxyWalletFactory, { gas: 3050000 }),
       deployer.deploy(SimplePriceFeed, { gas: 3050000 }),
       deployer.deploy(FathomStablecoinProxyActions, { gas: 5050000 }),
-      deployer.deploy(FixedSpreadLiquidationStrategy, { gas: 3050000 }),
+      deployer.deploy(FixedSpreadLiquidationStrategy, { gas: 5050000 }),
       deployer.deploy(CollateralTokenAdapterFactory, { gas: 4050000 }),
       deployer.deploy(PositionManager, { gas: 4050000 }),
       deployer.deploy(ShowStopper, { gas: 3050000 }),
