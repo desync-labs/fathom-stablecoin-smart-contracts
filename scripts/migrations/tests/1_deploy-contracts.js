@@ -24,6 +24,10 @@ const LiquidationEngine = artifacts.require('./8.17/stablecoin-core/LiquidationE
 const WXDC = artifacts.require('./8.17/mocks/WXDC.sol');
 const USDT = artifacts.require('./8.17/mocks/USDT.sol');
 const FlashMintModule = artifacts.require('./8.17/flash-mint/FlashMintModule.sol');
+//for delayed price testing
+const MockDexPriceOracle = artifacts.require('./8.17/mocks/MockDexPriceOracle.sol');
+const DelayFathomOraclePriceFeed = artifacts.require('./8.17/price-feeders/DelayFathomOraclePriceFeed.sol');
+
 
 module.exports =  async function(deployer) {
   let promises = [
@@ -52,7 +56,10 @@ module.exports =  async function(deployer) {
       deployer.deploy(LiquidationEngine, { gas: 3050000 }),
       deployer.deploy(WXDC, "WXDC", "WXDC", { gas: 3050000 }),
       deployer.deploy(USDT, "USDT", "USDT", { gas: 3050000 }),
-      deployer.deploy(FlashMintModule, { gas: 3050000 })
+      deployer.deploy(FlashMintModule, { gas: 3050000 }),
+//for delayed price testing
+      deployer.deploy(MockDexPriceOracle, { gas: 3050000 }),
+      deployer.deploy(DelayFathomOraclePriceFeed, { gas: 3050000 }),
   ];
 
   await Promise.all(promises);
