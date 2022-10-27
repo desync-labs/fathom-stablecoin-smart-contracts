@@ -13,6 +13,7 @@ module.exports =  async function(deployer) {
   await liquidationEngine.initialize(
     stablecoinAddress.bookKeeper,
     stablecoinAddress.systemDebtEngine,
+    stablecoinAddress.priceOracle
   )
 
 };

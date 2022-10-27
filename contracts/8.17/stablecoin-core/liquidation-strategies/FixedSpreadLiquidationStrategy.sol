@@ -128,7 +128,7 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
   }
 
   // get the price directly from the PriceOracle
-  function getFeedPrice(bytes32 collateralPoolId) internal view returns (uint256 feedPrice) {
+  function getFeedPrice(bytes32 collateralPoolId) internal returns (uint256 feedPrice) {
     address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(collateralPoolId);
     IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);
     (bytes32 price, bool priceOk) = _priceFeed.peekPrice();

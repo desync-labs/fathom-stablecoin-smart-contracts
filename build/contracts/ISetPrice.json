@@ -29,22 +29,22 @@
     "absolutePath": "project:/contracts/8.17/interfaces/ISetPrice.sol",
     "exportedSymbols": {
       "ISetPrice": [
-        18990
+        10926
       ]
     },
-    "id": 18991,
+    "id": 10927,
     "license": "AGPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 18984,
+        "id": 10920,
         "literals": [
           "solidity",
           "0.8",
           ".17"
         ],
         "nodeType": "PragmaDirective",
-        "src": "47:23:59"
+        "src": "47:23:58"
       },
       {
         "abstract": false,
@@ -53,36 +53,36 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 18990,
+        "id": 10926,
         "linearizedBaseContracts": [
-          18990
+          10926
         ],
         "name": "ISetPrice",
-        "nameLocation": "82:9:59",
+        "nameLocation": "82:9:58",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "285da53b",
-            "id": 18989,
+            "id": 10925,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "setPrice",
-            "nameLocation": "105:8:59",
+            "nameLocation": "105:8:58",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 18987,
+              "id": 10923,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 18986,
+                  "id": 10922,
                   "mutability": "mutable",
                   "name": "_collateralPoolId",
-                  "nameLocation": "122:17:59",
+                  "nameLocation": "122:17:58",
                   "nodeType": "VariableDeclaration",
-                  "scope": 18989,
-                  "src": "114:25:59",
+                  "scope": 10925,
+                  "src": "114:25:58",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -90,10 +90,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 18985,
+                    "id": 10921,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "114:7:59",
+                    "src": "114:7:58",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -102,27 +102,27 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "113:27:59"
+              "src": "113:27:58"
             },
             "returnParameters": {
-              "id": 18988,
+              "id": 10924,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "149:0:59"
+              "src": "149:0:58"
             },
-            "scope": 18990,
-            "src": "96:54:59",
+            "scope": 10926,
+            "src": "96:54:58",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 18991,
-        "src": "72:80:59",
+        "scope": 10927,
+        "src": "72:80:58",
         "usedErrors": []
       }
     ],
-    "src": "47:106:59"
+    "src": "47:106:58"
   },
   "compiler": {
     "name": "solc",
@@ -130,7 +130,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-21T12:59:12.519Z",
+  "updatedAt": "2022-10-27T10:35:28.498Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

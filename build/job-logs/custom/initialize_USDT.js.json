@@ -1,0 +1,10 @@
+{
+    "0x0ffc0c3c82560102ed406ae5428ef0da41b024ace4702db769ddc59dbb4b6353": {
+        "interface": "/Users/sangjun.lee/Sangjun/fathom-stablecoin-smart-contracts/contracts/8.17/mocks/USDT.sol",
+        "address": "0x63C478Bdff0F452Ca9B295eb4E2AAbA064ABDB13",
+        "action": "mint",
+        "args": "[\"0x4C5F0f90a2D4b518aFba11E22AC9b8F6B031d204\",{\"type\":\"BigNumber\",\"hex\":\"0x204fce5e3e25026110000000\"}]",
+        "txHash": "0xc443ec83425a6951d06f6b5f24bf003c11b86780f0855236a30a0c097f0c3582",
+        "nonce": 111
+    }
+}
