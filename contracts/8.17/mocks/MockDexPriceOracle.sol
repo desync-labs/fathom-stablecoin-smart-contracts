@@ -12,7 +12,7 @@ contract MockDexPriceOracle{
     return (mockPrice, uint64(block.timestamp));
   }
 
-  function changPrice(uint256 _mockPrice) external {
+  function changePrice(uint256 _mockPrice) external {
       mockPrice = _mockPrice;
   }
 }

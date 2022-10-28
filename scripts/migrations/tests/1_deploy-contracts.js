@@ -27,6 +27,7 @@ const FlashMintModule = artifacts.require('./8.17/flash-mint/FlashMintModule.sol
 //for delayed price testing
 const MockDexPriceOracle = artifacts.require('./8.17/mocks/MockDexPriceOracle.sol');
 const DelayFathomOraclePriceFeed = artifacts.require('./8.17/price-feeders/DelayFathomOraclePriceFeed.sol');
+const MockPriceOracle = artifacts.require('./8.17/mocks/MockPriceOracle.sol');
 
 
 module.exports =  async function(deployer) {
@@ -60,6 +61,7 @@ module.exports =  async function(deployer) {
 //for delayed price testing
       deployer.deploy(MockDexPriceOracle, { gas: 3050000 }),
       deployer.deploy(DelayFathomOraclePriceFeed, { gas: 3050000 }),
+      deployer.deploy(MockPriceOracle, { gas: 3050000 }),
   ];
 
   await Promise.all(promises);
