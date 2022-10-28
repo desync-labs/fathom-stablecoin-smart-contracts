@@ -5092,6 +5092,10 @@
         "version": "0.8.17+commit.8df45f5f.Emscripten.clang"
     },
     "networks": {
+        "51": {
+            "address": "0x5Fef658327916ba6020b190dD482568257A0eE25",
+            "transactionHash": "0x5bd7d2f40b54dfff9ac3447b07bc30004793b3e532066149a2c9a6b81256d583"
+        },
         "1337": {
             "address": "0xce75A95160D96F5388437993aB5825F322426E04",
             "transactionHash": "0x20967ff30babafa250a60910fbc158fd122b27094d29b96c7dde800c6d35390d"

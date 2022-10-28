@@ -1,0 +1,9 @@
+{
+    "0x52dc5873a925dc737ca450d61ffdab8ad95edd99e096d3171479cef7b43f2cb3": {
+        "interface": "/Users/sangjun.lee/Sangjun/fathom-stablecoin-smart-contracts/contracts/8.17/stablecoin-core/config/AccessControlConfig.sol",
+        "action": "deploy",
+        "args": "[]",
+        "txHash": "0x5bd7d2f40b54dfff9ac3447b07bc30004793b3e532066149a2c9a6b81256d583",
+        "nonce": 1367
+    }
+}
