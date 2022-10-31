@@ -1,0 +1,2056 @@
+{
+  "contractName": "IFathomVaultConfig",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "minDebtSize",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "debt",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "floating",
+          "type": "uint256"
+        }
+      ],
+      "name": "getInterestRate",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getWrappedNativeAddr",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getWNativeRelayer",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getFairLaunchAddr",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getReservePoolBps",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getKillBps",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "caller",
+          "type": "address"
+        }
+      ],
+      "name": "whitelistedCallers",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "caller",
+          "type": "address"
+        }
+      ],
+      "name": "whitelistedLiquidators",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "addStrats",
+          "type": "address"
+        }
+      ],
+      "name": "approvedAddStrategies",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "worker",
+          "type": "address"
+        }
+      ],
+      "name": "isWorker",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "worker",
+          "type": "address"
+        }
+      ],
+      "name": "acceptDebt",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "worker",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "debt",
+          "type": "uint256"
+        }
+      ],
+      "name": "workFactor",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "worker",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "debt",
+          "type": "uint256"
+        }
+      ],
+      "name": "killFactor",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "worker",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "debt",
+          "type": "uint256"
+        }
+      ],
+      "name": "rawKillFactor",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getKillTreasuryBps",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getTreasuryAddr",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "worker",
+          "type": "address"
+        }
+      ],
+      "name": "isWorkerStable",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "worker",
+          "type": "address"
+        }
+      ],
+      "name": "isWorkerReserveConsistent",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.17+commit.8df45f5f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"worker\",\"type\":\"address\"}],\"name\":\"acceptDebt\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addStrats\",\"type\":\"address\"}],\"name\":\"approvedAddStrategies\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getFairLaunchAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"debt\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"floating\",\"type\":\"uint256\"}],\"name\":\"getInterestRate\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getKillBps\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getKillTreasuryBps\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getReservePoolBps\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getTreasuryAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getWNativeRelayer\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getWrappedNativeAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"worker\",\"type\":\"address\"}],\"name\":\"isWorker\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"worker\",\"type\":\"address\"}],\"name\":\"isWorkerReserveConsistent\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"worker\",\"type\":\"address\"}],\"name\":\"isWorkerStable\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"worker\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"debt\",\"type\":\"uint256\"}],\"name\":\"killFactor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"minDebtSize\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"worker\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"debt\",\"type\":\"uint256\"}],\"name\":\"rawKillFactor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"caller\",\"type\":\"address\"}],\"name\":\"whitelistedCallers\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"caller\",\"type\":\"address\"}],\"name\":\"whitelistedLiquidators\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"worker\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"debt\",\"type\":\"uint256\"}],\"name\":\"workFactor\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{\"acceptDebt(address)\":{\"details\":\"Return whether the given worker accepts more debt. Revert on non-worker.\"},\"approvedAddStrategies(address)\":{\"details\":\"Return if the given strategy is approved.\"},\"getFairLaunchAddr()\":{\"details\":\"Return the address of fair launch contract.\"},\"getInterestRate(uint256,uint256)\":{\"details\":\"Return the interest rate per second, using 1e18 as denom.\"},\"getKillBps()\":{\"details\":\"Return the bps rate for Avada Kill caster.\"},\"getKillTreasuryBps()\":{\"details\":\"Return the portion of reward that will be transferred to treasury account after successfully killing a position.\"},\"getReservePoolBps()\":{\"details\":\"Return the bps rate for reserve pool.\"},\"getTreasuryAddr()\":{\"details\":\"Return the address of treasury account\"},\"getWNativeRelayer()\":{\"details\":\"Return the address of wNative relayer.\"},\"getWrappedNativeAddr()\":{\"details\":\"Return the address of wrapped native token.\"},\"isWorker(address)\":{\"details\":\"Return whether the given address is a worker.\"},\"isWorkerReserveConsistent(address)\":{\"details\":\"Return if reserve that worker is working with is consistent\"},\"isWorkerStable(address)\":{\"details\":\"Return if worker is stable\"},\"killFactor(address,uint256)\":{\"details\":\"Return the kill factor for the worker + BaseToken debt, using 1e4 as denom. Revert on non-worker.\"},\"minDebtSize()\":{\"details\":\"Return minimum BaseToken debt size per position.\"},\"rawKillFactor(address,uint256)\":{\"details\":\"Return the kill factor for the worker + BaseToken debt without checking isStable, using 1e4 as denom. Revert on non-worker.\"},\"whitelistedCallers(address)\":{\"details\":\"Return if the caller is whitelisted.\"},\"whitelistedLiquidators(address)\":{\"details\":\"Return if the caller is whitelisted.\"},\"workFactor(address,uint256)\":{\"details\":\"Return the work factor for the worker + BaseToken debt, using 1e4 as denom. Revert on non-worker.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/8.17/interfaces/IFathomVaultConfig.sol\":\"IFathomVaultConfig\"},\"evmVersion\":\"london\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/8.17/interfaces/IFathomVaultConfig.sol\":{\"keccak256\":\"0xf1e2f9dcf75f6291089f5510b2f08b9ba333c8ac92d8f9cac14ed16c642d4fc1\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://233110abeefbc8a1fef1334053ee08966ae460213530448b727508d8b108abcb\",\"dweb:/ipfs/QmNTda1D3sp3LQWTAJcfczQCRa7Gm3Asecq5PPPmimJMw6\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "// SPDX-License-Identifier: MIT\n\npragma solidity 0.8.17;\n\ninterface IFathomVaultConfig {\n  /// @dev Return minimum BaseToken debt size per position.\n  function minDebtSize() external view returns (uint256);\n\n  /// @dev Return the interest rate per second, using 1e18 as denom.\n  function getInterestRate(uint256 debt, uint256 floating) external view returns (uint256);\n\n  /// @dev Return the address of wrapped native token.\n  function getWrappedNativeAddr() external view returns (address);\n\n  /// @dev Return the address of wNative relayer.\n  function getWNativeRelayer() external view returns (address);\n\n  /// @dev Return the address of fair launch contract.\n  function getFairLaunchAddr() external view returns (address);\n\n  /// @dev Return the bps rate for reserve pool.\n  function getReservePoolBps() external view returns (uint256);\n\n  /// @dev Return the bps rate for Avada Kill caster.\n  function getKillBps() external view returns (uint256);\n\n  /// @dev Return if the caller is whitelisted.\n  function whitelistedCallers(address caller) external returns (bool);\n\n  /// @dev Return if the caller is whitelisted.\n  function whitelistedLiquidators(address caller) external returns (bool);\n\n  /// @dev Return if the given strategy is approved.\n  function approvedAddStrategies(address addStrats) external returns (bool);\n\n  /// @dev Return whether the given address is a worker.\n  function isWorker(address worker) external view returns (bool);\n\n  /// @dev Return whether the given worker accepts more debt. Revert on non-worker.\n  function acceptDebt(address worker) external view returns (bool);\n\n  /// @dev Return the work factor for the worker + BaseToken debt, using 1e4 as denom. Revert on non-worker.\n  function workFactor(address worker, uint256 debt) external view returns (uint256);\n\n  /// @dev Return the kill factor for the worker + BaseToken debt, using 1e4 as denom. Revert on non-worker.\n  function killFactor(address worker, uint256 debt) external view returns (uint256);\n\n  /// @dev Return the kill factor for the worker + BaseToken debt without checking isStable, using 1e4 as denom. Revert on non-worker.\n  function rawKillFactor(address worker, uint256 debt) external view returns (uint256);\n\n  /// @dev Return the portion of reward that will be transferred to treasury account after successfully killing a position.\n  function getKillTreasuryBps() external view returns (uint256);\n\n  /// @dev Return the address of treasury account\n  function getTreasuryAddr() external view returns (address);\n\n  /// @dev Return if worker is stable\n  function isWorkerStable(address worker) external view returns (bool);\n\n  /// @dev Return if reserve that worker is working with is consistent\n  function isWorkerReserveConsistent(address worker) external view returns (bool);\n}\n",
+  "sourcePath": "/Users/sangjun.lee/Sangjun/fathom-stablecoin-smart-contracts/contracts/8.17/interfaces/IFathomVaultConfig.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/8.17/interfaces/IFathomVaultConfig.sol",
+    "exportedSymbols": {
+      "IFathomVaultConfig": [
+        10593
+      ]
+    },
+    "id": 10594,
+    "license": "MIT",
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 10448,
+        "literals": [
+          "solidity",
+          "0.8",
+          ".17"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "33:23:47"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "IFathomVaultConfig",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 10593,
+        "linearizedBaseContracts": [
+          10593
+        ],
+        "name": "IFathomVaultConfig",
+        "nameLocation": "68:18:47",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "documentation": {
+              "id": 10449,
+              "nodeType": "StructuredDocumentation",
+              "src": "91:57:47",
+              "text": "@dev Return minimum BaseToken debt size per position."
+            },
+            "functionSelector": "e1ed4286",
+            "id": 10454,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "minDebtSize",
+            "nameLocation": "160:11:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10450,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "171:2:47"
+            },
+            "returnParameters": {
+              "id": 10453,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10452,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10454,
+                  "src": "197:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10451,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "197:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "196:9:47"
+            },
+            "scope": 10593,
+            "src": "151:55:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10455,
+              "nodeType": "StructuredDocumentation",
+              "src": "210:66:47",
+              "text": "@dev Return the interest rate per second, using 1e18 as denom."
+            },
+            "functionSelector": "c6dfa13f",
+            "id": 10464,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getInterestRate",
+            "nameLocation": "288:15:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10460,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10457,
+                  "mutability": "mutable",
+                  "name": "debt",
+                  "nameLocation": "312:4:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10464,
+                  "src": "304:12:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10456,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "304:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 10459,
+                  "mutability": "mutable",
+                  "name": "floating",
+                  "nameLocation": "326:8:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10464,
+                  "src": "318:16:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10458,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "318:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "303:32:47"
+            },
+            "returnParameters": {
+              "id": 10463,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10462,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10464,
+                  "src": "359:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10461,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "359:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "358:9:47"
+            },
+            "scope": 10593,
+            "src": "279:89:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10465,
+              "nodeType": "StructuredDocumentation",
+              "src": "372:52:47",
+              "text": "@dev Return the address of wrapped native token."
+            },
+            "functionSelector": "ef3bac5e",
+            "id": 10470,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getWrappedNativeAddr",
+            "nameLocation": "436:20:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10466,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "456:2:47"
+            },
+            "returnParameters": {
+              "id": 10469,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10468,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10470,
+                  "src": "482:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10467,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "482:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "481:9:47"
+            },
+            "scope": 10593,
+            "src": "427:64:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10471,
+              "nodeType": "StructuredDocumentation",
+              "src": "495:47:47",
+              "text": "@dev Return the address of wNative relayer."
+            },
+            "functionSelector": "d1783fa8",
+            "id": 10476,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getWNativeRelayer",
+            "nameLocation": "554:17:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10472,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "571:2:47"
+            },
+            "returnParameters": {
+              "id": 10475,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10474,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10476,
+                  "src": "597:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10473,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "597:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "596:9:47"
+            },
+            "scope": 10593,
+            "src": "545:61:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10477,
+              "nodeType": "StructuredDocumentation",
+              "src": "610:52:47",
+              "text": "@dev Return the address of fair launch contract."
+            },
+            "functionSelector": "bfbbd53f",
+            "id": 10482,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getFairLaunchAddr",
+            "nameLocation": "674:17:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10478,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "691:2:47"
+            },
+            "returnParameters": {
+              "id": 10481,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10480,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10482,
+                  "src": "717:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10479,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "717:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "716:9:47"
+            },
+            "scope": 10593,
+            "src": "665:61:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10483,
+              "nodeType": "StructuredDocumentation",
+              "src": "730:46:47",
+              "text": "@dev Return the bps rate for reserve pool."
+            },
+            "functionSelector": "09956f66",
+            "id": 10488,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getReservePoolBps",
+            "nameLocation": "788:17:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10484,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "805:2:47"
+            },
+            "returnParameters": {
+              "id": 10487,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10486,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10488,
+                  "src": "831:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10485,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "831:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "830:9:47"
+            },
+            "scope": 10593,
+            "src": "779:61:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10489,
+              "nodeType": "StructuredDocumentation",
+              "src": "844:51:47",
+              "text": "@dev Return the bps rate for Avada Kill caster."
+            },
+            "functionSelector": "28ae433e",
+            "id": 10494,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getKillBps",
+            "nameLocation": "907:10:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10490,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "917:2:47"
+            },
+            "returnParameters": {
+              "id": 10493,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10492,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10494,
+                  "src": "943:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10491,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "943:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "942:9:47"
+            },
+            "scope": 10593,
+            "src": "898:54:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10495,
+              "nodeType": "StructuredDocumentation",
+              "src": "956:45:47",
+              "text": "@dev Return if the caller is whitelisted."
+            },
+            "functionSelector": "ffc97ce9",
+            "id": 10502,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "whitelistedCallers",
+            "nameLocation": "1013:18:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10498,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10497,
+                  "mutability": "mutable",
+                  "name": "caller",
+                  "nameLocation": "1040:6:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10502,
+                  "src": "1032:14:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10496,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1032:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1031:16:47"
+            },
+            "returnParameters": {
+              "id": 10501,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10500,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10502,
+                  "src": "1066:4:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 10499,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1066:4:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1065:6:47"
+            },
+            "scope": 10593,
+            "src": "1004:68:47",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10503,
+              "nodeType": "StructuredDocumentation",
+              "src": "1076:45:47",
+              "text": "@dev Return if the caller is whitelisted."
+            },
+            "functionSelector": "d9ed3def",
+            "id": 10510,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "whitelistedLiquidators",
+            "nameLocation": "1133:22:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10506,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10505,
+                  "mutability": "mutable",
+                  "name": "caller",
+                  "nameLocation": "1164:6:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10510,
+                  "src": "1156:14:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10504,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1156:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1155:16:47"
+            },
+            "returnParameters": {
+              "id": 10509,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10508,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10510,
+                  "src": "1190:4:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 10507,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1190:4:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1189:6:47"
+            },
+            "scope": 10593,
+            "src": "1124:72:47",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10511,
+              "nodeType": "StructuredDocumentation",
+              "src": "1200:50:47",
+              "text": "@dev Return if the given strategy is approved."
+            },
+            "functionSelector": "238d19ed",
+            "id": 10518,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "approvedAddStrategies",
+            "nameLocation": "1262:21:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10514,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10513,
+                  "mutability": "mutable",
+                  "name": "addStrats",
+                  "nameLocation": "1292:9:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10518,
+                  "src": "1284:17:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10512,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1284:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1283:19:47"
+            },
+            "returnParameters": {
+              "id": 10517,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10516,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10518,
+                  "src": "1321:4:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 10515,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1321:4:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1320:6:47"
+            },
+            "scope": 10593,
+            "src": "1253:74:47",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10519,
+              "nodeType": "StructuredDocumentation",
+              "src": "1331:54:47",
+              "text": "@dev Return whether the given address is a worker."
+            },
+            "functionSelector": "aa156645",
+            "id": 10526,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isWorker",
+            "nameLocation": "1397:8:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10522,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10521,
+                  "mutability": "mutable",
+                  "name": "worker",
+                  "nameLocation": "1414:6:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10526,
+                  "src": "1406:14:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10520,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1406:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1405:16:47"
+            },
+            "returnParameters": {
+              "id": 10525,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10524,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10526,
+                  "src": "1445:4:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 10523,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1445:4:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1444:6:47"
+            },
+            "scope": 10593,
+            "src": "1388:63:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10527,
+              "nodeType": "StructuredDocumentation",
+              "src": "1455:81:47",
+              "text": "@dev Return whether the given worker accepts more debt. Revert on non-worker."
+            },
+            "functionSelector": "000237f0",
+            "id": 10534,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "acceptDebt",
+            "nameLocation": "1548:10:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10530,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10529,
+                  "mutability": "mutable",
+                  "name": "worker",
+                  "nameLocation": "1567:6:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10534,
+                  "src": "1559:14:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10528,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1559:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1558:16:47"
+            },
+            "returnParameters": {
+              "id": 10533,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10532,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10534,
+                  "src": "1598:4:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 10531,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1598:4:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1597:6:47"
+            },
+            "scope": 10593,
+            "src": "1539:65:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10535,
+              "nodeType": "StructuredDocumentation",
+              "src": "1608:106:47",
+              "text": "@dev Return the work factor for the worker + BaseToken debt, using 1e4 as denom. Revert on non-worker."
+            },
+            "functionSelector": "ad58e573",
+            "id": 10544,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "workFactor",
+            "nameLocation": "1726:10:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10540,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10537,
+                  "mutability": "mutable",
+                  "name": "worker",
+                  "nameLocation": "1745:6:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10544,
+                  "src": "1737:14:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10536,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1737:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 10539,
+                  "mutability": "mutable",
+                  "name": "debt",
+                  "nameLocation": "1761:4:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10544,
+                  "src": "1753:12:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10538,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1753:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1736:30:47"
+            },
+            "returnParameters": {
+              "id": 10543,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10542,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10544,
+                  "src": "1790:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10541,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1790:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1789:9:47"
+            },
+            "scope": 10593,
+            "src": "1717:82:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10545,
+              "nodeType": "StructuredDocumentation",
+              "src": "1803:106:47",
+              "text": "@dev Return the kill factor for the worker + BaseToken debt, using 1e4 as denom. Revert on non-worker."
+            },
+            "functionSelector": "13f6321b",
+            "id": 10554,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "killFactor",
+            "nameLocation": "1921:10:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10550,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10547,
+                  "mutability": "mutable",
+                  "name": "worker",
+                  "nameLocation": "1940:6:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10554,
+                  "src": "1932:14:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10546,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1932:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 10549,
+                  "mutability": "mutable",
+                  "name": "debt",
+                  "nameLocation": "1956:4:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10554,
+                  "src": "1948:12:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10548,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1948:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1931:30:47"
+            },
+            "returnParameters": {
+              "id": 10553,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10552,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10554,
+                  "src": "1985:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10551,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1985:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1984:9:47"
+            },
+            "scope": 10593,
+            "src": "1912:82:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10555,
+              "nodeType": "StructuredDocumentation",
+              "src": "1998:132:47",
+              "text": "@dev Return the kill factor for the worker + BaseToken debt without checking isStable, using 1e4 as denom. Revert on non-worker."
+            },
+            "functionSelector": "4f69476a",
+            "id": 10564,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "rawKillFactor",
+            "nameLocation": "2142:13:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10560,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10557,
+                  "mutability": "mutable",
+                  "name": "worker",
+                  "nameLocation": "2164:6:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10564,
+                  "src": "2156:14:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10556,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2156:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 10559,
+                  "mutability": "mutable",
+                  "name": "debt",
+                  "nameLocation": "2180:4:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10564,
+                  "src": "2172:12:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10558,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2172:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2155:30:47"
+            },
+            "returnParameters": {
+              "id": 10563,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10562,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10564,
+                  "src": "2209:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10561,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2209:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2208:9:47"
+            },
+            "scope": 10593,
+            "src": "2133:85:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10565,
+              "nodeType": "StructuredDocumentation",
+              "src": "2222:121:47",
+              "text": "@dev Return the portion of reward that will be transferred to treasury account after successfully killing a position."
+            },
+            "functionSelector": "04df1f5e",
+            "id": 10570,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getKillTreasuryBps",
+            "nameLocation": "2355:18:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10566,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2373:2:47"
+            },
+            "returnParameters": {
+              "id": 10569,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10568,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10570,
+                  "src": "2399:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 10567,
+                    "name": "uint256",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2399:7:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2398:9:47"
+            },
+            "scope": 10593,
+            "src": "2346:62:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10571,
+              "nodeType": "StructuredDocumentation",
+              "src": "2412:47:47",
+              "text": "@dev Return the address of treasury account"
+            },
+            "functionSelector": "044d6d6f",
+            "id": 10576,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getTreasuryAddr",
+            "nameLocation": "2471:15:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10572,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2486:2:47"
+            },
+            "returnParameters": {
+              "id": 10575,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10574,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10576,
+                  "src": "2512:7:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10573,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2512:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2511:9:47"
+            },
+            "scope": 10593,
+            "src": "2462:59:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10577,
+              "nodeType": "StructuredDocumentation",
+              "src": "2525:35:47",
+              "text": "@dev Return if worker is stable"
+            },
+            "functionSelector": "98cb0614",
+            "id": 10584,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isWorkerStable",
+            "nameLocation": "2572:14:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10580,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10579,
+                  "mutability": "mutable",
+                  "name": "worker",
+                  "nameLocation": "2595:6:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10584,
+                  "src": "2587:14:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10578,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2587:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2586:16:47"
+            },
+            "returnParameters": {
+              "id": 10583,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10582,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10584,
+                  "src": "2626:4:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 10581,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2626:4:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2625:6:47"
+            },
+            "scope": 10593,
+            "src": "2563:69:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "documentation": {
+              "id": 10585,
+              "nodeType": "StructuredDocumentation",
+              "src": "2636:68:47",
+              "text": "@dev Return if reserve that worker is working with is consistent"
+            },
+            "functionSelector": "bb6a0e04",
+            "id": 10592,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "isWorkerReserveConsistent",
+            "nameLocation": "2716:25:47",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 10588,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10587,
+                  "mutability": "mutable",
+                  "name": "worker",
+                  "nameLocation": "2750:6:47",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10592,
+                  "src": "2742:14:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 10586,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2742:7:47",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2741:16:47"
+            },
+            "returnParameters": {
+              "id": 10591,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 10590,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 10592,
+                  "src": "2781:4:47",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 10589,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2781:4:47",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2780:6:47"
+            },
+            "scope": 10593,
+            "src": "2707:80:47",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 10594,
+        "src": "58:2731:47",
+        "usedErrors": []
+      }
+    ],
+    "src": "33:2757:47"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.17+commit.8df45f5f.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.10",
+  "updatedAt": "2022-10-31T10:44:02.236Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {
+      "acceptDebt(address)": {
+        "details": "Return whether the given worker accepts more debt. Revert on non-worker."
+      },
+      "approvedAddStrategies(address)": {
+        "details": "Return if the given strategy is approved."
+      },
+      "getFairLaunchAddr()": {
+        "details": "Return the address of fair launch contract."
+      },
+      "getInterestRate(uint256,uint256)": {
+        "details": "Return the interest rate per second, using 1e18 as denom."
+      },
+      "getKillBps()": {
+        "details": "Return the bps rate for Avada Kill caster."
+      },
+      "getKillTreasuryBps()": {
+        "details": "Return the portion of reward that will be transferred to treasury account after successfully killing a position."
+      },
+      "getReservePoolBps()": {
+        "details": "Return the bps rate for reserve pool."
+      },
+      "getTreasuryAddr()": {
+        "details": "Return the address of treasury account"
+      },
+      "getWNativeRelayer()": {
+        "details": "Return the address of wNative relayer."
+      },
+      "getWrappedNativeAddr()": {
+        "details": "Return the address of wrapped native token."
+      },
+      "isWorker(address)": {
+        "details": "Return whether the given address is a worker."
+      },
+      "isWorkerReserveConsistent(address)": {
+        "details": "Return if reserve that worker is working with is consistent"
+      },
+      "isWorkerStable(address)": {
+        "details": "Return if worker is stable"
+      },
+      "killFactor(address,uint256)": {
+        "details": "Return the kill factor for the worker + BaseToken debt, using 1e4 as denom. Revert on non-worker."
+      },
+      "minDebtSize()": {
+        "details": "Return minimum BaseToken debt size per position."
+      },
+      "rawKillFactor(address,uint256)": {
+        "details": "Return the kill factor for the worker + BaseToken debt without checking isStable, using 1e4 as denom. Revert on non-worker."
+      },
+      "whitelistedCallers(address)": {
+        "details": "Return if the caller is whitelisted."
+      },
+      "whitelistedLiquidators(address)": {
+        "details": "Return if the caller is whitelisted."
+      },
+      "workFactor(address,uint256)": {
+        "details": "Return the work factor for the worker + BaseToken debt, using 1e4 as denom. Revert on non-worker."
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}

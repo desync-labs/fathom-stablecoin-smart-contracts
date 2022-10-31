@@ -90,6 +90,7 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IPriceFeed {
   }
 
   function peekPrice() external override returns (bytes32, bool) {
+    require(timeDelay >= 15 minutes && timeDelay <= 1 days, "FathomOraclePriceFeed/bad-or-no-delay-time");
     // [wad], [seconds]
     //routines
     //fetch Price from fathomOracle and update currentPrice
@@ -97,15 +98,14 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IPriceFeed {
     //does not update currentPrice
     //else
     //update currentPrice and return it.
-    if (block.timestamp < currentPrice.lastUpdateTS + timeDelay) {
-        return (bytes32(currentPrice.price), _isPriceOk(currentPrice.lastUpdateTS));
-    } else {
+    if (currentPrice.price == 0 || block.timestamp >= currentPrice.lastUpdateTS + timeDelay) {
         (uint256 _price, uint256 _lastUpdate) = fathomOracle.getPrice(token0, token1);
         currentPrice.price = _price;
         currentPrice.lastUpdateTS = _lastUpdate;
         return (bytes32(currentPrice.price), _isPriceOk(currentPrice.lastUpdateTS));
+    } else {
+        return (bytes32(currentPrice.price), _isPriceOk(currentPrice.lastUpdateTS));
     }
-
   }
 
   function _isPriceFresh(uint256 _lastUpdate) internal view returns (bool) {

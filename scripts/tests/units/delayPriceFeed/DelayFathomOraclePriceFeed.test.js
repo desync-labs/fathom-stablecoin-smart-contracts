@@ -49,6 +49,7 @@ describe("DelayFathomOraclePriceFeed", () => {
     // accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender
 
     await delayFathomOraclePriceFeed.initialize(MockDexPriceOracle.address, mockToken0, mockToken1, mockedAccessControlConfig.address);
+    
     // console.log("mockedAccessControlConfig address is " + mockedAccessControlConfig.address);
 
     // await MockPriceOracle.initialize(mockedBookKeeper.address);
@@ -59,6 +60,7 @@ describe("DelayFathomOraclePriceFeed", () => {
   describe("MockDexPriceOracle.sol check before testing DelayFathomOraclePriceFeed", () => {
     context("call getPrice", async () => {
       it("should return 0", async () => {
+          await MockDexPriceOracle.changePrice(0);
           const returnValue = await MockDexPriceOracle.getPrice(mockToken0, mockToken1);
           // console.log(returnValue);
           await expect(returnValue[0]).to.be.equal(0);
@@ -99,7 +101,6 @@ describe("DelayFathomOraclePriceFeed", () => {
           // console.log(returnValue);
           await mockedAccessControlConfig.mock.hasRole.returns(false);
           await expect(delayFathomOraclePriceFeed.setTimeDelay(900)).to.be.revertedWith("!ownerRole")
-
       })
     })
 
@@ -120,8 +121,36 @@ describe("DelayFathomOraclePriceFeed", () => {
       })
     })
 
-    //test for peekPrice()
 
+    context("check accessControlConfig address", async () => {
+      it("should return mockedAccessControlConfig.address", async () => {
+        const mockedAccessControlConfigAdd = await delayFathomOraclePriceFeed.accessControlConfig();
+          await expect(mockedAccessControlConfigAdd).to.be.equal(mockedAccessControlConfig.address);
+      })
+    })
+
+    context("check fathomOracle address", async () => {
+      it("should return MockDexPriceOracle.address", async () => {
+        const fathomOracleAdd = await delayFathomOraclePriceFeed.fathomOracle();
+          await expect(fathomOracleAdd).to.be.equal(MockDexPriceOracle.address);
+      })
+    })
+
+    //test for peekPrice()
+    context("call peekPrice()", async () => {
+      it("should return 100", async () => {
+        await MockDexPriceOracle.changePrice(100);
+        const price = await MockDexPriceOracle.getPrice(mockToken0, mockToken1);
+        console.log("Price from MockDexPriceOracle is "+price)
+        await delayFathomOraclePriceFeed.setTimeDelay(900);
+        
+        const returnValue = await delayFathomOraclePriceFeed.peekPrice();
+          console.log("returnValue[0] is "+ returnValue[0]);
+          console.log("returnValue[1] is "+ returnValue[1]);
+          await expect(returnValue).to.be.equal(100);
+      })
+    })
+      //first it should return without 
       //before 15 minutes passed
       //after 15 minutes passed
 
