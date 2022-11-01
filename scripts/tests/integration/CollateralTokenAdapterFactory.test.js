@@ -3,6 +3,9 @@ const { BigNumber } = require("ethers");
 
 const { solidity } = require("ethereum-waffle");
 const { formatBytes32String } = require("ethers/lib/utils");
+const { loadFixture } = require("../helper/fixtures");
+const { addRoles } = require("../helper/access-roles");
+const { initializeContracts } = require("../helper/initializer");
 
 chai.use(solidity);
 
@@ -10,7 +13,36 @@ const { expect } = chai
 const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 const { DeployerAddress } = require("../helper/address");
 
-describe("CollateralTokenAdapter", () => {
+const setup = async () => {
+    const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
+    const accessControlConfig = await artifacts.initializeInterfaceAt("AccessControlConfig", "AccessControlConfig");
+    const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
+    const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
+    const fairLaunch = await artifacts.initializeInterfaceAt("FairLaunch", "FairLaunch");
+    const shield = await artifacts.initializeInterfaceAt("Shield", "Shield");
+    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
+    const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
+    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
+    const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
+
+    await initializeContracts();
+    await addRoles();
+
+    return {
+        bookKeeper,
+        collateralPoolConfig,
+        accessControlConfig,
+        fairLaunch,
+        shield,
+        WXDC,
+        fathomToken,
+        collateralTokenAdapter,
+        collateralTokenAdapterFactory
+    }
+}
+
+
+describe("CollateralTokenAdapterFactory", () => {
     // Contracts
     let collateralTokenAdapterFactory
     let collateralTokenAdapter
@@ -20,17 +52,22 @@ describe("CollateralTokenAdapter", () => {
     let fathomToken
     let fairLaunch
 
-    beforeEach(async () => {
+    before(async () => {
         await snapshot.revertToSnapshot();
+    })
 
-        bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
-        fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
-        fairLaunch = await artifacts.initializeInterfaceAt("FairLaunch", "FairLaunch");
-        shield = await artifacts.initializeInterfaceAt("Shield", "Shield");
-        WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
-        collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-        const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
-        collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
+    beforeEach(async () => {
+        ({
+            bookKeeper,
+            collateralPoolConfig,
+            accessControlConfig,
+            fairLaunch,
+            shield,
+            WXDC,
+            fathomToken,
+            collateralTokenAdapter,
+            collateralTokenAdapterFactory
+        } = await loadFixture(setup));
     })
 
     describe("#createAdapter", async () => {

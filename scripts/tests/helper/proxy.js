@@ -1,5 +1,4 @@
-const loadProxyWalletFixtureHandler = async (signers) => {
-
+const createProxyWallets = async (signers) => {
   const proxyWalletRegistry = await artifacts.initializeInterfaceAt("ProxyWalletRegistry", "ProxyWalletRegistry");
 
   for (let i = 0; i < signers.length; i++) {
@@ -17,4 +16,4 @@ const loadProxyWalletFixtureHandler = async (signers) => {
   return { proxyWallets }
 }
 
-module.exports = { loadProxyWalletFixtureHandler }
+module.exports = { createProxyWallets }

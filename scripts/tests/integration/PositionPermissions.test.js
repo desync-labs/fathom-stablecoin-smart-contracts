@@ -5,10 +5,13 @@ const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
-const { loadProxyWalletFixtureHandler } = require("../helper/proxy");
-const { DeployerAddress, AliceAddress, BobAddress, AddressZero } = require("../helper/address");
+const { createProxyWallets } = require("../helper/proxy");
+const { AliceAddress, BobAddress, AddressZero } = require("../helper/address");
 const PositionHelper = require("../helper/positions");
 const { formatBytes32String } = require("ethers/lib/utils");
+const { loadFixture } = require("../helper/fixtures");
+const { initializeContracts } = require("../helper/initializer");
+const { addRoles } = require("../helper/access-roles");
 
 const { expect } = chai
 
@@ -20,84 +23,113 @@ const TREASURY_FEE_BPS = "100"
 
 const StabilityFeeCollector = artifacts.require('./8.17/stablecoin-core/StabilityFeeCollector.sol');
 
+const setup = async () => {
+    const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
+    const stablecoinAdapter = await artifacts.initializeInterfaceAt("StablecoinAdapter", "StablecoinAdapter");
+    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
+    const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
+    const fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
+    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
+    const USDT = await artifacts.initializeInterfaceAt("USDT", "USDT");
+    const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
+    const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
+    const fixedSpreadLiquidationStrategy = await artifacts.initializeInterfaceAt("FixedSpreadLiquidationStrategy", "FixedSpreadLiquidationStrategy");
+    const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
+
+    const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_WXDC);
+    const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_USDT);
+    const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterWXDC);
+    const collateralTokenAdapter2 = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterUSDT);
+
+    await initializeContracts();
+    await addRoles();
+
+    ({
+        proxyWallets: [aliceProxyWallet, bobProxyWallet],
+    } = await createProxyWallets([AliceAddress, BobAddress]));
+
+    await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(1000), { gasLimit: 1000000 })
+
+    await collateralPoolConfig.initCollateralPool(
+        COLLATERAL_POOL_ID_WXDC,
+        WeiPerRad.mul(1000),
+        0,
+        simplePriceFeed.address,
+        WeiPerRay,
+        WeiPerRay,
+        collateralTokenAdapter.address,
+        CLOSE_FACTOR_BPS,
+        LIQUIDATOR_INCENTIVE_BPS,
+        TREASURY_FEE_BPS,
+        AddressZero
+    )
+
+    await collateralPoolConfig.initCollateralPool(
+        COLLATERAL_POOL_ID_USDT,
+        WeiPerRad.mul(1000),
+        0,
+        simplePriceFeed.address,
+        WeiPerRay,
+        WeiPerRay,
+        collateralTokenAdapter2.address,
+        CLOSE_FACTOR_BPS,
+        LIQUIDATOR_INCENTIVE_BPS,
+        TREASURY_FEE_BPS,
+        AddressZero
+    )
+
+    await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
+
+    await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID_WXDC, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
+    await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID_USDT, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
+
+    await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress, gasLimit: 1000000 })
+    await WXDC.approve(bobProxyWallet.address, WeiPerWad.mul(10000), { from: BobAddress, gasLimit: 1000000 })
+
+    await USDT.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress, gasLimit: 1000000 })
+    await USDT.approve(bobProxyWallet.address, WeiPerWad.mul(10000), { from: BobAddress, gasLimit: 1000000 })
+
+    return {
+        bookKeeper,
+        collateralTokenAdapter,
+        collateralTokenAdapter2,
+        positionManager,
+        aliceProxyWallet,
+        bobProxyWallet,
+        fathomStablecoin,
+        fathomStablecoinProxyActions,
+        stablecoinAdapter
+    }
+}
+
 describe("PositionPermissions", () => {
     // Contracts
-    let deployerProxyWallet
     let aliceProxyWallet
     let bobProxyWallet
     let collateralTokenAdapter
     let collateralTokenAdapter2
     let stablecoinAdapter
     let bookKeeper
-    let WXDC
-    let USDT
     let positionManager
     let fathomStablecoinProxyActions
     let fathomStablecoin
 
-    beforeEach(async () => {
+    before(async () => {
         await snapshot.revertToSnapshot();
-        ; ({
-            proxyWallets: [deployerProxyWallet, aliceProxyWallet, bobProxyWallet],
-        } = await loadProxyWalletFixtureHandler([DeployerAddress, AliceAddress, BobAddress]))
+    })
 
-        bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
-        stablecoinAdapter = await artifacts.initializeInterfaceAt("StablecoinAdapter", "StablecoinAdapter");
-        fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
-        positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
-        fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
-        WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
-        USDT = await artifacts.initializeInterfaceAt("USDT", "USDT");
-        const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
-        const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
-        const fixedSpreadLiquidationStrategy = await artifacts.initializeInterfaceAt("FixedSpreadLiquidationStrategy", "FixedSpreadLiquidationStrategy");
-        const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-
-        const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_WXDC);
-        const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_USDT);
-         collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterWXDC);
-         collateralTokenAdapter2 = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterUSDT);
-
-        await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(1000), { gasLimit: 1000000 })
-
-        await collateralPoolConfig.initCollateralPool(
-            COLLATERAL_POOL_ID_WXDC,
-            WeiPerRad.mul(1000),
-            0,
-            simplePriceFeed.address,
-            WeiPerRay,
-            WeiPerRay,
-            collateralTokenAdapter.address,
-            CLOSE_FACTOR_BPS,
-            LIQUIDATOR_INCENTIVE_BPS,
-            TREASURY_FEE_BPS,
-            AddressZero
-        )
-
-        await collateralPoolConfig.initCollateralPool(
-            COLLATERAL_POOL_ID_USDT,
-            WeiPerRad.mul(1000),
-            0,
-            simplePriceFeed.address,
-            WeiPerRay,
-            WeiPerRay,
-            collateralTokenAdapter2.address,
-            CLOSE_FACTOR_BPS,
-            LIQUIDATOR_INCENTIVE_BPS,
-            TREASURY_FEE_BPS,
-            AddressZero
-        )
-
-        await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
-
-        await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID_WXDC, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
-        await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID_USDT, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
-
-        await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress, gasLimit: 1000000 })
-        await WXDC.approve(bobProxyWallet.address, WeiPerWad.mul(10000), { from: BobAddress, gasLimit: 1000000 })
-
-        await USDT.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress, gasLimit: 1000000 })
-        await USDT.approve(bobProxyWallet.address, WeiPerWad.mul(10000), { from: BobAddress, gasLimit: 1000000 })
+    beforeEach(async () => {
+        ({
+            bookKeeper,
+            collateralTokenAdapter,
+            collateralTokenAdapter2,
+            positionManager,
+            aliceProxyWallet,
+            bobProxyWallet,
+            fathomStablecoin,
+            fathomStablecoinProxyActions,
+            stablecoinAdapter
+        } = await loadFixture(setup));
     })
 
     describe("#permissions", async () => {

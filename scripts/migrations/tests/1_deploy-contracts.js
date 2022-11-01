@@ -4,9 +4,11 @@ const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
 const FathomStablecoin = artifacts.require('./8.17/stablecoin-core/FathomStablecoin.sol');
 const SystemDebtEngine = artifacts.require('./8.17/stablecoin-core/SystemDebtEngine.sol');
 const FathomOraclePriceFeed = artifacts.require('./8.17/price-feeders/FathomOraclePriceFeed.sol');
+const IbTokenPriceFeed = artifacts.require('./8.17/price-feeders/IbTokenPriceFeed.sol');
 const GetPositions = artifacts.require('./8.17/managers/GetPositions.sol');
 const StableSwapModule = artifacts.require('./8.17/stablecoin-core/StableSwapModule.sol');
 const AuthTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/AuthTokenAdapter.sol');
+const TokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/TokenAdapter.sol');
 const DexPriceOracle = artifacts.require('./8.17/price-oracles/DexPriceOracle.sol');
 const ProxyWalletRegistry = artifacts.require('./8.17/proxy-wallet/ProxyWalletRegistry.sol');
 const ProxyWalletFactory = artifacts.require('./8.17/proxy-wallet/ProxyWalletFactory.sol');
@@ -52,7 +54,9 @@ module.exports =  async function(deployer) {
       deployer.deploy(LiquidationEngine, { gas: 3050000 }),
       deployer.deploy(WXDC, "WXDC", "WXDC", { gas: 3050000 }),
       deployer.deploy(USDT, "USDT", "USDT", { gas: 3050000 }),
-      deployer.deploy(FlashMintModule, { gas: 3050000 })
+      deployer.deploy(FlashMintModule, { gas: 3050000 }),
+      deployer.deploy(TokenAdapter, { gas: 3050000 }),
+      deployer.deploy(IbTokenPriceFeed, { gas: 3050000 })
   ];
 
   await Promise.all(promises);
