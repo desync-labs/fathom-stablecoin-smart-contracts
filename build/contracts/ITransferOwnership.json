@@ -29,22 +29,22 @@
     "absolutePath": "project:/contracts/8.17/apis/fathom/interfaces/ITransferOwnership.sol",
     "exportedSymbols": {
       "ITransferOwnership": [
-        14464
+        6400
       ]
     },
-    "id": 14465,
+    "id": 6401,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 14458,
+        "id": 6394,
         "literals": [
           "solidity",
           "0.8",
           ".17"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:27"
+        "src": "33:23:26"
       },
       {
         "abstract": false,
@@ -53,36 +53,36 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 14464,
+        "id": 6400,
         "linearizedBaseContracts": [
-          14464
+          6400
         ],
         "name": "ITransferOwnership",
-        "nameLocation": "68:18:27",
+        "nameLocation": "68:18:26",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "f2fde38b",
-            "id": 14463,
+            "id": 6399,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "transferOwnership",
-            "nameLocation": "100:17:27",
+            "nameLocation": "100:17:26",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 14461,
+              "id": 6397,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 14460,
+                  "id": 6396,
                   "mutability": "mutable",
                   "name": "newOwner",
-                  "nameLocation": "126:8:27",
+                  "nameLocation": "126:8:26",
                   "nodeType": "VariableDeclaration",
-                  "scope": 14463,
-                  "src": "118:16:27",
+                  "scope": 6399,
+                  "src": "118:16:26",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -90,10 +90,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 14459,
+                    "id": 6395,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "118:7:27",
+                    "src": "118:7:26",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -103,27 +103,27 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "117:18:27"
+              "src": "117:18:26"
             },
             "returnParameters": {
-              "id": 14462,
+              "id": 6398,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "144:0:27"
+              "src": "144:0:26"
             },
-            "scope": 14464,
-            "src": "91:54:27",
+            "scope": 6400,
+            "src": "91:54:26",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 14465,
-        "src": "58:89:27",
+        "scope": 6401,
+        "src": "58:89:26",
         "usedErrors": []
       }
     ],
-    "src": "33:115:27"
+    "src": "33:115:26"
   },
   "compiler": {
     "name": "solc",
@@ -131,7 +131,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-21T12:59:12.500Z",
+  "updatedAt": "2022-10-27T10:35:28.463Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

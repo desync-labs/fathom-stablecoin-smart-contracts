@@ -29,31 +29,31 @@
     "absolutePath": "project:/contracts/8.17/stats/interfaces/IBookKeeper.sol",
     "exportedSymbols": {
       "IBookKeeper": [
-        41313
+        33914
       ]
     },
-    "id": 41314,
+    "id": 33915,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 41306,
+        "id": 33907,
         "literals": [
           "solidity",
           "0.8",
           ".17"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:126"
+        "src": "33:23:129"
       },
       {
-        "id": 41307,
+        "id": 33908,
         "literals": [
           "experimental",
           "ABIEncoderV2"
         ],
         "nodeType": "PragmaDirective",
-        "src": "57:33:126"
+        "src": "57:33:129"
       },
       {
         "abstract": false,
@@ -62,42 +62,42 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 41313,
+        "id": 33914,
         "linearizedBaseContracts": [
-          41313
+          33914
         ],
         "name": "IBookKeeper",
-        "nameLocation": "102:11:126",
+        "nameLocation": "102:11:129",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "5b2a5121",
-            "id": 41312,
+            "id": 33913,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "totalDebtCeiling",
-            "nameLocation": "160:16:126",
+            "nameLocation": "160:16:129",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 41308,
+              "id": 33909,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "176:2:126"
+              "src": "176:2:129"
             },
             "returnParameters": {
-              "id": 41311,
+              "id": 33912,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 41310,
+                  "id": 33911,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 41312,
-                  "src": "202:7:126",
+                  "scope": 33913,
+                  "src": "202:7:129",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -105,10 +105,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 41309,
+                    "id": 33910,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "202:7:126",
+                    "src": "202:7:129",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -117,21 +117,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "201:9:126"
+              "src": "201:9:129"
             },
-            "scope": 41313,
-            "src": "151:60:126",
+            "scope": 33914,
+            "src": "151:60:129",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 41314,
-        "src": "92:121:126",
+        "scope": 33915,
+        "src": "92:121:129",
         "usedErrors": []
       }
     ],
-    "src": "33:181:126"
+    "src": "33:181:129"
   },
   "compiler": {
     "name": "solc",
@@ -139,7 +139,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-21T12:59:12.513Z",
+  "updatedAt": "2022-10-27T10:35:28.487Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

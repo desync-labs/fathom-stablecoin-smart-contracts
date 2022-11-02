@@ -14,15 +14,15 @@ deploy:
 # deploy systemDebtEngine
 	coralX execute --network development --path scripts/deployment/4_system-debt-engine/deploy/system-debt-engine.js
 	coralX execute --network development --path scripts/deployment/4_system-debt-engine/initialize/initialize_system-debt-engine.js
+# deploy priceOracle
+	coralX execute --network development --path scripts/deployment/7_price-oracle/deploy/price-oracle.js
+	coralX execute --network development --path scripts/deployment/7_price-oracle/initialize/initialize_price-oracle.js
 # deploy liquidationEngine
 	coralX execute --network development --path scripts/deployment/5_liquidation-engine/deploy/liquidation-engine.js
 	coralX execute --network development --path scripts/deployment/5_liquidation-engine/initialize/initialize_liquidation-engine.js
 # deploy stablecoinAdapter
 	coralX execute --network development --path scripts/deployment/6_stablecoin-adapter/deploy/stablecoin-adapter.js
 	coralX execute --network development --path scripts/deployment/6_stablecoin-adapter/initialize/initialize_stablecoin-adapter.js
-# deploy priceOracle
-	coralX execute --network development --path scripts/deployment/7_price-oracle/deploy/price-oracle.js
-	coralX execute --network development --path scripts/deployment/7_price-oracle/initialize/initialize_price-oracle.js
 # deploy showStopper
 	coralX execute --network development --path scripts/deployment/8_show-stopper/deploy/show-stopper.js
 	coralX execute --network development --path scripts/deployment/8_show-stopper/initialize/initialize_show-stopper.js
