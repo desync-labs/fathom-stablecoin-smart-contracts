@@ -5093,8 +5093,8 @@
     },
     "networks": {
         "1337": {
-            "address": "0xce75A95160D96F5388437993aB5825F322426E04",
-            "transactionHash": "0x20967ff30babafa250a60910fbc158fd122b27094d29b96c7dde800c6d35390d"
+            "address": "0x04bc42B5E7E8082C053199eA72347f38B0063746",
+            "transactionHash": "0x3fc233de051ee48d420f4ab4282c7b26b17cdeaba0a196aa407612e98757b279"
         }
     },
     "schemaVersion": "3.4.10",

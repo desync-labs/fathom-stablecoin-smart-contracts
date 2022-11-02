@@ -10641,7 +10641,7 @@
         1436
       ],
       "ERC20Interface": [
-        22755
+        22193
       ],
       "FlashMintModule": [
         2438
@@ -10698,7 +10698,7 @@
         822
       ],
       "SafeToken": [
-        22948
+        22386
       ],
       "StringsUpgradeable": [
         1392
@@ -10821,7 +10821,7 @@
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
         "scope": 2439,
-        "sourceUnit": 22949,
+        "sourceUnit": 22387,
         "src": "510:32:12",
         "symbolAliases": [],
         "unitAlias": ""
@@ -10902,7 +10902,7 @@
                 "647:9:12"
               ],
               "nodeType": "IdentifierPath",
-              "referencedDeclaration": 22948,
+              "referencedDeclaration": 22386,
               "src": "647:9:12"
             },
             "nodeType": "UsingForDirective",
@@ -13087,7 +13087,7 @@
                       "memberLocation": "2589:11:12",
                       "memberName": "safeApprove",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 22833,
+                      "referencedDeclaration": 22271,
                       "src": "2569:31:12",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_address_$_t_uint256_$returns$__$bound_to$_t_address_$",
@@ -16846,7 +16846,7 @@
                       "memberLocation": "4777:16:12",
                       "memberName": "safeTransferFrom",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 22922,
+                      "referencedDeclaration": 22360,
                       "src": "4757:36:12",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_address_$_t_address_$_t_uint256_$returns$__$bound_to$_t_address_$",
@@ -19745,7 +19745,7 @@
                       "memberLocation": "6408:11:12",
                       "memberName": "safeApprove",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 22833,
+                      "referencedDeclaration": 22271,
                       "src": "6388:31:12",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$_t_address_$_t_address_$_t_uint256_$returns$__$bound_to$_t_address_$",
@@ -19853,7 +19853,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-31T10:52:15.210Z",
+  "updatedAt": "2022-11-02T19:26:56.802Z",
   "devdoc": {
     "kind": "dev",
     "methods": {

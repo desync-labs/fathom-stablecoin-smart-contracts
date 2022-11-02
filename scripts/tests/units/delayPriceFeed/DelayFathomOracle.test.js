@@ -5,7 +5,6 @@ chai.use(solidity);
 
 const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
 
-
 const { BigNumber, ethers } = require("ethers");
 
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../../helper/unit");
@@ -44,15 +43,21 @@ describe("DelayFathomOraclePriceFeed", () => {
     await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"));
     await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"));
 
+    await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address);
+    // await mockedCollateralPoolConfig.mock.collateralPools.priceFeed.returns(delayFathomOraclePriceFeed.address);
+    await mockedCollateralPoolConfig.mock.getLiquidationRatio.returns(WeiPerRay);
+
     //if accounts[0] is checked whether having role or not,
     //set up accessPoolConfig.hasRole()
     // accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender
 
     await delayFathomOraclePriceFeed.initialize(MockDexPriceOracle.address, mockToken0, mockToken1, mockedAccessControlConfig.address);
     
+    await MockPriceOracle.initialize(mockedBookKeeper.address, delayFathomOraclePriceFeed.address, WeiPerRay);
+
     // console.log("mockedAccessControlConfig address is " + mockedAccessControlConfig.address);
 
-    // await MockPriceOracle.initialize(mockedBookKeeper.address);
+
     // console.log("mockedBookKeeper address is " + mockedBookKeeper.address);
 
   })
@@ -149,6 +154,10 @@ describe("DelayFathomOraclePriceFeed", () => {
           console.log("returnValue[1] is "+ returnValue[1]);
           await expect(returnValue[0]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000064');
 
+        // const tx = await delayFathomOraclePriceFeed.peekPrice();
+        // const resultValue2 = await tx.wait();
+        // console.log("result value from .wait method is" + resultValue2);
+
       })
     })
       //first it should return without 
@@ -160,6 +169,45 @@ describe("DelayFathomOraclePriceFeed", () => {
 
   })
 
+  describe("MockPriceOracle", () => {
+    context("1", async () => {
+      it("when changePrice(WeiPerWad) and liquidationRatio is WeiPerRay, _priceWithSafetyMargin should be WeiPerRay", async () => {
+        await MockDexPriceOracle.changePrice(WeiPerWad);
+        await delayFathomOraclePriceFeed.setTimeDelay(900);
+
+        const _collateralPoolId = formatBytes32String("WXDC")
+
+        // await delayFathomOraclePriceFeed.peekPrice();
+
+        const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
+        await expect(returnValue[1]).to.be.equal(true);
+        await MockPriceOracle.setPrice(_collateralPoolId);
+        const _priceWithSafetyMargin = await MockPriceOracle.callStatic.setPrice(_collateralPoolId);
+        console.log("_priceWithSafetyMargin is " + _priceWithSafetyMargin);
+        await expect(_priceWithSafetyMargin).to.be.equal(WeiPerRay);
+
+      })
+    })
+
+    context("2", async () => {
+      it("when changePrice(WeiPerWad.div(2)) and liquidationRatio is WeiPerRay, _priceWithSafetyMargin should be WeiPerRay.div(2)", async () => {
+        await MockDexPriceOracle.changePrice(WeiPerWad.div(2));
+        await delayFathomOraclePriceFeed.setTimeDelay(900);
+
+        const _collateralPoolId = formatBytes32String("WXDC")
+
+        // await delayFathomOraclePriceFeed.peekPrice();
+
+        const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
+        await expect(returnValue[1]).to.be.equal(true);
+        await MockPriceOracle.setPrice(_collateralPoolId);
+        const _priceWithSafetyMargin = await MockPriceOracle.callStatic.setPrice(_collateralPoolId);
+        console.log("_priceWithSafetyMargin is " + _priceWithSafetyMargin);
+        await expect(_priceWithSafetyMargin).to.be.equal(WeiPerRay.div(2));
+
+      })
+    })
+  })
   //then test MockPriceOracle which has DelayFathomOraclepPriceFeed as price Feed.
   //DelayFathomOraclePriceFeed should have _fathomOracle as MockDexPriceOracle
 })

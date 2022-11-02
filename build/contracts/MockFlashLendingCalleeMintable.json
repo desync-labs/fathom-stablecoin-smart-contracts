@@ -2868,8 +2868,8 @@
       "name": "#utility.yul"
     }
   ],
-  "sourceMap": "240:817:52:-:0;;;;;;;;;;;;;;;;;;;",
-  "deployedSourceMap": "240:817:52:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1858:84:4;1928:7;;;;1858:84;;179:14:77;;172:22;154:41;;142:2;127:18;1858:84:4;;;;;;;;538:517:52;;;;;;:::i;:::-;;:::i;:::-;;380:154;;;;;;:::i;:::-;;:::i;328:29::-;;;;;-1:-1:-1;;;;;328:29:52;;;;;;-1:-1:-1;;;;;1646:32:77;;;1628:51;;1616:2;1601:18;328:29:52;1462:223:77;538:517:52;726:10;;:81;;-1:-1:-1;;;726:81:52;;768:4;726:81;;;1930:34:77;;;1980:18;;;1973:43;2032:18;;;2025:34;;;-1:-1:-1;;;;;726:10:52;;;;:33;;1865:18:77;;726:81:52;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;817:15:52;;;-1:-1:-1;813:238:52;;-1:-1:-1;813:238:52;843:23;;896:36;;;;907:4;896:36;:::i;:::-;940:10;;:104;;-1:-1:-1;;;940:104:52;;;;;2629:25:77;;;992:4:52;2708:18:77;;;2701:43;-1:-1:-1;;;;;2780:15:77;;;2760:18;;;2753:43;2812:18;;;2805:34;;;842:90:52;;-1:-1:-1;842:90:52;;-1:-1:-1;940:10:52;;;;;:25;;2601:19:77;;940:104:52;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;834:217;;813:238;538:517;;;;;:::o;380:154::-;3111:19:3;3134:13;;;;;;3133:14;;3179:34;;;;-1:-1:-1;3197:12:3;;3212:1;3197:12;;;;:16;3179:34;3178:108;;;-1:-1:-1;3258:4:3;1476:19:6;:23;;;3219:66:3;;-1:-1:-1;3268:12:3;;;;;:17;3219:66;3157:201;;;;-1:-1:-1;;;3157:201:3;;3052:2:77;3157:201:3;;;3034:21:77;3091:2;3071:18;;;3064:30;3130:34;3110:18;;;3103:62;-1:-1:-1;;;3181:18:77;;;3174:44;3235:19;;3157:201:3;;;;;;;;;3368:12;:16;;-1:-1:-1;;3368:16:3;3383:1;3368:16;;;3394:65;;;;3428:13;:20;;-1:-1:-1;;3428:20:3;;;;;3394:65;448:37:52::1;:35;:37::i;:::-;492:10;:37:::0;;-1:-1:-1;;;;;;492:37:52::1;-1:-1:-1::0;;;;;492:37:52;::::1;;::::0;;3479:99:3;;;;3529:5;3513:21;;-1:-1:-1;;3513:21:3;;;3553:14;;-1:-1:-1;3417:36:77;;3553:14:3;;3405:2:77;3390:18;3553:14:3;;;;;;;3479:99;3101:483;380:154:52;:::o;1063:97:4:-;4910:13:3;;;;;;;4902:69;;;;-1:-1:-1;;;4902:69:3;;;;;;;:::i;:::-;1126:27:4::1;:25;:27::i;:::-;1063:97::o:0;1166:95::-;4910:13:3;;;;;;;4902:69;;;;-1:-1:-1;;;4902:69:3;;;;;;;:::i;:::-;1239:7:4::1;:15:::0;;-1:-1:-1;;1239:15:4::1;::::0;;1166:95::o;206:131:77:-;-1:-1:-1;;;;;281:31:77;;271:42;;261:70;;327:1;324;317:12;261:70;206:131;:::o;342:863::-;439:6;447;455;463;471;524:3;512:9;503:7;499:23;495:33;492:53;;;541:1;538;531:12;492:53;580:9;567:23;599:31;624:5;599:31;:::i;:::-;649:5;-1:-1:-1;701:2:77;686:18;;673:32;;-1:-1:-1;752:2:77;737:18;;724:32;;-1:-1:-1;807:2:77;792:18;;779:32;830:18;860:14;;;857:34;;;887:1;884;877:12;857:34;925:6;914:9;910:22;900:32;;970:7;963:4;959:2;955:13;951:27;941:55;;992:1;989;982:12;941:55;1032:2;1019:16;1058:2;1050:6;1047:14;1044:34;;;1074:1;1071;1064:12;1044:34;1119:7;1114:2;1105:6;1101:2;1097:15;1093:24;1090:37;1087:57;;;1140:1;1137;1130:12;1087:57;342:863;;;;-1:-1:-1;342:863:77;;-1:-1:-1;1171:2:77;1163:11;;1193:6;342:863;-1:-1:-1;;;342:863:77:o;1210:247::-;1269:6;1322:2;1310:9;1301:7;1297:23;1293:32;1290:52;;;1338:1;1335;1328:12;1290:52;1377:9;1364:23;1396:31;1421:5;1396:31;:::i;:::-;1446:5;1210:247;-1:-1:-1;;;1210:247:77:o;2070:323::-;2146:6;2154;2207:2;2195:9;2186:7;2182:23;2178:32;2175:52;;;2223:1;2220;2213:12;2175:52;2262:9;2249:23;2281:31;2306:5;2281:31;:::i;:::-;2331:5;2383:2;2368:18;;;;2355:32;;-1:-1:-1;;;2070:323:77:o;3464:407::-;3666:2;3648:21;;;3705:2;3685:18;;;3678:30;3744:34;3739:2;3724:18;;3717:62;-1:-1:-1;;;3810:2:77;3795:18;;3788:41;3861:3;3846:19;;3464:407::o",
+  "sourceMap": "240:817:53:-:0;;;;;;;;;;;;;;;;;;;",
+  "deployedSourceMap": "240:817:53:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;1858:84:4;1928:7;;;;1858:84;;179:14:77;;172:22;154:41;;142:2;127:18;1858:84:4;;;;;;;;538:517:53;;;;;;:::i;:::-;;:::i;:::-;;380:154;;;;;;:::i;:::-;;:::i;328:29::-;;;;;-1:-1:-1;;;;;328:29:53;;;;;;-1:-1:-1;;;;;1646:32:77;;;1628:51;;1616:2;1601:18;328:29:53;1462:223:77;538:517:53;726:10;;:81;;-1:-1:-1;;;726:81:53;;768:4;726:81;;;1930:34:77;;;1980:18;;;1973:43;2032:18;;;2025:34;;;-1:-1:-1;;;;;726:10:53;;;;:33;;1865:18:77;;726:81:53;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-1:-1:-1;;817:15:53;;;-1:-1:-1;813:238:53;;-1:-1:-1;813:238:53;843:23;;896:36;;;;907:4;896:36;:::i;:::-;940:10;;:104;;-1:-1:-1;;;940:104:53;;;;;2629:25:77;;;992:4:53;2708:18:77;;;2701:43;-1:-1:-1;;;;;2780:15:77;;;2760:18;;;2753:43;2812:18;;;2805:34;;;842:90:53;;-1:-1:-1;842:90:53;;-1:-1:-1;940:10:53;;;;;:25;;2601:19:77;;940:104:53;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;834:217;;813:238;538:517;;;;;:::o;380:154::-;3111:19:3;3134:13;;;;;;3133:14;;3179:34;;;;-1:-1:-1;3197:12:3;;3212:1;3197:12;;;;:16;3179:34;3178:108;;;-1:-1:-1;3258:4:3;1476:19:6;:23;;;3219:66:3;;-1:-1:-1;3268:12:3;;;;;:17;3219:66;3157:201;;;;-1:-1:-1;;;3157:201:3;;3052:2:77;3157:201:3;;;3034:21:77;3091:2;3071:18;;;3064:30;3130:34;3110:18;;;3103:62;-1:-1:-1;;;3181:18:77;;;3174:44;3235:19;;3157:201:3;;;;;;;;;3368:12;:16;;-1:-1:-1;;3368:16:3;3383:1;3368:16;;;3394:65;;;;3428:13;:20;;-1:-1:-1;;3428:20:3;;;;;3394:65;448:37:53::1;:35;:37::i;:::-;492:10;:37:::0;;-1:-1:-1;;;;;;492:37:53::1;-1:-1:-1::0;;;;;492:37:53;::::1;;::::0;;3479:99:3;;;;3529:5;3513:21;;-1:-1:-1;;3513:21:3;;;3553:14;;-1:-1:-1;3417:36:77;;3553:14:3;;3405:2:77;3390:18;3553:14:3;;;;;;;3479:99;3101:483;380:154:53;:::o;1063:97:4:-;4910:13:3;;;;;;;4902:69;;;;-1:-1:-1;;;4902:69:3;;;;;;;:::i;:::-;1126:27:4::1;:25;:27::i;:::-;1063:97::o:0;1166:95::-;4910:13:3;;;;;;;4902:69;;;;-1:-1:-1;;;4902:69:3;;;;;;;:::i;:::-;1239:7:4::1;:15:::0;;-1:-1:-1;;1239:15:4::1;::::0;;1166:95::o;206:131:77:-;-1:-1:-1;;;;;281:31:77;;271:42;;261:70;;327:1;324;317:12;261:70;206:131;:::o;342:863::-;439:6;447;455;463;471;524:3;512:9;503:7;499:23;495:33;492:53;;;541:1;538;531:12;492:53;580:9;567:23;599:31;624:5;599:31;:::i;:::-;649:5;-1:-1:-1;701:2:77;686:18;;673:32;;-1:-1:-1;752:2:77;737:18;;724:32;;-1:-1:-1;807:2:77;792:18;;779:32;830:18;860:14;;;857:34;;;887:1;884;877:12;857:34;925:6;914:9;910:22;900:32;;970:7;963:4;959:2;955:13;951:27;941:55;;992:1;989;982:12;941:55;1032:2;1019:16;1058:2;1050:6;1047:14;1044:34;;;1074:1;1071;1064:12;1044:34;1119:7;1114:2;1105:6;1101:2;1097:15;1093:24;1090:37;1087:57;;;1140:1;1137;1130:12;1087:57;342:863;;;;-1:-1:-1;342:863:77;;-1:-1:-1;1171:2:77;1163:11;;1193:6;342:863;-1:-1:-1;;;342:863:77:o;1210:247::-;1269:6;1322:2;1310:9;1301:7;1297:23;1293:32;1290:52;;;1338:1;1335;1328:12;1290:52;1377:9;1364:23;1396:31;1421:5;1396:31;:::i;:::-;1446:5;1210:247;-1:-1:-1;;;1210:247:77:o;2070:323::-;2146:6;2154;2207:2;2195:9;2186:7;2182:23;2178:32;2175:52;;;2223:1;2220;2213:12;2175:52;2262:9;2249:23;2281:31;2306:5;2281:31;:::i;:::-;2331:5;2383:2;2368:18;;;;2355:32;;-1:-1:-1;;;2070:323:77:o;3464:407::-;3666:2;3648:21;;;3705:2;3685:18;;;3678:30;3744:34;3739:2;3724:18;;3717:62;-1:-1:-1;;;3810:2:77;3795:18;;3788:41;3861:3;3846:19;;3464:407::o",
   "source": "// SPDX-License-Identifier: AGPL-3.0-or-later\n\npragma solidity 0.8.17;\n\nimport \"../interfaces/IFlashLendingCallee.sol\";\nimport \"../interfaces/IBookKeeper.sol\";\nimport \"@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol\";\n\ncontract MockFlashLendingCalleeMintable is IFlashLendingCallee, PausableUpgradeable {\n  IBookKeeper public bookKeeper;\n\n  // --- Init ---\n  function initialize(address _bookKeeper) external initializer {\n    PausableUpgradeable.__Pausable_init();\n\n    bookKeeper = IBookKeeper(_bookKeeper);\n  }\n\n  function flashLendingCall(\n    address caller,\n    uint256 debtValueToRepay, // [rad]\n    uint256 collateralAmountToLiquidate, // [wad]\n    bytes calldata data\n  ) external override {\n    bookKeeper.mintUnbackedStablecoin(address(this), address(this), debtValueToRepay);\n    if (data.length > 0) {\n      (address treasuryAccount, bytes32 collateralPoolId) = abi.decode(data, (address, bytes32));\n      bookKeeper.moveCollateral(collateralPoolId, address(this), treasuryAccount, collateralAmountToLiquidate);\n    }\n  }\n}\n",
   "sourcePath": "/Users/sangjun.lee/Sangjun/fathom-stablecoin-smart-contracts/contracts/8.17/mocks/MockFlashLendingCalleeMintable.sol",
   "ast": {
@@ -2909,59 +2909,59 @@
         695
       ],
       "MockFlashLendingCalleeMintable": [
-        6710
+        6746
       ],
       "PausableUpgradeable": [
         822
       ]
     },
-    "id": 6711,
+    "id": 6747,
     "license": "AGPL-3.0-or-later",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 6621,
+        "id": 6657,
         "literals": [
           "solidity",
           "0.8",
           ".17"
         ],
         "nodeType": "PragmaDirective",
-        "src": "47:23:52"
+        "src": "47:23:53"
       },
       {
         "absolutePath": "project:/contracts/8.17/interfaces/IFlashLendingCallee.sol",
         "file": "../interfaces/IFlashLendingCallee.sol",
-        "id": 6622,
+        "id": 6658,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 6711,
+        "scope": 6747,
         "sourceUnit": 3479,
-        "src": "72:47:52",
+        "src": "72:47:53",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
         "absolutePath": "project:/contracts/8.17/interfaces/IBookKeeper.sol",
         "file": "../interfaces/IBookKeeper.sol",
-        "id": 6623,
+        "id": 6659,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 6711,
+        "scope": 6747,
         "sourceUnit": 2865,
-        "src": "120:39:52",
+        "src": "120:39:53",
         "symbolAliases": [],
         "unitAlias": ""
       },
       {
         "absolutePath": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
         "file": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol",
-        "id": 6624,
+        "id": 6660,
         "nameLocation": "-1:-1:-1",
         "nodeType": "ImportDirective",
-        "scope": 6711,
+        "scope": 6747,
         "sourceUnit": 823,
-        "src": "160:78:52",
+        "src": "160:78:53",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -2970,61 +2970,61 @@
         "baseContracts": [
           {
             "baseName": {
-              "id": 6625,
+              "id": 6661,
               "name": "IFlashLendingCallee",
               "nameLocations": [
-                "283:19:52"
+                "283:19:53"
               ],
               "nodeType": "IdentifierPath",
               "referencedDeclaration": 3478,
-              "src": "283:19:52"
+              "src": "283:19:53"
             },
-            "id": 6626,
+            "id": 6662,
             "nodeType": "InheritanceSpecifier",
-            "src": "283:19:52"
+            "src": "283:19:53"
           },
           {
             "baseName": {
-              "id": 6627,
+              "id": 6663,
               "name": "PausableUpgradeable",
               "nameLocations": [
-                "304:19:52"
+                "304:19:53"
               ],
               "nodeType": "IdentifierPath",
               "referencedDeclaration": 822,
-              "src": "304:19:52"
+              "src": "304:19:53"
             },
-            "id": 6628,
+            "id": 6664,
             "nodeType": "InheritanceSpecifier",
-            "src": "304:19:52"
+            "src": "304:19:53"
           }
         ],
         "canonicalName": "MockFlashLendingCalleeMintable",
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 6710,
+        "id": 6746,
         "linearizedBaseContracts": [
-          6710,
+          6746,
           822,
           1166,
           695,
           3478
         ],
         "name": "MockFlashLendingCalleeMintable",
-        "nameLocation": "249:30:52",
+        "nameLocation": "249:30:53",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": false,
             "functionSelector": "e3b3932a",
-            "id": 6631,
+            "id": 6667,
             "mutability": "mutable",
             "name": "bookKeeper",
-            "nameLocation": "347:10:52",
+            "nameLocation": "347:10:53",
             "nodeType": "VariableDeclaration",
-            "scope": 6710,
-            "src": "328:29:52",
+            "scope": 6746,
+            "src": "328:29:53",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
@@ -3032,20 +3032,20 @@
               "typeString": "contract IBookKeeper"
             },
             "typeName": {
-              "id": 6630,
+              "id": 6666,
               "nodeType": "UserDefinedTypeName",
               "pathNode": {
-                "id": 6629,
+                "id": 6665,
                 "name": "IBookKeeper",
                 "nameLocations": [
-                  "328:11:52"
+                  "328:11:53"
                 ],
                 "nodeType": "IdentifierPath",
                 "referencedDeclaration": 2864,
-                "src": "328:11:52"
+                "src": "328:11:53"
               },
               "referencedDeclaration": 2864,
-              "src": "328:11:52",
+              "src": "328:11:53",
               "typeDescriptions": {
                 "typeIdentifier": "t_contract$_IBookKeeper_$2864",
                 "typeString": "contract IBookKeeper"
@@ -3055,9 +3055,9 @@
           },
           {
             "body": {
-              "id": 6649,
+              "id": 6685,
               "nodeType": "Block",
-              "src": "442:92:52",
+              "src": "442:92:53",
               "statements": [
                 {
                   "expression": {
@@ -3065,33 +3065,33 @@
                     "expression": {
                       "argumentTypes": [],
                       "expression": {
-                        "id": 6638,
+                        "id": 6674,
                         "name": "PausableUpgradeable",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 822,
-                        "src": "448:19:52",
+                        "src": "448:19:53",
                         "typeDescriptions": {
                           "typeIdentifier": "t_type$_t_contract$_PausableUpgradeable_$822_$",
                           "typeString": "type(contract PausableUpgradeable)"
                         }
                       },
-                      "id": 6640,
+                      "id": 6676,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
-                      "memberLocation": "468:15:52",
+                      "memberLocation": "468:15:53",
                       "memberName": "__Pausable_init",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 726,
-                      "src": "448:35:52",
+                      "src": "448:35:53",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_internal_nonpayable$__$returns$__$",
                         "typeString": "function ()"
                       }
                     },
-                    "id": 6641,
+                    "id": 6677,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -3100,31 +3100,31 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "448:37:52",
+                    "src": "448:37:53",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 6642,
+                  "id": 6678,
                   "nodeType": "ExpressionStatement",
-                  "src": "448:37:52"
+                  "src": "448:37:53"
                 },
                 {
                   "expression": {
-                    "id": 6647,
+                    "id": 6683,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftHandSide": {
-                      "id": 6643,
+                      "id": 6679,
                       "name": "bookKeeper",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 6631,
-                      "src": "492:10:52",
+                      "referencedDeclaration": 6667,
+                      "src": "492:10:53",
                       "typeDescriptions": {
                         "typeIdentifier": "t_contract$_IBookKeeper_$2864",
                         "typeString": "contract IBookKeeper"
@@ -3135,12 +3135,12 @@
                     "rightHandSide": {
                       "arguments": [
                         {
-                          "id": 6645,
+                          "id": 6681,
                           "name": "_bookKeeper",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 6633,
-                          "src": "517:11:52",
+                          "referencedDeclaration": 6669,
+                          "src": "517:11:53",
                           "typeDescriptions": {
                             "typeIdentifier": "t_address",
                             "typeString": "address"
@@ -3154,18 +3154,18 @@
                             "typeString": "address"
                           }
                         ],
-                        "id": 6644,
+                        "id": 6680,
                         "name": "IBookKeeper",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
                         "referencedDeclaration": 2864,
-                        "src": "505:11:52",
+                        "src": "505:11:53",
                         "typeDescriptions": {
                           "typeIdentifier": "t_type$_t_contract$_IBookKeeper_$2864_$",
                           "typeString": "type(contract IBookKeeper)"
                         }
                       },
-                      "id": 6646,
+                      "id": 6682,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -3174,63 +3174,63 @@
                       "nameLocations": [],
                       "names": [],
                       "nodeType": "FunctionCall",
-                      "src": "505:24:52",
+                      "src": "505:24:53",
                       "tryCall": false,
                       "typeDescriptions": {
                         "typeIdentifier": "t_contract$_IBookKeeper_$2864",
                         "typeString": "contract IBookKeeper"
                       }
                     },
-                    "src": "492:37:52",
+                    "src": "492:37:53",
                     "typeDescriptions": {
                       "typeIdentifier": "t_contract$_IBookKeeper_$2864",
                       "typeString": "contract IBookKeeper"
                     }
                   },
-                  "id": 6648,
+                  "id": 6684,
                   "nodeType": "ExpressionStatement",
-                  "src": "492:37:52"
+                  "src": "492:37:53"
                 }
               ]
             },
             "functionSelector": "c4d66de8",
-            "id": 6650,
+            "id": 6686,
             "implemented": true,
             "kind": "function",
             "modifiers": [
               {
-                "id": 6636,
+                "id": 6672,
                 "kind": "modifierInvocation",
                 "modifierName": {
-                  "id": 6635,
+                  "id": 6671,
                   "name": "initializer",
                   "nameLocations": [
-                    "430:11:52"
+                    "430:11:53"
                   ],
                   "nodeType": "IdentifierPath",
                   "referencedDeclaration": 615,
-                  "src": "430:11:52"
+                  "src": "430:11:53"
                 },
                 "nodeType": "ModifierInvocation",
-                "src": "430:11:52"
+                "src": "430:11:53"
               }
             ],
             "name": "initialize",
-            "nameLocation": "389:10:52",
+            "nameLocation": "389:10:53",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 6634,
+              "id": 6670,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6633,
+                  "id": 6669,
                   "mutability": "mutable",
                   "name": "_bookKeeper",
-                  "nameLocation": "408:11:52",
+                  "nameLocation": "408:11:53",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6650,
-                  "src": "400:19:52",
+                  "scope": 6686,
+                  "src": "400:19:53",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -3238,10 +3238,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 6632,
+                    "id": 6668,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "400:7:52",
+                    "src": "400:7:53",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -3251,16 +3251,16 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "399:21:52"
+              "src": "399:21:53"
             },
             "returnParameters": {
-              "id": 6637,
+              "id": 6673,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "442:0:52"
+              "src": "442:0:53"
             },
-            "scope": 6710,
-            "src": "380:154:52",
+            "scope": 6746,
+            "src": "380:154:53",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
@@ -3270,9 +3270,9 @@
               3477
             ],
             "body": {
-              "id": 6708,
+              "id": 6744,
               "nodeType": "Block",
-              "src": "720:335:52",
+              "src": "720:335:53",
               "statements": [
                 {
                   "expression": {
@@ -3280,14 +3280,14 @@
                       {
                         "arguments": [
                           {
-                            "id": 6667,
+                            "id": 6703,
                             "name": "this",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
                             "referencedDeclaration": 4294967268,
-                            "src": "768:4:52",
+                            "src": "768:4:53",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6710",
+                              "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6746",
                               "typeString": "contract MockFlashLendingCalleeMintable"
                             }
                           }
@@ -3295,30 +3295,30 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6710",
+                              "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6746",
                               "typeString": "contract MockFlashLendingCalleeMintable"
                             }
                           ],
-                          "id": 6666,
+                          "id": 6702,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
                           "lValueRequested": false,
                           "nodeType": "ElementaryTypeNameExpression",
-                          "src": "760:7:52",
+                          "src": "760:7:53",
                           "typeDescriptions": {
                             "typeIdentifier": "t_type$_t_address_$",
                             "typeString": "type(address)"
                           },
                           "typeName": {
-                            "id": 6665,
+                            "id": 6701,
                             "name": "address",
                             "nodeType": "ElementaryTypeName",
-                            "src": "760:7:52",
+                            "src": "760:7:53",
                             "typeDescriptions": {}
                           }
                         },
-                        "id": 6668,
+                        "id": 6704,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -3327,7 +3327,7 @@
                         "nameLocations": [],
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "760:13:52",
+                        "src": "760:13:53",
                         "tryCall": false,
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -3337,14 +3337,14 @@
                       {
                         "arguments": [
                           {
-                            "id": 6671,
+                            "id": 6707,
                             "name": "this",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
                             "referencedDeclaration": 4294967268,
-                            "src": "783:4:52",
+                            "src": "783:4:53",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6710",
+                              "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6746",
                               "typeString": "contract MockFlashLendingCalleeMintable"
                             }
                           }
@@ -3352,30 +3352,30 @@
                         "expression": {
                           "argumentTypes": [
                             {
-                              "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6710",
+                              "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6746",
                               "typeString": "contract MockFlashLendingCalleeMintable"
                             }
                           ],
-                          "id": 6670,
+                          "id": 6706,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
                           "lValueRequested": false,
                           "nodeType": "ElementaryTypeNameExpression",
-                          "src": "775:7:52",
+                          "src": "775:7:53",
                           "typeDescriptions": {
                             "typeIdentifier": "t_type$_t_address_$",
                             "typeString": "type(address)"
                           },
                           "typeName": {
-                            "id": 6669,
+                            "id": 6705,
                             "name": "address",
                             "nodeType": "ElementaryTypeName",
-                            "src": "775:7:52",
+                            "src": "775:7:53",
                             "typeDescriptions": {}
                           }
                         },
-                        "id": 6672,
+                        "id": 6708,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -3384,7 +3384,7 @@
                         "nameLocations": [],
                         "names": [],
                         "nodeType": "FunctionCall",
-                        "src": "775:13:52",
+                        "src": "775:13:53",
                         "tryCall": false,
                         "typeDescriptions": {
                           "typeIdentifier": "t_address",
@@ -3392,12 +3392,12 @@
                         }
                       },
                       {
-                        "id": 6673,
+                        "id": 6709,
                         "name": "debtValueToRepay",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 6654,
-                        "src": "790:16:52",
+                        "referencedDeclaration": 6690,
+                        "src": "790:16:53",
                         "typeDescriptions": {
                           "typeIdentifier": "t_uint256",
                           "typeString": "uint256"
@@ -3420,33 +3420,33 @@
                         }
                       ],
                       "expression": {
-                        "id": 6662,
+                        "id": 6698,
                         "name": "bookKeeper",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 6631,
-                        "src": "726:10:52",
+                        "referencedDeclaration": 6667,
+                        "src": "726:10:53",
                         "typeDescriptions": {
                           "typeIdentifier": "t_contract$_IBookKeeper_$2864",
                           "typeString": "contract IBookKeeper"
                         }
                       },
-                      "id": 6664,
+                      "id": 6700,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
-                      "memberLocation": "737:22:52",
+                      "memberLocation": "737:22:53",
                       "memberName": "mintUnbackedStablecoin",
                       "nodeType": "MemberAccess",
                       "referencedDeclaration": 2822,
-                      "src": "726:33:52",
+                      "src": "726:33:53",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_$_t_address_$_t_uint256_$returns$__$",
                         "typeString": "function (address,address,uint256) external"
                       }
                     },
-                    "id": 6674,
+                    "id": 6710,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -3455,16 +3455,16 @@
                     "nameLocations": [],
                     "names": [],
                     "nodeType": "FunctionCall",
-                    "src": "726:81:52",
+                    "src": "726:81:53",
                     "tryCall": false,
                     "typeDescriptions": {
                       "typeIdentifier": "t_tuple$__$",
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 6675,
+                  "id": 6711,
                   "nodeType": "ExpressionStatement",
-                  "src": "726:81:52"
+                  "src": "726:81:53"
                 },
                 {
                   "condition": {
@@ -3472,33 +3472,33 @@
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
                     },
-                    "id": 6679,
+                    "id": 6715,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
                     "lValueRequested": false,
                     "leftExpression": {
                       "expression": {
-                        "id": 6676,
+                        "id": 6712,
                         "name": "data",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 6658,
-                        "src": "817:4:52",
+                        "referencedDeclaration": 6694,
+                        "src": "817:4:53",
                         "typeDescriptions": {
                           "typeIdentifier": "t_bytes_calldata_ptr",
                           "typeString": "bytes calldata"
                         }
                       },
-                      "id": 6677,
+                      "id": 6713,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
                       "lValueRequested": false,
-                      "memberLocation": "822:6:52",
+                      "memberLocation": "822:6:53",
                       "memberName": "length",
                       "nodeType": "MemberAccess",
-                      "src": "817:11:52",
+                      "src": "817:11:53",
                       "typeDescriptions": {
                         "typeIdentifier": "t_uint256",
                         "typeString": "uint256"
@@ -3508,49 +3508,49 @@
                     "operator": ">",
                     "rightExpression": {
                       "hexValue": "30",
-                      "id": 6678,
+                      "id": 6714,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": true,
                       "kind": "number",
                       "lValueRequested": false,
                       "nodeType": "Literal",
-                      "src": "831:1:52",
+                      "src": "831:1:53",
                       "typeDescriptions": {
                         "typeIdentifier": "t_rational_0_by_1",
                         "typeString": "int_const 0"
                       },
                       "value": "0"
                     },
-                    "src": "817:15:52",
+                    "src": "817:15:53",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
                     }
                   },
-                  "id": 6707,
+                  "id": 6743,
                   "nodeType": "IfStatement",
-                  "src": "813:238:52",
+                  "src": "813:238:53",
                   "trueBody": {
-                    "id": 6706,
+                    "id": 6742,
                     "nodeType": "Block",
-                    "src": "834:217:52",
+                    "src": "834:217:53",
                     "statements": [
                       {
                         "assignments": [
-                          6681,
-                          6683
+                          6717,
+                          6719
                         ],
                         "declarations": [
                           {
                             "constant": false,
-                            "id": 6681,
+                            "id": 6717,
                             "mutability": "mutable",
                             "name": "treasuryAccount",
-                            "nameLocation": "851:15:52",
+                            "nameLocation": "851:15:53",
                             "nodeType": "VariableDeclaration",
-                            "scope": 6706,
-                            "src": "843:23:52",
+                            "scope": 6742,
+                            "src": "843:23:53",
                             "stateVariable": false,
                             "storageLocation": "default",
                             "typeDescriptions": {
@@ -3558,10 +3558,10 @@
                               "typeString": "address"
                             },
                             "typeName": {
-                              "id": 6680,
+                              "id": 6716,
                               "name": "address",
                               "nodeType": "ElementaryTypeName",
-                              "src": "843:7:52",
+                              "src": "843:7:53",
                               "stateMutability": "nonpayable",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_address",
@@ -3572,13 +3572,13 @@
                           },
                           {
                             "constant": false,
-                            "id": 6683,
+                            "id": 6719,
                             "mutability": "mutable",
                             "name": "collateralPoolId",
-                            "nameLocation": "876:16:52",
+                            "nameLocation": "876:16:53",
                             "nodeType": "VariableDeclaration",
-                            "scope": 6706,
-                            "src": "868:24:52",
+                            "scope": 6742,
+                            "src": "868:24:53",
                             "stateVariable": false,
                             "storageLocation": "default",
                             "typeDescriptions": {
@@ -3586,10 +3586,10 @@
                               "typeString": "bytes32"
                             },
                             "typeName": {
-                              "id": 6682,
+                              "id": 6718,
                               "name": "bytes32",
                               "nodeType": "ElementaryTypeName",
-                              "src": "868:7:52",
+                              "src": "868:7:53",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_bytes32",
                                 "typeString": "bytes32"
@@ -3598,16 +3598,16 @@
                             "visibility": "internal"
                           }
                         ],
-                        "id": 6693,
+                        "id": 6729,
                         "initialValue": {
                           "arguments": [
                             {
-                              "id": 6686,
+                              "id": 6722,
                               "name": "data",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 6658,
-                              "src": "907:4:52",
+                              "referencedDeclaration": 6694,
+                              "src": "907:4:53",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_bytes_calldata_ptr",
                                 "typeString": "bytes calldata"
@@ -3616,54 +3616,54 @@
                             {
                               "components": [
                                 {
-                                  "id": 6688,
+                                  "id": 6724,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "914:7:52",
+                                  "src": "914:7:53",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_address_$",
                                     "typeString": "type(address)"
                                   },
                                   "typeName": {
-                                    "id": 6687,
+                                    "id": 6723,
                                     "name": "address",
                                     "nodeType": "ElementaryTypeName",
-                                    "src": "914:7:52",
+                                    "src": "914:7:53",
                                     "typeDescriptions": {}
                                   }
                                 },
                                 {
-                                  "id": 6690,
+                                  "id": 6726,
                                   "isConstant": false,
                                   "isLValue": false,
                                   "isPure": true,
                                   "lValueRequested": false,
                                   "nodeType": "ElementaryTypeNameExpression",
-                                  "src": "923:7:52",
+                                  "src": "923:7:53",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_type$_t_bytes32_$",
                                     "typeString": "type(bytes32)"
                                   },
                                   "typeName": {
-                                    "id": 6689,
+                                    "id": 6725,
                                     "name": "bytes32",
                                     "nodeType": "ElementaryTypeName",
-                                    "src": "923:7:52",
+                                    "src": "923:7:53",
                                     "typeDescriptions": {}
                                   }
                                 }
                               ],
-                              "id": 6691,
+                              "id": 6727,
                               "isConstant": false,
                               "isInlineArray": false,
                               "isLValue": false,
                               "isPure": true,
                               "lValueRequested": false,
                               "nodeType": "TupleExpression",
-                              "src": "913:18:52",
+                              "src": "913:18:53",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_tuple$_t_type$_t_address_$_$_t_type$_t_bytes32_$_$",
                                 "typeString": "tuple(type(address),type(bytes32))"
@@ -3682,32 +3682,32 @@
                               }
                             ],
                             "expression": {
-                              "id": 6684,
+                              "id": 6720,
                               "name": "abi",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
                               "referencedDeclaration": 4294967295,
-                              "src": "896:3:52",
+                              "src": "896:3:53",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_magic_abi",
                                 "typeString": "abi"
                               }
                             },
-                            "id": 6685,
+                            "id": 6721,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": true,
                             "lValueRequested": false,
-                            "memberLocation": "900:6:52",
+                            "memberLocation": "900:6:53",
                             "memberName": "decode",
                             "nodeType": "MemberAccess",
-                            "src": "896:10:52",
+                            "src": "896:10:53",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_abidecode_pure$__$returns$__$",
                               "typeString": "function () pure"
                             }
                           },
-                          "id": 6692,
+                          "id": 6728,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -3716,7 +3716,7 @@
                           "nameLocations": [],
                           "names": [],
                           "nodeType": "FunctionCall",
-                          "src": "896:36:52",
+                          "src": "896:36:53",
                           "tryCall": false,
                           "typeDescriptions": {
                             "typeIdentifier": "t_tuple$_t_address_payable_$_t_bytes32_$",
@@ -3724,18 +3724,18 @@
                           }
                         },
                         "nodeType": "VariableDeclarationStatement",
-                        "src": "842:90:52"
+                        "src": "842:90:53"
                       },
                       {
                         "expression": {
                           "arguments": [
                             {
-                              "id": 6697,
+                              "id": 6733,
                               "name": "collateralPoolId",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 6683,
-                              "src": "966:16:52",
+                              "referencedDeclaration": 6719,
+                              "src": "966:16:53",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_bytes32",
                                 "typeString": "bytes32"
@@ -3744,14 +3744,14 @@
                             {
                               "arguments": [
                                 {
-                                  "id": 6700,
+                                  "id": 6736,
                                   "name": "this",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
                                   "referencedDeclaration": 4294967268,
-                                  "src": "992:4:52",
+                                  "src": "992:4:53",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6710",
+                                    "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6746",
                                     "typeString": "contract MockFlashLendingCalleeMintable"
                                   }
                                 }
@@ -3759,30 +3759,30 @@
                               "expression": {
                                 "argumentTypes": [
                                   {
-                                    "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6710",
+                                    "typeIdentifier": "t_contract$_MockFlashLendingCalleeMintable_$6746",
                                     "typeString": "contract MockFlashLendingCalleeMintable"
                                   }
                                 ],
-                                "id": 6699,
+                                "id": 6735,
                                 "isConstant": false,
                                 "isLValue": false,
                                 "isPure": true,
                                 "lValueRequested": false,
                                 "nodeType": "ElementaryTypeNameExpression",
-                                "src": "984:7:52",
+                                "src": "984:7:53",
                                 "typeDescriptions": {
                                   "typeIdentifier": "t_type$_t_address_$",
                                   "typeString": "type(address)"
                                 },
                                 "typeName": {
-                                  "id": 6698,
+                                  "id": 6734,
                                   "name": "address",
                                   "nodeType": "ElementaryTypeName",
-                                  "src": "984:7:52",
+                                  "src": "984:7:53",
                                   "typeDescriptions": {}
                                 }
                               },
-                              "id": 6701,
+                              "id": 6737,
                               "isConstant": false,
                               "isLValue": false,
                               "isPure": false,
@@ -3791,7 +3791,7 @@
                               "nameLocations": [],
                               "names": [],
                               "nodeType": "FunctionCall",
-                              "src": "984:13:52",
+                              "src": "984:13:53",
                               "tryCall": false,
                               "typeDescriptions": {
                                 "typeIdentifier": "t_address",
@@ -3799,24 +3799,24 @@
                               }
                             },
                             {
-                              "id": 6702,
+                              "id": 6738,
                               "name": "treasuryAccount",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 6681,
-                              "src": "999:15:52",
+                              "referencedDeclaration": 6717,
+                              "src": "999:15:53",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_address",
                                 "typeString": "address"
                               }
                             },
                             {
-                              "id": 6703,
+                              "id": 6739,
                               "name": "collateralAmountToLiquidate",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 6656,
-                              "src": "1016:27:52",
+                              "referencedDeclaration": 6692,
+                              "src": "1016:27:53",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_uint256",
                                 "typeString": "uint256"
@@ -3843,33 +3843,33 @@
                               }
                             ],
                             "expression": {
-                              "id": 6694,
+                              "id": 6730,
                               "name": "bookKeeper",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 6631,
-                              "src": "940:10:52",
+                              "referencedDeclaration": 6667,
+                              "src": "940:10:53",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_contract$_IBookKeeper_$2864",
                                 "typeString": "contract IBookKeeper"
                               }
                             },
-                            "id": 6696,
+                            "id": 6732,
                             "isConstant": false,
                             "isLValue": false,
                             "isPure": false,
                             "lValueRequested": false,
-                            "memberLocation": "951:14:52",
+                            "memberLocation": "951:14:53",
                             "memberName": "moveCollateral",
                             "nodeType": "MemberAccess",
                             "referencedDeclaration": 2798,
-                            "src": "940:25:52",
+                            "src": "940:25:53",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_nonpayable$_t_bytes32_$_t_address_$_t_address_$_t_uint256_$returns$__$",
                               "typeString": "function (bytes32,address,address,uint256) external"
                             }
                           },
-                          "id": 6704,
+                          "id": 6740,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": false,
@@ -3878,16 +3878,16 @@
                           "nameLocations": [],
                           "names": [],
                           "nodeType": "FunctionCall",
-                          "src": "940:104:52",
+                          "src": "940:104:53",
                           "tryCall": false,
                           "typeDescriptions": {
                             "typeIdentifier": "t_tuple$__$",
                             "typeString": "tuple()"
                           }
                         },
-                        "id": 6705,
+                        "id": 6741,
                         "nodeType": "ExpressionStatement",
-                        "src": "940:104:52"
+                        "src": "940:104:53"
                       }
                     ]
                   }
@@ -3895,32 +3895,32 @@
               ]
             },
             "functionSelector": "af7bd142",
-            "id": 6709,
+            "id": 6745,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
             "name": "flashLendingCall",
-            "nameLocation": "547:16:52",
+            "nameLocation": "547:16:53",
             "nodeType": "FunctionDefinition",
             "overrides": {
-              "id": 6660,
+              "id": 6696,
               "nodeType": "OverrideSpecifier",
               "overrides": [],
-              "src": "711:8:52"
+              "src": "711:8:53"
             },
             "parameters": {
-              "id": 6659,
+              "id": 6695,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 6652,
+                  "id": 6688,
                   "mutability": "mutable",
                   "name": "caller",
-                  "nameLocation": "577:6:52",
+                  "nameLocation": "577:6:53",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6709,
-                  "src": "569:14:52",
+                  "scope": 6745,
+                  "src": "569:14:53",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -3928,10 +3928,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 6651,
+                    "id": 6687,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "569:7:52",
+                    "src": "569:7:53",
                     "stateMutability": "nonpayable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
@@ -3942,13 +3942,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6654,
+                  "id": 6690,
                   "mutability": "mutable",
                   "name": "debtValueToRepay",
-                  "nameLocation": "597:16:52",
+                  "nameLocation": "597:16:53",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6709,
-                  "src": "589:24:52",
+                  "scope": 6745,
+                  "src": "589:24:53",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -3956,10 +3956,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6653,
+                    "id": 6689,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "589:7:52",
+                    "src": "589:7:53",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -3969,13 +3969,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6656,
+                  "id": 6692,
                   "mutability": "mutable",
                   "name": "collateralAmountToLiquidate",
-                  "nameLocation": "636:27:52",
+                  "nameLocation": "636:27:53",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6709,
-                  "src": "628:35:52",
+                  "scope": 6745,
+                  "src": "628:35:53",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -3983,10 +3983,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 6655,
+                    "id": 6691,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "628:7:52",
+                    "src": "628:7:53",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -3996,13 +3996,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 6658,
+                  "id": 6694,
                   "mutability": "mutable",
                   "name": "data",
-                  "nameLocation": "693:4:52",
+                  "nameLocation": "693:4:53",
                   "nodeType": "VariableDeclaration",
-                  "scope": 6709,
-                  "src": "678:19:52",
+                  "scope": 6745,
+                  "src": "678:19:53",
                   "stateVariable": false,
                   "storageLocation": "calldata",
                   "typeDescriptions": {
@@ -4010,10 +4010,10 @@
                     "typeString": "bytes"
                   },
                   "typeName": {
-                    "id": 6657,
+                    "id": 6693,
                     "name": "bytes",
                     "nodeType": "ElementaryTypeName",
-                    "src": "678:5:52",
+                    "src": "678:5:53",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes_storage_ptr",
                       "typeString": "bytes"
@@ -4022,27 +4022,27 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "563:138:52"
+              "src": "563:138:53"
             },
             "returnParameters": {
-              "id": 6661,
+              "id": 6697,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "720:0:52"
+              "src": "720:0:53"
             },
-            "scope": 6710,
-            "src": "538:517:52",
+            "scope": 6746,
+            "src": "538:517:53",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 6711,
-        "src": "240:817:52",
+        "scope": 6747,
+        "src": "240:817:53",
         "usedErrors": []
       }
     ],
-    "src": "47:1011:52"
+    "src": "47:1011:53"
   },
   "compiler": {
     "name": "solc",
@@ -4050,7 +4050,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-31T10:52:15.254Z",
+  "updatedAt": "2022-11-02T19:26:56.858Z",
   "devdoc": {
     "kind": "dev",
     "methods": {

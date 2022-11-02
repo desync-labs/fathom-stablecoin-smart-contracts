@@ -25,7 +25,9 @@ contract MockPriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPr
     uint256 liquidationRatio; // Liquidation ratio or Collateral ratio [ray]
   }
 
+  uint256 private liquidationRatio;
   IBookKeeper public bookKeeper; // CDP Engine
+  address public priceFeed;
   uint256 public override stableCoinReferencePrice; // ref per FUSD [ray] :: value of stablecoin in the reference asset (e.g. $1 per Fathom USD)
 
   uint256 public live;
@@ -38,12 +40,14 @@ contract MockPriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPr
   );
 
   // --- Init ---
-  function initialize(address _bookKeeper) external initializer {
+  function initialize(address _bookKeeper, address _priceFeed, uint256 _liquidationRatio) external initializer {
     PausableUpgradeable.__Pausable_init();
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
+    liquidationRatio = _liquidationRatio;
 
     IBookKeeper(_bookKeeper).collateralPoolConfig(); // Sanity check call
     bookKeeper = IBookKeeper(_bookKeeper);
+    priceFeed = _priceFeed;
     stableCoinReferencePrice = ONE;
     live = 1;
   }
@@ -98,19 +102,22 @@ contract MockPriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPr
   // --- Update value ---
   /// @dev Update the latest price with safety margin of the collateral pool to the BookKeeper
   /// @param _collateralPoolId Collateral pool id
-  function setPrice(bytes32 _collateralPoolId) external whenNotPaused {
-    IPriceFeed _priceFeed = IPriceFeed(
-      ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).collateralPools(_collateralPoolId).priceFeed
-    );
-    uint256 _liquidationRatio = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLiquidationRatio(
-      _collateralPoolId
-    );
-    (bytes32 _rawPrice, bool _hasPrice) = _priceFeed.peekPrice();
+  function setPrice(bytes32 _collateralPoolId) external whenNotPaused returns (uint256){
+    // IPriceFeed _priceFeed = IPriceFeed(
+    //   ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).collateralPools(_collateralPoolId).priceFeed
+    // );
+    // uint256 _liquidationRatio = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLiquidationRatio(
+    //   _collateralPoolId
+    // );
+
+    (bytes32 _rawPrice, bool _hasPrice) = IPriceFeed(priceFeed).peekPrice();
+    // (bytes32 _rawPrice, bool _hasPrice) = _priceFeed.peekPrice();
     uint256 _priceWithSafetyMargin = _hasPrice
-      ? rdiv(rdiv(mul(uint256(_rawPrice), 10**9), stableCoinReferencePrice), _liquidationRatio)
+      ? rdiv(rdiv(mul(uint256(_rawPrice), 10**9), stableCoinReferencePrice), liquidationRatio)
       : 0;
-    address _collateralPoolConfig = address(bookKeeper.collateralPoolConfig());
-    ICollateralPoolConfig(_collateralPoolConfig).setPriceWithSafetyMargin(_collateralPoolId, _priceWithSafetyMargin);
+    return _priceWithSafetyMargin;
+    // address _collateralPoolConfig = address(bookKeeper.collateralPoolConfig());
+    // ICollateralPoolConfig(_collateralPoolConfig).setPriceWithSafetyMargin(_collateralPoolId, _priceWithSafetyMargin);
     emit LogSetPrice(_collateralPoolId, _rawPrice, _priceWithSafetyMargin);
   }
 
