@@ -107,6 +107,8 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     _collateralPools[_collateralPoolId].liquidatorIncentiveBps = _liquidatorIncentiveBps;
     _collateralPools[_collateralPoolId].treasuryFeesBps = _treasuryFeesBps;
     _collateralPools[_collateralPoolId].strategy = _strategy;
+    
+    emit LogInitCollateralPoolId(_collateralPoolId, _debtCeiling, _liquidationRatio, _stabilityFeeRate, _adapter);
   }
 
   function setPriceWithSafetyMargin(bytes32 _collateralPoolId, uint256 _priceWithSafetyMargin) external override {
