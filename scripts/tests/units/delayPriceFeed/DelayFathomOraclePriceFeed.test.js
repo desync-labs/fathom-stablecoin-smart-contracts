@@ -11,10 +11,11 @@ const { BigNumber, ethers } = require("ethers");
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../../helper/unit");
 const { DeployerAddress, AliceAddress, BobAddress } = require("../../helper/address");
 const { getContract, createMock } = require("../../helper/contracts");
+const { increase } = require('../../helper/time');
 
 const { formatBytes32String } = ethers.utils
 
-describe("DelayFathomOraclePriceFeed", () => {
+describe("DelayFathomOraclePriceFeed - Unit Test Suite", () => {
 
   let delayFathomOraclePriceFeed  //<- the contract that this test is focusing on.
   let MockDexPriceOracle // <- contract that provides price to delayFathomOraclePriceFeed.
@@ -24,7 +25,7 @@ describe("DelayFathomOraclePriceFeed", () => {
   let mockedBookKeeper //  <- bookKeeper.collateralPoolConfig() should return the address of mockCollateralPoolConfig
   let mockedCollateralPoolConfig // <- collateralPoolConfig.collateralPools(_collateralPoolId) 
   // should return priceFeed address which is delayFathomOraclePriceFeed
-  
+
 
 
   let mockToken0 = "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"; // <- some address from Remix
@@ -49,7 +50,7 @@ describe("DelayFathomOraclePriceFeed", () => {
     // accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender
 
     await delayFathomOraclePriceFeed.initialize(MockDexPriceOracle.address, mockToken0, mockToken1, mockedAccessControlConfig.address);
-    
+
     // console.log("mockedAccessControlConfig address is " + mockedAccessControlConfig.address);
 
     // await MockPriceOracle.initialize(mockedBookKeeper.address);
@@ -57,104 +58,94 @@ describe("DelayFathomOraclePriceFeed", () => {
 
   })
 
-  describe("MockDexPriceOracle.sol check before testing DelayFathomOraclePriceFeed", () => {
-    context("call getPrice", async () => {
-      it("should return 0", async () => {
-          await MockDexPriceOracle.changePrice(0);
-          const returnValue = await MockDexPriceOracle.getPrice(mockToken0, mockToken1);
-          // console.log(returnValue);
-          await expect(returnValue[0]).to.be.equal(0);
-      })
-    })
+  describe("MockDexPriceOracle Contract Tests", () => {
+    it("Check getPrice method returns correct default price value", async () => {
+      const returnValue = await MockDexPriceOracle.getPrice(mockToken0, mockToken1);
+      expect(returnValue[0]).to.be.equal(0);
+    });
 
-    context("call changePrice and call getPrice", async () => {
-      it("should return 1000", async () => {
-          await MockDexPriceOracle.changePrice(1000);
-          const returnValue = await MockDexPriceOracle.getPrice(mockToken0, mockToken1);
-          // console.log(returnValue);
-          await expect(returnValue[0]).to.be.equal(1000);
-      })
-    })
-  })
+    it("Check getPrice method returns modified price value after calling changePrice method", async () => {
+      await MockDexPriceOracle.changePrice(1000);
+      const returnValue = await MockDexPriceOracle.getPrice(mockToken0, mockToken1);
+      expect(returnValue[0]).to.be.equal(1000);
+    });
+  });
 
-  describe("DelayFathomOraclePriceFeed", () => {
-    context("currentPrice before peekPrice()", async () => {
-      it("should return 0", async () => {
-          const returnValue = await delayFathomOraclePriceFeed.currentPrice();
-          // console.log(returnValue);
-          await expect(returnValue[0]).to.be.equal(0);
-      })
-    })
+  describe("DelayFathomOraclePriceFeed Contract Tests", () => {
+    it("Check currentPrice method returns correct default price value", async () => {
+      const returnValue = await delayFathomOraclePriceFeed.currentPrice();
+      expect(returnValue[0]).to.be.equal(0);
+    });
 
-    context("timeDelay before setTimeDelay()", async () => {
-      it("should return 0", async () => {
-          const returnValue = await delayFathomOraclePriceFeed.timeDelay();
-          // console.log(returnValue);
-          await expect(returnValue).to.be.equal(0);
-      })
-    })
+    it("Check timeDelay method returns correct default time delay value", async () => {
+      const returnValue = await delayFathomOraclePriceFeed.timeDelay();
+      expect(returnValue).to.be.equal(0);
+    });
 
-    //setTimeDelay should revert when tried without access control.
-    context("setTimeDelay() without owner role", async () => {
-      it("should revert", async () => {
-          // await delayFathomOraclePriceFeed.initialize(MockDexPriceOracle.address, mockToken0, mockToken1, mockedAccessControlConfig.address);
-          // console.log(returnValue);
-          await mockedAccessControlConfig.mock.hasRole.returns(false);
-          await expect(delayFathomOraclePriceFeed.setTimeDelay(900)).to.be.revertedWith("!ownerRole")
-      })
-    })
+    it("Check setTimeDelay function reverts with '!ownerRole' without access control", async () => {
+      await mockedAccessControlConfig.mock.hasRole.returns(false);
+      await expect(delayFathomOraclePriceFeed.setTimeDelay(900)).to.be.revertedWith("!ownerRole");
+    });
 
-    //setTimeDelay should revert with "FathomOraclePriceFeed/bad-delay-time" if the param is less than 15 minutes
-    context("setTimeDelay() with param less than 15 min(900 sec)", async () => {
-      it("should revert", async () => {
-          await expect(delayFathomOraclePriceFeed.setTimeDelay(10)).to.be.revertedWith("FathomOraclePriceFeed/bad-delay-time")
+    it("Check setTimeDelay function reverts with 'FathomOraclePriceFeed/bad-delay-time' when parameter is less than 900(seconds) / 15 minutes", async () => {
+      await expect(delayFathomOraclePriceFeed.setTimeDelay(10)).to.be.revertedWith("FathomOraclePriceFeed/bad-delay-time");
+    });
 
-      })
-    })
+    it("Check timeDelay method returns correct time delay value after calling setTimeDelay with valid parameter value", async () => {
+      await delayFathomOraclePriceFeed.setTimeDelay(900);
+      const returnValue = await delayFathomOraclePriceFeed.timeDelay();
+      expect(returnValue).to.be.equal(900);
+    });
 
-    context("timeDelay after setTimeDelay()", async () => {
-      it("should return 900", async () => {
-          // await delayFathomOraclePriceFeed.initialize(MockDexPriceOracle.address, mockToken0, mockToken1, mockedAccessControlConfig.address);
-          await delayFathomOraclePriceFeed.setTimeDelay(900);
-          const returnValue = await delayFathomOraclePriceFeed.timeDelay();
-          await expect(returnValue).to.be.equal(900);
-      })
-    })
+    it("Check accessControlConfig address", async () => {
+      const mockedAccessControlConfigAdd = await delayFathomOraclePriceFeed.accessControlConfig();
+      expect(mockedAccessControlConfigAdd).to.be.equal(mockedAccessControlConfig.address);
+    });
 
-
-    context("check accessControlConfig address", async () => {
-      it("should return mockedAccessControlConfig.address", async () => {
-        const mockedAccessControlConfigAdd = await delayFathomOraclePriceFeed.accessControlConfig();
-          await expect(mockedAccessControlConfigAdd).to.be.equal(mockedAccessControlConfig.address);
-      })
-    })
-
-    context("check fathomOracle address", async () => {
-      it("should return MockDexPriceOracle.address", async () => {
-        const fathomOracleAdd = await delayFathomOraclePriceFeed.fathomOracle();
-          await expect(fathomOracleAdd).to.be.equal(MockDexPriceOracle.address);
-      })
-    })
+    it("Check fathomOracle address", async () => {
+      const fathomOracleAdd = await delayFathomOraclePriceFeed.fathomOracle();
+      expect(fathomOracleAdd).to.be.equal(MockDexPriceOracle.address);
+    });
 
     //test for peekPrice()
-    context("call peekPrice()", async () => {
-      it("should return 100", async () => {
-        await MockDexPriceOracle.changePrice(100);
-        const price = await MockDexPriceOracle.getPrice(mockToken0, mockToken1);
-        console.log("Price from MockDexPriceOracle is "+price)
-        await delayFathomOraclePriceFeed.setTimeDelay(900);
-        
-        const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
-          console.log("returnValue[0] is "+ returnValue[0]);
-          console.log("returnValue[1] is "+ returnValue[1]);
-          await expect(returnValue[0]).to.be.equal('0x0000000000000000000000000000000000000000000000000000000000000064');
+    it("Check peekPrice method returns updated price when current price is 0 and delay time has not passed", async () => {
+      await MockDexPriceOracle.changePrice(100);
+      await delayFathomOraclePriceFeed.setTimeDelay(900);
 
-      })
-    })
-      //first it should return without 
-      //before 15 minutes passed
-      //after 15 minutes passed
+      await delayFathomOraclePriceFeed.peekPrice();
+      const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
+      expect(Number(returnValue[0])).to.be.equal(100);
+      expect(returnValue[1]).to.be.true;
+    });
 
+    it("Check peekPrice method returns old price when current price is not 0 and before time delay has passed", async () => {
+      await MockDexPriceOracle.changePrice(100);
+      await delayFathomOraclePriceFeed.setTimeDelay(900);
+
+      await delayFathomOraclePriceFeed.peekPrice();
+
+      await MockDexPriceOracle.changePrice(200);
+      await delayFathomOraclePriceFeed.peekPrice();
+      const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
+      expect(Number(returnValue[0])).to.be.equal(100);
+      expect(returnValue[1]).to.be.true;
+    });
+
+    it("Check peekPrice method returnd updated price when current price is not 0 and after time delay has passed", async () => {
+      await MockDexPriceOracle.changePrice(100);
+      await delayFathomOraclePriceFeed.setTimeDelay(900);
+
+      await delayFathomOraclePriceFeed.peekPrice();
+
+      await MockDexPriceOracle.changePrice(200);
+
+      increase(900);
+
+      await delayFathomOraclePriceFeed.peekPrice();
+      const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
+      expect(Number(returnValue[0])).to.be.equal(200);
+      expect(returnValue[1]).to.be.true;
+    });
 
     //test for readPrice()
 
