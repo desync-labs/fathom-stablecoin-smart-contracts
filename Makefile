@@ -115,7 +115,7 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/config/set-fee-in.js
 # set fee out for SSM	
 	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/config/set-fee-out.js
-continue:
+# continue:
 # whiteList collateralTokenAdapter to bookKeeper
 	coralX execute --network apothem --path scripts/deployment/2_book-keeper/config/whitelist-collateral-token-adapter.js
 
@@ -173,7 +173,7 @@ getPositionsV2:
 	coralX execute --network apothem --path scripts/deployment/28_get-positions-v2/deploy/get-positions-v2.js
 
 	coralX execute --network apothem --path scripts/deployment/28_get-positions-v2/initialize/initialize_get-positions-v2.js
-	
+
 callsetPriceFTHM:
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/config/config_simple-price-feed-FTHM.js
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/config/config_simple-price-feed-WXDC.js
