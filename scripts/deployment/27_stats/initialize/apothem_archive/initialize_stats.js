@@ -1,6 +1,7 @@
 const fs = require('fs');
 const rawdata = fs.readFileSync('../../../../addresses.json');
-
+require("dotenv").config();
+const WXDCAdd = process.env.WXDC_ADDRESS;
 // const rawdata = fs.readFileSync('../../../../addresses_ApothemV1.json');
 let stablecoinAddress = JSON.parse(rawdata);
 const { formatBytes32String } = require("ethers/lib/utils");
@@ -16,7 +17,7 @@ module.exports =  async function(deployer) {
   await fathomStats.initialize(
     stablecoinAddress.bookKeeper,  //bookKeeper
     stablecoinAddress.fairLaunch,                  //FairLaunch
-    stablecoinAddress.WXDC, //WXDC
+    WXDCAdd, //WXDC
     stablecoinAddress.USDT, // USDT
     stablecoinAddress.fathomStablecoin, //FXD
     "0xfbba07454DAe1D94436cC4241bf31543f426257E", //dEXPriceOracle

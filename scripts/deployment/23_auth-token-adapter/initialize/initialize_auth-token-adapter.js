@@ -5,7 +5,7 @@ const { formatBytes32String } = require("ethers/lib/utils");
 
 const AuthTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/AuthTokenAdapter.sol');
 
-const COLLATERAL_POOL_ID = formatBytes32String("USDT-STABLE")
+const COLLATERAL_POOL_ID = formatBytes32String("US+STABLE")
 const TOKEN_ADDR = stablecoinAddress.USDT // <- USDT address
 
 module.exports =  async function(deployer) {

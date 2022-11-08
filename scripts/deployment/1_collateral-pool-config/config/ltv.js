@@ -43,8 +43,8 @@ module.exports = async function(deployer) {
   // const PriceWithSafetyMarginFTHM1 = await collateralPoolConfig.getPriceWithSafetyMargin(COLLATERAL_POOL_ID_FTHM);
   // console.log("PriceWithSafetyMargin FTHM is " + PriceWithSafetyMarginFTHM1);
 
-  // await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID_WXDC, LIQUIDATIONRATIO);
-  // await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID_FTHM, LIQUIDATIONRATIO);
+  await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID_WXDC, LIQUIDATIONRATIO);
+  await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID_FTHM, LIQUIDATIONRATIO);
 
   // const LTV3 = await collateralPoolConfig.getLiquidationRatio(COLLATERAL_POOL_ID_WXDC);
   // console.log("Liquidation ratio WXDC AFTER LTV change is " + LTV3);
@@ -53,8 +53,8 @@ module.exports = async function(deployer) {
 
   // const LTVFTHM2 = await collateralPoolConfig.getLiquidationRatio(COLLATERAL_POOL_ID_FTHM);
   // console.log("Liquidation ratio WXDC after LTV change is " + LTVFTHM2);
-  const PriceWithSafetyMarginFTHM2 = await collateralPoolConfig.getPriceWithSafetyMargin(COLLATERAL_POOL_ID_FTHM);
-  console.log("PriceWithSafetyMargin FTHM after LTV change is " + PriceWithSafetyMarginFTHM2);
+  // const PriceWithSafetyMarginFTHM2 = await collateralPoolConfig.getPriceWithSafetyMargin(COLLATERAL_POOL_ID_FTHM);
+  // console.log("PriceWithSafetyMargin FTHM after LTV change is " + PriceWithSafetyMarginFTHM2);
 
   // const getPriceFeedWXDC = await collateralPoolConfig.getPriceFeed(COLLATERAL_POOL_ID_WXDC);
   // console.log("FathomPriceOraclePriceFeed is " + getPriceFeedWXDC);

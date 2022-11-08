@@ -9,9 +9,9 @@ const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
 const SimplePriceFeed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
 
 module.exports =  async function(deployer) {
-  console.log(">> Initializing SimplePriceFeedUSDT")
+  console.log(">> Initializing SimplePriceFeedUSDTCOL")
 
-  const simplePriceFeedUSDT = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeedUSDT);
+  const simplePriceFeedUSDT = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeedUSDTCOL);
 
   // await simplePriceFeedUSDT.setPrice(WeiPerWad.div(100).toString());
 
