@@ -7,33 +7,64 @@ chai.use(solidity);
 const { weiToRay } = require("../helper/unit");
 const { advanceBlock } = require("../helper/time");
 const { DeployerAddress, AliceAddress, BobAddress, TreasuryAddress } = require("../helper/address");
+const { loadFixture } = require("../helper/fixtures");
+const { addRoles } = require("../helper/access-roles");
+const { initializeContracts } = require("../helper/initializer");
+
 const { formatBytes32String } = require("ethers/lib/utils");
 
 const { expect } = chai
 
 const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 
+const setup = async () => {
+    const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
+    const accessControlConfig = await artifacts.initializeInterfaceAt("AccessControlConfig", "AccessControlConfig");
+    const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
+    const fairLaunch = await artifacts.initializeInterfaceAt("FairLaunch", "FairLaunch");
+    const shield = await artifacts.initializeInterfaceAt("Shield", "Shield");
+    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
+
+    const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
+    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
+    const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
+
+    await initializeContracts();
+    await addRoles();
+
+    return {
+        collateralPoolConfig,
+        accessControlConfig,
+        fairLaunch,
+        shield,
+        WXDC,
+        fathomToken,
+        collateralTokenAdapter
+    }
+}
+
 describe("CollateralTokenAdapter", () => {
     // Contracts
     let collateralTokenAdapter
-    let bookKeeper
     let WXDC
     let shield
     let fathomToken
     let fairLaunch
 
-    beforeEach(async () => {
+    before(async () => {
         await snapshot.revertToSnapshot();
+    })
 
-        bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
-        fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
-        fairLaunch = await artifacts.initializeInterfaceAt("FairLaunch", "FairLaunch");
-        shield = await artifacts.initializeInterfaceAt("Shield", "Shield");
-        WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
-        const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-        const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
-        collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
-
+    beforeEach(async () => {
+        ({
+            collateralPoolConfig,
+            accessControlConfig,
+            fairLaunch,
+            shield,
+            WXDC,
+            fathomToken,
+            collateralTokenAdapter
+        } = await loadFixture(setup));
     })
     describe("#netAssetValuation", async () => {
         context("when all collateral tokens are deposited by deposit function", async () => {
@@ -65,7 +96,7 @@ describe("CollateralTokenAdapter", () => {
                     AliceAddress,
                     ethers.utils.parseEther("1"),
                     ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
-                    { from: AliceAddress, gasLimit: 1000000 }
+                    { from: AliceAddress, gasLimit: 2000000 }
                 )
 
                 await WXDC.transfer(collateralTokenAdapter.address, ethers.utils.parseEther("88"), { from: BobAddress })

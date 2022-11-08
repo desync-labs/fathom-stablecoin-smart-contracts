@@ -42,6 +42,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
   IBookKeeper public bookKeeper; // CDP Engine
   ISystemDebtEngine public systemDebtEngine; // Debt Engine
   uint256 public override live; // Active Flag
+  mapping(address => uint256) public liquidatorsWhitelist;
 
   modifier onlyOwnerOrShowStopper() {
     IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
@@ -60,6 +61,11 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
       "!(ownerRole or govRole)"
     );
+    _;
+  }
+
+    modifier onlyWhitelisted() {
+    require(liquidatorsWhitelist[msg.sender] == 1, "LiquidationEngine/liquidator-not-whitelisted");
     _;
   }
 
@@ -82,6 +88,14 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
   // --- Math ---
   uint256 constant WAD = 10**18;
 
+  function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
+    liquidatorsWhitelist[toBeWhitelisted] = 1;
+  }
+
+  function blacklist(address toBeRemoved) external onlyOwnerOrGov {
+    liquidatorsWhitelist[toBeRemoved] = 0;
+  }
+
   function liquidate(
     bytes32 _collateralPoolId,
     address _positionAddress,
@@ -89,7 +103,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     uint256 _maxDebtShareToBeLiquidated, // [wad]
     address _collateralRecipient,
     bytes calldata _data
-  ) external override nonReentrant whenNotPaused {
+  ) external override nonReentrant whenNotPaused onlyWhitelisted {
 
     ISetPrice(priceOracle).setPrice(_collateralPoolId);
 

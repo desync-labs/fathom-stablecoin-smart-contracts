@@ -15,9 +15,6 @@ module.exports = async function (deployer) {
     await fathomToken.mint(DeployerWallet, ethers.utils.parseEther("150"), { gasLimit: 1000000 })
     await fathomToken.transferOwnership(fairLaunch.address)
 
-    await accessControlConfig.grantRole(await accessControlConfig.PRICE_ORACLE_ROLE(), DeployerWallet)
-    await accessControlConfig.grantRole(await accessControlConfig.MINTABLE_ROLE(), DeployerWallet)
-
     await WXDC.mint(AliceWallet, ethers.BigNumber.from("90000000000000000000000000000000"), { gasLimit: 1000000 });
     await WXDC.mint(BobWallet, ethers.BigNumber.from("90000000000000000000000000000000"), { gasLimit: 1000000 })
 
@@ -25,5 +22,4 @@ module.exports = async function (deployer) {
     await USDT.mint(BobWallet, ethers.BigNumber.from("90000000000000000000000000000000"), { gasLimit: 1000000 })
 
     await shield.transferOwnership(DeployerWallet)
-    await accessControlConfig.grantRole(await accessControlConfig.OWNER_ROLE(), DeployerWallet)
 }
