@@ -26,6 +26,8 @@ const LiquidationEngine = artifacts.require('./8.17/stablecoin-core/LiquidationE
 const WXDC = artifacts.require('./8.17/mocks/WXDC.sol');
 const USDT = artifacts.require('./8.17/mocks/USDT.sol');
 const FlashMintModule = artifacts.require('./8.17/flash-mint/FlashMintModule.sol');
+const FlashMintArbitrager = artifacts.require('./8.17/mocks/FlashMintArbitrager.sol');
+const BookKeeperFlashMintArbitrager = artifacts.require('./8.17/mocks/BookKeeperFlashMintArbitrager.sol');
 
 module.exports =  async function(deployer) {
   let promises = [
@@ -56,7 +58,9 @@ module.exports =  async function(deployer) {
       deployer.deploy(USDT, "USDT", "USDT", { gas: 3050000 }),
       deployer.deploy(FlashMintModule, { gas: 3050000 }),
       deployer.deploy(TokenAdapter, { gas: 3050000 }),
-      deployer.deploy(IbTokenPriceFeed, { gas: 3050000 })
+      deployer.deploy(IbTokenPriceFeed, { gas: 3050000 }),
+      deployer.deploy(FlashMintArbitrager, { gas: 3050000 }),
+      deployer.deploy(BookKeeperFlashMintArbitrager, { gas: 3050000 }),
   ];
 
   await Promise.all(promises);

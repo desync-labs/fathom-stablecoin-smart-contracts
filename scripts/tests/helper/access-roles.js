@@ -1,4 +1,5 @@
 const { formatBytes32String } = require("ethers/lib/utils");
+const { DeployerAddress } = require("./address");
 const COLLATERAL_POOL_ID_WXDC = formatBytes32String("WXDC")
 const COLLATERAL_POOL_ID_USDT = formatBytes32String("USDT")
 
@@ -55,6 +56,7 @@ async function addRoles() {
     await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), stableSwapModule.address)
 
     await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), stablecoinAdapter.address);
+    await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), DeployerAddress);
 
     await accessControlConfig.grantRole(await accessControlConfig.PRICE_ORACLE_ROLE(), DeployerWallet)
     await accessControlConfig.grantRole(await accessControlConfig.MINTABLE_ROLE(), DeployerWallet)
