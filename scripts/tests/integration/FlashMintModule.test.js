@@ -82,6 +82,10 @@ describe("FlastMintModule", () => {
   let stableSwapModule
   let bookKeeperFlashMintArbitrager
 
+  before(async () => {
+    await snapshot.revertToSnapshot();
+  })
+
   beforeEach(async () => {
     ; ({
       bookKeeper,

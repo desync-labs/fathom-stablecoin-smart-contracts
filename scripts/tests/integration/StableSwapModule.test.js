@@ -14,14 +14,14 @@ const { addRoles } = require("../helper/access-roles");
 
 const { expect } = chai
 
-const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
+const COLLATERAL_POOL_ID = formatBytes32String("USDT")
 
 const CLOSE_FACTOR_BPS = BigNumber.from(5000)
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(12500)
 const TREASURY_FEE_BPS = BigNumber.from(2500)
 
 const setup = async () => {
-    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
+    const USDT = await artifacts.initializeInterfaceAt("USDT", "USDT");
     const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
     const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
     const fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
@@ -67,7 +67,7 @@ const setup = async () => {
         bookKeeper,
         stablecoinAdapter,
         collateralPoolConfig,
-        WXDC,
+        USDT,
         stableSwapModule,
         authTokenAdapter,
         fathomStablecoin,
@@ -79,7 +79,7 @@ describe("StableSwapModule", () => {
     // Contracts
     let stablecoinAdapter
     let bookKeeper
-    let WXDC
+    let USDT
     let stableSwapModule
     let authTokenAdapter
     let fathomStablecoin
@@ -96,7 +96,7 @@ describe("StableSwapModule", () => {
             bookKeeper,
             stablecoinAdapter,
             collateralPoolConfig,
-            WXDC,
+            USDT,
             stableSwapModule,
             authTokenAdapter,
             fathomStablecoin,
@@ -110,37 +110,37 @@ describe("StableSwapModule", () => {
                 // Set debtCeiling of StableSwapModule to 0
                 await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, 0, { gasLimit: 1000000 })
 
-                // Mint 1000 WXDC to deployer
-                await WXDC.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
+                // Mint 1000 USDT to deployer
+                await USDT.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // Swap 1000 WXDC to FXD
-                await WXDC.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
+                // Swap 1000 USDT to FXD
+                await USDT.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
                 await expect(
                     stableSwapModule.swapTokenToStablecoin(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 3000000 })
                 ).to.be.revertedWith("BookKeeper/ceiling-exceeded")
             })
         })
 
-        context("swap WXDC when WXDC is insufficient", async () => {
+        context("swap USDT when USDT is insufficient", async () => {
             it("should revert", async () => {
-                // Mint 1000 WXDC to deployer
-                await WXDC.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
+                // Mint 1000 USDT to deployer
+                await USDT.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // Swap 1000 WXDC to FXD
-                await WXDC.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
+                // Swap 1000 USDT to FXD
+                await USDT.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
 
                 await expect(
                     stableSwapModule.swapTokenToStablecoin(DeployerAddress, ethers.utils.parseEther("1001"), { gasLimit: 3000000 })
                 ).to.be.revertedWith("!safeTransferFrom")
             })
         })
-        context("swap WXDC to FXD", async () => {
+        context("swap USDT to FXD", async () => {
             it("should success", async () => {
-                // Mint 1000 WXDC to deployer
-                await WXDC.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
+                // Mint 1000 USDT to deployer
+                await USDT.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // Swap 1000 WXDC to FXD
-                await WXDC.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
+                // Swap 1000 USDT to FXD
+                await USDT.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
                 // 1000 * 0.001 = 1
@@ -151,9 +151,9 @@ describe("StableSwapModule", () => {
                 const stablecoinReceived = await fathomStablecoin.balanceOf(DeployerAddress)
                 expect(stablecoinReceived).to.be.equal(ethers.utils.parseEther("999"))
 
-                const WXDCCollateralAmount = (await bookKeeper.positions(COLLATERAL_POOL_ID, stableSwapModule.address))
+                const USDTCollateralAmount = (await bookKeeper.positions(COLLATERAL_POOL_ID, stableSwapModule.address))
                     .lockedCollateral
-                expect(WXDCCollateralAmount).to.be.equal(ethers.utils.parseEther("1000"))
+                expect(USDTCollateralAmount).to.be.equal(ethers.utils.parseEther("1000"))
             })
         })
     })
@@ -170,23 +170,23 @@ describe("StableSwapModule", () => {
                 )
                 await stablecoinAdapter.withdraw(DeployerAddress, ethers.utils.parseEther("1001"), "0x", { gasLimit: 1000000 })
 
-                // Swap 1000 FXD to WXDC
+                // Swap 1000 FXD to USDT
                 await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
                 await expect(stableSwapModule.swapStablecoinToToken(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })).to.be
                     .reverted
             })
         })
 
-        context("swap FXD to WXDC", async () => {
+        context("swap FXD to USDT", async () => {
             it("should success", async () => {
-                // Mint 1000 WXDC to deployer
-                await WXDC.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
+                // Mint 1000 USDT to deployer
+                await USDT.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // Swap 1000 WXDC to FXD
-                await WXDC.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
+                // Swap 1000 USDT to FXD
+                await USDT.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // Swap 998 FXD to WXDC
+                // Swap 998 FXD to USDT
                 await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress, ethers.utils.parseEther("998"), { gasLimit: 1000000 })
 
@@ -196,12 +196,12 @@ describe("StableSwapModule", () => {
                 const feeFromSwap = await bookKeeper.stablecoin(systemDebtEngine.address)
                 expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("1.998").mul(WeiPerRay))
 
-                const WXDCReceived = await WXDC.balanceOf(DeployerAddress)
-                expect(WXDCReceived).to.be.equal(ethers.utils.parseEther("998"))
+                const USDTReceived = await USDT.balanceOf(DeployerAddress)
+                expect(USDTReceived).to.be.equal(ethers.utils.parseEther("998"))
 
-                const WXDCCollateralAmount = (await bookKeeper.positions(COLLATERAL_POOL_ID, stableSwapModule.address))
+                const USDTCollateralAmount = (await bookKeeper.positions(COLLATERAL_POOL_ID, stableSwapModule.address))
                     .lockedCollateral
-                expect(WXDCCollateralAmount).to.be.equal(ethers.utils.parseEther("2"))
+                expect(USDTCollateralAmount).to.be.equal(ethers.utils.parseEther("2"))
             })
         })
     })

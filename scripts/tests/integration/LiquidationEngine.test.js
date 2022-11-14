@@ -62,6 +62,7 @@ const setup = async () => {
     await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10000000), { gasLimit: 1000000 })
     await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRad.mul(10000000), { gasLimit: 1000000 })
     await simplePriceFeed.setPrice(WeiPerWad, { gasLimit: 1000000 });
+    await liquidationEngine.whitelist(BobAddress, { gasLimit: 1000000 });
 
     await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
 
