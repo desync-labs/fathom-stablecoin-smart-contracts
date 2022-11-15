@@ -721,7 +721,7 @@ contract FathomStablecoinProxyActions {
       _stabilityFeeCollector,
       _manager.positions(_positionId),
       _collateralPoolId,
-      _stablecoinAmount
+      _stablecoinAmount  //
     ); // [wad]
 
     adjustPosition(address(_manager), _positionId, _collateralAmountInWad, _drawDebtShare, _tokenAdapter, _data);
