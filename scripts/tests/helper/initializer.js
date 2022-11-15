@@ -24,7 +24,6 @@ async function initializeContracts() {
   const USDT = await artifacts.initializeInterfaceAt("USDT", "USDT");
   const flashMintArbitrager = await artifacts.initializeInterfaceAt("FlashMintArbitrager", "FlashMintArbitrager");
   const bookKeeperFlashMintArbitrager = await artifacts.initializeInterfaceAt("BookKeeperFlashMintArbitrager", "BookKeeperFlashMintArbitrager");
-  
 
   let promises = [
     collateralPoolConfig.initialize(accessControlConfig.address, { gasLimit: 1000000 }),

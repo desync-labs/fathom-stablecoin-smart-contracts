@@ -8,7 +8,7 @@ import "../interfaces/IPriceFeed.sol";
 import "../interfaces/IFathomOracle.sol";
 import "../interfaces/IAccessControlConfig.sol";
 
-contract FathomOraclePriceFeed is PausableUpgradeable, IPriceFeed {
+contract DelayFathomOraclePriceFeed is PausableUpgradeable, IPriceFeed {
 
   struct Feed {
     uint256 price;

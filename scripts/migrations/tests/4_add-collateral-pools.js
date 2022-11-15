@@ -18,6 +18,9 @@ const treasury = "0x299739f52346940c7c1E8E156dfD51A6eE61A5Da";
 module.exports = async function (deployer) {
     const fairLaunch = await artifacts.initializeInterfaceAt("FairLaunch", "FairLaunch");
     const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
+    const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", "CollateralTokenAdapter");
+
+    await collateralTokenAdapterFactory.initialize(collateralTokenAdapter.address);
 
     await fairLaunch.addPool(1, WXDC.address, true);
     await fairLaunch.addPool(0, USDT.address, true);

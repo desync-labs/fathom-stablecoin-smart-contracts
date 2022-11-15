@@ -7,7 +7,7 @@ const openPositionAndDraw = async (proxyWallet, from, collateral_pool_id, collat
     const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
     const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(collateral_pool_id)
+    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(collateral_pool_id)
 
     const openLockTokenAndDrawAbi = [
         "function openLockTokenAndDraw(address _manager, address _stabilityFeeCollector, address _tokenAdapter, address _stablecoinAdapter, bytes32 _collateralPoolId, uint256 _collateralAmount, uint256 _stablecoinAmount, bool _transferFrom, bytes calldata _data)"
@@ -69,7 +69,7 @@ const lockToken = async (proxyWallet, from, collateral_pool_id, positionId, amou
     const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
     const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(collateral_pool_id)
+    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(collateral_pool_id)
 
     const lockAbi = [
         "function lockToken(address _manager, address _tokenAdapter, uint256 _positionId, uint256 _amount, bool _transferFrom, bytes calldata _data)"
@@ -90,7 +90,7 @@ const draw = async (proxyWallet, from, collateral_pool_id, positionId, amount) =
     const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
     const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(collateral_pool_id)
+    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(collateral_pool_id)
 
     const drawTokenAbi = [
         "function draw(address _manager, address _stabilityFeeCollector, address _tokenAdapter, address _stablecoinAdapter, uint256 _positionId, uint256 _amount, bytes calldata _data)"

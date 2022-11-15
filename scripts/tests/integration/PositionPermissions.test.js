@@ -36,8 +36,8 @@ const setup = async () => {
     const fixedSpreadLiquidationStrategy = await artifacts.initializeInterfaceAt("FixedSpreadLiquidationStrategy", "FixedSpreadLiquidationStrategy");
     const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
 
-    const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_WXDC);
-    const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_USDT);
+    const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID_WXDC);
+    const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID_USDT);
     const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterWXDC);
     const collateralTokenAdapter2 = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterUSDT);
 

@@ -17,6 +17,7 @@ const FathomStablecoinProxyActions = artifacts.require('./8.17/proxy-actions/Fat
 const FixedSpreadLiquidationStrategy = artifacts.require('./8.17/stablecoin-core/liquidation-strategies/FixedSpreadLiquidationStrategy.sol');
 const SimplePriceFeed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
 const CollateralTokenAdapterFactory = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapterFactory.sol');
+const CollateralTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 const PositionManager = artifacts.require('./8.17/managers/PositionManager.sol');
 const FathomToken = artifacts.require('./8.17/apis/fathom/FathomToken.sol');
 const ShowStopper = artifacts.require('./8.17/stablecoin-core/ShowStopper.sol');
@@ -48,6 +49,7 @@ module.exports =  async function(deployer) {
       deployer.deploy(FathomStablecoinProxyActions, { gas: 5050000 }),
       deployer.deploy(FixedSpreadLiquidationStrategy, { gas: 5050000 }),
       deployer.deploy(CollateralTokenAdapterFactory, { gas: 4050000 }),
+      deployer.deploy(CollateralTokenAdapter, { gas: 4050000 }),
       deployer.deploy(PositionManager, { gas: 4050000 }),
       deployer.deploy(ShowStopper, { gas: 3050000 }),
       deployer.deploy(FathomToken, 88, 89, { gas: 4050000 }),

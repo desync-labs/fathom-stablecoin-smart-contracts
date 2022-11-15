@@ -38,8 +38,8 @@ const setup = async () => {
     const USDT = await artifacts.initializeInterfaceAt("USDT", "USDT");
     const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
 
-    const wxdcTokenAdapter = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_WXDC);
-    const usdtTokenAdapter = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_USDT);
+    const wxdcTokenAdapter = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID_WXDC);
+    const usdtTokenAdapter = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID_USDT);
 
     await initializeContracts();
     await addRoles();

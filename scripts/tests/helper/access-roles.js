@@ -40,8 +40,8 @@ async function addRoles() {
   
     await accessControlConfig.grantRole(await accessControlConfig.PRICE_ORACLE_ROLE(), priceOracle.address)
   
-    const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_WXDC)
-    const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_USDT)
+    const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID_WXDC)
+    const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID_USDT)
   
     await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterWXDC)
     await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterUSDT)
