@@ -148,6 +148,8 @@ describe("LiquidationEngine", () => {
                 await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
                 // await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
 
+                // 3.5 whitelist bob as liquidator
+                await liquidationEngine.whitelist(BobAddress);
                 // 4. Bob try to liquidate Alice's position but failed due to the price did not drop low enough
                 await expect(
                     liquidationEngine.liquidate(COLLATERAL_POOL_ID, alicePositionAddress, 1, 1, AliceAddress, "0x", { from: BobAddress, gasLimit: 1000000 })
@@ -186,6 +188,9 @@ describe("LiquidationEngine", () => {
 
                 // 3. WXDC price drop to 0.99 USD
                 await simplePriceFeed.setPrice(WeiPerRay.sub(1).div(1e9), { gasLimit: 1000000 })
+
+                // 3.5 whitelist bob as liquidator
+                await liquidationEngine.whitelist(BobAddress);
 
                 // 4. Bob liquidate Alice's position up to full close factor successfully
                 const debtShareToRepay = parseEther("0.5")
@@ -459,6 +464,9 @@ describe("LiquidationEngine", () => {
                     // 3. WXDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 1000000 })
 
+                    // 3.5 whitelist bob as liquidator
+                    await liquidationEngine.whitelist(BobAddress);
+
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther(testParam.debtShareToRepay)
                     await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 1000000 })
@@ -582,6 +590,9 @@ describe("LiquidationEngine", () => {
                     // 3. WXDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 1000000 })
 
+                    // 3.5 whitelist bob as liquidator
+                    await liquidationEngine.whitelist(BobAddress);
+
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther(testParam.debtShareToRepay)
                     await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 1000000 })
@@ -665,6 +676,9 @@ describe("LiquidationEngine", () => {
             "safety buffer -20%, position is liquidated up to full close factor with some interest and debt floor",
             async () => {
                 it("should success", async () => {
+                    // 0 whitelist bob as liquidator
+                    await liquidationEngine.whitelist(BobAddress);
+
                     // 1. Set priceWithSafetyMargin for WXDC to 420 USD
                     await simplePriceFeed.setPrice(parseUnits("367", 18), { gasLimit: 1000000 })
                     let ratio = WeiPerRay.mul(1000).div(parseUnits("0.8", 3))
@@ -721,6 +735,8 @@ describe("LiquidationEngine", () => {
                     )
                     //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, parseUnits("199.5", 27), { gasLimit: 1000000 })
                     await simplePriceFeed.setPrice(parseEther("249.37"), { gasLimit: 1000000 })
+
+
 
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther("1000")
