@@ -24,8 +24,6 @@ describe("Delay Fathom Oracle - Unit Test Suite", () => {
   let mockedBookKeeper //  <- bookKeeper.collateralPoolConfig() should return the address of mockCollateralPoolConfig
   let mockedCollateralPoolConfig // <- collateralPoolConfig.collateralPools(_collateralPoolId) 
   // should return priceFeed address which is delayFathomOraclePriceFeed
-  
-
 
   let mockToken0 = "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"; // <- some address from Remix
   let mockToken1 = "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db"; // <- some address from Remix
@@ -53,7 +51,7 @@ describe("Delay Fathom Oracle - Unit Test Suite", () => {
     // accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender
 
     await delayFathomOraclePriceFeed.initialize(MockDexPriceOracle.address, mockToken0, mockToken1, mockedAccessControlConfig.address);
-    
+
     await MockPriceOracle.initialize(mockedBookKeeper.address, delayFathomOraclePriceFeed.address, WeiPerRay);
 
     // console.log("mockedAccessControlConfig address is " + mockedAccessControlConfig.address);
@@ -151,8 +149,19 @@ describe("Delay Fathom Oracle - Unit Test Suite", () => {
       expect(returnValue[1]).to.be.true;
     });
 
-    //test for readPrice()
+    it("Check readPrice method returns current price with default price value", async () => {
+      const returnValue = await delayFathomOraclePriceFeed.readPrice();
+      expect(Number(returnValue)).to.be.equal(0);
+    });
 
+    it("Check readPrice method returns current price with updated price value", async () => {
+      await MockDexPriceOracle.changePrice(100);
+      await delayFathomOraclePriceFeed.setTimeDelay(900);
+      await delayFathomOraclePriceFeed.peekPrice();
+
+      const returnValue = await delayFathomOraclePriceFeed.readPrice();
+      expect(Number(returnValue)).to.be.equal(100);
+    });
   })
 
   describe("MockPriceOracle Contract Tests", () => {
