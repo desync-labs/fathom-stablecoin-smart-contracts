@@ -162,47 +162,59 @@ describe("Delay Fathom Oracle - Unit Test Suite", () => {
       const returnValue = await delayFathomOraclePriceFeed.readPrice();
       expect(Number(returnValue)).to.be.equal(100);
     });
-  })
+  });
 
   describe("MockPriceOracle Contract Tests", () => {
-    context("1", async () => {
-      it("when changePrice(WeiPerWad) and liquidationRatio is WeiPerRay, _priceWithSafetyMargin should be WeiPerRay", async () => {
+    it("Check setPrice method returns WeiPerRay when MockDexPriceOracle price is WeiPerWad, delayFathomOraclePriceFeed price is 0 and time delay has not passed",
+      async () => {
         await MockDexPriceOracle.changePrice(WeiPerWad);
         await delayFathomOraclePriceFeed.setTimeDelay(900);
 
-        const _collateralPoolId = formatBytes32String("WXDC")
+        const _collateralPoolId = formatBytes32String("WXDC");
 
-        // await delayFathomOraclePriceFeed.peekPrice();
+        await delayFathomOraclePriceFeed.peekPrice();
 
         const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
         await expect(returnValue[1]).to.be.equal(true);
         await MockPriceOracle.setPrice(_collateralPoolId);
         const _priceWithSafetyMargin = await MockPriceOracle.callStatic.setPrice(_collateralPoolId);
-        console.log("_priceWithSafetyMargin is " + _priceWithSafetyMargin);
         await expect(_priceWithSafetyMargin).to.be.equal(WeiPerRay);
+      });
 
-      })
-    })
-
-    context("2", async () => {
-      it("when changePrice(WeiPerWad.div(2)) and liquidationRatio is WeiPerRay, _priceWithSafetyMargin should be WeiPerRay.div(2)", async () => {
+    it("Check setPrice method returns WeiPerRay.div(2) when MockDexPriceOracle price is WeiPerWad.div(2), delayFathomOraclePriceFeed price is 0 and time delay has not passed",
+      async () => {
         await MockDexPriceOracle.changePrice(WeiPerWad.div(2));
         await delayFathomOraclePriceFeed.setTimeDelay(900);
 
-        const _collateralPoolId = formatBytes32String("WXDC")
+        const _collateralPoolId = formatBytes32String("WXDC");
 
-        // await delayFathomOraclePriceFeed.peekPrice();
+        await delayFathomOraclePriceFeed.peekPrice();
 
         const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
         await expect(returnValue[1]).to.be.equal(true);
         await MockPriceOracle.setPrice(_collateralPoolId);
         const _priceWithSafetyMargin = await MockPriceOracle.callStatic.setPrice(_collateralPoolId);
-        console.log("_priceWithSafetyMargin is " + _priceWithSafetyMargin);
         await expect(_priceWithSafetyMargin).to.be.equal(WeiPerRay.div(2));
+      });
 
-      })
-    })
-  })
-  //then test MockPriceOracle which has DelayFathomOraclepPriceFeed as price Feed.
-  //DelayFathomOraclePriceFeed should have _fathomOracle as MockDexPriceOracle
-})
+    it("Check setPrice method returns WeiPerRay.div(2) when MockDexPriceOracle price is WeiPerWad.div(2), delayFathomOraclePriceFeed price is not 0 and time delay has passed",
+      async () => {
+        await MockDexPriceOracle.changePrice(WeiPerWad);
+        await delayFathomOraclePriceFeed.setTimeDelay(900);
+
+        const _collateralPoolId = formatBytes32String("WXDC");
+
+        await delayFathomOraclePriceFeed.peekPrice();
+
+        await MockDexPriceOracle.changePrice(WeiPerWad.div(2));
+        increase(900);
+        await delayFathomOraclePriceFeed.peekPrice();
+        const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
+        await expect(returnValue[1]).to.be.equal(true);
+
+        await MockPriceOracle.setPrice(_collateralPoolId);
+        const _priceWithSafetyMargin = await MockPriceOracle.callStatic.setPrice(_collateralPoolId);
+        await expect(_priceWithSafetyMargin).to.be.equal(WeiPerRay.div(2));
+      });
+  });
+});
