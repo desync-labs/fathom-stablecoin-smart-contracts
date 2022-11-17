@@ -165,6 +165,17 @@ describe("Delay Fathom Oracle - Unit Test Suite", () => {
   });
 
   describe("MockPriceOracle Contract Tests", () => {
+    it("Check setPrice method returns default price when both MockDexPriceOracle and delayFathomOraclePriceFeed prices are not changed",
+      async () => {
+        await delayFathomOraclePriceFeed.setTimeDelay(900);
+
+        const _collateralPoolId = formatBytes32String("WXDC");
+
+        await MockPriceOracle.setPrice(_collateralPoolId);
+        const _priceWithSafetyMargin = await MockPriceOracle.callStatic.setPrice(_collateralPoolId);
+        await expect(_priceWithSafetyMargin).to.be.equal(0);
+      });
+
     it("Check setPrice method returns WeiPerRay when MockDexPriceOracle price is WeiPerWad, delayFathomOraclePriceFeed price is 0 and time delay has not passed",
       async () => {
         await MockDexPriceOracle.changePrice(WeiPerWad);
