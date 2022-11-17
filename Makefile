@@ -161,6 +161,9 @@ deploy:
 # better check if scripts above work, then move on to DEX Integration Scripts
 
 # fathomStats can be deployed after DEXPriceOracle is set.
+proxy:
+	coralX execute --network gorli --path scripts/deployment/a_proxy/accessControlConfig.js
+
 gorliPM:
 	coralX execute --network gorli --path scripts/deployment/25_get-positions/deploy/get-positions.js
 gorliPMInit:
