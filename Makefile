@@ -243,6 +243,16 @@ tankWXDC:
 	# Second set price to update priceWithSafetyMargin in PriceOracle for WXDC
 	coralX execute --network apothem --path scripts/deployment/7_price-oracle/config/setPrice.js
 
+tankFTHM:
+#for some reason, USDT-STABLE is used to open position.
+#and unfortunately, USDT-COL does not really work and it fails.
+#better be tested locally
+	# for quick price manipulation, running scripts below will make your life easier.
+	# First set price to change prce in simplePriceFeed
+	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/config/config_simple-price-feed-FTHM.js
+	# Second set price to update priceWithSafetyMargin in PriceOracle for FTHM
+	coralX execute --network apothem --path scripts/deployment/7_price-oracle/config/setPriceFTHM.js
+
 
 check:
 	coralX execute --network apothem --path scripts/PrepSepDemo/openClosePosition/3_openPosition.js
