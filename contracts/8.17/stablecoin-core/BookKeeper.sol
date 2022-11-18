@@ -239,6 +239,7 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     address _positionAddress,
     uint256 _lockedCollateral,
     uint256 _debtShare,
+    uint256 _positionDebtValue,
     int256 _addCollateral,
     int256 _addDebtShare
   );
@@ -443,6 +444,7 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
       _positionAddress,
       position.lockedCollateral,
       position.debtShare,
+      _positionDebtValue,
       _collateralValue,
       _debtShare
     );
