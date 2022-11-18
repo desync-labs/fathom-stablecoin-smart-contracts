@@ -1,6 +1,6 @@
 const fs = require('fs');
-require("dotenv").config();
-const WXDCAdd = process.env.WXDC_ADDRESS;
+// require("dotenv").config();
+// const WXDCAdd = process.env.WXDC_ADDRESS;
 
 const USDT = artifacts.require('./8.17/mocks/USDT.sol');
 
@@ -26,7 +26,7 @@ module.exports =  async function(deployer) {
 
   let addressesUpdate = { 
     USDT:deployed.address,
-    WXDC:WXDCAdd
+    // WXDC:WXDCAdd
   };
 
   const newAddresses = {

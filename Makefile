@@ -31,8 +31,8 @@ deploy:
 # deploy fairLaunch
 	coralX execute --network apothem --path scripts/deployment/10_fair-launch/deploy/fair-launch.js
 # deploy WXDC
-	# coralX execute --network apothem --path scripts/deployment/11_WXDC/deploy/WXDC.js
-	# coralX execute --network apothem --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
+	coralX execute --network apothem --path scripts/deployment/11_WXDC/deploy/WXDC.js
+	coralX execute --network apothem --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
 # deploy USDT
 	coralX execute --network apothem --path scripts/deployment/22_USDT-mock/deploy/USDT.js
 	coralX execute --network apothem --path scripts/deployment/22_USDT-mock/initialize/initialize_USDT.js
