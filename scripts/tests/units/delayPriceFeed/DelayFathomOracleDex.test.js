@@ -54,9 +54,21 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     describe("DexPriceOracle Contract Tests", () => {
         it("Check getPrice method returns correct default price value from DEX", async () => {
             const returnValue = await dexPriceOracle.getPrice(dexToken0, dexToken1);
-            console.log(returnValue[0]);
             expect(returnValue[0]).to.be.equal("333333333333333333");
         });
     });
+
+    describe("DelayFathomOraclePriceFeed Contract Tests", () => {
+        it("Check peekPrice method returns default price from DexPriceOracle when current price is 0 and delay time has not passed", async () => {
+            const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken0, dexToken1);
+
+            await delayFathomOraclePriceFeed.setTimeDelay(900);
+
+            await delayFathomOraclePriceFeed.peekPrice();
+            const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
+            expect(returnValue[0]).to.be.equal(dexPriceOraclePrice[0]);
+            expect(returnValue[1]).to.be.true;
+        })
+    })
 });
 
