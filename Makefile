@@ -260,3 +260,5 @@ stableSwap to generate FXD for providing liquidity:
 	# needs to be adjusted in coralX syntax
 	coralX execute --network apothem --path scripts/PrepSepDemo/stableSwap/1_mintUSDTtoDeployer.js
 	coralX execute --network apothem --path scripts/PrepSepDemo/stableSwap/2_swapThreeMilUSDT.js
+mockPoolInfo:
+	coralX execute --network apothem --path scripts/deployment/27_stats/deploy/mockPoolInfo.js
