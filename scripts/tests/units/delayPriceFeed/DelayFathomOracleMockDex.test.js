@@ -14,7 +14,7 @@ const { increase } = require('../../helper/time');
 
 const { formatBytes32String } = ethers.utils
 
-describe("Delay Fathom Oracle - Unit Test Suite", () => {
+describe("Delay Fathom Oracle with MockDexPriceOracle - Unit Test Suite", () => {
 
   let delayFathomOraclePriceFeed  //<- the contract that this test is focusing on.
   let MockDexPriceOracle // <- contract that provides price to delayFathomOraclePriceFeed.
