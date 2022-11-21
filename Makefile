@@ -13,6 +13,7 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/3_fathom-stablecoin/initialize/initialize_fathom-stablecoin.js
 # deploy systemDebtEngine
 	coralX execute --network apothem --path scripts/deployment/4_system-debt-engine/deploy/system-debt-engine.js
+# continue:
 	coralX execute --network apothem --path scripts/deployment/4_system-debt-engine/initialize/initialize_system-debt-engine.js
 # deploy priceOracle
 	coralX execute --network apothem --path scripts/deployment/7_price-oracle/deploy/price-oracle.js
