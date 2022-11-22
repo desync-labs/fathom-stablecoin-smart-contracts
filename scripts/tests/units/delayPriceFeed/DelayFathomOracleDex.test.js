@@ -53,9 +53,14 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     });
 
     describe("DexPriceOracle Contract Tests", () => {
-        it("Check getPrice method returns correct default price value from DEX", async () => {
+        it("Check getPrice method returns correct default price from DEX", async () => {
             const returnValue = await dexPriceOracle.getPrice(dexToken0, dexToken1);
             expect(returnValue[0]).to.be.equal("3000000000000000000");
+        });
+
+        it("Check getPrice method returns 1 when same token addresses are given as arguments", async () => {
+            const returnValue = await dexPriceOracle.getPrice(dexToken0, dexToken0);
+            expect(returnValue[0]).to.be.equal("1000000000000000000");
         });
     });
 
@@ -70,10 +75,19 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
             expect(returnValue[0]).to.be.equal(dexPriceOraclePrice[0]);
             expect(returnValue[1]).to.be.true;
         });
+
+        it("Check readPrice method returns default price from DexPriceOracle after calling peekPrice", async () => {
+            const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken0, dexToken1);
+            await delayFathomOraclePriceFeed.setTimeDelay(900);
+            await delayFathomOraclePriceFeed.peekPrice();
+            
+            const returnValue = await delayFathomOraclePriceFeed.readPrice();
+            expect(returnValue).to.be.equal(dexPriceOraclePrice[0]);
+          });
     });
 
     describe("MockPriceOracle Contract Tests", () => {
-        it("Check setPrice method returns default price from delayPriceFeed <- DexPriceOracle", async () => {
+        it("Check setPrice method returns default price from DelayPriceFeed when DexPriceOracle price is also the default one", async () => {
             const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken0, dexToken1);
             await delayFathomOraclePriceFeed.setTimeDelay(900);
 
