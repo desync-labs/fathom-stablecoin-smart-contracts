@@ -13,7 +13,6 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/3_fathom-stablecoin/initialize/initialize_fathom-stablecoin.js
 # deploy systemDebtEngine
 	coralX execute --network apothem --path scripts/deployment/4_system-debt-engine/deploy/system-debt-engine.js
-# continue:
 	coralX execute --network apothem --path scripts/deployment/4_system-debt-engine/initialize/initialize_system-debt-engine.js
 # deploy priceOracle
 	coralX execute --network apothem --path scripts/deployment/7_price-oracle/deploy/price-oracle.js
@@ -57,7 +56,6 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/initialize/initialize_simple-price-feed-USDT.js
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/initialize/initialize_simple-price-feed-USDT-COL.js
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/initialize/initialize_simple-price-feed-FTHM.js
-
 # deploy FSL strategy
 	coralX execute --network apothem --path scripts/deployment/16_fixed-spread-liquidation-strategy/deploy/fixed-spread-liquidation-strategy.js
 	coralX execute --network apothem --path scripts/deployment/16_fixed-spread-liquidation-strategy/initialize/initialize_fixed-spread-liquidation-strategy.js
@@ -116,7 +114,6 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/config/set-fee-in.js
 # set fee out for SSM	
 	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/config/set-fee-out.js
-# continue:
 # whiteList collateralTokenAdapter to bookKeeper
 	coralX execute --network apothem --path scripts/deployment/2_book-keeper/config/whitelist-collateral-token-adapter.js
 
@@ -154,7 +151,7 @@ deploy:
 # Adding priceOracle address to Position Manager's storage
 	coralX execute --network apothem --path scripts/deployment/13_position-manager/config/config_position-manager.js
 # mint more tokens
-	# coralX execute --network apothem --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
+	coralX execute --network apothem --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
 	coralX execute --network apothem --path scripts/deployment/22_USDT-mock/initialize/initialize_USDT.js
 
 # DEX Integration Scripts
@@ -215,7 +212,7 @@ dexIntegration:
 	coralX execute --network apothem --path scripts/deployment/26_fathom-oracle-price-feed/initialize/initialize_fathom-oracle-price-feedFTHM.js
 
 	#setPriceFeed to FathomOraclePriceFeed
-	#for WXDC & WXDC
+	#for WXDC & FTHM
 	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/config/setPriceFeed.js
 
 	# //change LTV
