@@ -1,0 +1,48 @@
+enum PositionStatus {
+  active
+  unsafe
+  closed
+  liquidated
+}
+
+type Pool @entity {
+  id: String!
+  poolName: String!
+  debtCeiling: BigInt!
+  liquidtionRatio: BigDecimal!
+  stabilityFeeRate: BigInt!
+  tokenAdapterAddress: Bytes!
+  lockedCollatral: BigInt!
+  collatralPrice: BigDecimal!
+  collatralLastPrice: BigDecimal!
+  priceWithSafetyMargin: BigDecimal!
+  debtAccumulatedRate: BigDecimal!
+  totalBorrowed: BigInt!
+  totalAvailable: BigInt!
+  tvl: BigDecimal!
+  positions: [String!]!
+}
+
+type ProtocolStat @entity {
+  id: String!
+  totalSupply: BigInt!
+  tvl: BigDecimal!
+  pools: [String!]!
+}
+
+type Position @entity {
+  id: String!
+  positionAddress: Bytes!
+  userAddress: Bytes!
+  walletAddress: Bytes!
+  collatralPool: Bytes!
+  collatralPoolName: String!
+  positionId: BigInt!
+  lockedCollateral: BigInt!
+  debtShare: BigInt!
+  safetyBuffer: BigDecimal!
+  safetyBufferInPrecent: BigDecimal!
+  tvl: BigDecimal!
+  positionStatus: PositionStatus!
+  liquidtionPrice: BigDecimal!
+}
