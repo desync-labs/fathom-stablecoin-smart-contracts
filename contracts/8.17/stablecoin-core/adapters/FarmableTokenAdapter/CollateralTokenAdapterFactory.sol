@@ -4,11 +4,10 @@ pragma solidity 0.8.17;
 
 import "./CollateralTokenAdapter.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { Clones } from "@openzeppelin/contracts/proxy/Clones.sol";
-
+import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
 contract CollateralTokenAdapterFactory is OwnableUpgradeable {
-    address public implementationAddress;
+    address public implementation;
     mapping(bytes32 => address) public adapters;
 
     event CollateralTokenAdapterCreated(
@@ -16,9 +15,9 @@ contract CollateralTokenAdapterFactory is OwnableUpgradeable {
         address adapterAddress
     );
 
-    function initialize(address adapterImplementationAddress) external initializer {
+    function initialize(address impl) external initializer {
         OwnableUpgradeable.__Ownable_init();
-        implementationAddress = adapterImplementationAddress;
+        implementation = impl;
     }
 
     function createAdapter(
@@ -33,8 +32,10 @@ contract CollateralTokenAdapterFactory is OwnableUpgradeable {
         uint256 treasuryFeeBps,
         address treasuryAccount,
         address positionManager
-    ) external onlyOwner returns (address adapterAddress) {
-        CollateralTokenAdapter adapter = CollateralTokenAdapter(Clones.clone(implementationAddress));
+    ) external onlyOwner {
+        CollateralTokenAdapter adapter = CollateralTokenAdapter(
+            Clones.clone(implementation)
+        );
 
         adapter.initialize(
             bookKeeper,
@@ -51,9 +52,6 @@ contract CollateralTokenAdapterFactory is OwnableUpgradeable {
         );
         adapters[collateralPoolId] = address(adapter);
 
-        emit CollateralTokenAdapterCreated(
-            collateralPoolId,
-            adapterAddress
-        );
+        emit CollateralTokenAdapterCreated(collateralPoolId, address(adapter));
     }
-  }
+}
