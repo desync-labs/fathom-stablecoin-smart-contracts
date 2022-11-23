@@ -5,7 +5,7 @@ chai.use(solidity);
 const { BigNumber, ethers } = require("ethers");
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../../helper/unit");
 const { DeployerAddress, AliceAddress, BobAddress } = require("../../helper/address");
-const { getContract, createMock } = require("../../helper/contracts");
+const { getContract, createMock, connectToContractWithAddress } = require("../../helper/contracts");
 const { increase } = require('../../helper/time');
 const { weiToRay } = require('../../helper/unit');
 const { formatBytes32String } = ethers.utils
@@ -14,6 +14,10 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     let dexPriceOracle;
     let delayFathomOraclePriceFeed;
     let mockPriceOracle;
+
+    let bookKeeper;
+    let collateralPoolConfig;
+    let accessControlConfig;
 
     let mockedBookKeeper;
     let mockedCollateralPoolConfig;
@@ -26,27 +30,32 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     delayFathomOraclePriceFeed = getContract("DelayFathomOraclePriceFeed", DeployerAddress);
     mockPriceOracle = getContract("MockPriceOracle", DeployerAddress);
 
+    bookKeeper = getContract("BookKeeper", DeployerAddress);
+    collateralPoolConfig = getContract("CollateralPoolConfig", DeployerAddress);
+    accessControlConfig = getContract("AccessControlConfig", DeployerAddress);
+
     beforeEach(async () => {
         await snapshot.revertToSnapshot();
-        mockedBookKeeper = await createMock("BookKeeper");
-        mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
-        mockedAccessControlConfig = await createMock("AccessControlConfig");
+        await dexPriceOracle.initialize(dexFactoryAddress);
+        await delayFathomOraclePriceFeed.initialize(dexPriceOracle.address, dexToken0, dexToken1, accessControlConfig.address);
+        await mockPriceOracle.initialize(bookKeeper.address, delayFathomOraclePriceFeed.address, WeiPerRay);
+        // mockedBookKeeper = await createMock("BookKeeper");
+        // mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
+        // mockedAccessControlConfig = await createMock("AccessControlConfig");
 
-        await mockedAccessControlConfig.mock.hasRole.returns(true);
-        await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"));
-        await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"));
+        // await mockedAccessControlConfig.mock.hasRole.returns(true);
+        // await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"));
+        // await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"));
 
-        await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address);
+        // await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address);
+
         // await mockedCollateralPoolConfig.mock.collateralPools.priceFeed.returns(delayFathomOraclePriceFeed.address);
-        await mockedCollateralPoolConfig.mock.getLiquidationRatio.returns(WeiPerRay);
+
+        // await mockedCollateralPoolConfig.mock.getLiquidationRatio.returns(WeiPerRay);
 
         //if accounts[0] is checked whether having role or not,
         //set up accessPoolConfig.hasRole()
         // accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender
-
-        await dexPriceOracle.initialize(dexFactoryAddress);
-        await delayFathomOraclePriceFeed.initialize(dexPriceOracle.address, dexToken0, dexToken1, mockedAccessControlConfig.address);
-        await mockPriceOracle.initialize(mockedBookKeeper.address, delayFathomOraclePriceFeed.address, WeiPerRay);
 
         // console.log("mockedAccessControlConfig address is " + mockedAccessControlConfig.address);
         // console.log("mockedBookKeeper address is " + mockedBookKeeper.address);
@@ -65,6 +74,24 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     });
 
     describe("DelayFathomOraclePriceFeed Contract Tests", () => {
+        it("Check setTimeDelay method reverts with !ownerRole when calling it with address having no role", async () => {
+            const delayFathomOraclePriceFeed2 = await connectToContractWithAddress(delayFathomOraclePriceFeed, AliceAddress);
+            await expect(delayFathomOraclePriceFeed2.setTimeDelay(900)).to.be.revertedWith("!ownerRole");
+        });
+
+        it("Check setTimeDelay method reverts with !ownerRole when calling it with address having GOV role", async () => {
+            await accessControlConfig.grantRole(accessControlConfig.GOV_ROLE(),BobAddress, { gasLimit: 1000000 });
+
+            const delayFathomOraclePriceFeed2 = await connectToContractWithAddress(delayFathomOraclePriceFeed, BobAddress);
+            await expect(delayFathomOraclePriceFeed2.setTimeDelay(900)).to.be.revertedWith("!ownerRole");
+        });
+
+        it("Check setTimeDelay method succeeds when calling it with address having OWNER role", async () => {
+            await delayFathomOraclePriceFeed.setTimeDelay(900);
+            const returnValue = await delayFathomOraclePriceFeed.timeDelay();
+            expect(returnValue).to.be.eq(900);
+        });
+
         it("Check peekPrice method returns default price from DexPriceOracle when current price is 0 and delay time has not passed", async () => {
             const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken0, dexToken1);
 
@@ -80,10 +107,10 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
             const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken0, dexToken1);
             await delayFathomOraclePriceFeed.setTimeDelay(900);
             await delayFathomOraclePriceFeed.peekPrice();
-            
+
             const returnValue = await delayFathomOraclePriceFeed.readPrice();
             expect(returnValue).to.be.equal(dexPriceOraclePrice[0]);
-          });
+        });
     });
 
     describe("MockPriceOracle Contract Tests", () => {
