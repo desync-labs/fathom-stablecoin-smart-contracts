@@ -113,7 +113,6 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
         });
 
         // pause method tests
-        
         //unpause method tests
 
         // peekPrice method tests
