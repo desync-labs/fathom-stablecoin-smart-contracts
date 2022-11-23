@@ -44,7 +44,9 @@ export function adjustPositionHandler(
 
         //Update the liquidation price
         //TODO: Can we put this calculationin smart contracts
-        if(pool.priceWithSafetyMargin.gt(BigDecimal.fromString('0'))){
+        if(pool.priceWithSafetyMargin.gt(BigDecimal.fromString('0')) && 
+                             position.lockedCollateral.gt(BigInt.fromI32(0))){
+                              
            let collatralAvailableToWithdraw = (
                                                 pool.priceWithSafetyMargin.times(
                                                     position.lockedCollateral.toBigDecimal()).minus(position.debtShare.toBigDecimal())
