@@ -4,7 +4,7 @@ const { approve } = require("../../helper/token");
 
 
 //1)approve
-//2)Include DEX RouterV2 Interface to the codebase, so that the contract can be instantiated.
+//2)Include DEX Router Interface to the codebase, so that the contract can be instantiated.
 //3)swap.
 
 describe("Swap tokens on dex", async () => {
@@ -26,6 +26,7 @@ describe("Swap tokens on dex", async () => {
   
     describe("Swap tokens on DEX", () => {
       it("Swap", async () => {
+        //spending mockToken0 to receive mockToken1. The amount of mockToken0 to spend is fixed but mockToken1 amount should be more than 200, otherwise refault.
         await Router.swapExactTokensForTokens(100, 200, [mockToken0, mockToken1], "0x4C5F0f90a2D4b518aFba11E22AC9b8F6B031d204", await getDeadlineTimestamp(10000));
       });
 
