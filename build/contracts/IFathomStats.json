@@ -42,31 +42,31 @@
     "absolutePath": "project:/contracts/8.17/stats/interfaces/IFathomStats.sol",
     "exportedSymbols": {
       "IFathomStats": [
-        34456
+        35676
       ]
     },
-    "id": 34457,
+    "id": 35677,
     "license": "MIT",
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 34444,
+        "id": 35664,
         "literals": [
           "solidity",
           "0.8",
           ".17"
         ],
         "nodeType": "PragmaDirective",
-        "src": "33:23:135"
+        "src": "33:23:137"
       },
       {
-        "id": 34445,
+        "id": 35665,
         "literals": [
           "experimental",
           "ABIEncoderV2"
         ],
         "nodeType": "PragmaDirective",
-        "src": "57:33:135"
+        "src": "57:33:137"
       },
       {
         "abstract": false,
@@ -75,42 +75,42 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 34456,
+        "id": 35676,
         "linearizedBaseContracts": [
-          34456
+          35676
         ],
         "name": "IFathomStats",
-        "nameLocation": "102:12:135",
+        "nameLocation": "102:12:137",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "1616d75c",
-            "id": 34450,
+            "id": 35670,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getWXDCPrice",
-            "nameLocation": "161:12:135",
+            "nameLocation": "161:12:137",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 34446,
+              "id": 35666,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "173:2:135"
+              "src": "173:2:137"
             },
             "returnParameters": {
-              "id": 34449,
+              "id": 35669,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 34448,
+                  "id": 35668,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 34450,
-                  "src": "199:7:135",
+                  "scope": 35670,
+                  "src": "199:7:137",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -118,10 +118,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 34447,
+                    "id": 35667,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "199:7:135",
+                    "src": "199:7:137",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -130,42 +130,42 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "198:9:135"
+              "src": "198:9:137"
             },
-            "scope": 34456,
-            "src": "152:56:135",
+            "scope": 35676,
+            "src": "152:56:137",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "2929e796",
-            "id": 34455,
+            "id": 35675,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "getFTHMPrice",
-            "nameLocation": "220:12:135",
+            "nameLocation": "220:12:137",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 34451,
+              "id": 35671,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "232:2:135"
+              "src": "232:2:137"
             },
             "returnParameters": {
-              "id": 34454,
+              "id": 35674,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 34453,
+                  "id": 35673,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 34455,
-                  "src": "258:7:135",
+                  "scope": 35675,
+                  "src": "258:7:137",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -173,10 +173,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 34452,
+                    "id": 35672,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "258:7:135",
+                    "src": "258:7:137",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -185,21 +185,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "257:9:135"
+              "src": "257:9:137"
             },
-            "scope": 34456,
-            "src": "211:56:135",
+            "scope": 35676,
+            "src": "211:56:137",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 34457,
-        "src": "92:177:135",
+        "scope": 35677,
+        "src": "92:177:137",
         "usedErrors": []
       }
     ],
-    "src": "33:237:135"
+    "src": "33:237:137"
   },
   "compiler": {
     "name": "solc",
@@ -207,7 +207,7 @@
   },
   "networks": {},
   "schemaVersion": "3.4.10",
-  "updatedAt": "2022-10-31T10:44:02.406Z",
+  "updatedAt": "2022-11-24T09:45:49.433Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
