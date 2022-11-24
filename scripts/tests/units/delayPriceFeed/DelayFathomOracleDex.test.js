@@ -7,8 +7,10 @@ const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../../helper/unit");
 const { DeployerAddress, AliceAddress, BobAddress } = require("../../helper/address");
 const { getContract, createMock, connectToContractWithAddress } = require("../../helper/contracts");
 const { increase } = require('../../helper/time');
-const { weiToRay } = require('../../helper/unit');
+const { weiToRay, weiToDecimal } = require('../../helper/unit');
 const { formatBytes32String } = ethers.utils
+const { getDeadlineTimestamp } = require("../../helper/timeStamp");
+const { approve } = require("../../helper/token");
 
 describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     let dexPriceOracle;
@@ -22,9 +24,12 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     let mockedBookKeeper;
     let mockedCollateralPoolConfig;
 
-    let dexToken0 = "0x0D2B0406bc8400E61f7507bDed415c98E54A8b11";
-    let dexToken1 = "0xce75A95160D96F5388437993aB5825F322426E04";
+    let Router;
+
+    let dexToken0 = "0xce75A95160D96F5388437993aB5825F322426E04";
+    let dexToken1 = "0x0D2B0406bc8400E61f7507bDed415c98E54A8b11";
     let dexFactoryAddress = "0xb9AdA6B44E4CFF8FE00443Fadf8ad006CfCc2d10";
+    let routerAddress = "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714";
 
     dexPriceOracle = getContract("DexPriceOracle", DeployerAddress);
     delayFathomOraclePriceFeed = getContract("DelayFathomOraclePriceFeed", DeployerAddress);
@@ -33,6 +38,12 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     bookKeeper = getContract("BookKeeper", DeployerAddress);
     collateralPoolConfig = getContract("CollateralPoolConfig", DeployerAddress);
     accessControlConfig = getContract("AccessControlConfig", DeployerAddress);
+
+    before(async () => {
+        await approve(dexToken0, routerAddress, 200000);
+        await approve(dexToken1, routerAddress, 200000);
+        Router = await artifacts.initializeInterfaceAt("IUniswapV2Router01", routerAddress);
+    });
 
     beforeEach(async () => {
         await snapshot.revertToSnapshot();
@@ -45,13 +56,22 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
 
         // getPrice method tests
         it("Check getPrice method returns correct default price from DEX", async () => {
-            const returnValue = await dexPriceOracle.getPrice(dexToken0, dexToken1);
+            const returnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
             expect(returnValue[0]).to.be.equal("3000000000000000000");
         });
 
         it("Check getPrice method returns 1 when same token addresses are given as arguments", async () => {
             const returnValue = await dexPriceOracle.getPrice(dexToken0, dexToken0);
             expect(returnValue[0]).to.be.equal("1000000000000000000");
+        });
+    });
+
+    describe("Swap Tokens on DEX Tests", () => {
+        it("Check Tokan1 price increases after swapping 100 Token0 with 200 Token1 (1:3) ", async () => {
+            //spending mockToken0 to receive mockToken1. The amount of mockToken0 to spend is fixed but mockToken1 amount should be more than 200, otherwise refault.
+            await Router.swapExactTokensForTokens(100, 200, [dexToken0, dexToken1], DeployerAddress, await getDeadlineTimestamp(10000));
+            const returnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            expect(weiToDecimal(returnValue[0])).to.be.lessThan(3);
         });
     });
 
@@ -115,7 +135,7 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
         // pause method tests
         it("Check pause method reverts with !ownerRole when calling it with address having no role", async () => {
             const delayFathomOraclePriceFeed2 = await connectToContractWithAddress(delayFathomOraclePriceFeed, AliceAddress);
-            await expect(delayFathomOraclePriceFeed2.pause()).to.be.revertedWith( "!(ownerRole or govRole)");
+            await expect(delayFathomOraclePriceFeed2.pause()).to.be.revertedWith("!(ownerRole or govRole)");
         });
 
         it("Check pause method reverts with !ownerRole when calling it with address having GOV role", async () => {
@@ -132,8 +152,7 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
         //unpause method tests
         it("Check unpause method reverts with !ownerRole when calling it with address having no role", async () => {
             const delayFathomOraclePriceFeed2 = await connectToContractWithAddress(delayFathomOraclePriceFeed, AliceAddress);
-            delayFathomOraclePriceFeed.pause();
-            await expect(delayFathomOraclePriceFeed2.unpause()).to.be.revertedWith( "!(ownerRole or govRole)");
+            await expect(delayFathomOraclePriceFeed2.unpause()).to.be.revertedWith("!(ownerRole or govRole)");
         });
 
         // peekPrice method tests
