@@ -10,9 +10,9 @@ export function adjustPositionHandler(
     let poolId = event.params._collateralPoolId
     let pool  = Pool.load(poolId.toHexString())
     if(pool != null){
-        pool.lockedCollatral = pool.lockedCollatral.plus(event.params._addCollateral.div(Constants.WAD))
+        pool.lockedCollateral = pool.lockedCollateral.plus(event.params._addCollateral.div(Constants.WAD))
         pool.totalAvailable = pool.debtCeiling.minus(pool.totalBorrowed)
-        pool.tvl = pool.lockedCollatral.toBigDecimal().times(pool.collatralPrice)
+        pool.tvl = pool.lockedCollateral.toBigDecimal().times(pool.collateralPrice)
         pool.save()
     }  
 
@@ -37,7 +37,7 @@ export function adjustPositionHandler(
     if(position!=null && pool!=null){
         position.lockedCollateral =  event.params._lockedCollateral.div(Constants.WAD)
         position.debtShare =  Constants.divByRAD(event.params._positionDebtValue)
-        position.tvl = position.lockedCollateral.toBigDecimal().times(pool.collatralPrice)
+        position.tvl = position.lockedCollateral.toBigDecimal().times(pool.collateralPrice)
         if(event.params._debtShare.equals(BigInt.fromI32(0))){
           position.positionStatus = 'closed'
         }
@@ -47,20 +47,20 @@ export function adjustPositionHandler(
         if(pool.priceWithSafetyMargin.gt(BigDecimal.fromString('0')) && 
                              position.lockedCollateral.gt(BigInt.fromI32(0))){
                               
-           let collatralAvailableToWithdraw = (
+           let collateralAvailableToWithdraw = (
                                                 pool.priceWithSafetyMargin.times(
                                                     position.lockedCollateral.toBigDecimal()).minus(position.debtShare.toBigDecimal())
                                                 )
                                                 .div(pool.priceWithSafetyMargin)
                                                 
-           position.liquidtionPrice = pool.collatralPrice.minus(
+           position.liquidationPrice = pool.collateralPrice.minus(
                                           (
-                                            collatralAvailableToWithdraw.times(pool.priceWithSafetyMargin))
+                                            collateralAvailableToWithdraw.times(pool.priceWithSafetyMargin))
                                             .div(position.lockedCollateral.toBigDecimal()
                                           )
                                         )
 
-            position.safetyBufferInPrecent = collatralAvailableToWithdraw.div(position.lockedCollateral.toBigDecimal())
+            position.safetyBufferInPrecent = collateralAvailableToWithdraw.div(position.lockedCollateral.toBigDecimal())
         }
 
         position.save()

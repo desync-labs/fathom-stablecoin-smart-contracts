@@ -19,20 +19,20 @@ export function handleLogInitCollateralPoolId(
     pool = new Pool(poolId.toHexString())
     pool.poolName = poolId.toString()
     pool.debtCeiling = Constants.divByRAD(event.params._debtCeiling) 
-    pool.liquidtionRatio = Constants.divByRAYToDecimal(event.params._liquidtionRatio)
+    pool.liquidationRatio = Constants.divByRAYToDecimal(event.params._liquidtionRatio)
     pool.stabilityFeeRate = Constants.divByRAY(event.params._stabilityFeeRate)
     pool.tokenAdapterAddress = event.params._adapter
-    pool.lockedCollatral = BigInt.fromI32(0)
-    pool.collatralPrice = Constants.DEFAULT_PRICE
-    pool.collatralLastPrice = Constants.DEFAULT_PRICE
+    pool.lockedCollateral = BigInt.fromI32(0)
+    pool.collateralPrice = Constants.DEFAULT_PRICE
+    pool.collateralLastPrice = Constants.DEFAULT_PRICE
     pool.priceWithSafetyMargin = Constants.DEFAULT_PRICE
     pool.totalBorrowed = BigInt.fromI32(0)
     pool.tvl = BigDecimal.fromString('0')
     pool.totalAvailable = Constants.divByRAD(event.params._debtCeiling) 
     pool.positions = []
 
-    let collatralConfig = CollateralPoolConfig.bind(Address.fromString(Constants.ADDR_COLLATRAL_POOL_CONFIG))
-    pool.debtAccumulatedRate = Constants.divByRAYToDecimal(collatralConfig.getDebtAccumulatedRate(poolId))
+    let collateralConfig = CollateralPoolConfig.bind(Address.fromString(Constants.ADDR_COLLATERAL_POOL_CONFIG))
+    pool.debtAccumulatedRate = Constants.divByRAYToDecimal(collateralConfig.getDebtAccumulatedRate(poolId))
 
     pool.save()
 
@@ -74,7 +74,7 @@ export function handleSetLiquidationRatio(
   let poolId = event.params._poolId
   let pool  = Pool.load(poolId.toHexString())
   if(pool != null){
-    pool.liquidtionRatio =  Constants.divByRAYToDecimal(event.params._data) 
+    pool.liquidationRatio =  Constants.divByRAYToDecimal(event.params._data) 
     pool.save()
   }
 }

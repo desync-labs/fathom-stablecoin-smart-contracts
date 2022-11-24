@@ -25,15 +25,15 @@ export function newPositionHandler(event: LogNewPosition): void {
     position.positionAddress = positionAddress;
     position.userAddress = event.params._usr;
     position.walletAddress = event.params._own;
-    position.collatralPool = poolId
-    position.collatralPoolName = poolId.toString()
+    position.collateralPool = poolId
+    position.collateralPoolName = poolId.toString()
     position.lockedCollateral = BigInt.fromString('0')
     position.debtShare = BigInt.fromString('0')
     position.safetyBuffer= BigDecimal.fromString('1')
     position.safetyBufferInPrecent= BigDecimal.fromString('0')
     position.tvl = BigDecimal.fromString('0')
     position.positionStatus = 'active'
-    position.liquidtionPrice = Constants.DEFAULT_PRICE
+    position.liquidationPrice = Constants.DEFAULT_PRICE
     position.save()
 
     //Save newly opened position in pool

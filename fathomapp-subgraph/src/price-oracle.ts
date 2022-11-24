@@ -8,17 +8,17 @@ export function priceUpdateHandler(event: LogSetPrice): void {
     let pool  = Pool.load(poolId.toHexString())
     if(pool != null){
         //Price is not set yet...
-        if(pool.collatralPrice == Constants.DEFAULT_PRICE && 
-            pool.collatralLastPrice == Constants.DEFAULT_PRICE){
-                pool.collatralPrice = pool.collatralLastPrice = event.params._rawPriceUint.div(Constants.WAD).toBigDecimal()
+        if(pool.collateralPrice == Constants.DEFAULT_PRICE && 
+            pool.collateralLastPrice == Constants.DEFAULT_PRICE){
+                pool.collateralPrice = pool.collateralLastPrice = event.params._rawPriceUint.div(Constants.WAD).toBigDecimal()
         }else{
             //Assign the price to old price and then update the current price to latest.
-            pool.collatralLastPrice = pool.collatralPrice
-            pool.collatralPrice = event.params._rawPriceUint.div(Constants.WAD).toBigDecimal()
+            pool.collateralLastPrice = pool.collateralPrice
+            pool.collateralPrice = event.params._rawPriceUint.div(Constants.WAD).toBigDecimal()
         }
 
         pool.priceWithSafetyMargin = Constants.divByRAYToDecimal(event.params._priceWithSafetyMargin)
-        pool.tvl = pool.lockedCollatral.toBigDecimal().times(pool.collatralPrice)
+        pool.tvl = pool.lockedCollateral.toBigDecimal().times(pool.collateralPrice)
         pool.save()
 
         //Update the safety buffer for positions
@@ -38,7 +38,7 @@ export function priceUpdateHandler(event: LogSetPrice): void {
                  }
 
 
-                pos.tvl = pos.lockedCollateral.toBigDecimal().times(pool.collatralPrice) 
+                pos.tvl = pos.lockedCollateral.toBigDecimal().times(pool.collateralPrice) 
                 pos.save()
             }
         }

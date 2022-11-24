@@ -39,7 +39,7 @@ export function createInitializedEvent(version: i32): Initialized {
 export function createLogInitCollateralPoolIdEvent(
   _collateralPoolId: Bytes,
   _debtCeiling: BigInt,
-  _liquidtionRatio: BigInt,
+  _liquidationRatio: BigInt,
   _stabilityFeeRate: BigInt,
   _adapter: Address
 ): LogInitCollateralPoolId {
@@ -64,7 +64,7 @@ export function createLogInitCollateralPoolIdEvent(
   logInitCollateralPoolIdEvent.parameters.push(
     new ethereum.EventParam(
       "_liquidtionRatio",
-      ethereum.Value.fromUnsignedBigInt(_liquidtionRatio)
+      ethereum.Value.fromUnsignedBigInt(_liquidationRatio)
     )
   )
   logInitCollateralPoolIdEvent.parameters.push(
