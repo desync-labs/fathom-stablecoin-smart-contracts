@@ -113,8 +113,28 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
         });
 
         // pause method tests
-        
+        it("Check pause method reverts with !ownerRole when calling it with address having no role", async () => {
+            const delayFathomOraclePriceFeed2 = await connectToContractWithAddress(delayFathomOraclePriceFeed, AliceAddress);
+            await expect(delayFathomOraclePriceFeed2.pause()).to.be.revertedWith( "!(ownerRole or govRole)");
+        });
+
+        it("Check pause method reverts with !ownerRole when calling it with address having GOV role", async () => {
+            await accessControlConfig.grantRole(accessControlConfig.GOV_ROLE(), BobAddress, { gasLimit: 1000000 });
+
+            const delayFathomOraclePriceFeed2 = await connectToContractWithAddress(delayFathomOraclePriceFeed, BobAddress);
+            await expect(delayFathomOraclePriceFeed2.pause()).not.to.be.reverted;
+        });
+
+        it("Check pause method succeeds when calling it with address having OWNER role", async () => {
+            await expect(delayFathomOraclePriceFeed.pause()).not.to.be.reverted;
+        });
+
         //unpause method tests
+        it("Check unpause method reverts with !ownerRole when calling it with address having no role", async () => {
+            const delayFathomOraclePriceFeed2 = await connectToContractWithAddress(delayFathomOraclePriceFeed, AliceAddress);
+            delayFathomOraclePriceFeed.pause();
+            await expect(delayFathomOraclePriceFeed2.unpause()).to.be.revertedWith( "!(ownerRole or govRole)");
+        });
 
         // peekPrice method tests
         it("Check peekPrice method returns default price from DexPriceOracle when current price is 0 and delay time has not passed", async () => {
