@@ -260,3 +260,6 @@ stableSwap to generate FXD for providing liquidity:
 	coralX execute --network apothem --path scripts/PrepSepDemo/stableSwap/2_swapThreeMilUSDT.js
 mockPoolInfo:
 	coralX execute --network apothem --path scripts/deployment/27_stats/deploy/mockPoolInfo.js
+mintable-role-bot:
+	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/archive_apothem/grant-mintable-role-liquidation-bot.js
+
