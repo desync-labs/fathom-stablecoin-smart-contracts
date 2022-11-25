@@ -40,13 +40,15 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     accessControlConfig = getContract("AccessControlConfig", DeployerAddress);
 
     before(async () => {
-        await approve(dexToken0, routerAddress, 200000);
-        await approve(dexToken1, routerAddress, 200000);
+        // await approve(dexToken0, routerAddress, 200000);
+        // await approve(dexToken1, routerAddress, 200000);
         Router = await artifacts.initializeInterfaceAt("IUniswapV2Router01", routerAddress);
     });
 
     beforeEach(async () => {
         await snapshot.revertToSnapshot();
+        // await approve(dexToken0, routerAddress, 200000);
+        // await approve(dexToken1, routerAddress, 200000);
         await dexPriceOracle.initialize(dexFactoryAddress);
         await delayFathomOraclePriceFeed.initialize(dexPriceOracle.address, dexToken0, dexToken1, accessControlConfig.address);
         await mockPriceOracle.initialize(bookKeeper.address, delayFathomOraclePriceFeed.address, WeiPerRay);
@@ -67,11 +69,86 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     });
 
     describe("Swap Tokens on DEX Tests", () => {
-        it("Check Tokan1 price increases after swapping 100 Token0 with 200 Token1 (1:3) ", async () => {
+        it("Check Token1 price increases after swapping 100 Token0 with 200 Token1 (1:3) ", async () => {
             //spending mockToken0 to receive mockToken1. The amount of mockToken0 to spend is fixed but mockToken1 amount should be more than 200, otherwise refault.
+            await approve(dexToken0, routerAddress, 200000);
+            await approve(dexToken1, routerAddress, 200000);
             await Router.swapExactTokensForTokens(100, 200, [dexToken0, dexToken1], DeployerAddress, await getDeadlineTimestamp(10000));
             const returnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
             expect(weiToDecimal(returnValue[0])).to.be.lessThan(3);
+        });
+
+        it("Check Token1 price keeps fluctuating in a correct direcation after continously swapping different amount of Token0 with Token1 and vice versa", async () => {
+            //spending mockToken0 to receive mockToken1. The amount of mockToken0 to spend is fixed but mockToken1 amount should be more than 200, otherwise refault.
+            let token1PreviousPrice = 3;
+            let returnValue;
+            let token1CurrentPrice;
+
+            // Swap 1: 100 Token0 for 200 Token1 -> Token1 Price should increase
+            await approve(dexToken0, routerAddress, 20000);
+            await approve(dexToken1, routerAddress, 20000);
+            increase(900);
+            await Router.swapExactTokensForTokens(100, 200, [dexToken0, dexToken1], DeployerAddress, await getDeadlineTimestamp(10000));
+            returnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            token1CurrentPrice = weiToDecimal(returnValue[0]);
+            console.log("Token1 Price is: " + token1CurrentPrice);
+            expect(token1CurrentPrice).to.be.lessThan(token1PreviousPrice);
+            token1PreviousPrice = token1CurrentPrice;
+
+            // Swap 2: 500 Token0 for 200 Token1 -> Token1 Price should increase
+            await approve(dexToken0, routerAddress, 20000);
+            await approve(dexToken1, routerAddress, 20000);
+            increase(900);
+            await Router.swapExactTokensForTokens(500, 100, [dexToken0, dexToken1], DeployerAddress, await getDeadlineTimestamp(10000));
+            returnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            token1CurrentPrice = weiToDecimal(returnValue[0]);
+            console.log("Token1 Price is: " + token1CurrentPrice);
+            expect(token1CurrentPrice).to.be.lessThan(token1PreviousPrice);
+            token1PreviousPrice = token1CurrentPrice;
+
+            // Swap 3: 1000 Token0 for 200 Token1 -> Token1 Price should increase
+            await approve(dexToken0, routerAddress, 20000);
+            await approve(dexToken1, routerAddress, 20000);
+            increase(900);
+            await Router.swapExactTokensForTokens(1000, 100, [dexToken0, dexToken1], DeployerAddress, await getDeadlineTimestamp(10000));
+            returnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            token1CurrentPrice = weiToDecimal(returnValue[0]);
+            console.log("Token1 Price is: " + token1CurrentPrice);
+            expect(token1CurrentPrice).to.be.lessThan(token1PreviousPrice);
+            token1PreviousPrice = token1CurrentPrice;
+
+            // Swap 4: 300 Token1 for 50 Token0 -> Token1 Price should deacrease
+            await approve(dexToken0, routerAddress, 20000);
+            await approve(dexToken1, routerAddress, 20000);
+            increase(900);
+            await Router.swapExactTokensForTokens(300, 50, [dexToken1, dexToken0], DeployerAddress, await getDeadlineTimestamp(10000));
+            returnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            token1CurrentPrice = weiToDecimal(returnValue[0]);
+            console.log("Token1 Price is: " + token1CurrentPrice);
+            expect(token1CurrentPrice).to.be.greaterThan((token1PreviousPrice));
+            token1PreviousPrice = token1CurrentPrice;
+
+            // Swap 5: 300 Token1 for 50 Token0 -> Token1 Price should deacrease
+            await approve(dexToken0, routerAddress, 20000);
+            await approve(dexToken1, routerAddress, 20000);
+            increase(900);
+            await Router.swapExactTokensForTokens(600, 50, [dexToken1, dexToken0], DeployerAddress, await getDeadlineTimestamp(10000));
+            returnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            token1CurrentPrice = weiToDecimal(returnValue[0]);
+            console.log("Token1 Price is: " + token1CurrentPrice);
+            expect(token1CurrentPrice).to.be.greaterThan((token1PreviousPrice));
+            token1PreviousPrice = token1CurrentPrice;
+
+            // Swap 6: 300 Token1 for 50 Token0 -> Token1 Price should deacrease
+            await approve(dexToken0, routerAddress, 20000);
+            await approve(dexToken1, routerAddress, 20000);
+            increase(900);
+            await Router.swapExactTokensForTokens(1000, 50, [dexToken1, dexToken0], DeployerAddress, await getDeadlineTimestamp(10000));
+            returnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            token1CurrentPrice = weiToDecimal(returnValue[0]);
+            console.log("Token1 Price is: " + token1CurrentPrice);
+            expect(token1CurrentPrice).to.be.greaterThan((token1PreviousPrice));
+            token1PreviousPrice = token1CurrentPrice;
         });
     });
 
