@@ -313,6 +313,30 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
             expect(token1PriceOraclePrice).to.be.equal(token1DexPrice);
             expect(token1PriceOraclePrice).to.be.equal(token1DelayPrice);
         });
+
+        it("Check setPrice method returns updated price from DelayPriceFeed after delay time has passed when DexPriceOracle price is changed", async () => {
+            await delayFathomOraclePriceFeed.setTimeDelay(900);
+            await delayFathomOraclePriceFeed.peekPrice();
+
+            await approve(dexToken0, routerAddress, 200000);
+            await Router.swapExactTokensForTokens(100, 200, [dexToken0, dexToken1], DeployerAddress, await getDeadlineTimestamp(10000));
+            const dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            const token1DexPrice = weiToDecimal(dexReturnValue[0]);
+
+            increase(900);
+            await delayFathomOraclePriceFeed.peekPrice();
+            const delayReturnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
+            const token1DelayPrice = weiToDecimal(delayReturnValue[0]);
+
+            const _collateralPoolId = formatBytes32String("WXDC");
+
+            await mockPriceOracle.setPrice(_collateralPoolId);
+            const _priceWithSafetyMargin = await mockPriceOracle.callStatic.setPrice(_collateralPoolId);
+            const token1PriceOraclePrice = rayToDecimal(_priceWithSafetyMargin);
+
+            expect(token1PriceOraclePrice).to.be.equal(token1DexPrice);
+            expect(token1PriceOraclePrice).to.be.equal(token1DelayPrice);
+        });
     });
 });
 
