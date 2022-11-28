@@ -42,7 +42,7 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     beforeEach(async () => {
         await snapshot.revertToSnapshot();
         await dexPriceOracle.initialize(dexFactoryAddress);
-        await delayFathomOraclePriceFeed.initialize(dexPriceOracle.address, dexToken0, dexToken1, accessControlConfig.address);
+        await delayFathomOraclePriceFeed.initialize(dexPriceOracle.address, dexToken1, dexToken0, accessControlConfig.address);
         await mockPriceOracle.initialize(bookKeeper.address, delayFathomOraclePriceFeed.address, WeiPerRay);
         Router = await artifacts.initializeInterfaceAt("IUniswapV2Router01", routerAddress);
     });
@@ -224,8 +224,7 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
 
         // peekPrice method tests
         it("Check peekPrice method returns default price from DexPriceOracle when current price is 0 and delay time has not passed", async () => {
-            const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken0, dexToken1);
-
+            const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken1, dexToken0);
             await delayFathomOraclePriceFeed.setTimeDelay(900);
 
             await delayFathomOraclePriceFeed.peekPrice();
@@ -234,9 +233,53 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
             expect(returnValue[1]).to.be.true;
         });
 
+        it("Check peekPrice method returns old price from DexPriceOracle when current price is not 0 and delay time has not passed", async () => {
+            await delayFathomOraclePriceFeed.setTimeDelay(900);
+            await delayFathomOraclePriceFeed.peekPrice();
+
+            await approve(dexToken0, routerAddress, 200000);
+            await Router.swapExactTokensForTokens(100, 200, [dexToken0, dexToken1], DeployerAddress, await getDeadlineTimestamp(10000));
+            const dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            
+            const token1PreviousPrice = 3;
+            const token1CurrentPrice = weiToDecimal(dexReturnValue[0]);
+
+            await delayFathomOraclePriceFeed.peekPrice();
+            const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
+
+            expect(weiToDecimal(returnValue[0])).not.to.be.equal(token1CurrentPrice);
+            expect(weiToDecimal(returnValue[0])).to.be.eq(token1PreviousPrice);
+            expect(returnValue[1]).to.be.true;
+        });
+
+        it("Check peekPrice method returns updated price from DexPriceOracle when current price is not 0 and delay time has passed", async () => {
+            await delayFathomOraclePriceFeed.setTimeDelay(900);
+            await delayFathomOraclePriceFeed.peekPrice();
+
+            await approve(dexToken0, routerAddress, 200000);
+            await Router.swapExactTokensForTokens(100, 200, [dexToken0, dexToken1], DeployerAddress, await getDeadlineTimestamp(10000));
+            const dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+
+            const token1PreviousPrice = 3;
+            const token1CurrentPrice = weiToDecimal(dexReturnValue[0]);
+
+            increase(900);
+            await delayFathomOraclePriceFeed.peekPrice();
+            const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
+
+            expect(weiToDecimal(returnValue[0])).not.to.be.eq(token1PreviousPrice);
+            expect(weiToDecimal(returnValue[0])).to.be.equal(token1CurrentPrice);
+            expect(returnValue[1]).to.be.true;
+        });
+
         // readPrice method tests
-        it("Check readPrice method returns default price from DexPriceOracle after calling peekPrice", async () => {
-            const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken0, dexToken1);
+        it("Check readPrice method returns default current price (0) when peekPrice is never called", async () => {
+            const returnValue = await delayFathomOraclePriceFeed.readPrice();
+            expect(weiToDecimal(returnValue)).to.be.equal(0);
+          });
+          
+        it("Check readPrice method returns current price from DexPriceOracle after calling peekPrice", async () => {
+            const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken1, dexToken0);
             await delayFathomOraclePriceFeed.setTimeDelay(900);
             await delayFathomOraclePriceFeed.peekPrice();
 
@@ -249,7 +292,7 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
 
         // setPrice method tests
         it("Check setPrice method returns default price from DelayPriceFeed when DexPriceOracle price is also the default one", async () => {
-            const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken0, dexToken1);
+            const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken1, dexToken0);
             await delayFathomOraclePriceFeed.setTimeDelay(900);
 
             await delayFathomOraclePriceFeed.peekPrice();
