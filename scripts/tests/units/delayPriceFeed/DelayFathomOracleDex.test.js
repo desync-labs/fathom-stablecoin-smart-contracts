@@ -7,7 +7,7 @@ const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../../helper/unit");
 const { DeployerAddress, AliceAddress, BobAddress } = require("../../helper/address");
 const { getContract, createMock, connectToContractWithAddress } = require("../../helper/contracts");
 const { increase } = require('../../helper/time');
-const { weiToRay, weiToDecimal } = require('../../helper/unit');
+const { weiToRay, weiToDecimal, rayToDecimal } = require('../../helper/unit');
 const { formatBytes32String } = ethers.utils
 const { getDeadlineTimestamp } = require("../../helper/timeStamp");
 const { approve } = require("../../helper/token");
@@ -224,12 +224,12 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
 
         // peekPrice method tests
         it("Check peekPrice method returns default price from DexPriceOracle when current price is 0 and delay time has not passed", async () => {
-            const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            const dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
             await delayFathomOraclePriceFeed.setTimeDelay(900);
 
             await delayFathomOraclePriceFeed.peekPrice();
             const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
-            expect(returnValue[0]).to.be.equal(dexPriceOraclePrice[0]);
+            expect(returnValue[0]).to.be.equal(dexReturnValue[0]);
             expect(returnValue[1]).to.be.true;
         });
 
@@ -237,11 +237,13 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
             await delayFathomOraclePriceFeed.setTimeDelay(900);
             await delayFathomOraclePriceFeed.peekPrice();
 
+            let dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            const token1PreviousPrice = weiToDecimal(dexReturnValue[0]);
+
             await approve(dexToken0, routerAddress, 200000);
             await Router.swapExactTokensForTokens(100, 200, [dexToken0, dexToken1], DeployerAddress, await getDeadlineTimestamp(10000));
-            const dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
-            
-            const token1PreviousPrice = 3;
+
+            dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
             const token1CurrentPrice = weiToDecimal(dexReturnValue[0]);
 
             await delayFathomOraclePriceFeed.peekPrice();
@@ -256,11 +258,13 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
             await delayFathomOraclePriceFeed.setTimeDelay(900);
             await delayFathomOraclePriceFeed.peekPrice();
 
+            let dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            const token1PreviousPrice = weiToDecimal(dexReturnValue[0]);
+            
             await approve(dexToken0, routerAddress, 200000);
             await Router.swapExactTokensForTokens(100, 200, [dexToken0, dexToken1], DeployerAddress, await getDeadlineTimestamp(10000));
-            const dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
 
-            const token1PreviousPrice = 3;
+            dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
             const token1CurrentPrice = weiToDecimal(dexReturnValue[0]);
 
             increase(900);
@@ -279,12 +283,12 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
           });
           
         it("Check readPrice method returns current price from DexPriceOracle after calling peekPrice", async () => {
-            const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            const dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
             await delayFathomOraclePriceFeed.setTimeDelay(900);
             await delayFathomOraclePriceFeed.peekPrice();
 
             const returnValue = await delayFathomOraclePriceFeed.readPrice();
-            expect(returnValue).to.be.equal(dexPriceOraclePrice[0]);
+            expect(returnValue).to.be.equal(dexReturnValue[0]);
         });
     });
 
@@ -292,18 +296,22 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
 
         // setPrice method tests
         it("Check setPrice method returns default price from DelayPriceFeed when DexPriceOracle price is also the default one", async () => {
-            const dexPriceOraclePrice = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            const dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            const token1DexPrice = weiToDecimal(dexReturnValue[0]);
+
             await delayFathomOraclePriceFeed.setTimeDelay(900);
-
             await delayFathomOraclePriceFeed.peekPrice();
-
-            await delayFathomOraclePriceFeed.callStatic.peekPrice();
+            const delayReturnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
+            const token1DelayPrice = weiToDecimal(delayReturnValue[0]);
 
             const _collateralPoolId = formatBytes32String("WXDC");
 
             await mockPriceOracle.setPrice(_collateralPoolId);
             const _priceWithSafetyMargin = await mockPriceOracle.callStatic.setPrice(_collateralPoolId);
-            await expect(_priceWithSafetyMargin).to.be.equal(weiToRay(dexPriceOraclePrice[0]));
+            const token1PriceOraclePrice = rayToDecimal(_priceWithSafetyMargin);
+
+            expect(token1PriceOraclePrice).to.be.equal(token1DexPrice);
+            expect(token1PriceOraclePrice).to.be.equal(token1DelayPrice);
         });
     });
 });
