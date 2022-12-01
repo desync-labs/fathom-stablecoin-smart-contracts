@@ -47,17 +47,23 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
         Router = await artifacts.initializeInterfaceAt("IUniswapV2Router01", routerAddress);
     });
 
+    after(async () => {
+        await snapshot.revertToSnapshot();
+    });
+
     describe("DexPriceOracle Contract Tests", () => {
 
         // getPrice method tests
         it("Check getPrice method returns correct default price from DEX", async () => {
-            const returnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
-            expect(returnValue[0]).to.be.equal("3000000000000000000");
+            const dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            const token1DexPrice = weiToDecimal(dexReturnValue[0]);
+            expect(token1DexPrice).to.be.equal(3);
         });
 
         it("Check getPrice method returns 1 when same token addresses are given as arguments", async () => {
-            const returnValue = await dexPriceOracle.getPrice(dexToken0, dexToken0);
-            expect(returnValue[0]).to.be.equal("1000000000000000000");
+            const dexReturnValue = await dexPriceOracle.getPrice(dexToken0, dexToken0);
+            const token0DexPrice = weiToDecimal(dexReturnValue[0]);
+            expect(token0DexPrice).to.be.equal(1);
         });
     });
 
@@ -65,8 +71,9 @@ describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
         it("Check Token1 price increases after swapping 100 Token0 with 200 Token1 (1:3) ", async () => {
             await approve(dexToken0, routerAddress, 200000);
             await Router.swapExactTokensForTokens(100, 200, [dexToken0, dexToken1], DeployerAddress, await getDeadlineTimestamp(10000));
-            const returnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
-            expect(weiToDecimal(returnValue[0])).to.be.lessThan(3);
+            const dexReturnValue = await dexPriceOracle.getPrice(dexToken1, dexToken0);
+            const token1DexPrice = weiToDecimal(dexReturnValue[0]);
+            expect(token1DexPrice).to.be.lessThan(3);
         });
 
         it("Check Token1 price keeps fluctuating in a correct direcation after continously swapping different amount of Token0 with Token1 and vice versa", async () => {
