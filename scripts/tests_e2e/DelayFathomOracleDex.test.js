@@ -3,14 +3,14 @@ const { expect } = chai
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 const { BigNumber, ethers } = require("ethers");
-const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../../helper/unit");
-const { DeployerAddress, AliceAddress, BobAddress } = require("../../helper/address");
-const { getContract, createMock, connectToContractWithAddress } = require("../../helper/contracts");
-const { increase } = require('../../helper/time');
-const { weiToRay, weiToDecimal, rayToDecimal } = require('../../helper/unit');
+const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../tests/helper/unit");
+const { DeployerAddress, AliceAddress, BobAddress } = require("../tests/helper/address");
+const { getContract, createMock, connectToContractWithAddress } = require("../tests/helper/contracts");
+const { increase } = require('../tests/helper/time');
+const { weiToRay, weiToDecimal, rayToDecimal } = require('../tests/helper/unit');
 const { formatBytes32String } = ethers.utils
-const { getDeadlineTimestamp } = require("../../helper/timeStamp");
-const { approve } = require("../../helper/token");
+const { getDeadlineTimestamp } = require("../tests/helper/timeStamp");
+const { approve } = require("../tests/helper/token");
 
 describe("Delay Fathom Oracle with DexPriceOracle - Unit Test Suite", () => {
     let dexPriceOracle;
