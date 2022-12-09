@@ -158,8 +158,6 @@ contract PositionManager is PausableUpgradeable, IManager {
   /// @param _user The user address that is owned this position
   function open(bytes32 _collateralPoolId, address _user) external override whenNotPaused returns (uint256) {
 
-    ISetPrice(priceOracle).setPrice(_collateralPoolId);
-
     require(_user != address(0), "PositionManager/user-address(0)");
     uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig())
       .getDebtAccumulatedRate(_collateralPoolId);
@@ -183,6 +181,8 @@ contract PositionManager is PausableUpgradeable, IManager {
     ownerPositionCount[_user] = _safeAdd(ownerPositionCount[_user], 1);
 
     emit LogNewPosition(msg.sender, _user, lastPositionId);
+
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
 
     return lastPositionId;
   }
@@ -255,8 +255,6 @@ contract PositionManager is PausableUpgradeable, IManager {
   ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
     bytes32 _collateralPoolId = collateralPools[_positionId];
 
-    ISetPrice(priceOracle).setPrice(_collateralPoolId);
-
     address _positionAddress = positions[_positionId];
     IBookKeeper(bookKeeper).adjustPosition(
       collateralPools[_positionId],
@@ -273,6 +271,8 @@ contract PositionManager is PausableUpgradeable, IManager {
       _debtShare,
       _data
     );
+
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
   }
 
   /// @dev Transfer wad amount of position's collateral from the positionHandler address to a destination address.
@@ -290,10 +290,10 @@ contract PositionManager is PausableUpgradeable, IManager {
   ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
     bytes32 _collateralPoolId = collateralPools[_positionId];
 
-    ISetPrice(priceOracle).setPrice(_collateralPoolId);
-
     IBookKeeper(bookKeeper).moveCollateral(collateralPools[_positionId], positions[_positionId], _destination, _wad);
     IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
+
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
   }
 
   /// @dev Transfer wad amount of any type of collateral (collateralPoolId) from the positionHandler address to the destination address
@@ -312,10 +312,11 @@ contract PositionManager is PausableUpgradeable, IManager {
     address _adapter,
     bytes calldata _data
   ) external whenNotPaused onlyOwnerAllowed(_positionId) {
-    ISetPrice(priceOracle).setPrice(_collateralPoolId);
 
     IBookKeeper(bookKeeper).moveCollateral(_collateralPoolId, positions[_positionId], _destination, _wad);
     IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
+
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
   }
 
   /// @dev Transfer rad amount of stablecoin from the positionHandler address to the destination address
