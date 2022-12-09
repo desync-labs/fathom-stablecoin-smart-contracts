@@ -10,6 +10,10 @@ const { formatBytes32String } = require("ethers/lib/utils");
 const FathomStats = artifacts.require('./8.17/stats/FathomStats.sol');
 const COLLATERAL_POOL_ID_FTHM = formatBytes32String("FTHM")
 
+require("dotenv").config();
+const WXDCAdd = process.env.WXDC_ADDRESS;
+const USDTAdd = process.env.USDT_ADDRESS;
+const FTHMAdd = process.env.FTHM_ADDRESS;
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing FathomStats")
@@ -20,12 +24,12 @@ module.exports =  async function(deployer) {
     stablecoinAddress.bookKeeper,  //bookKeeper
     stablecoinAddress.fairLaunch,                  //FairLaunch
     // WXDCAdd, //WXDC
-    stablecoinAddress.WXDC,
-    stablecoinAddress.USDT, // USDT
+    WXDCAdd,
+    USDTAdd, // USDT
     stablecoinAddress.fathomStablecoin, //FXD
     stablecoinAddress.dexPriceOracle, //dEXPriceOracle
     COLLATERAL_POOL_ID_FTHM, //bytes32 of WXDC string
     stablecoinAddress.collateralPoolConfig, //CollateralPoolConfig
-    stablecoinAddress.fathomToken  //FathomToken
+    FTHMAdd  //FathomToken
     )
 };

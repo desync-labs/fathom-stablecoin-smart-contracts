@@ -10,7 +10,13 @@ const WeiPerRad = BigNumber.from(`1${"0".repeat(45)}`)
 const COLLATERAL_POOL_ID = formatBytes32String("US+STABLE")
 const CLOSE_FACTOR_BPS = BigNumber.from(5000)   // <- 0.5
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)  // <- 1.05
-const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
+const TREASURY_FEE_BPS = BigNumber.from(1000) // <- 0.1     10%
+
+
+const stabilityFee = BigNumber.from(`1000000000315522921573372069`)
+
+const LIQUIDATIONRATIO = WeiPerRay.mul(133).div(100).toString();
+
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -36,8 +42,8 @@ module.exports = async function(deployer) {
     0,   //<-_debtCeiling
     0,   //<-_debtFloor
     stablecoinAddress.simplePriceFeedUSDT,  //<-_priceFeed
-    WeiPerRay,  //<-_liquidationRatio   1 RAY, therefore MAX LTV rate of 100%
-    WeiPerRay,  //<-_stabilityFeeRate   Initially set as 1 RAY, which is 0 stability fee taken by the system from _usrs
+    LIQUIDATIONRATIO,  //<-_liquidationRatio   1 RAY, therefore MAX LTV rate of 100%
+    stabilityFee,  //<-_stabilityFeeRate   Initially set as 1 RAY, which is 0 stability fee taken by the system from _usrs
     stablecoinAddress.collateralTokenAdapterUSDT,   //<-_adapter
     CLOSE_FACTOR_BPS.mul(2),   // <-_closeFactorBps    mul(2) therefore 100%
     LIQUIDATOR_INCENTIVE_BPS,  //<-_liquidatorIncentiveBps

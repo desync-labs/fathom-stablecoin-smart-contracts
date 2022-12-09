@@ -20,7 +20,6 @@ const { BigNumber } = require("ethers");
 module.exports =  async function(deployer) {
   console.log(">> Initializing USDT")
 
-  // const USDTInstance = await USDT.at(stablecoinAddress.USDT);
   const USDTInstance = await USDT.at(stablecoinAddress.USDT);
 
   // await USDTInstance.mint(

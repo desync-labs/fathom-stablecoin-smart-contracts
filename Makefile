@@ -27,15 +27,15 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/8_show-stopper/deploy/show-stopper.js
 	coralX execute --network apothem --path scripts/deployment/8_show-stopper/initialize/initialize_show-stopper.js
 # deploy fathomToken
-	coralX execute --network apothem --path scripts/deployment/9_fathom-token/deploy/fathom-token.js
+	# coralX execute --network apothem --path scripts/deployment/9_fathom-token/deploy/fathom-token.js
 # deploy fairLaunch
 	coralX execute --network apothem --path scripts/deployment/10_fair-launch/deploy/fair-launch.js
 # deploy WXDC
-	coralX execute --network apothem --path scripts/deployment/11_WXDC/deploy/WXDC.js
-	coralX execute --network apothem --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
+	# coralX execute --network apothem --path scripts/deployment/11_WXDC/deploy/WXDC.js
+	# coralX execute --network apothem --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
 # deploy USDT
-	coralX execute --network apothem --path scripts/deployment/22_USDT-mock/deploy/USDT.js
-	coralX execute --network apothem --path scripts/deployment/22_USDT-mock/initialize/initialize_USDT.js
+	# coralX execute --network apothem --path scripts/deployment/22_USDT-mock/deploy/USDT.js
+	# coralX execute --network apothem --path scripts/deployment/22_USDT-mock/initialize/initialize_USDT.js
 # deploy shield
 	coralX execute --network apothem --path scripts/deployment/12_shield/deploy/shield.js
 # config fairLaunch

@@ -2,6 +2,10 @@ const fs = require('fs');
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 const { BigNumber } = require("ethers");
+
+require("dotenv").config();
+const WXDCAdd = process.env.WXDC_ADDRESS;
+
 // for testnet
 const walletDeployer = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
 
@@ -16,7 +20,7 @@ const WXDCAddress = "0xcEc1609Efd3f12d0Da63250eF6761A7482Dda3BF";
 module.exports =  async function(deployer) {
   console.log(">> Initializing WXDC")
 
-  const WXDCInstance = await WXDC.at(stablecoinAddress.WXDC);
+  const WXDCInstance = await WXDC.at(WXDCAdd);
   // const WXDCInstance = await WXDC.at(stablecoinAddress.WXDC);
 
   await WXDCInstance.mint(
