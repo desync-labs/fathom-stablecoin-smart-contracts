@@ -128,6 +128,8 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     bytes calldata _data
   ) internal {
 
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
+
     require(live == 1, "LiquidationEngine/not-live");
     require(_debtShareToBeLiquidated != 0, "LiquidationEngine/zero-debt-value-to-be-liquidated");
     require(_maxDebtShareToBeLiquidated != 0, "LiquidationEngine/zero-max-debt-value-to-be-liquidated");
@@ -204,7 +206,6 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         -int256(_vars.newPositionDebtShare)
       );
     }
-      ISetPrice(priceOracle).setPrice(_collateralPoolId);
   }
 
   function setPriceOracle(address _priceOracle) external onlyOwnerOrShowStopper {
