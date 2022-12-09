@@ -28,7 +28,8 @@ const FlashMintModule = artifacts.require('./8.17/flash-mint/FlashMintModule.sol
 const MockDexPriceOracle = artifacts.require('./8.17/mocks/MockDexPriceOracle.sol');
 const DelayFathomOraclePriceFeed = artifacts.require('./8.17/price-feeders/DelayFathomOraclePriceFeed.sol');
 const MockPriceOracle = artifacts.require('./8.17/mocks/MockPriceOracle.sol');
-
+const FlashMintArbitrager = artifacts.require('./8.17/mocks/FlashMintArbitrager.sol');
+const BookKeeperFlashMintArbitrager = artifacts.require('./8.17/mocks/BookKeeperFlashMintArbitrager.sol');
 
 module.exports =  async function(deployer) {
   let promises = [
@@ -62,6 +63,10 @@ module.exports =  async function(deployer) {
       deployer.deploy(MockDexPriceOracle, { gas: 3050000 }),
       deployer.deploy(DelayFathomOraclePriceFeed, { gas: 3050000 }),
       deployer.deploy(MockPriceOracle, { gas: 3050000 }),
+      deployer.deploy(TokenAdapter, { gas: 3050000 }),
+      deployer.deploy(IbTokenPriceFeed, { gas: 3050000 }),
+      deployer.deploy(FlashMintArbitrager, { gas: 3050000 }),
+      deployer.deploy(BookKeeperFlashMintArbitrager, { gas: 3050000 }),
   ];
 
   await Promise.all(promises);

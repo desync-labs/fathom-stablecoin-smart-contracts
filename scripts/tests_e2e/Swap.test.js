@@ -1,6 +1,6 @@
-const { getDeadlineTimestamp } = require("../../helper/timeStamp");
-const { getContract } = require("../../helper/contracts");
-const { approve } = require("../../helper/token");
+const { getDeadlineTimestamp } = require("../tests/helper/timeStamp");
+const { getContract } = require("../tests/helper/contracts");
+const { approve } = require("../tests/helper/token");
 
 
 //1)approve

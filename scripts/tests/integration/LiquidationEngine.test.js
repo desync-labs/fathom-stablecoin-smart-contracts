@@ -378,12 +378,12 @@ describe("LiquidationEngine", () => {
             for (let i = 0; i < testParams.length; i++) {
                 const testParam = testParams[i]
                 it(testParam.label, async () => {
-                    await WXDC.mint(AliceAddress, parseEther(testParam.collateralAmount), { gasLimit: 1000000 })
+                    await WXDC.mint(AliceAddress, parseEther(testParam.collateralAmount), { gasLimit: 3000000 })
                     await collateralPoolConfig.setLiquidatorIncentiveBps(COLLATERAL_POOL_ID, testParam.liquidatorIncentiveBps)
                     await collateralPoolConfig.setCloseFactorBps(COLLATERAL_POOL_ID, testParam.closeFactorBps)
-                    await simplePriceFeed.setPrice(parseUnits(testParam.startingPrice, 18), { gasLimit: 1000000 })
+                    await simplePriceFeed.setPrice(parseUnits(testParam.startingPrice, 18), { gasLimit: 3000000 })
                     let ratio = WeiPerRay.mul(1000).div(parseUnits(testParam.collateralFactor, 3))
-                    await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 1000000 })
+                    await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 3000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
 
                     // 2. Alice open a new position with 1 WXDC and draw 1 FUSD
@@ -415,17 +415,17 @@ describe("LiquidationEngine", () => {
                     ).to.be.equal(0)
 
                     // 3. WXDC price drop to 0.99 USD
-                    await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 1000000 })
+                    await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 3000000 })
 
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther(testParam.debtShareToRepay)
-                    await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 1000000 })
-                    await bookKeeper.whitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 1000000 })
+                    await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 3000000 })
+                    await bookKeeper.whitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 3000000 })
                     await bookKeeper.mintUnbackedStablecoin(
                         DeployerAddress,
                         BobAddress,
                         parseUnits(testParam.debtShareToRepay, 46),
-                        { gasLimit: 1000000 }
+                        { gasLimit: 3000000 }
                     )
                     const bobStablecoinBeforeLiquidation = await bookKeeper.stablecoin(BobAddress)
                     await liquidationEngine.liquidate(
@@ -435,7 +435,7 @@ describe("LiquidationEngine", () => {
                         MaxUint256,
                         BobAddress,
                         "0x",
-                        { from: BobAddress, gasLimit: 2000000 }
+                        { from: BobAddress, gasLimit: 3000000 }
                     )
 
                     // 5. Settle system bad debt

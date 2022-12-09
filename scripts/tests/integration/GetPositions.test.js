@@ -68,9 +68,9 @@ describe("GetPositions", () => {
     describe("#getPositionWithSafetyBuffer", async () => {
         context("multiple positions at risks", async () => {
             it("should query all positions at risks", async () => {
-                await simplePriceFeed.setPrice(WeiPerRay.mul(2), { gasLimit: 1000000 })
+                await simplePriceFeed.setPrice(WeiPerRay.mul(2), { gasLimit: 3000000 })
 
-                await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress, gasLimit: 1000000 })
+                await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress, gasLimit: 3000000 })
 
                 await openPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, ethers.utils.parseEther("1"), ethers.utils.parseEther("1"));
                 await advanceBlock()
@@ -81,7 +81,7 @@ describe("GetPositions", () => {
                 await openPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, ethers.utils.parseEther("1.5"), ethers.utils.parseEther("1"));
                 await advanceBlock()
 
-                await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, ethers.utils.parseEther("0.9").mul(1e9), { gasLimit: 1000000 })
+                await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, ethers.utils.parseEther("0.9").mul(1e9), { gasLimit: 3000000 })
                 const positions = await getPositions.getPositionWithSafetyBuffer(positionManager.address, 1, 40)
                 expect(positions._debtShares[0]).to.be.equal(WeiPerWad)
                 expect(positions._debtShares[1]).to.be.equal(WeiPerWad)
