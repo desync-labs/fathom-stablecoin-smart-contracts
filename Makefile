@@ -18,13 +18,16 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/7_price-oracle/deploy/price-oracle.js
 	coralX execute --network apothem --path scripts/deployment/7_price-oracle/initialize/initialize_price-oracle.js
 # deploy liquidationEngine
+# continue:
 	coralX execute --network apothem --path scripts/deployment/5_liquidation-engine/deploy/liquidation-engine.js
 	coralX execute --network apothem --path scripts/deployment/5_liquidation-engine/initialize/initialize_liquidation-engine.js
 # deploy stablecoinAdapter
 	coralX execute --network apothem --path scripts/deployment/6_stablecoin-adapter/deploy/stablecoin-adapter.js
+
 	coralX execute --network apothem --path scripts/deployment/6_stablecoin-adapter/initialize/initialize_stablecoin-adapter.js
 # deploy showStopper
 	coralX execute --network apothem --path scripts/deployment/8_show-stopper/deploy/show-stopper.js
+# continue:
 	coralX execute --network apothem --path scripts/deployment/8_show-stopper/initialize/initialize_show-stopper.js
 # deploy fathomToken
 	# coralX execute --network apothem --path scripts/deployment/9_fathom-token/deploy/fathom-token.js
@@ -34,8 +37,8 @@ deploy:
 	# coralX execute --network apothem --path scripts/deployment/11_WXDC/deploy/WXDC.js
 	# coralX execute --network apothem --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
 # deploy USDT
-	# coralX execute --network apothem --path scripts/deployment/22_USDT-mock/deploy/USDT.js
-	# coralX execute --network apothem --path scripts/deployment/22_USDT-mock/initialize/initialize_USDT.js
+	coralX execute --network apothem --path scripts/deployment/22_USDT-mock/deploy/USDT.js
+	coralX execute --network apothem --path scripts/deployment/22_USDT-mock/initialize/initialize_USDT.js
 # deploy shield
 	coralX execute --network apothem --path scripts/deployment/12_shield/deploy/shield.js
 # config fairLaunch
@@ -45,6 +48,7 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/13_position-manager/initialize/initialize_position-manager.js
 # collateralTokenAdapter
 	coralX execute --network apothem --path scripts/deployment/14_collateral-token-adapter/deploy/collateral-token-adapter.js
+
 	coralX execute --network apothem --path scripts/deployment/14_collateral-token-adapter/initialize/initialize_collateral-token-adapter.js
 # deploy simplePriceFeeds
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/deploy/simple-price-feed.js
@@ -53,7 +57,9 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/deploy/simple-price-feed-FTHM.js
 # initialize simplePriceFeeds
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/initialize/initialize_simple-price-feed.js
+
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/initialize/initialize_simple-price-feed-USDT.js
+# continue:
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/initialize/initialize_simple-price-feed-USDT-COL.js
 	coralX execute --network apothem --path scripts/deployment/15_simple-price-feed/initialize/initialize_simple-price-feed-FTHM.js
 # deploy FSL strategy
@@ -63,6 +69,10 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-price-oracle-role.js
 # config collateralPoolConfig 
 	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config.js
+# debtCeiling:
+# 	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/config/setDebtCeiling.js
+
+# continue:
 # deploy proxyActions
 	coralX execute --network apothem --path scripts/deployment/17_proxy-actions/deploy/proxy-actions.js
 # deploy stabilityFeeCollector
@@ -80,7 +90,9 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/deploy/stable-swap-module.js
 	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/initialize/initialize_stable-swap-module.js
 # deploy getPositions
+# continue:
 	coralX execute --network apothem --path scripts/deployment/25_get-positions/deploy/get-positions.js
+
 	coralX execute --network apothem --path scripts/deployment/25_get-positions/initialize/initialize_get-positions.js
 # whiteList StableSwapModule to authTokenAdapter
 	coralX execute --network apothem --path scripts/deployment/23_auth-token-adapter/config/auth-token-adapter-whitelist.js
@@ -94,12 +106,15 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-collateral-manager-role.js
 # grant GOV_ROLE() to systemAccount
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-gov-role.js
+
 # grant LIQUIDATION_ENGINE_ROLE() to LIQUIDATION_ENGINE_ADDR
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-liquidation-engine-role.js
 # grant LIQUIDATION_ENGINE_ROLE() to LIQUIDATION_STRATEGY_ADDR
+
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-liquidation-strategy-role.js
 # skip granting MINTABLE_ROLE() to flashMintModule
 	# coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-mintable-role.js
+# continue:
 # grant POSITION_MANAGER_ROLE to POSITION_MANAGER_ADDR & STABLE_SWAP_MODULE_ADDR
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-position-manager-role.js
 # grant SHOW_STOPPER_ROLE() to SHOW_STOPPER_ADDR
@@ -136,22 +151,25 @@ deploy:
 # grant adapter role to collateralTokenAdapterUSDT/USDT-COL/FTHM
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role-USDT.js
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role-USDT-COL.js
+
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role-FTHM.js
 
 # collateral-pool-config-USDT, USDT-COL, FTHM
 	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config-USDT.js
+
 	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config-USDT-COL.js
 	coralX execute --network apothem --path scripts/deployment/1_collateral-pool-config/config/collateral-pool-config-FTHM.js
 
 #Grant stablecoin's ownership to fairLaunch
-	coralX execute --network apothem --path scripts/deployment/9_fathom-token/config/fathom-token-ownership.js
+	# coralX execute --network apothem --path scripts/deployment/9_fathom-token/config/fathom-token-ownership.js
 
 # Adding priceOracle address to liquidation-engine's storage
 	coralX execute --network apothem --path scripts/deployment/5_liquidation-engine/config/config_liquidation-engine.js
 # Adding priceOracle address to Position Manager's storage
 	coralX execute --network apothem --path scripts/deployment/13_position-manager/config/config_position-manager.js
 # mint more tokens
-	coralX execute --network apothem --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
+	# coralX execute --network apothem --path scripts/deployment/11_WXDC/initialize/initialize_WXDC.js
+continue:
 	coralX execute --network apothem --path scripts/deployment/22_USDT-mock/initialize/initialize_USDT.js
 
 # DEX Integration Scripts

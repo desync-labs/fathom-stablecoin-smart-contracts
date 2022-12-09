@@ -9,6 +9,13 @@ const { formatBytes32String } = require("ethers/lib/utils");
 
 const COLLATERAL_POOL_ID = formatBytes32String("USDT-STABLE")
 
+
+require("dotenv").config();
+const WXDCAdd = process.env.WXDC_ADDRESS;
+const USDTAdd = process.env.USDT_ADDRESS;
+const FTHMAdd = process.env.FTHM_ADDRESS;
+
+
 const rawdata = fs.readFileSync('./addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 async function main() {
@@ -27,8 +34,8 @@ async function main() {
   const collateralTokenAdapter = await upgrades.deployProxy(CollateralTokenAdapter, [
     stablecoinAddress.bookKeeper,
     COLLATERAL_POOL_ID,
-    stablecoinAddress.USDT,             //COLLATERAL_TOKEN_ADDR
-    stablecoinAddress.fathomToken,  //Reward token addr
+    USDTAdd,             //COLLATERAL_TOKEN_ADDR
+    FTHMAdd,  //Reward token addr
     stablecoinAddress.fairLaunch,
     1,  // Pool ID
     stablecoinAddress.shield,   //  deployerAddress as sheild

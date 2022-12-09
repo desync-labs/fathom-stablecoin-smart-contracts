@@ -14,12 +14,12 @@ const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 const CollateralTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 
 //for testnet
-// const deployerAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
-// const devAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
+const deployerAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
+const devAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
 
 //for ganache
-const deployerAddress = accounts[0];
-const devAddress = accounts[0];
+// const deployerAddress = accounts[0];
+// const devAddress = accounts[0];
 
 // require("dotenv").config();
 // const WXDCAdd = process.env.WXDC_ADDRESS;
@@ -34,7 +34,7 @@ module.exports =  async function(deployer) {
     stablecoinAddress.bookKeeper,
     COLLATERAL_POOL_ID,
     WXDCAdd,
-    USDTAdd,  //Reward token addr
+    FTHMAdd,  //Reward token addr
     stablecoinAddress.fairLaunch,
     0,  // Pool ID
     stablecoinAddress.shield,   //  deployerAddress as sheild

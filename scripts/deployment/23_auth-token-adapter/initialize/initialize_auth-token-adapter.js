@@ -20,6 +20,6 @@ module.exports =  async function(deployer) {
   await authTokenAdapter.initialize(
     stablecoinAddress.bookKeeper,
     COLLATERAL_POOL_ID,
-    USDTAdd,
+    stablecoinAddress.USDT,
   )
 };

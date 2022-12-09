@@ -7,7 +7,7 @@ const FathomStablecoin = artifacts.require('./8.17/stablecoin-core/FathomStablec
 module.exports =  async function(deployer) {
   console.log(">> Initializing FathomStablecoin")
 
-  const NAME = "Fathom USD"
+  const NAME = "Fathom Stablecoin"
   const SYMBOL = "FXD"
 
   const fathomStablecoin = await FathomStablecoin.at(stablecoinAddress.fathomStablecoin);

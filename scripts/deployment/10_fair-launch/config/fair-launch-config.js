@@ -16,7 +16,7 @@ module.exports = async function(deployer) {
 
   await fairLaunch.addPool(0, WXDCAdd, true);
   console.log("addPool 0 WXDC done")
-  await fairLaunch.addPool(1, USDTAdd, true);
+  await fairLaunch.addPool(1, stablecoinAddress.USDT, true);
   console.log("addPool 1 USDT done")
   await fairLaunch.addPool(2, FTHMAdd, true);
   console.log("addPool 2 FXD done")

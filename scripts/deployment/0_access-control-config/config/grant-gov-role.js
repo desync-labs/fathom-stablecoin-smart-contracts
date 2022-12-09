@@ -5,7 +5,9 @@ let stablecoinAddress = JSON.parse(rawdata);
 const AccessControlConfig = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
 
 module.exports = async function(deployer) {
-  const systemAccount = accounts[0]; //coralX way of indicating first address
+  // const systemAccount = accounts[0]; //coralX way of indicating first address
+  // for testnet
+  const systemAccount = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
   const deployerAddress =   systemAccount;
   const GOV_ROLE_ADDR = deployerAddress //Protocol Deployer
 

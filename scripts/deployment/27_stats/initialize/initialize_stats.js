@@ -25,7 +25,7 @@ module.exports =  async function(deployer) {
     stablecoinAddress.fairLaunch,                  //FairLaunch
     // WXDCAdd, //WXDC
     WXDCAdd,
-    USDTAdd, // USDT
+    stablecoinAddress.USDT, // USDT
     stablecoinAddress.fathomStablecoin, //FXD
     stablecoinAddress.dexPriceOracle, //dEXPriceOracle
     COLLATERAL_POOL_ID_FTHM, //bytes32 of WXDC string

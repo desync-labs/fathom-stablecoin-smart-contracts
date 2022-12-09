@@ -16,7 +16,7 @@ module.exports =  async function(deployer) {
 
   await fathomOraclePriceFeed.initialize(
     stablecoinAddress.dexPriceOracle,   //DexPriceOracle
-    USDTAdd,  //USDT , actually US+
+    stablecoinAddress.USDT,  //USDT , actually US+
     WXDCAdd, //WXDC
     stablecoinAddress.accessControlConfig // Access Control Config
   )

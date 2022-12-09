@@ -6,6 +6,11 @@ const { BigNumber } = require("ethers");
 
 const COLLATERAL_POOL_ID = formatBytes32String("FTHM")
 
+require("dotenv").config();
+const WXDCAdd = process.env.WXDC_ADDRESS;
+const USDTAdd = process.env.USDT_ADDRESS;
+const FTHMAdd = process.env.FTHM_ADDRESS;
+
 
 const CollateralTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 
@@ -23,7 +28,7 @@ module.exports =  async function(deployer) {
     stablecoinAddress.bookKeeper,
     COLLATERAL_POOL_ID,
     "0x4c52500DdC18EE0C6CB6155961347076E43ABb99",             //COLLATERAL_TOKEN_ADDR
-    stablecoinAddress.fathomToken,  //Reward token addr
+    FTHMAdd,  //Reward token addr
     stablecoinAddress.fairLaunch,
     4,  // Pool ID
     stablecoinAddress.shield,   //  deployerAddress as sheild

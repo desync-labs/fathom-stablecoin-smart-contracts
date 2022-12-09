@@ -13,12 +13,12 @@ const FTHMAdd = process.env.FTHM_ADDRESS;
 const CollateralTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 
 //for testnet
-// const deployerAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
-// const devAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
+const deployerAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
+const devAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
 
 //for ganache
-const deployerAddress = accounts[0];
-const devAddress = accounts[0];
+// const deployerAddress = accounts[0];
+// const devAddress = accounts[0];
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing collateralTokenAdapterUSDT");
@@ -28,7 +28,7 @@ module.exports =  async function(deployer) {
   await collateralTokenAdapter.initialize(
     stablecoinAddress.bookKeeper,
     COLLATERAL_POOL_ID,
-    USDTAdd,             //COLLATERAL_TOKEN_ADDR
+    stablecoinAddress.USDT,             //COLLATERAL_TOKEN_ADDR
     FTHMAdd,  //Reward token addr
     stablecoinAddress.fairLaunch,
     1,  // Pool ID

@@ -29,6 +29,6 @@ module.exports =  async function(deployer) {
     "0xfbba07454DAe1D94436cC4241bf31543f426257E", //dEXPriceOracle
     COLLATERAL_POOL_ID_FTHM, //bytes32 of WXDC string
     stablecoinAddress.collateralPoolConfig, //CollateralPoolConfig
-    "0x4c52500DdC18EE0C6CB6155961347076E43ABb99"  //FathomToken
+    FTHMAdd  //FathomToken
     )
 };

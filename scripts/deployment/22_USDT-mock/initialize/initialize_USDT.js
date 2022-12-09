@@ -27,7 +27,7 @@ module.exports =  async function(deployer) {
   // )
 
   await USDTInstance.mint(
-    systemAccount, BigNumber.from("10000000000000000000000000000"), { gasLimit: 1000000 }
+    walletDeployer, BigNumber.from("10000000000000000000000000000"), { gasLimit: 1000000 }
   )
   const faucetBalance = await USDTInstance.balanceOf(systemAccount);
   console.log("faucetBalanceUSDT is" + faucetBalance);
