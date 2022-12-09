@@ -15,4 +15,12 @@ function weiToRay(input) {
   return BigNumber.from(input.mul(WeiPerRay).div(WeiPerWad))
 }
 
-module.exports = {WeiPerWad, WeiPerBln, WeiPerRay, WeiPerRad, weiToRay}
+function weiToDecimal(input) {
+  return Number((input/Math.pow(10, 18)).toFixed(2));
+}
+
+function rayToDecimal(input) {
+  return Number((input/Math.pow(10, 27)).toFixed(2));
+}
+
+module.exports = {WeiPerWad, WeiPerBln, WeiPerRay, WeiPerRad, weiToRay, weiToDecimal, rayToDecimal}
