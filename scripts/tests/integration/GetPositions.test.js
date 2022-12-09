@@ -8,10 +8,13 @@ const { MaxUint256 } = require("@ethersproject/constants");
 
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
 const { advanceBlock } = require("../helper/time");
-const { loadProxyWalletFixtureHandler } = require("../helper/proxy");
-const { DeployerAddress, AliceAddress, BobAddress } = require("../helper/address");
+const { createProxyWallets } = require("../helper/proxy");
+const { AliceAddress, BobAddress } = require("../helper/address");
 const { openPosition, openPositionAndDraw } = require("../helper/positions");
 const { formatBytes32String } = require("ethers/lib/utils");
+const { loadFixture } = require("../helper/fixtures");
+const { initializeContracts } = require("../helper/initializer");
+const { addRoles } = require("../helper/access-roles");
 
 const { expect } = chai
 const { AddressZero } = ethers.constants
@@ -21,8 +24,53 @@ const CLOSE_FACTOR_BPS = "5000"
 const LIQUIDATOR_INCENTIVE_BPS = "10250"
 const TREASURY_FEE_BPS = "5000"
 
-describe("GetPositions", () => {
+const setup = async () => {
+    const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
+    const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
+    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
+    const getPositions = await artifacts.initializeInterfaceAt("GetPositions", "GetPositions");
+    const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
+    const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
+    const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
+    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
 
+    await initializeContracts();
+    
+    await addRoles();
+
+    ({
+        proxyWallets: [aliceProxyWallet, bobProxyWallet],
+    } = await createProxyWallets([AliceAddress, BobAddress]));
+
+    await collateralPoolConfig.initCollateralPool(
+        COLLATERAL_POOL_ID,
+        WeiPerRad.mul(10000000),
+        0,
+        simplePriceFeed.address,
+        WeiPerRay,
+        WeiPerRay,
+        collateralTokenAdapterAddress,
+        CLOSE_FACTOR_BPS,
+        LIQUIDATOR_INCENTIVE_BPS,
+        TREASURY_FEE_BPS,
+        AddressZero,
+        { gasLimit: 2000000 }
+    )
+    await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10000000), { gasLimit: 1000000 })
+    await simplePriceFeed.setPrice(WeiPerWad, { gasLimit: 1000000 });
+
+    return {
+        getPositions,
+        collateralPoolConfig,
+        positionManager,
+        WXDC,
+        simplePriceFeed,
+        aliceProxyWallet,
+        bobProxyWallet
+    }
+}
+
+describe("GetPositions", () => {
     let aliceProxyWallet
     let bobProxyWallet
     let WXDC
@@ -31,38 +79,21 @@ describe("GetPositions", () => {
     let simplePriceFeed
     let getPositions
 
-    beforeEach(async () => {
+    before(async () => {
         await snapshot.revertToSnapshot();
-        ; ({
-            proxyWallets: [deployerProxyWallet, aliceProxyWallet, bobProxyWallet],
-        } = await loadProxyWalletFixtureHandler([DeployerAddress, AliceAddress, BobAddress]))
+    })
 
-        collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
-        positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
-        WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
-        getPositions = await artifacts.initializeInterfaceAt("GetPositions", "GetPositions");
+    beforeEach(async () => {
+        ({
+            getPositions,
+            collateralPoolConfig,
+            positionManager,
+            WXDC,
+            simplePriceFeed,
+            aliceProxyWallet,
+            bobProxyWallet
+        } = await loadFixture(setup));
 
-        simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
-        const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
-        const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-        const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
-
-        await collateralPoolConfig.initCollateralPool(
-            COLLATERAL_POOL_ID,
-            WeiPerRad.mul(10000000),
-            0,
-            simplePriceFeed.address,
-            WeiPerRay,
-            WeiPerRay,
-            collateralTokenAdapterAddress,
-            CLOSE_FACTOR_BPS,
-            LIQUIDATOR_INCENTIVE_BPS,
-            TREASURY_FEE_BPS,
-            AddressZero
-        )
-        await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10000000), { gasLimit: 1000000 })
-
-        await simplePriceFeed.setPrice(WeiPerWad, { gasLimit: 1000000 });
     })
 
     describe("#getPositionWithSafetyBuffer", async () => {

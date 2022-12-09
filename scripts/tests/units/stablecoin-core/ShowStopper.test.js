@@ -8,8 +8,41 @@ const { formatBytes32BigNumber } = require("../../helper/format");
 const { WeiPerRay, WeiPerWad } = require("../../helper/unit")
 const { DeployerAddress, AliceAddress, AddressZero } = require("../../helper/address");
 const { getContract, createMock } = require("../../helper/contracts");
+const { loadFixture } = require("../../helper/fixtures");
+
 const { formatBytes32String } = ethers.utils
 
+const loadFixtureHandler = async () => {
+    const mockedAccessControlConfig = await createMock("AccessControlConfig");
+    const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
+    const mockedBookKeeper = await createMock("BookKeeper");
+    const mockedSystemDebtEngine = await createMock("SystemDebtEngine");
+    const mockedLiquidationEngine = await createMock("LiquidationEngine");
+    const mockedPriceFeed = await createMock("MockPriceFeed");
+    const mockedPriceOracle = await createMock("PriceOracle");
+    const mockedTokenAdapter = await createMock("TokenAdapter");
+
+    await mockedBookKeeper.mock.totalStablecoinIssued.returns(0)
+    await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
+
+    const showStopper = getContract("ShowStopper", DeployerAddress)
+    const showStopperAsAlice = getContract("ShowStopper", AliceAddress)
+
+    await showStopper.initialize(mockedBookKeeper.address);
+
+    return {
+        showStopper,
+        showStopperAsAlice,
+        mockedBookKeeper,
+        mockedLiquidationEngine,
+        mockedSystemDebtEngine,
+        mockedPriceOracle,
+        mockedPriceFeed,
+        mockedTokenAdapter,
+        mockedAccessControlConfig,
+        mockedCollateralPoolConfig
+    }
+}
 describe("ShowStopper", () => {
   // Contracts
   let mockedBookKeeper
@@ -51,25 +84,24 @@ describe("ShowStopper", () => {
     await mockedBookKeeper.mock.stablecoin.returns(0)
   }
 
-  beforeEach(async () => {
+  before(async () => {
     await snapshot.revertToSnapshot();
+  })
 
-    mockedAccessControlConfig = await createMock("AccessControlConfig");
-    mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
-    mockedBookKeeper = await createMock("BookKeeper");
-    mockedSystemDebtEngine = await createMock("SystemDebtEngine");
-    mockedLiquidationEngine = await createMock("LiquidationEngine");
-    mockedPriceFeed = await createMock("MockPriceFeed");
-    mockedPriceOracle = await createMock("PriceOracle");
-    mockedTokenAdapter = await createMock("TokenAdapter");
+  beforeEach(async () => {
+    ({
+        showStopper,
+        showStopperAsAlice,
+        mockedBookKeeper,
+        mockedLiquidationEngine,
+        mockedSystemDebtEngine,
+        mockedPriceOracle,
+        mockedPriceFeed,
+        mockedTokenAdapter,
+        mockedAccessControlConfig,
+        mockedCollateralPoolConfig
+      } = await loadFixture(loadFixtureHandler))
 
-    await mockedBookKeeper.mock.totalStablecoinIssued.returns(0)
-    await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
-
-    showStopper = getContract("ShowStopper", DeployerAddress)
-    showStopperAsAlice = getContract("ShowStopper", AliceAddress)
-
-    await showStopper.setBookKeeper(await mockedBookKeeper.address);
   })
 
   describe("#cage()", () => {
