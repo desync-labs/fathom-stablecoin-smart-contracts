@@ -105,7 +105,7 @@ module.exports = async function (deployer) {
         ),
         authTokenAdapter.initialize(
             bookKeeper.address,
-            pools.USDT,
+            pools.USDT_STABLE,
             addresses.USDT,
             { gasLimit: 1000000 }
         ),
@@ -137,6 +137,7 @@ module.exports = async function (deployer) {
     await Promise.all(promises);
 
     const newAddresses = {
+        proxyFactory: proxyFactory.address,
         getPositions: getPositions.address,
         getPositions2: getPositions2.address,
         getPositionsBot: getPositionsBot.address,

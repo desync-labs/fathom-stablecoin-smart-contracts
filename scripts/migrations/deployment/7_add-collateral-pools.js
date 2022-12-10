@@ -27,7 +27,7 @@ module.exports = async function (deployer) {
     const addresses = getAddresses(deployer.networkId())
 
     const wxdcAdapter = await collateralTokenAdapterFactory.adapters(pools.WXDC)
-    const usdtAdapter = await collateralTokenAdapterFactory.adapters(pools.USDT)
+    const usdtAdapter = await collateralTokenAdapterFactory.adapters(pools.USDT_COL)
     const fthmAdapter = await collateralTokenAdapterFactory.adapters(pools.FTHM)
 
     const priceFeedWXDC = await fathomOraclePriceFeedFactory.feeds(addresses.WXDC)
@@ -36,19 +36,19 @@ module.exports = async function (deployer) {
     const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);
     const debtCeilingSetUp = WeiPerRad.mul(10000000).div(2);
 
-    await simplePriceFeed.setPrice(WeiPerWad.mul(1), { gasLimit: 1000000 });
+    await simplePriceFeed.setPrice(WeiPerWad.mul(1), { gasLimit: 2000000 });
 
     const promises = [
         initPool(pools.WXDC, wxdcAdapter, priceFeedWXDC, LIQUIDATIONRATIO_75),
         // we initiate pool with simple price feed because at this moment liquidity 
-        initPool(pools.USDT, usdtAdapter, simplePriceFeed.address, LIQUIDATIONRATIO_75),
+        initPool(pools.USDT_COL, usdtAdapter, simplePriceFeed.address, LIQUIDATIONRATIO_75),
         initPool(pools.FTHM, fthmAdapter, pricefeedFTHM, LIQUIDATIONRATIO_75),
-        initPool(pools.USDT_COL, usdtAdapter, simplePriceFeed.address, WeiPerRay),
+        initPool(pools.USDT_STABLE, usdtAdapter, simplePriceFeed.address, WeiPerRay),
     ]
 
     await Promise.all(promises);
 
-    await bookKeeper.setTotalDebtCeiling(debtCeilingSetUpTotal, { gasLimit: 1000000 });
+    await bookKeeper.setTotalDebtCeiling(debtCeilingSetUpTotal, { gasLimit: 2000000 });
 
     async function initPool(poolId, adapter, priceFeed, liquidationRatio) {
         await collateralPoolConfig.initCollateralPool(
@@ -63,10 +63,10 @@ module.exports = async function (deployer) {
             LIQUIDATOR_INCENTIVE_BPS,
             TREASURY_FEE_BPS,
             fixedSpreadLiquidationStrategy.address,
-            { gas: 4000000 }
+            { gas: 5000000 }
         );
 
-        await collateralPoolConfig.setDebtCeiling(poolId, debtCeilingSetUp, { gasLimit: 1000000 });
-        await priceOracle.setPrice(poolId, { gasLimit: 1000000 });
+        await collateralPoolConfig.setDebtCeiling(poolId, debtCeilingSetUp, { gasLimit: 2000000 });
+        await priceOracle.setPrice(poolId, { gasLimit: 2000000 });
     }
 }

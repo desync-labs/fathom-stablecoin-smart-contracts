@@ -22,7 +22,7 @@ module.exports = async function (deployer) {
 
     const promises = [
         createAdapter(pools.WXDC, addresses.WXDC, 0),
-        createAdapter(pools.USDT, addresses.USDT, 1),
+        createAdapter(pools.USDT_COL, addresses.USDT, 1),
         createAdapter(pools.FTHM, addresses.FTHM, 2),
         createDexPriceFeed(addresses.USDT, addresses.WXDC),
         createDexPriceFeed(addresses.USDT, addresses.FTHM),

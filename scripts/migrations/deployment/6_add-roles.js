@@ -37,12 +37,12 @@ module.exports =  async function(deployer) {
     await accessControlConfig.grantRole(await accessControlConfig.PRICE_ORACLE_ROLE(), priceOracle.address)
   
     const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.adapters(pools.WXDC)
-    const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.adapters(pools.USDT)
+    const collateralTokenAdapterUSDT_stbl = await collateralTokenAdapterFactory.adapters(pools.USDT_STABLE)
     const collateralTokenAdapterUSDT_col = await collateralTokenAdapterFactory.adapters(pools.USDT_COL)
     const collateralTokenAdapterFTHM = await collateralTokenAdapterFactory.adapters(pools.FTHM)
   
     await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterWXDC)
-    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterUSDT)
+    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterUSDT_stbl)
     await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterUSDT_col)
     await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterFTHM)
   
