@@ -21,4 +21,9 @@ async function createMock(contract) {
     return deployMockContract(signer, instance.getAbiFile().abi);
 }
 
-module.exports = { getContract, createMock }
+async function connectToContractWithAddress(contract, address) {
+    const newSigner = provider.getSigner(address);
+    return contract.connect(newSigner);
+}
+
+module.exports = { getContract, createMock, connectToContractWithAddress }

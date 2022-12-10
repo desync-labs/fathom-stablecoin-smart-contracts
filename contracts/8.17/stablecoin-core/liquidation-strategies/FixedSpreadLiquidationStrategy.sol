@@ -228,10 +228,15 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
     info.actualDebtShareToBeLiquidated = info.actualDebtValueToBeLiquidated.div(_vars.debtAccumulatedRate); // [wad]
 
     // collateralAmountToBeLiquidated - (collateralAmountToBeLiquidated * 10000 / liquidatorIncentiveBps)
+    // e.a.
+    // 1 - (1 * 10000 / 10500) = 0.047619048 which is roughly around 0.05
     uint256 liquidatorIncentiveCollectedFromPosition = info.collateralAmountToBeLiquidated.sub(
       info.collateralAmountToBeLiquidated.mul(10000).div(_vars.liquidatorIncentiveBps)
     ); // [wad]
 
+    // liquidatorIncentiveCollectedFromPosition * (treasuryFeesBps) / 10000
+    // e.a.
+    // 0.047619048 * 5000 / 10000  
     info.treasuryFees = liquidatorIncentiveCollectedFromPosition.mul(_vars.treasuryFeesBps).div(10000); // [wad]
   }
 
