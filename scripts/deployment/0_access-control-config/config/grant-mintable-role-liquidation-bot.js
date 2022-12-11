@@ -5,7 +5,7 @@ let stablecoinAddress = JSON.parse(rawdata);
 const AccessControlConfig = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
 
 module.exports = async function(deployer) {
-  const liquidationBotAddress = ""; // please put liquidation bot's address in order to do unbackedMinting
+  const liquidationBotAddress = "0xe7B11F39E08089B1d76A79D6272AC7Ad11E8eFe9"; // please put liquidation bot's address in order to do unbackedMinting
 
   const accessControlConfig = await AccessControlConfig.at(stablecoinAddress.accessControlConfig);
   
