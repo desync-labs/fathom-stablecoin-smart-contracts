@@ -7,10 +7,6 @@ const AuthTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/Auth
 
 const COLLATERAL_POOL_ID = formatBytes32String("US+STABLE")
 
-require("dotenv").config();
-const WXDCAdd = process.env.WXDC_ADDRESS;
-const USDTAdd = process.env.USDT_ADDRESS;
-const FTHMAdd = process.env.FTHM_ADDRESS;
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing AuthTokenAdapter")

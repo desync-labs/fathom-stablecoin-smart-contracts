@@ -32,7 +32,7 @@ async function main() {
     stablecoinAddress.bookKeeper,
     COLLATERAL_POOL_ID,
     WXDCAdd,             //COLLATERAL_TOKEN_ADDR
-    FTHMAdd,  //Reward token addr
+    stablecoinAddress.fathomToken,  //Reward token addr
     stablecoinAddress.fairLaunch,
     0,  // Pool ID
     stablecoinAddress.shield,   //  deployerAddress as sheild

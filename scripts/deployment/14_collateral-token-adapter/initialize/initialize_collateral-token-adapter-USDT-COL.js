@@ -6,10 +6,6 @@ const { BigNumber } = require("ethers");
 
 const COLLATERAL_POOL_ID = formatBytes32String("US+COL")
 
-require("dotenv").config();
-const WXDCAdd = process.env.WXDC_ADDRESS;
-const USDTAdd = process.env.USDT_ADDRESS;
-const FTHMAdd = process.env.FTHM_ADDRESS;
 const CollateralTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 
 //for testnet
@@ -29,7 +25,7 @@ module.exports =  async function(deployer) {
     stablecoinAddress.bookKeeper,
     COLLATERAL_POOL_ID,
     stablecoinAddress.USDT,             //COLLATERAL_TOKEN_ADDR
-    FTHMAdd,  //Reward token addr
+    stablecoinAddress.fathomToken,  //Reward token addr
     stablecoinAddress.fairLaunch,
     1,  // Pool ID
     stablecoinAddress.shield,   //  deployerAddress as sheild

@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 // FathomToken with Governance.
-contract FathomToken is ERC20("FathomToken", "FTHM"), Ownable {
+contract FathomToken is ERC20("MockReward", "MKRW"), Ownable {
   uint256 private constant CAP = 18800000000000000000000e18;
   uint256 private _totalLock;
 

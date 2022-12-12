@@ -22,7 +22,7 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
     PausableUpgradeable.__Pausable_init();
     AccessControlUpgradeable.__AccessControl_init();
 
-    priceLife = 1 days; // [seconds] how old the price is considered stale, default 1 day
+    priceLife = 365 days; // [seconds] how old the price is considered stale, default 1 day
 
     accessControlConfig = IAccessControlConfig(_accessControlConfig);
   }
@@ -53,7 +53,7 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
 
   /// @dev access: OWNER_ROLE
   function setPriceLife(uint256 _second) external onlyOwner {
-    require(_second >= 1 hours && _second <= 1 days, "SimplePriceFeed/bad-price-life");
+    require(_second >= 1 hours && _second <= 366 days, "SimplePriceFeed/bad-price-life");
     priceLife = _second;
     emit LogSetPriceLife(msg.sender, _second);
   }

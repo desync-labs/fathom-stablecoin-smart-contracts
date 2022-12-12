@@ -6,8 +6,6 @@ const FathomOraclePriceFeed = artifacts.require('./8.17/price-feeders/FathomOrac
 
 require("dotenv").config();
 const WXDCAdd = process.env.WXDC_ADDRESS;
-const USDTAdd = process.env.USDT_ADDRESS;
-const FTHMAdd = process.env.FTHM_ADDRESS;
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing fathom-oracle-price-feedWXDC")

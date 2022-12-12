@@ -4,8 +4,7 @@ let stablecoinAddress = JSON.parse(rawdata);
 
 require("dotenv").config();
 const WXDCAdd = process.env.WXDC_ADDRESS;
-const USDTAdd = process.env.USDT_ADDRESS;
-const FTHMAdd = process.env.FTHM_ADDRESS;
+
 
 const IFairLaunch = artifacts.require('./8.17/apis/fathom/interfaces/IFairLaunch.sol');
 
@@ -18,8 +17,6 @@ module.exports = async function(deployer) {
   console.log("addPool 0 WXDC done")
   await fairLaunch.addPool(1, stablecoinAddress.USDT, true);
   console.log("addPool 1 USDT done")
-  await fairLaunch.addPool(2, FTHMAdd, true);
-  console.log("addPool 2 FXD done")
 
   await fairLaunch2.transferOwnership(stablecoinAddress.shield);
 };

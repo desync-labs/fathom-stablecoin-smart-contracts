@@ -3,12 +3,10 @@ const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
 // for testnet
-const walletDeployer = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
-
-const systemAccount = accounts[0]; //coralX way of indicating first address
-
+// const devAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
 // for ganache
-const devAddress = systemAccount;
+const devAddress = accounts[0]; //coralX way of indicating first address
+
 
 const USDT = artifacts.require('./8.17/mocks/USDT.sol');
 
@@ -27,9 +25,9 @@ module.exports =  async function(deployer) {
   // )
 
   await USDTInstance.mint(
-    walletDeployer, BigNumber.from("10000000000000000000000000000"), { gasLimit: 1000000 }
+    devAddress, BigNumber.from("10000000000000000000000000000"), { gasLimit: 1000000 }
   )
-  const faucetBalance = await USDTInstance.balanceOf(systemAccount);
+  const faucetBalance = await USDTInstance.balanceOf(devAddress);
   console.log("faucetBalanceUSDT is" + faucetBalance);
 
 };
