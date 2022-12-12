@@ -30,6 +30,6 @@ module.exports =  async function(deployer) {
     stablecoinAddress.dexPriceOracle, //dEXPriceOracle
     COLLATERAL_POOL_ID_FTHM, //bytes32 of WXDC string
     stablecoinAddress.collateralPoolConfig, //CollateralPoolConfig
-    FTHMAdd  //FathomToken
+    FTHMAdd  //FathomToken <- since this is stats, better be fthm from gov
     )
 };

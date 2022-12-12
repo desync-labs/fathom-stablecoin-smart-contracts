@@ -12,5 +12,14 @@ interface ILiquidationEngine {
     bytes calldata data
   ) external;
 
+  function batchLiquidate(
+    bytes32[] calldata _collateralPoolIds,
+    address[] calldata _positionAddresses,
+    uint256[] calldata _debtShareToBeLiquidateds, // [rad]
+    uint256[] calldata _maxDebtShareToBeLiquidateds, // [rad]
+    address[] calldata _collateralRecipients,
+    bytes[] calldata datas
+  ) external;
+
   function live() external view returns (uint256);
 }
