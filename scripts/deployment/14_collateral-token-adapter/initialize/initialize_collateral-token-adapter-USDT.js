@@ -4,7 +4,7 @@ let stablecoinAddress = JSON.parse(rawdata);
 const { formatBytes32String } = require("ethers/lib/utils");
 const { BigNumber } = require("ethers");
 
-const COLLATERAL_POOL_ID = formatBytes32String("USDT-STABLE")
+const COLLATERAL_POOL_ID = formatBytes32String("US+STABLE")
 
 
 const CollateralTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');

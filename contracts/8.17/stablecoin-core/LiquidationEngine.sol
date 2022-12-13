@@ -96,6 +96,18 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     liquidatorsWhitelist[toBeRemoved] = 0;
   }
 
+  function batchLiquidate(
+    bytes32[] calldata _collateralPoolIds,
+    address[] calldata _positionAddresses,
+    uint256[] calldata _debtShareToBeLiquidateds, // [rad]
+    uint256[] calldata _maxDebtShareToBeLiquidateds, // [rad]
+    address[] calldata _collateralRecipients,
+    bytes[] calldata datas
+  ) external override nonReentrant whenNotPaused onlyWhitelisted {
+    for(uint i = 0; i < _collateralPoolIds.length; i++)
+      _liquidate(_collateralPoolIds[i], _positionAddresses[i],_debtShareToBeLiquidateds[i], _maxDebtShareToBeLiquidateds[i], _collateralRecipients[i], datas[i]);
+  }
+
   function liquidate(
     bytes32 _collateralPoolId,
     address _positionAddress,
@@ -104,6 +116,17 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     address _collateralRecipient,
     bytes calldata _data
   ) external override nonReentrant whenNotPaused onlyWhitelisted {
+    _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated,_maxDebtShareToBeLiquidated, _collateralRecipient, _data);
+  }
+
+  function _liquidate(
+    bytes32 _collateralPoolId,
+    address _positionAddress,
+    uint256 _debtShareToBeLiquidated, // [rad]
+    uint256 _maxDebtShareToBeLiquidated, // [wad]
+    address _collateralRecipient,
+    bytes calldata _data
+  ) internal {
 
     ISetPrice(priceOracle).setPrice(_collateralPoolId);
 

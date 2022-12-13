@@ -34,7 +34,8 @@ contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceO
   event LogSetPrice(
     bytes32 _poolId,
     bytes32 _rawPrice, // Raw price from price feed [wad]
-    uint256 _priceWithSafetyMargin // Price with safety margin [ray]
+    uint256 _priceWithSafetyMargin, // Price with safety margin [ray]
+    uint256 _rawPriceUint // Raw price from price feed in uint256
   );
 
   // --- Init ---
@@ -111,7 +112,8 @@ contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceO
       : 0;
     address _collateralPoolConfig = address(bookKeeper.collateralPoolConfig());
     ICollateralPoolConfig(_collateralPoolConfig).setPriceWithSafetyMargin(_collateralPoolId, _priceWithSafetyMargin);
-    emit LogSetPrice(_collateralPoolId, _rawPrice, _priceWithSafetyMargin);
+    uint256 _rawPriceInUint = uint256(_rawPrice);
+    emit LogSetPrice(_collateralPoolId, _rawPrice, _priceWithSafetyMargin, _rawPriceInUint);
   }
 
   /// @dev access: OWNER_ROLE, SHOW_STOPPER_ROLE

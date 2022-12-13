@@ -16,6 +16,9 @@ const CollateralTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapter
 const deployerAddress = accounts[0];
 const devAddress = accounts[0];
 
+// require("dotenv").config();
+// const WXDCAdd = process.env.WXDC_ADDRESS;
+
 module.exports =  async function(deployer) {
   console.log(">> Initializing collateralTokenAdapter")
   // const collateralTokenAdapter = await artifacts.initializeInterfaceAt("ICollateralTokenAdapter", stablecoinAddress.collateralTokenAdapter);
@@ -25,7 +28,8 @@ module.exports =  async function(deployer) {
   await collateralTokenAdapter.initialize(
     stablecoinAddress.bookKeeper,
     COLLATERAL_POOL_ID,
-    stablecoinAddress.WXDC,             //COLLATERAL_TOKEN_ADDR
+    // WXDCAdd,             //COLLATERAL_TOKEN_ADDR
+    stablecoinAddress.WXDC,
     stablecoinAddress.fathomToken,  //Reward token addr
     stablecoinAddress.fairLaunch,
     0,  // Pool ID

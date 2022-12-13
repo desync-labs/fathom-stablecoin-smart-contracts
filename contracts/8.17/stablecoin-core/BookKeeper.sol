@@ -137,6 +137,7 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
   mapping(bytes32 => mapping(address => uint256)) public override collateralToken; // the accounting of collateral token which is deposited into the protocol [wad]
   mapping(address => uint256) public override stablecoin; // the accounting of the stablecoin that is deposited or has not been withdrawn from the protocol [rad]
   mapping(address => uint256) public override systemBadDebt; // the bad debt of the system from late liquidation [rad]
+  mapping(bytes32 => uint256) public override poolStablecoinIssued; // the accounting of the stablecoin issued per collateralPool [rad];
 
   uint256 public override totalStablecoinIssued; // Total stable coin issued or total stalbecoin in circulation   [rad]
   uint256 public totalUnbackedStablecoin; // Total unbacked stable coin  [rad]
@@ -238,6 +239,7 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     address _positionAddress,
     uint256 _lockedCollateral,
     uint256 _debtShare,
+    uint256 _positionDebtValue,
     int256 _addCollateral,
     int256 _addDebtShare
   );
@@ -248,6 +250,12 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     address _src,
     address _dst,
     uint256 _amount
+  );
+
+  event stablecoinIssuedAmount(
+    uint256 _totalStablecoinIssued,
+    bytes32 _collateralPoolId,
+    uint256 _poolStablecoinIssued
   );
 
   /// @dev access: OWNER_ROLE
@@ -384,7 +392,9 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     int256 _debtValue = mul(_vars.debtAccumulatedRate, _debtShare);
     uint256 _positionDebtValue = mul(_vars.debtAccumulatedRate, position.debtShare);
     totalStablecoinIssued = add(totalStablecoinIssued, _debtValue);
-
+    uint256 _poolStablecoinAmount = poolStablecoinIssued[_collateralPoolId];
+    poolStablecoinIssued[_collateralPoolId] = add(_poolStablecoinAmount, _debtValue);
+    _poolStablecoinAmount = poolStablecoinIssued[_collateralPoolId];
     // either debt has decreased, or debt ceilings are not exceeded
     require(
       either(
@@ -434,9 +444,16 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
       _positionAddress,
       position.lockedCollateral,
       position.debtShare,
+      _positionDebtValue,
       _collateralValue,
       _debtShare
     );
+    emit stablecoinIssuedAmount(
+      totalStablecoinIssued,
+      _collateralPoolId,
+      _poolStablecoinAmount // [rad]
+    );
+
   }
 
   // --- CDP Fungibility ---

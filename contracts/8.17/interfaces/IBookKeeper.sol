@@ -84,6 +84,8 @@ interface IBookKeeper {
 
   function settleSystemBadDebt(uint256 value) external; // [rad]
 
+  function poolStablecoinIssued(bytes32 collateralPoolId) external view returns (uint256); // [rad]
+
   function whitelist(address toBeWhitelistedAddress) external;
 
   function blacklist(address toBeBlacklistedAddress) external;

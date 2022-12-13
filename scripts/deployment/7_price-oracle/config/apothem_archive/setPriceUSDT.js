@@ -3,7 +3,7 @@ const fs = require('fs');
 // let stablecoinAddress = JSON.parse(rawdata);
 const { formatBytes32String } = require("ethers/lib/utils");
 
-const COLLATERAL_POOL_ID = formatBytes32String("USDT-STABLE")
+const COLLATERAL_POOL_ID = formatBytes32String("US+STABLE")
 
 const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
 

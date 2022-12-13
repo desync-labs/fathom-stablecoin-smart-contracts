@@ -7,7 +7,7 @@ const { formatBytes32String } = require("ethers/lib/utils");
 const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
 const WeiPerRay = BigNumber.from(`1${"0".repeat(27)}`)
 const WeiPerRad = BigNumber.from(`1${"0".repeat(45)}`)
-const COLLATERAL_POOL_ID = formatBytes32String("USDT-COL")
+const COLLATERAL_POOL_ID = formatBytes32String("US+COL")
 const CLOSE_FACTOR_BPS = BigNumber.from(5000)   // <- 0.5
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)  // <- 1.05
 const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
@@ -43,7 +43,7 @@ module.exports = async function(deployer) {
     LIQUIDATOR_INCENTIVE_BPS,  //<-_liquidatorIncentiveBps
     TREASURY_FEE_BPS,  //<-_treasuryFeesBps
     stablecoinAddress.fixedSpreadLiquidationStrategy  //<-_strategy
-    , { gas : 5000000 } 
+    , { gas : 8000000 } 
   );
 //   await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, fixedSpreadLiquidationStrategy.address)
   const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);

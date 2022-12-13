@@ -34,7 +34,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
   event LogSetStrategy(address indexed _caller, bytes32 _collateralPoolId, address strategy);
   event LogSetTotalDebtShare(address indexed _caller, bytes32 _collateralPoolId, uint256 _totalDebtShare);
   event LogSetDebtAccumulatedRate(address indexed _caller, bytes32 _collateralPoolId, uint256 _debtAccumulatedRate);
-  event LogInitCollateralPoolId(bytes32 _collateralPoolId, uint256 _debtCeiling, uint256 _liquidtionRatio, uint256 _stabilityFeeRate, address _adapter );
+  event LogInitCollateralPoolId(bytes32 _collateralPoolId, uint256 _debtCeiling, uint256 _liquidationRatio, uint256 _stabilityFeeRate, address _adapter );
 
   mapping(bytes32 => ICollateralPoolConfig.CollateralPool) private _collateralPools;
 
@@ -107,7 +107,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     _collateralPools[_collateralPoolId].liquidatorIncentiveBps = _liquidatorIncentiveBps;
     _collateralPools[_collateralPoolId].treasuryFeesBps = _treasuryFeesBps;
     _collateralPools[_collateralPoolId].strategy = _strategy;
-    
+  
     emit LogInitCollateralPoolId(_collateralPoolId, _debtCeiling, _liquidationRatio, _stabilityFeeRate, _adapter);
   }
 
