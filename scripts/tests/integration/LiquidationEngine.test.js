@@ -8,10 +8,13 @@ chai.use(solidity);
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
 const TimeHelpers = require("../helper/time");
 const AssertHelpers = require("../helper/assert");
-const { loadProxyWalletFixtureHandler } = require("../helper/proxy");
+const { createProxyWallets } = require("../helper/proxy");
 const { DeployerAddress, AliceAddress, BobAddress, AddressZero } = require("../helper/address");
 const PositionHelper = require("../helper/positions");
 const { parseEther, parseUnits, defaultAbiCoder, formatBytes32String } = require("ethers/lib/utils");
+const { loadFixture } = require("../helper/fixtures");
+const { initializeContracts } = require("../helper/initializer");
+const { addRoles } = require("../helper/access-roles");
 
 const { expect } = chai
 
@@ -20,6 +23,65 @@ const CLOSE_FACTOR_BPS = BigNumber.from(5000)
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)
 const TREASURY_FEE_BPS = BigNumber.from(5000)
 const BPS = BigNumber.from(10000)
+
+const setup = async () => {
+    const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
+    const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
+    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
+    const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
+    const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
+    const fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
+    const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
+    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
+    const stabilityFeeCollector = await artifacts.initializeInterfaceAt("StabilityFeeCollector", "StabilityFeeCollector");
+    const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
+    const fixedSpreadLiquidationStrategy = await artifacts.initializeInterfaceAt("FixedSpreadLiquidationStrategy", "FixedSpreadLiquidationStrategy");
+    const liquidationEngine = await artifacts.initializeInterfaceAt("LiquidationEngine", "LiquidationEngine");
+    const systemDebtEngine = await artifacts.initializeInterfaceAt("SystemDebtEngine", "SystemDebtEngine");
+
+    await initializeContracts();
+    await addRoles();
+
+    ({
+        proxyWallets: [aliceProxyWallet],
+    } = await createProxyWallets([AliceAddress, BobAddress]));
+
+    await collateralPoolConfig.initCollateralPool(
+        COLLATERAL_POOL_ID,
+        0,
+        0,
+        simplePriceFeed.address,
+        WeiPerRay,
+        WeiPerRay,
+        collateralTokenAdapterAddress,
+        CLOSE_FACTOR_BPS,
+        LIQUIDATOR_INCENTIVE_BPS,
+        TREASURY_FEE_BPS,
+        AddressZero
+    )
+    await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10000000), { gasLimit: 1000000 })
+    await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRad.mul(10000000), { gasLimit: 1000000 })
+    await simplePriceFeed.setPrice(WeiPerWad, { gasLimit: 1000000 });
+    await liquidationEngine.whitelist(BobAddress, { gasLimit: 1000000 });
+
+    await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
+
+    return {
+        bookKeeper,
+        collateralPoolConfig,
+        positionManager,
+        WXDC,
+        simplePriceFeed,
+        aliceProxyWallet,
+        stabilityFeeCollector,
+        fathomToken,
+        liquidationEngine,
+        systemDebtEngine,
+        fathomStablecoin,
+        fixedSpreadLiquidationStrategy
+    }
+}
+
 
 describe("LiquidationEngine", () => {
     // Contracts
@@ -37,46 +99,27 @@ describe("LiquidationEngine", () => {
     let systemDebtEngine
     let collateralPoolConfig
 
-    beforeEach(async () => {
+    before(async () => {
         await snapshot.revertToSnapshot();
-        ({
-            proxyWallets: [deployerProxyWallet, aliceProxyWallet, bobProxyWallet],
-        } = await loadProxyWalletFixtureHandler([DeployerAddress, AliceAddress, BobAddress]))
-
-        stabilityFeeCollector = await artifacts.initializeInterfaceAt("StabilityFeeCollector", "StabilityFeeCollector");
-        proxyWalletRegistry = await artifacts.initializeInterfaceAt("ProxyWalletRegistry", "ProxyWalletRegistry");
-        simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
-        collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
-        bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
-        positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
-        fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
-        fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
-        fixedSpreadLiquidationStrategy = await artifacts.initializeInterfaceAt("FixedSpreadLiquidationStrategy", "FixedSpreadLiquidationStrategy");
-        WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
-        liquidationEngine = await artifacts.initializeInterfaceAt("LiquidationEngine", "LiquidationEngine");
-        systemDebtEngine = await artifacts.initializeInterfaceAt("SystemDebtEngine", "SystemDebtEngine");
-        collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-        collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID);
-
-        await collateralPoolConfig.initCollateralPool(
-            COLLATERAL_POOL_ID,
-            0,
-            0,
-            simplePriceFeed.address,
-            WeiPerRay,
-            WeiPerRay,
-            collateralTokenAdapterAddress,
-            CLOSE_FACTOR_BPS,
-            LIQUIDATOR_INCENTIVE_BPS,
-            TREASURY_FEE_BPS,
-            AddressZero
-        )
-        await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10000000), { gasLimit: 1000000 })
-        await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRad.mul(10000000), { gasLimit: 1000000 })
-        await simplePriceFeed.setPrice(WeiPerWad, { gasLimit: 1000000 });
-
-        await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
     })
+
+    beforeEach(async () => {
+        ({
+            bookKeeper,
+            collateralPoolConfig,
+            positionManager,
+            WXDC,
+            simplePriceFeed,
+            aliceProxyWallet,
+            stabilityFeeCollector,
+            fathomToken,
+            liquidationEngine,
+            systemDebtEngine,
+            fathomStablecoin,
+            fixedSpreadLiquidationStrategy
+        } = await loadFixture(setup));
+    })
+
     describe("#liquidate", async () => {
         context("price drop but does not make the position underwater", async () => {
             it("should revert", async () => {
@@ -106,6 +149,8 @@ describe("LiquidationEngine", () => {
                 await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
                 // await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
 
+                // 3.5 whitelist bob as liquidator
+                await liquidationEngine.whitelist(BobAddress);
                 // 4. Bob try to liquidate Alice's position but failed due to the price did not drop low enough
                 await expect(
                     liquidationEngine.liquidate(COLLATERAL_POOL_ID, alicePositionAddress, 1, 1, AliceAddress, "0x", { from: BobAddress, gasLimit: 1000000 })
@@ -144,6 +189,9 @@ describe("LiquidationEngine", () => {
 
                 // 3. WXDC price drop to 0.99 USD
                 await simplePriceFeed.setPrice(WeiPerRay.sub(1).div(1e9), { gasLimit: 1000000 })
+
+                // 3.5 whitelist bob as liquidator
+                await liquidationEngine.whitelist(BobAddress);
 
                 // 4. Bob liquidate Alice's position up to full close factor successfully
                 const debtShareToRepay = parseEther("0.5")
@@ -378,12 +426,12 @@ describe("LiquidationEngine", () => {
             for (let i = 0; i < testParams.length; i++) {
                 const testParam = testParams[i]
                 it(testParam.label, async () => {
-                    await WXDC.mint(AliceAddress, parseEther(testParam.collateralAmount), { gasLimit: 1000000 })
+                    await WXDC.mint(AliceAddress, parseEther(testParam.collateralAmount), { gasLimit: 3000000 })
                     await collateralPoolConfig.setLiquidatorIncentiveBps(COLLATERAL_POOL_ID, testParam.liquidatorIncentiveBps)
                     await collateralPoolConfig.setCloseFactorBps(COLLATERAL_POOL_ID, testParam.closeFactorBps)
-                    await simplePriceFeed.setPrice(parseUnits(testParam.startingPrice, 18), { gasLimit: 1000000 })
+                    await simplePriceFeed.setPrice(parseUnits(testParam.startingPrice, 18), { gasLimit: 3000000 })
                     let ratio = WeiPerRay.mul(1000).div(parseUnits(testParam.collateralFactor, 3))
-                    await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 1000000 })
+                    await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 3000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
 
                     // 2. Alice open a new position with 1 WXDC and draw 1 FUSD
@@ -415,17 +463,20 @@ describe("LiquidationEngine", () => {
                     ).to.be.equal(0)
 
                     // 3. WXDC price drop to 0.99 USD
-                    await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 1000000 })
+                    await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 3000000 })
+
+                    // 3.5 whitelist bob as liquidator
+                    await liquidationEngine.whitelist(BobAddress);
 
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther(testParam.debtShareToRepay)
-                    await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 1000000 })
-                    await bookKeeper.whitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 1000000 })
+                    await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 3000000 })
+                    await bookKeeper.whitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 3000000 })
                     await bookKeeper.mintUnbackedStablecoin(
                         DeployerAddress,
                         BobAddress,
                         parseUnits(testParam.debtShareToRepay, 46),
-                        { gasLimit: 1000000 }
+                        { gasLimit: 3000000 }
                     )
                     const bobStablecoinBeforeLiquidation = await bookKeeper.stablecoin(BobAddress)
                     await liquidationEngine.liquidate(
@@ -435,7 +486,7 @@ describe("LiquidationEngine", () => {
                         MaxUint256,
                         BobAddress,
                         "0x",
-                        { from: BobAddress, gasLimit: 2000000 }
+                        { from: BobAddress, gasLimit: 3000000 }
                     )
 
                     // 5. Settle system bad debt
@@ -540,6 +591,9 @@ describe("LiquidationEngine", () => {
                     // 3. WXDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 1000000 })
 
+                    // 3.5 whitelist bob as liquidator
+                    await liquidationEngine.whitelist(BobAddress);
+
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther(testParam.debtShareToRepay)
                     await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 1000000 })
@@ -623,6 +677,9 @@ describe("LiquidationEngine", () => {
             "safety buffer -20%, position is liquidated up to full close factor with some interest and debt floor",
             async () => {
                 it("should success", async () => {
+                    // 0 whitelist bob as liquidator
+                    await liquidationEngine.whitelist(BobAddress);
+
                     // 1. Set priceWithSafetyMargin for WXDC to 420 USD
                     await simplePriceFeed.setPrice(parseUnits("367", 18), { gasLimit: 1000000 })
                     let ratio = WeiPerRay.mul(1000).div(parseUnits("0.8", 3))
@@ -680,6 +737,8 @@ describe("LiquidationEngine", () => {
                     //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, parseUnits("199.5", 27), { gasLimit: 1000000 })
                     await simplePriceFeed.setPrice(parseEther("249.37"), { gasLimit: 1000000 })
 
+
+
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther("1000")
                     await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 1000000 })
@@ -724,7 +783,7 @@ describe("LiquidationEngine", () => {
                     AssertHelpers.assertAlmostEqual(
                         (await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)).toString(),
                         parseEther("4.1309099").toString()
-                    ) 
+                    )
                     AssertHelpers.assertAlmostEqual(
                         bobStablecoinBeforeLiquidation.sub(bobStablecoinAfterLiquidation).toString(),
                         parseEther("1005").mul(WeiPerRay).toString()

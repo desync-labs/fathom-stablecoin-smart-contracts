@@ -36,8 +36,8 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
   event LogSetDebtAccumulatedRate(address indexed _caller, bytes32 _collateralPoolId, uint256 _debtAccumulatedRate);
   event LogInitCollateralPoolId(bytes32 _collateralPoolId, uint256 _debtCeiling, uint256 _liquidationRatio, uint256 _stabilityFeeRate, address _adapter );
 
-
   mapping(bytes32 => ICollateralPoolConfig.CollateralPool) private _collateralPools;
+
 
   function collateralPools(bytes32 _collateralPoolId)
     external
@@ -67,13 +67,13 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
   }
 
   function initCollateralPool(
-    bytes32 _collateralPoolId,
-    uint256 _debtCeiling,
+    bytes32 _collateralPoolId, // v
+    uint256 _debtCeiling, // v
     uint256 _debtFloor,
     address _priceFeed,
-    uint256 _liquidationRatio,
-    uint256 _stabilityFeeRate,
-    address _adapter,
+    uint256 _liquidationRatio, // v
+    uint256 _stabilityFeeRate, //v
+    address _adapter, //v
     uint256 _closeFactorBps,
     uint256 _liquidatorIncentiveBps,
     uint256 _treasuryFeesBps,
@@ -109,7 +109,6 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     _collateralPools[_collateralPoolId].strategy = _strategy;
   
     emit LogInitCollateralPoolId(_collateralPoolId, _debtCeiling, _liquidationRatio, _stabilityFeeRate, _adapter);
-
   }
 
   function setPriceWithSafetyMargin(bytes32 _collateralPoolId, uint256 _priceWithSafetyMargin) external override {
