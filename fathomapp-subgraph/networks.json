@@ -1,0 +1,10 @@
+{
+  "apothem": {
+    "CollateralPoolConfig": {
+      "address": "0xDc5D216d3608e8f3fBC9b864a333C2e4f83E3bA9"
+    },
+    "FathomStablecoin": {
+      "address": "0x45E51092e7bD81aA16FD8De241E06Cd94392a85E"
+    }
+  }
+}

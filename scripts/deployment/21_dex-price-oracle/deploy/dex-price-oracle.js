@@ -33,5 +33,5 @@ module.exports =  async function(deployer) {
   };
 
   let data = JSON.stringify(newAddresses);
-  fs.writeFileSync('../../../../addresses.json', data);
+  fs.writeFileSync('./addresses.json', data);
 };

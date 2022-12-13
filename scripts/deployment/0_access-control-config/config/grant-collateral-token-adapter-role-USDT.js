@@ -11,6 +11,6 @@ module.exports = async function(deployer) {
 
   console.log(`>> Grant ADAPTER_ROLE address: ${ADAPTER_ADDR}`)
 
-  await accessControlConfig.grantRole(await accessControlConfig.ADAPTER_ROLE(), ADAPTER_ADDR, { gasLimit: 1000000 })
+  await accessControlConfig.grantRole(await accessControlConfig.ADAPTER_ROLE(), ADAPTER_ADDR, { gasLimit: 2000000 })
   console.log("✅ Done")
 };

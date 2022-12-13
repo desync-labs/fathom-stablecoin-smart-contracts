@@ -1,0 +1,119 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: CollateralPoolConfig
+    network: mainnet
+    source:
+      address: "0x05eE441CcfABC1661467Ab0F54a6656551704e62"
+      abi: CollateralPoolConfig
+      startBlock: 41698000 
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Pool
+        - ProtocolStat
+      abis:
+        - name: CollateralPoolConfig
+          file: ./abis/CollateralPoolConfig.json
+      eventHandlers:
+        - event: LogInitCollateralPoolId(bytes32,uint256,uint256,uint256,address)
+          handler: handleLogInitCollateralPoolId
+        - event: LogSetDebtCeiling(indexed address,bytes32,uint256)
+          handler: handleLogSetDebtCeiling
+        - event: LogSetLiquidationRatio(indexed address,bytes32,uint256) 
+          handler: handleSetLiquidationRatio
+        - event: LogSetDebtAccumulatedRate(indexed address,bytes32,uint256) 
+          handler: handleSetDebtAccumulatedRate
+      file: ./src/collateral-pool-config.ts
+  - kind: ethereum
+    name: BookKeeper
+    network: mainnet
+    source:
+      address: "0xea96c53d1a910907BA7B1c7aE6931EF0D7a65716"
+      abi: BookKeeper
+      startBlock: 41698450
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Pool
+        - ProtocolStat
+      abis:
+        - name: BookKeeper
+          file: ./abis/BookKeeper.json
+      eventHandlers:
+        - event: LogAdjustPosition(indexed address,bytes32,address,uint256,uint256,uint256,int256,int256)
+          handler: adjustPositionHandler
+        - event: LogSetTotalDebtCeiling(indexed address,uint256)
+          handler: setTotalDebtCeilingHanlder
+        - event: stablecoinIssuedAmount(uint256,bytes32,uint256)
+          handler: stablecoinIssuedAmountHandler
+      file: ./src/bookkeeper.ts
+  - kind: ethereum
+    name: PriceOracle
+    network: mainnet
+    source:
+      address: "0xe1831aeE35142bB621383c48e87C60886a239355"
+      abi: PriceOracle
+      startBlock: 41698450
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Pool
+      abis:
+        - name: PriceOracle
+          file: ./abis/PriceOracle.json
+      eventHandlers:
+        - event: LogSetPrice(bytes32,bytes32,uint256,uint256)
+          handler: priceUpdateHandler
+      file: ./src/price-oracle.ts
+  - kind: ethereum
+    name: PositionManager
+    network: mainnet
+    source:
+      address: "0xc6F6702df7AEb254d84c134DF3FC4A73013A402E"
+      abi: PositionManager
+      startBlock: 41698450
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Position
+        - Pool
+      abis:
+        - name: PositionManager
+          file: ./abis/PositionManager.json
+        - name: CollateralPoolConfig
+          file: ./abis/CollateralPoolConfig.json
+      eventHandlers:
+        - event: LogNewPosition(indexed address,indexed address,indexed uint256)
+          handler: newPositionHandler
+      file: ./src/position-manager.ts
+  - kind: ethereum
+    name: FixedSpreadLiquidationStrategy
+    network: mainnet
+    source:
+      address: "0x522D29810014938E773387D1B07deea2DF320117"
+      abi: FixedSpreadLiquidationStrategy
+      startBlock: 41698450
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Position
+      abis:
+        - name: FixedSpreadLiquidationStrategy
+          file: ./abis/FixedSpreadLiquidationStrategy.json
+      eventHandlers:
+        - event: LogFixedSpreadLiquidate(indexed bytes32,uint256,uint256,indexed address,uint256,uint256,indexed address,address,uint256,uint256,uint256,uint256)
+          handler: positionLiquidationHandler
+      file: ./src/liquidation-strategy.ts

@@ -1,6 +1,6 @@
 const fs = require('fs');
-// const rawdata = fs.readFileSync('../../../../addresses.json');
-// let stablecoinAddress = JSON.parse(rawdata);
+const rawdata = fs.readFileSync('../../../../addresses.json');
+let stablecoinAddress = JSON.parse(rawdata);
 
 const DexPriceOracle = artifacts.require('./8.17/price-oracles/DexPriceOracle.sol');
 
@@ -13,7 +13,7 @@ const DexPriceOracle = artifacts.require('./8.17/price-oracles/DexPriceOracle.so
 module.exports =  async function(deployer) {
   console.log(">> Initializing DexPriceOracle")
 
-  const dexPriceOracle = await DexPriceOracle.at("0x16c5DA5b2535Dc8bE0b26B2584552a7423583967");
+  const dexPriceOracle = await DexPriceOracle.at(stablecoinAddress.dexPriceOracle);
 
 
   await dexPriceOracle.initialize(
