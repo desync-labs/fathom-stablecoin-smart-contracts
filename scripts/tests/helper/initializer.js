@@ -21,10 +21,12 @@ async function initializeContracts() {
   const stableSwapModule = await artifacts.initializeInterfaceAt("StableSwapModule", "StableSwapModule");
   const authTokenAdapter = await artifacts.initializeInterfaceAt("AuthTokenAdapter", "AuthTokenAdapter");
   const proxyWalletFactory = await artifacts.initializeInterfaceAt("ProxyWalletFactory", "ProxyWalletFactory");
-  const USDT = await artifacts.initializeInterfaceAt("USDT", "USDT");
   const flashMintArbitrager = await artifacts.initializeInterfaceAt("FlashMintArbitrager", "FlashMintArbitrager");
   const bookKeeperFlashMintArbitrager = await artifacts.initializeInterfaceAt("BookKeeperFlashMintArbitrager", "BookKeeperFlashMintArbitrager");
-  
+  const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
+  const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_USDT)
+  const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
+  const usdtAddr = await collateralTokenAdapter.collateralToken();
 
   let promises = [
     collateralPoolConfig.initialize(accessControlConfig.address, { gasLimit: 1000000 }),
@@ -87,7 +89,7 @@ async function initializeContracts() {
     authTokenAdapter.initialize(
       bookKeeper.address,
       COLLATERAL_POOL_ID_USDT,
-      USDT.address,
+      usdtAddr,
       { gasLimit: 1000000 }
     ),
     stableSwapModule.initialize(

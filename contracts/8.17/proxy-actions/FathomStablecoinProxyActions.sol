@@ -5,7 +5,7 @@ pragma experimental ABIEncoderV2;
 
 import "../interfaces/IFathomVault.sol";
 import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IWBNB.sol";
+import "../interfaces/IWXDC.sol";
 import "../interfaces/IToken.sol";
 import "../interfaces/IManager.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
@@ -154,17 +154,17 @@ contract FathomStablecoinProxyActions {
     address(_collateralToken).safeTransfer(_dst, _amt);
   }
 
-  function bnbAdapterDeposit(
+  function xdcAdapterDeposit(
     address _adapter,
     address _positionAddress,
     bytes calldata _data
   ) public payable {
     address _collateralToken = address(IGenericTokenAdapter(_adapter).collateralToken());
-    // Wraps BNB into WBNB
-    IWBNB(_collateralToken).deposit{ value: msg.value }();
-    // Approves adapter to take the WBNB amount
+    // Wraps XDC into WXDC
+    IWXDC(_collateralToken).deposit{ value: msg.value }();
+    // Approves adapter to take the WXDC amount
     _collateralToken.safeApprove(address(_adapter), msg.value);
-    // Deposits WBNB collateral into the bookKeeper
+    // Deposits WXDC collateral into the bookKeeper
     IGenericTokenAdapter(_adapter).deposit(_positionAddress, msg.value, _data);
   }
 
@@ -315,33 +315,33 @@ contract FathomStablecoinProxyActions {
     IManager(_manager).movePosition(_source, _destination);
   }
 
-  function bnbToIbBNB(
+  function xdcToIbXDC(
     address _vault,
     uint256 _amount, // [wad]
     bool _transferTo
   ) public payable returns (uint256) {
     SafeToken.safeApprove(address(IFathomVault(_vault).token()), address(_vault), _amount);
-    uint256 _ibBNBBefore = _vault.balanceOf(address(this));
+    uint256 _ibXDCBefore = _vault.balanceOf(address(this));
     IFathomVault(_vault).deposit{ value: msg.value }(msg.value);
-    uint256 _ibBNBAfter = _vault.balanceOf(address(this));
+    uint256 _ibXDCAfter = _vault.balanceOf(address(this));
     SafeToken.safeApprove(address(IFathomVault(_vault).token()), address(_vault), 0);
-    uint256 _backIbBNB = _safeSub(_ibBNBAfter, _ibBNBBefore);
+    uint256 _backIbXDC = _safeSub(_ibXDCAfter, _ibXDCBefore);
     if (_transferTo) {
-      address(_vault).safeTransfer(msg.sender, _backIbBNB);
+      address(_vault).safeTransfer(msg.sender, _backIbXDC);
     }
-    return _backIbBNB;
+    return _backIbXDC;
   }
 
-  function ibBNBToBNB(
+  function ibXDCToXDC(
     address _vault,
     uint256 _amount // [wad]
   ) public payable {
     // user requires to approve the proxy wallet before calling this function
     address(_vault).safeTransferFrom(msg.sender, address(this), _amount);
-    uint256 _bnbBefore = address(this).balance;
+    uint256 _xdcBefore = address(this).balance;
     IFathomVault(_vault).withdraw(_amount);
-    uint256 _bnbAfter = address(this).balance;
-    SafeToken.safeTransferETH(msg.sender, _safeSub(_bnbAfter, _bnbBefore));
+    uint256 _xdcAfter = address(this).balance;
+    SafeToken.safeTransferETH(msg.sender, _safeSub(_xdcAfter, _xdcBefore));
   }
 
   function tokenToIbToken(
@@ -375,28 +375,28 @@ contract FathomStablecoinProxyActions {
     address(IFathomVault(_vault).token()).safeTransfer(msg.sender, _safeSub(_baseTokenAfter, _baseTokenBefore));
   }
 
-  function lockBNB(
+  function lockXDC(
     address _manager,
-    address _bnbAdapter,
+    address _xdcAdapter,
     uint256 _positionId,
     bytes calldata _data
   ) public payable {
     address _positionAddress = IManager(_manager).positions(_positionId);
-    // Receives BNB amount, converts it to WBNB and joins it into the bookKeeper
-    bnbAdapterDeposit(_bnbAdapter, _positionAddress, _data);
-    // Locks WBNB amount into the CDP
-    adjustPosition(_manager, _positionId, _safeToInt(msg.value), 0, _bnbAdapter, _data);
+    // Receives XDC amount, converts it to WXDC and joins it into the bookKeeper
+    xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data);
+    // Locks WXDC amount into the CDP
+    adjustPosition(_manager, _positionId, _safeToInt(msg.value), 0, _xdcAdapter, _data);
   }
 
-  function safeLockBNB(
+  function safeLockXDC(
     address _manager,
-    address _bnbAdapter,
+    address _xdcAdapter,
     uint256 _positionId,
     address _owner,
     bytes calldata _data
   ) external payable {
     require(IManager(_manager).owners(_positionId) == _owner, "!owner");
-    lockBNB(_manager, _bnbAdapter, _positionId, _data);
+    lockXDC(_manager, _xdcAdapter, _positionId, _data);
   }
 
   function lockToken(
@@ -428,22 +428,22 @@ contract FathomStablecoinProxyActions {
     lockToken(_manager, _tokenAdapter, _positionId, _amount, _transferFrom, _data);
   }
 
-  function unlockBNB(
+  function unlockXDC(
     address _manager,
-    address _bnbAdapter,
+    address _xdcAdapter,
     uint256 _positionId,
     uint256 _amount, // [wad]
     bytes calldata _data
   ) external {
-    // Unlocks WBNB amount from the CDP
-    adjustPosition(_manager, _positionId, -_safeToInt(_amount), 0, _bnbAdapter, _data);
+    // Unlocks WXDC amount from the CDP
+    adjustPosition(_manager, _positionId, -_safeToInt(_amount), 0, _xdcAdapter, _data);
     // Moves the amount from the CDP positionAddress to proxy's address
-    moveCollateral(_manager, _positionId, address(this), _amount, _bnbAdapter, _data);
-    // Withdraws WBNB amount to proxy address as a token
-    IGenericTokenAdapter(_bnbAdapter).withdraw(address(this), _amount, _data);
-    // Converts WBNB to BNB
-    IWBNB(address(IGenericTokenAdapter(_bnbAdapter).collateralToken())).withdraw(_amount);
-    // Sends BNB back to the user's wallet
+    moveCollateral(_manager, _positionId, address(this), _amount, _xdcAdapter, _data);
+    // Withdraws WXDC amount to proxy address as a token
+    IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _amount, _data);
+    // Converts WXDC to XDC
+    IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_amount);
+    // Sends XDC back to the user's wallet
     SafeToken.safeTransferETH(msg.sender, _amount);
   }
 
@@ -467,21 +467,21 @@ contract FathomStablecoinProxyActions {
     IGenericTokenAdapter(_tokenAdapter).withdraw(msg.sender, _amount, _data);
   }
 
-  function withdrawBNB(
+  function withdrawXDC(
     address _manager,
-    address _bnbAdapter,
+    address _xdcAdapter,
     uint256 _positionId,
     uint256 _amount, // [wad]
     bytes calldata _data
   ) external {
     // Moves the amount from the position to proxy's address
-    moveCollateral(_manager, _positionId, address(this), _amount, _bnbAdapter, _data);
+    moveCollateral(_manager, _positionId, address(this), _amount, _xdcAdapter, _data);
 
-    // Withdraws WBNB amount to proxy address as a token
-    IGenericTokenAdapter(_bnbAdapter).withdraw(address(this), _amount, _data);
-    // Converts WBNB to BNB
-    IWBNB(address(IGenericTokenAdapter(_bnbAdapter).collateralToken())).withdraw(_amount);
-    // Sends BNB back to the user's wallet
+    // Withdraws WXDC amount to proxy address as a token
+    IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _amount, _data);
+    // Converts WXDC to XDC
+    IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_amount);
+    // Sends XDC back to the user's wallet
     SafeToken.safeTransferETH(msg.sender, _amount);
   }
 
@@ -644,10 +644,10 @@ contract FathomStablecoinProxyActions {
     wipeAll(_manager, _tokenAdapter, _stablecoinAdapter, _positionId, _data);
   }
 
-  function lockBNBAndDraw(
+  function lockXDCAndDraw(
     address _manager,
     address _stabilityFeeCollector,
-    address _bnbAdapter,
+    address _xdcAdapter,
     address _stablecoinAdapter,
     uint256 _positionId,
     uint256 _stablecoinAmount, // [wad]
@@ -656,15 +656,15 @@ contract FathomStablecoinProxyActions {
     address _positionAddress = IManager(_manager).positions(_positionId);
     address _bookKeeper = IManager(_manager).bookKeeper();
     bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
-    // Receives BNB amount, converts it to WBNB and joins it into the bookKeeper
-    bnbAdapterDeposit(_bnbAdapter, _positionAddress, _data);
-    // Locks WBNB amount into the CDP and generates debt
+    // Receives XDC amount, converts it to WXDC and joins it into the bookKeeper
+    xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data);
+    // Locks WXDC amount into the CDP and generates debt
     adjustPosition(
       _manager,
       _positionId,
       _safeToInt(msg.value),
       _getDrawDebtShare(_bookKeeper, _stabilityFeeCollector, _positionAddress, _collateralPoolId, _stablecoinAmount),
-      _bnbAdapter,
+      _xdcAdapter,
       _data
     );
     // Moves the Fathom Stablecoin amount (balance in the bookKeeper in rad) to proxy's address
@@ -678,20 +678,20 @@ contract FathomStablecoinProxyActions {
   }
 
   /// @notice
-  function openLockBNBAndDraw(
+  function openLockXDCAndDraw(
     address _manager,
     address _stabilityFeeCollector,
-    address _bnbAdapter,
+    address _xdcAdapter,
     address _stablecoinAdapter,
     bytes32 _collateralPoolId,
     uint256 _stablecoinAmount, // [wad]
     bytes calldata _data
   ) external payable returns (uint256 _positionId) {
     _positionId = open(_manager, _collateralPoolId, address(this));
-    lockBNBAndDraw(
+    lockXDCAndDraw(
       _manager,
       _stabilityFeeCollector,
-      _bnbAdapter,
+      _xdcAdapter,
       _stablecoinAdapter,
       _positionId,
       _stablecoinAmount,
@@ -798,18 +798,18 @@ contract FathomStablecoinProxyActions {
     );
   }
 
-  function convertBNBAndLockToken(
+  function convertXDCAndLockToken(
     address _vault,
     address _manager,
     address _tokenAdapter,
     uint256 _positionId,
     bytes calldata _data
   ) external payable {
-    uint256 _collateralAmount = bnbToIbBNB(_vault, msg.value, false);
+    uint256 _collateralAmount = xdcToIbXDC(_vault, msg.value, false);
     lockToken(_manager, _tokenAdapter, _positionId, _collateralAmount, false, _data);
   }
 
-  function convertBNBLockTokenAndDraw(
+  function convertXDCLockTokenAndDraw(
     address _vault,
     IManager _manager,
     address _stabilityFeeCollector,
@@ -819,7 +819,7 @@ contract FathomStablecoinProxyActions {
     uint256 _stablecoinAmount, // [wad]
     bytes calldata _data
   ) external payable {
-    uint256 _collateralAmount = bnbToIbBNB(_vault, msg.value, false);
+    uint256 _collateralAmount = xdcToIbXDC(_vault, msg.value, false);
     lockTokenAndDraw(
       IManager(_manager),
       _stabilityFeeCollector,
@@ -833,7 +833,7 @@ contract FathomStablecoinProxyActions {
     );
   }
 
-  function convertBNBOpenLockTokenAndDraw(
+  function convertXDCOpenLockTokenAndDraw(
     address _vault,
     address _manager,
     address _stabilityFeeCollector,
@@ -843,7 +843,7 @@ contract FathomStablecoinProxyActions {
     uint256 _stablecoinAmount, // [wad]
     bytes calldata _data
   ) external payable returns (uint256 positionId) {
-    uint256 _collateralAmount = bnbToIbBNB(_vault, msg.value, false);
+    uint256 _collateralAmount = xdcToIbXDC(_vault, msg.value, false);
     return
       openLockTokenAndDraw(
         _manager,
@@ -884,9 +884,9 @@ contract FathomStablecoinProxyActions {
       );
   }
 
-  function wipeAndUnlockBNB(
+  function wipeAndUnlockXDC(
     address _manager,
-    address _bnbAdapter,
+    address _xdcAdapter,
     address _stablecoinAdapter,
     uint256 _positionId,
     uint256 _collateralAmount, // [wad]
@@ -896,27 +896,27 @@ contract FathomStablecoinProxyActions {
     address _positionAddress = IManager(_manager).positions(_positionId);
     // Deposits Fathom Stablecoin amount into the bookKeeper
     stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _stablecoinAmount, _data);
-    // Paybacks debt to the position and unlocks WBNB amount from it
+    // Paybacks debt to the position and unlocks WXDC amount from it
     int256 _wipeDebtShare = _getWipeDebtShare(
       IManager(_manager).bookKeeper(),
       IBookKeeper(IManager(_manager).bookKeeper()).stablecoin(_positionAddress),
       _positionAddress,
       IManager(_manager).collateralPools(_positionId)
     ); // [wad]
-    adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmount), _wipeDebtShare, _bnbAdapter, _data);
+    adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmount), _wipeDebtShare, _xdcAdapter, _data);
     // Moves the amount from the position to proxy's address
-    moveCollateral(_manager, _positionId, address(this), _collateralAmount, _bnbAdapter, _data);
-    // Withdraws WBNB amount to proxy address as a token
-    IGenericTokenAdapter(_bnbAdapter).withdraw(address(this), _collateralAmount, _data);
-    // Converts WBNB to BNB
-    IWBNB(address(IGenericTokenAdapter(_bnbAdapter).collateralToken())).withdraw(_collateralAmount);
-    // Sends BNB back to the user's wallet
+    moveCollateral(_manager, _positionId, address(this), _collateralAmount, _xdcAdapter, _data);
+    // Withdraws WXDC amount to proxy address as a token
+    IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _collateralAmount, _data);
+    // Converts WXDC to XDC
+    IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_collateralAmount);
+    // Sends XDC back to the user's wallet
     SafeToken.safeTransferETH(msg.sender, _collateralAmount);
   }
 
-  function wipeAllAndUnlockBNB(
+  function wipeAllAndUnlockXDC(
     address _manager,
-    address _bnbAdapter,
+    address _xdcAdapter,
     address _stablecoinAdapter,
     uint256 _positionId,
     uint256 _collateralAmount, // [wad]
@@ -934,15 +934,15 @@ contract FathomStablecoinProxyActions {
       _getWipeAllStablecoinAmount(_bookKeeper, _positionAddress, _positionAddress, _collateralPoolId),
       _data
     );
-    // Paybacks debt to the CDP and unlocks WBNB amount from it
-    adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmount), -int256(_debtShare), _bnbAdapter, _data);
+    // Paybacks debt to the CDP and unlocks WXDC amount from it
+    adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmount), -int256(_debtShare), _xdcAdapter, _data);
     // Moves the amount from the CDP positionAddress to proxy's address
-    moveCollateral(_manager, _positionId, address(this), _collateralAmount, _bnbAdapter, _data);
-    // Withdraws WBNB amount to proxy address as a token
-    IGenericTokenAdapter(_bnbAdapter).withdraw(address(this), _collateralAmount, _data);
-    // Converts WBNB to BNB
-    IWBNB(address(IGenericTokenAdapter(_bnbAdapter).collateralToken())).withdraw(_collateralAmount);
-    // Sends BNB back to the user's wallet
+    moveCollateral(_manager, _positionId, address(this), _collateralAmount, _xdcAdapter, _data);
+    // Withdraws WXDC amount to proxy address as a token
+    IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _collateralAmount, _data);
+    // Converts WXDC to XDC
+    IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_collateralAmount);
+    // Sends XDC back to the user's wallet
     SafeToken.safeTransferETH(msg.sender, _collateralAmount);
   }
 
@@ -973,7 +973,7 @@ contract FathomStablecoinProxyActions {
     IGenericTokenAdapter(_tokenAdapter).withdraw(msg.sender, _collateralAmount, _data);
   }
 
-  function wipeUnlockIbBNBAndCovertToBNB(
+  function wipeUnlockIbXDCAndCovertToXDC(
     address _vault,
     address _manager,
     address _tokenAdapter,
@@ -992,7 +992,7 @@ contract FathomStablecoinProxyActions {
       _stablecoinAmount,
       _data
     );
-    ibBNBToBNB(_vault, _collateralAmount);
+    ibXDCToXDC(_vault, _collateralAmount);
   }
 
   function wipeUnlockTokenAndConvert(
@@ -1053,7 +1053,7 @@ contract FathomStablecoinProxyActions {
     IGenericTokenAdapter(_tokenAdapter).withdraw(msg.sender, _collateralAmount, _data);
   }
 
-  function wipeAllUnlockIbBNBAndConvertToBNB(
+  function wipeAllUnlockIbXDCAndConvertToXDC(
     address _vault,
     address _manager,
     address _tokenAdapter,
@@ -1063,7 +1063,7 @@ contract FathomStablecoinProxyActions {
     bytes calldata _data
   ) external {
     wipeAllAndUnlockToken(_manager, _tokenAdapter, _stablecoinAdapter, _positionId, _collateralAmount, _data);
-    ibBNBToBNB(_vault, _collateralAmount);
+    ibXDCToXDC(_vault, _collateralAmount);
   }
 
   function wipeAllUnlockTokenAndConvert(

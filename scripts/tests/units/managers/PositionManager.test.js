@@ -13,7 +13,7 @@ const { loadFixture } = require("../../helper/fixtures");
 const loadFixtureHandler = async () => {
     const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
     const mockedBookKeeper = await createMock("BookKeeper");
-    const mockedDummyToken = await createMock("BEP20");
+    const mockedDummyToken = await createMock("ERC20Mintable");
     const mockedTokenAdapter = await createMock("TokenAdapter");
     const mockedShowStopper = await createMock("ShowStopper");
     const mockedPriceOracle = await createMock("PriceOracle");

@@ -18,7 +18,7 @@ const loadFixtureHandler = async () => {
     const mockedBookKeeper = await createMock("BookKeeper");
     const mockedSystemDebtEngine = await createMock("SystemDebtEngine");
     const mockedLiquidationEngine = await createMock("LiquidationEngine");
-    const mockedPriceFeed = await createMock("MockPriceFeed");
+    const mockedPriceFeed = await createMock("SimplePriceFeed");
     const mockedPriceOracle = await createMock("PriceOracle");
     const mockedTokenAdapter = await createMock("TokenAdapter");
 

@@ -24,5 +24,5 @@ interface IFathomVault {
 
   function token() external view returns (address);
 
-  function approve(address spender, uint256 amount) external virtual returns (bool);
+  function approve(address spender, uint256 amount) external returns (bool);
 }

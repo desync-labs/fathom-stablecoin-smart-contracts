@@ -4,7 +4,6 @@ const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
 const FathomStablecoin = artifacts.require('./8.17/stablecoin-core/FathomStablecoin.sol');
 const SystemDebtEngine = artifacts.require('./8.17/stablecoin-core/SystemDebtEngine.sol');
 const FathomOraclePriceFeed = artifacts.require('./8.17/price-feeders/FathomOraclePriceFeed.sol');
-const IbTokenPriceFeed = artifacts.require('./8.17/price-feeders/IbTokenPriceFeed.sol');
 const GetPositions = artifacts.require('./8.17/managers/GetPositions.sol');
 const StableSwapModule = artifacts.require('./8.17/stablecoin-core/StableSwapModule.sol');
 const AuthTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/AuthTokenAdapter.sol');
@@ -23,13 +22,10 @@ const ShowStopper = artifacts.require('./8.17/stablecoin-core/ShowStopper.sol');
 const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
 const StablecoinAdapter = artifacts.require('./8.17/stablecoin-core/adapters/StablecoinAdapter.sol');
 const LiquidationEngine = artifacts.require('./8.17/stablecoin-core/LiquidationEngine.sol');
-const WXDC = artifacts.require('./8.17/mocks/WXDC.sol');
-const USDT = artifacts.require('./8.17/mocks/USDT.sol');
+// const ERC20Mintable = artifacts.require('./8.17/mocks/ERC20Mintable.sol');
 const FlashMintModule = artifacts.require('./8.17/flash-mint/FlashMintModule.sol');
 //for delayed price testing
-const MockDexPriceOracle = artifacts.require('./8.17/mocks/MockDexPriceOracle.sol');
 const DelayFathomOraclePriceFeed = artifacts.require('./8.17/price-feeders/DelayFathomOraclePriceFeed.sol');
-const MockPriceOracle = artifacts.require('./8.17/mocks/MockPriceOracle.sol');
 const FlashMintArbitrager = artifacts.require('./8.17/mocks/FlashMintArbitrager.sol');
 const BookKeeperFlashMintArbitrager = artifacts.require('./8.17/mocks/BookKeeperFlashMintArbitrager.sol');
 
@@ -58,15 +54,10 @@ module.exports =  async function(deployer) {
       deployer.deploy(StablecoinAdapter, { gas: 3050000 }),
       deployer.deploy(PriceOracle, { gas: 3050000 }),
       deployer.deploy(LiquidationEngine, { gas: 3050000 }),
-      deployer.deploy(WXDC, "WXDC", "WXDC", { gas: 3050000 }),
-      deployer.deploy(USDT, "USDT", "USDT", { gas: 3050000 }),
       deployer.deploy(FlashMintModule, { gas: 3050000 }),
 //for delayed price testing
-      deployer.deploy(MockDexPriceOracle, { gas: 3050000 }),
       deployer.deploy(DelayFathomOraclePriceFeed, { gas: 3050000 }),
-      deployer.deploy(MockPriceOracle, { gas: 3050000 }),
       deployer.deploy(TokenAdapter, { gas: 3050000 }),
-      deployer.deploy(IbTokenPriceFeed, { gas: 3050000 }),
       deployer.deploy(FlashMintArbitrager, { gas: 3050000 }),
       deployer.deploy(BookKeeperFlashMintArbitrager, { gas: 3050000 }),
   ];

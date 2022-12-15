@@ -27,13 +27,15 @@ const TREASURY_FEE_BPS = "5000"
 const setup = async () => {
     const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
     const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
-    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
     const getPositions = await artifacts.initializeInterfaceAt("GetPositions", "GetPositions");
     const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
     const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
     const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
     const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
-
+    const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
+    const wxdcAddr = await collateralTokenAdapter.collateralToken();
+    const WXDC = await artifacts.initializeInterfaceAt("ERC20Mintable", wxdcAddr);
+  
     await initializeContracts();
     
     await addRoles();

@@ -20,7 +20,7 @@ const nHoursAgoInSec = (now, n) => {
 }
 
 const loadFixtureHandler = async () => {
-    const mockedFathomOracle = await createMock("MockFathomOracle");
+    const mockedFathomOracle = await createMock("DexPriceOracle");
     const mockedAccessControlConfig = await createMock("AccessControlConfig");
 
     const fathomOraclePriceFeed = getContract("FathomOraclePriceFeed", DeployerAddress)

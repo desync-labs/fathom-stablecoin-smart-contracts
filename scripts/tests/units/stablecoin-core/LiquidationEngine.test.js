@@ -81,7 +81,7 @@ describe("LiquidationEngine", () => {
       it("should be revert", async () => {
         await expect(
           liquidationEngineAsBob.liquidate(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             AliceAddress,
             WeiPerWad,
             WeiPerWad,
@@ -99,7 +99,7 @@ describe("LiquidationEngine", () => {
 
         await expect(
           liquidationEngineAsAlice.liquidate(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             AliceAddress,
             WeiPerWad,
             WeiPerWad,
@@ -118,7 +118,7 @@ describe("LiquidationEngine", () => {
 
         await expect(
           liquidationEngine.liquidate(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             AliceAddress,
             WeiPerWad,
             WeiPerWad,
@@ -133,7 +133,7 @@ describe("LiquidationEngine", () => {
       it("should be revert", async () => {
         await expect(
           liquidationEngine.liquidate(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             AliceAddress,
             0,
             0,
@@ -153,7 +153,7 @@ describe("LiquidationEngine", () => {
 
         await expect(
           liquidationEngine.liquidate(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             AliceAddress,
             WeiPerWad,
             WeiPerWad,
@@ -289,7 +289,7 @@ describe("LiquidationEngine", () => {
 
         await expect(
           liquidationEngine.liquidate(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             AliceAddress,
             WeiPerWad,
             WeiPerWad,
@@ -344,10 +344,10 @@ describe("LiquidationEngine", () => {
         await liquidationEngine.unpause()
 
         // mock contract
-        await mockedBookKeeper.mock.positions.withArgs(formatBytes32String("BNB"), AliceAddress).returns(WeiPerWad.mul(10), WeiPerWad.mul(10))
+        await mockedBookKeeper.mock.positions.withArgs(formatBytes32String("WXDC"), AliceAddress).returns(WeiPerWad.mul(10), WeiPerWad.mul(10))
         await mockedBookKeeper.mock.stablecoin.returns(0)
         await mockedFixedSpreadLiquidationStrategy.mock.execute.withArgs(
-          formatBytes32String("BNB"),
+          formatBytes32String("WXDC"),
           WeiPerWad.mul(10),
           WeiPerWad.mul(10),
           AliceAddress,
@@ -363,7 +363,7 @@ describe("LiquidationEngine", () => {
 
         await expect(
           liquidationEngine.liquidate(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             AliceAddress,
             WeiPerWad,
             WeiPerWad,

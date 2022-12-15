@@ -21,7 +21,6 @@ const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(12500)
 const TREASURY_FEE_BPS = BigNumber.from(2500)
 
 const setup = async () => {
-    const USDT = await artifacts.initializeInterfaceAt("USDT", "USDT");
     const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
     const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
     const fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
@@ -31,6 +30,12 @@ const setup = async () => {
     const stableSwapModule = await artifacts.initializeInterfaceAt("StableSwapModule", "StableSwapModule");
     const authTokenAdapter = await artifacts.initializeInterfaceAt("AuthTokenAdapter", "AuthTokenAdapter");
     const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
+
+    const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
+    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
+    const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
+    const usdtAddr = await collateralTokenAdapter.collateralToken();
+    const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
 
     await initializeContracts();
     await addRoles();

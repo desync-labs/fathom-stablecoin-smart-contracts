@@ -29,8 +29,6 @@ const setup = async () => {
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
     const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
     const fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
-    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
-    const USDT = await artifacts.initializeInterfaceAt("USDT", "USDT");
     const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
     const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
     const fixedSpreadLiquidationStrategy = await artifacts.initializeInterfaceAt("FixedSpreadLiquidationStrategy", "FixedSpreadLiquidationStrategy");
@@ -40,6 +38,11 @@ const setup = async () => {
     const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_USDT);
     const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterWXDC);
     const collateralTokenAdapter2 = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterUSDT);
+
+    const wxdcAddr = await collateralTokenAdapter.collateralToken();
+    const usdtAddr = await collateralTokenAdapter2.collateralToken();
+    const WXDC = await artifacts.initializeInterfaceAt("ERC20Mintable", wxdcAddr);
+    const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
 
     await initializeContracts();
     await addRoles();

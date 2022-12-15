@@ -20,10 +20,11 @@ const setup = async () => {
     const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
     const fairLaunch = await artifacts.initializeInterfaceAt("FairLaunch", "FairLaunch");
     const shield = await artifacts.initializeInterfaceAt("Shield", "Shield");
-    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
     const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
     const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
     const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
+    const wxdcAddr = await collateralTokenAdapter.collateralToken();
+    const WXDC = await artifacts.initializeInterfaceAt("ERC20Mintable", wxdcAddr);
 
     await initializeContracts();
     await addRoles();
