@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const CollateralPoolConfig = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
+const CollateralPoolConfig = artifacts.require('./main/stablecoin-core/config/CollateralPoolConfig.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -14,7 +14,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
+  const deployed = artifacts.require('./main/stablecoin-core/config/CollateralPoolConfig.sol');
 
   let addressesUpdate = { 
     collateralPoolConfig:deployed.address,

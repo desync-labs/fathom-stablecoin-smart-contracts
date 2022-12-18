@@ -3,7 +3,7 @@ const { expect } = chai
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 
-const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
+const PriceOracle = artifacts.require('./main/stablecoin-core/PriceOracle.sol');
 
 const { BigNumber, ethers } = require("ethers");
 

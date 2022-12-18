@@ -2,7 +2,7 @@ const fs = require('fs');
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-const GetPositionsV2 = artifacts.require('./8.17/stats/GetPositionsV2.sol');
+const GetPositionsV2 = artifacts.require('./main/stats/GetPositionsV2.sol');
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing GetPositionsV2")

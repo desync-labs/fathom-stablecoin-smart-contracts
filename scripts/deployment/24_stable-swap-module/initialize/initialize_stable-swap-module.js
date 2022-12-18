@@ -2,7 +2,7 @@ const fs = require('fs');
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-const StableSwapModule = artifacts.require('./8.17/stablecoin-core/StableSwapModule.sol');
+const StableSwapModule = artifacts.require('./main/stablecoin-core/StableSwapModule.sol');
 const AUTH_TOKEN_ADAPTER_ADDR = stablecoinAddress.authTokenAdapter;
 const STABLECOIN_ADAPTER_ADDR = stablecoinAddress.stablecoinAdapter;
 const SYSTEM_DEBT_ENGINE_ADDR = stablecoinAddress.systemDebtEngine;

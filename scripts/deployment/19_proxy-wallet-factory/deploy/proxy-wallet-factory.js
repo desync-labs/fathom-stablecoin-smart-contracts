@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const ProxyWalletFactory = artifacts.require('./8.17/proxy-wallet/ProxyWalletFactory.sol');
+const ProxyWalletFactory = artifacts.require('./main/proxy-wallet/ProxyWalletFactory.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -14,7 +14,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/proxy-wallet/ProxyWalletFactory.sol');
+  const deployed = artifacts.require('./main/proxy-wallet/ProxyWalletFactory.sol');
 
   let addressesUpdate = { 
     proxyWalletFactory:deployed.address,

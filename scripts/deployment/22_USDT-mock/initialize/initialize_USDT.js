@@ -10,7 +10,7 @@ const systemAccount = accounts[0]; //coralX way of indicating first address
 // for ganache
 const devAddress = systemAccount;
 
-const USDT = artifacts.require('./8.17/mocks/USDT.sol');
+const USDT = artifacts.require('./tests/mocks/USDT.sol');
 
 // Apothem V1
 const USDTAddress = "0xCcdC0653935A251B6839F30359917977f994b5d9";

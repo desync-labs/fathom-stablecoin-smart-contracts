@@ -8,7 +8,7 @@ const walletDeployer = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
 // for ganache
 const devAddress = accounts[0];
 
-const WXDC = artifacts.require('./8.17/mocks/WXDC.sol');
+const WXDC = artifacts.require('./tests/mocks/WXDC.sol');
 
 // ApothemV1
 const WXDCAddress = "0xcEc1609Efd3f12d0Da63250eF6761A7482Dda3BF";

@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const GetPositionsV2Mock = artifacts.require('./8.17/stats/GetPositionsV2Mock.sol');
+const GetPositionsV2Mock = artifacts.require('./main/stats/GetPositionsV2Mock.sol');
 
 // const rawdata = fs.readFileSync('../../../../addresses.json');
 // let stablecoinAddress = JSON.parse(rawdata);
@@ -13,7 +13,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/stats/GetPositionsV2Mock.sol');
+  const deployed = artifacts.require('./main/stats/GetPositionsV2Mock.sol');
   console.log("getPositions is "+ deployed.address);
   let addressesUpdate = { 
     getPositionsV2Mock:deployed.address,

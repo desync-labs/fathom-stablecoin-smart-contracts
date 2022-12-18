@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
+const BookKeeper = artifacts.require('./main/stablecoin-core/BookKeeper.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -14,7 +14,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
+  const deployed = artifacts.require('./main/stablecoin-core/BookKeeper.sol');
 
   let addressesUpdate = { 
     bookKeeper:deployed.address,

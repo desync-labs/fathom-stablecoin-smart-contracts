@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-const FairLaunch = artifacts.require('./8.17/apis/fathom/FairLaunch.sol');
+const FairLaunch = artifacts.require('./fair-launch/FairLaunch.sol');
 
 module.exports = async function (deployer) {
 
@@ -22,7 +22,7 @@ module.exports = async function (deployer) {
     //fairLaunch cannot addPool with same token twice, thus, above fails.
     await fairLaunch.addPool(3, stablecoinAddress.fathomStablecoin, true);
 
-    ITransferOwnership
+    //ITransferOwnership
     await fairLaunch.transferOwnership(stablecoinAddress.shield);
 };
   

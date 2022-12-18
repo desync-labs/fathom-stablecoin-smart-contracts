@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const PositionManager = artifacts.require('./8.17/managers/PositionManager.sol');
+const PositionManager = artifacts.require('./main/managers/PositionManager.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -14,7 +14,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/managers/PositionManager.sol');
+  const deployed = artifacts.require('./main/managers/PositionManager.sol');
 
   let addressesUpdate = { 
     positionManager:deployed.address,

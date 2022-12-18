@@ -3,7 +3,7 @@ const hre = require("hardhat");
 const fs = require('fs');
 
 // getting artifact
-const ProxyWalletRegistryArtifact = require("../../../artifacts/contracts/8.17/proxy-wallet/ProxyWalletRegistry.sol/ProxyWalletRegistry.json");
+const ProxyWalletRegistryArtifact = require("../../../artifacts/contracts/main/proxy-wallet/ProxyWalletRegistry.sol/ProxyWalletRegistry.json");
 
 
 

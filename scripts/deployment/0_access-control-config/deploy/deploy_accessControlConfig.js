@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const AccessControlConfig = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
+const AccessControlConfig = artifacts.require('./main/stablecoin-core/config/AccessControlConfig.sol');
 
 module.exports =  async function(deployer) {
 
@@ -11,7 +11,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
+  const deployed = artifacts.require('./main/stablecoin-core/config/AccessControlConfig.sol');
 
   let addressesUpdate = { 
     accessControlConfig:deployed.address,

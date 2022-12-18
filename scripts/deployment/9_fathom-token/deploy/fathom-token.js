@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const FathomToken = artifacts.require('./8.17/apis/fathom/FathomToken.sol');
+const FathomToken = artifacts.require('./tests/FathomToken.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -14,7 +14,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/apis/fathom/FathomToken.sol');
+  const deployed = artifacts.require('./tests/FathomToken.sol');
 
   let addressesUpdate = { 
     fathomToken:deployed.address,
