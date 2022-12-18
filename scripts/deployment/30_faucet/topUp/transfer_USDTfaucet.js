@@ -9,7 +9,7 @@ const faucetAmount = BigNumber.from("300000000000000000000").toString();
 // for ganache
 const devAddress = "0x0CF4bC892112518f96506Df151185d0F572CfF5f";
 
-const USDT = artifacts.require('./8.17/mocks/USDT.sol');
+const USDT = artifacts.require('./tests/mocks/USDT.sol');
 
 // Apothem V1
 const USDTAddress = "0xCcdC0653935A251B6839F30359917977f994b5d9";

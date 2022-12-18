@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-const AccessControlConfig = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
+const AccessControlConfig = artifacts.require('./main/stablecoin-core/config/AccessControlConfig.sol');
 
 module.exports = async function(deployer) {
   const deployerAddress =   "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";

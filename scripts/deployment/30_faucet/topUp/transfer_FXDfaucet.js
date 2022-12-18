@@ -9,7 +9,7 @@ const faucetAmount = BigNumber.from("300000000000000000000").toString();
 // for ganache
 const devAddress = "0x0CF4bC892112518f96506Df151185d0F572CfF5f";
 
-const FathomToken = artifacts.require('./8.17/apis/fathom/FathomToken.sol');
+const FathomToken = artifacts.require('./tests/FathomToken.sol');
 
 // Apothem V2
 const FXDAddress = "";

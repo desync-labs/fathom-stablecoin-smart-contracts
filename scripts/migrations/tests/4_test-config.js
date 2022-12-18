@@ -1,12 +1,12 @@
 const { formatBytes32String } = require("ethers/lib/utils");
 const { BigNumber, ethers } = require("ethers");
 
-const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
-const PositionManager = artifacts.require('./8.17/managers/PositionManager.sol');
-const Shield = artifacts.require('./8.17/apis/fathom/Shield.sol');
-const FairLaunch = artifacts.require('./8.17/apis/fathom/FairLaunch.sol');
-const FathomToken = artifacts.require('./8.17/apis/fathom/FathomToken.sol');
-const ERC20Mintable = artifacts.require('./8.17/mocks/ERC20Mintable.sol');
+const BookKeeper = artifacts.require('./main/stablecoin-core/BookKeeper.sol');
+const PositionManager = artifacts.require('./main/managers/PositionManager.sol');
+const Shield = artifacts.require('./fair-launch/Shield.sol');
+const FairLaunch = artifacts.require('./fair-launch/FairLaunch.sol');
+const FathomToken = artifacts.require('./tests/FathomToken.sol');
+const ERC20Mintable = artifacts.require('./tests/mocks/ERC20Mintable.sol');
 
 const COLLATERAL_POOL_ID_WXDC = formatBytes32String("WXDC")
 const COLLATERAL_POOL_ID_USDT = formatBytes32String("USDT")

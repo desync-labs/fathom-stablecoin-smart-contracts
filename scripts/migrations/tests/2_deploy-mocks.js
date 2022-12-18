@@ -1,7 +1,7 @@
-// const MockMyFlashLoan = artifacts.require('./8.17/mocks/MockMyFlashLoan.sol');
-const MockedDexRouter = artifacts.require('./8.17/mocks/MockedDexRouter.sol');
+// const MockMyFlashLoan = artifacts.require('./tests/mocks/MockMyFlashLoan.sol');
+const MockedDexRouter = artifacts.require('./tests/mocks/MockedDexRouter.sol');
 
-const FlashMintModule = artifacts.require('./8.17/flash-mint/FlashMintModule.sol');
+const FlashMintModule = artifacts.require('./main/flash-mint/FlashMintModule.sol');
 
 module.exports =  async function(deployer) {
   const promises = [

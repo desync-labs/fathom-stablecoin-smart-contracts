@@ -4,8 +4,8 @@ const fs = require('fs');
 
 const { parseEther, formatBytes32String, parseUnits } = require("ethers/lib/utils");
 const { BigNumber } = require("ethers");
-const ProxyWalletArtifact = require("../../../artifacts/contracts/8.17/proxy-wallet/ProxyWallet.sol/ProxyWallet.json");
-const WXDCArtifact = require("../../../artifacts/contracts/8.17/mocks/BEP20.sol/BEP20.json");
+const ProxyWalletArtifact = require("../../../artifacts/contracts/main/proxy-wallet/ProxyWallet.sol/ProxyWallet.json");
+const WXDCArtifact = require("../../../artifacts/contracts/main/mocks/BEP20.sol/BEP20.json");
 
 const WeiPerWad = hre.ethers.constants.WeiPerEther
 const WeiPerRay = BigNumber.from(`1${"0".repeat(27)}`)

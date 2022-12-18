@@ -3,7 +3,7 @@ const fs = require('fs');
 // const rawdata = fs.readFileSync('../../../../addresses.json');
 // let stablecoinAddress = JSON.parse(rawdata);
 
-const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
+const BookKeeper = artifacts.require('./main/stablecoin-core/BookKeeper.sol');
 
 module.exports =  async function(deployer) {
 

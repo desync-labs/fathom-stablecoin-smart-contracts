@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const FathomStablecoinProxyActions = artifacts.require('./8.17/proxy-actions/FathomStablecoinProxyActions.sol');
+const FathomStablecoinProxyActions = artifacts.require('./main/proxy-actions/FathomStablecoinProxyActions.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -14,7 +14,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/proxy-actions/FathomStablecoinProxyActions.sol');
+  const deployed = artifacts.require('./main/proxy-actions/FathomStablecoinProxyActions.sol');
   let addressesUpdate = { 
     fathomStablecoinProxyActions:deployed.address,
   };

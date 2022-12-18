@@ -6,7 +6,7 @@ const { BigNumber } = require("ethers");
 
 const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 
-const CollateralTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
+const CollateralTokenAdapter = artifacts.require('./main/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 
 //for testnet
 // const deployerAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";

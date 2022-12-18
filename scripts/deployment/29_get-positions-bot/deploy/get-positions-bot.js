@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const GetPositions = artifacts.require('./8.17/managers/GetPositionsBot.sol');
+const GetPositions = artifacts.require('./main/managers/GetPositionsBot.sol');
 
 // const rawdata = fs.readFileSync('../../../../addresses.json');
 // let stablecoinAddress = JSON.parse(rawdata);
@@ -13,7 +13,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/managers/GetPositionsBot.sol');
+  const deployed = artifacts.require('./main/managers/GetPositionsBot.sol');
 
   let addressesUpdate = { 
     getPositionsBot:deployed.address,

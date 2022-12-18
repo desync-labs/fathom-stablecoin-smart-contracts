@@ -2,7 +2,7 @@ const fs = require('fs');
 const rawdata = fs.readFileSync('../../../../addresses_ApothemV1.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-const Shield = artifacts.require('./8.17/apis/fathom/Shield.sol');
+const Shield = artifacts.require('./fair-launch/Shield.sol');
 
 module.exports = async function(deployer) {
     // const fairLaunch = await artifacts.initializeInterfaceAt("IFairLaunch", "FairLaunch");

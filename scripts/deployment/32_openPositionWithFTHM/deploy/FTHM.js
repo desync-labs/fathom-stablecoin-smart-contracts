@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const FTHM = artifacts.require('./8.17/mocks/FTHM.sol');
+const FTHM = artifacts.require('./tests/mocks/FTHM.sol');
 
 // const rawdata = fs.readFileSync('../../../../addresses.json');
 // let stablecoinAddress = JSON.parse(rawdata);
@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/mocks/WXDC.sol');
+  const deployed = artifacts.require('./tests/mocks/WXDC.sol');
 
   // let addressesUpdate = { 
   //   WXDC:deployed.address,

@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const StableSwapModule = artifacts.require('./8.17/stablecoin-core/StableSwapModule.sol');
+const StableSwapModule = artifacts.require('./main/stablecoin-core/StableSwapModule.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -13,7 +13,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/stablecoin-core/StableSwapModule.sol');
+  const deployed = artifacts.require('./main/stablecoin-core/StableSwapModule.sol');
 
   let addressesUpdate = { 
     stableSwapModule:deployed.address,

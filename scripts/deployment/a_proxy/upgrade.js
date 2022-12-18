@@ -1,10 +1,10 @@
 const fs = require('fs');
 
-const FTHMProxy = artifacts.require('./8.17/proxy/FTHMProxy.sol');
+const FTHMProxy = artifacts.require('./main/proxy/FTHMProxy.sol');
 
-const FTHMProxyAdmin = artifacts.require('./8.17/proxy/FTHMProxyAdmin.sol');
+const FTHMProxyAdmin = artifacts.require('./main/proxy/FTHMProxyAdmin.sol');
 
-const AccessControlConfig = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
+const AccessControlConfig = artifacts.require('./main/stablecoin-core/config/AccessControlConfig.sol');
 
 // const rawdata = fs.readFileSync('../../../../addresses.json');
 // let stablecoinAddress = JSON.parse(rawdata);
@@ -21,10 +21,10 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed0 = artifacts.require('./8.17/mocks/FTHMProxyAdmin.sol');
+  const deployed0 = artifacts.require('./main/proxy/FTHMProxyAdmin.sol');
   const FTHMProxyAdmin_Address = deployed0.address;
 
-  const deployed1 = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
+  const deployed1 = artifacts.require('./main/stablecoin-core/config/AccessControlConfig.sol');
   const AccessControlConfig_Address = deployed1.address;
 
   //access control does not have anything in fn initialize()

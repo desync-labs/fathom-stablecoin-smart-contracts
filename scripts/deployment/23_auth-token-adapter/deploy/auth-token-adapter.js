@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const AuthTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/AuthTokenAdapter.sol');
+const AuthTokenAdapter = artifacts.require('./main/stablecoin-core/adapters/AuthTokenAdapter.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -13,7 +13,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/stablecoin-core/adapters/AuthTokenAdapter.sol');
+  const deployed = artifacts.require('./main/stablecoin-core/adapters/AuthTokenAdapter.sol');
 
   let addressesUpdate = { 
     authTokenAdapter:deployed.address,

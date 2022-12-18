@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const SimplePriceFeed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
+const SimplePriceFeed = artifacts.require('./tests/SimplePriceFeed.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -14,7 +14,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
+  const deployed = artifacts.require('./tests/SimplePriceFeed.sol');
 
   let addressesUpdate = { 
     simplePriceFeedUSDT:deployed.address,

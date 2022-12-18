@@ -21,7 +21,7 @@ const CLOSE_FACTOR_BPS = "5000"
 const LIQUIDATOR_INCENTIVE_BPS = "10250"
 const TREASURY_FEE_BPS = "100"
 
-const StabilityFeeCollector = artifacts.require('./8.17/stablecoin-core/StabilityFeeCollector.sol');
+const StabilityFeeCollector = artifacts.require('./main/stablecoin-core/StabilityFeeCollector.sol');
 
 const setup = async () => {
     const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
