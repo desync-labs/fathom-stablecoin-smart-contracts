@@ -4,7 +4,6 @@ const BookKeeper = artifacts.require('./main/stablecoin-core/BookKeeper.sol');
 const FathomStablecoin = artifacts.require('./main/stablecoin-core/FathomStablecoin.sol');
 const SystemDebtEngine = artifacts.require('./main/stablecoin-core/SystemDebtEngine.sol');
 const FathomOraclePriceFeed = artifacts.require('./main/price-feeders/FathomOraclePriceFeed.sol');
-const GetPositions = artifacts.require('./main/managers/GetPositions.sol');
 const StableSwapModule = artifacts.require('./main/stablecoin-core/StableSwapModule.sol');
 const AuthTokenAdapter = artifacts.require('./main/stablecoin-core/adapters/AuthTokenAdapter.sol');
 const TokenAdapter = artifacts.require('./main/stablecoin-core/adapters/TokenAdapter.sol');
@@ -14,7 +13,7 @@ const ProxyWalletFactory = artifacts.require('./main/proxy-wallet/ProxyWalletFac
 const StabilityFeeCollector = artifacts.require('./main/stablecoin-core/StabilityFeeCollector.sol');
 const FathomStablecoinProxyActions = artifacts.require('./main/proxy-actions/FathomStablecoinProxyActions.sol');
 const FixedSpreadLiquidationStrategy = artifacts.require('./main/stablecoin-core/liquidation-strategies/FixedSpreadLiquidationStrategy.sol');
-const SimplePriceFeed = artifacts.require('./tests/SimplePriceFeed.sol');
+const SimplePriceFeed = artifacts.require('./main/price-feeders/SimplePriceFeed.sol');
 const CollateralTokenAdapterFactory = artifacts.require('./main/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapterFactory.sol');
 const PositionManager = artifacts.require('./main/managers/PositionManager.sol');
 const FathomToken = artifacts.require('./tests/FathomToken.sol');
@@ -37,7 +36,6 @@ module.exports =  async function(deployer) {
       deployer.deploy(FathomStablecoin, { gas: 3050000 }),
       deployer.deploy(SystemDebtEngine, { gas: 3050000 }),
       deployer.deploy(FathomOraclePriceFeed, { gas: 3050000 }),
-      deployer.deploy(GetPositions, { gas: 3050000 }),
       deployer.deploy(AuthTokenAdapter, { gas: 3050000 }),
       deployer.deploy(StableSwapModule, { gas: 3050000 }),
       deployer.deploy(DexPriceOracle, { gas: 3050000 }),

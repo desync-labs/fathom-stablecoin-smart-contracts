@@ -4,8 +4,8 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-import "../main/interfaces/IPriceFeed.sol";
-import "../main/interfaces/IAccessControlConfig.sol";
+import "../interfaces/IPriceFeed.sol";
+import "../interfaces/IAccessControlConfig.sol";
 
 contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPriceFeed {
     IAccessControlConfig public accessControlConfig;
@@ -19,7 +19,7 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
         PausableUpgradeable.__Pausable_init();
         AccessControlUpgradeable.__AccessControl_init();
 
-        priceLife = 1 days; // [seconds] how old the price is considered stale, default 1 day
+        priceLife = 365 days; // [seconds] how old the price is considered stale, default 1 day
 
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
     }
@@ -49,7 +49,7 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
     }
 
     function setPriceLife(uint256 _second) external onlyOwner {
-        require(_second >= 1 hours && _second <= 1 days, "SimplePriceFeed/bad-price-life");
+        require(_second >= 1 hours && _second <= 365 days, "SimplePriceFeed/bad-price-life");
         priceLife = _second;
         emit LogSetPriceLife(msg.sender, _second);
     }

@@ -2,7 +2,6 @@ const { formatBytes32String } = require("ethers/lib/utils");
 const COLLATERAL_POOL_ID_USDT = formatBytes32String("USDT")
 
 async function initializeContracts() {
-  const getPositions = await artifacts.initializeInterfaceAt("GetPositions", "GetPositions");
   const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
   const fixedSpreadLiquidationStrategy = await artifacts.initializeInterfaceAt("FixedSpreadLiquidationStrategy", "FixedSpreadLiquidationStrategy");
   const proxyWalletRegistry = await artifacts.initializeInterfaceAt("ProxyWalletRegistry", "ProxyWalletRegistry");
@@ -80,7 +79,6 @@ async function initializeContracts() {
     proxyWalletRegistry.initialize(
       proxyWalletFactory.address
     ),
-    getPositions.initialize({ gaslimit: 4050000 }),
     flashMintModule.initialize(
       stablecoinAdapter.address,
       systemDebtEngine.address,
