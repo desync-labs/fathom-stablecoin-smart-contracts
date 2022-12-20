@@ -2,7 +2,7 @@ const fs = require('fs');
 // const rawdata = fs.readFileSync('../../../../addresses.json');
 // let stablecoinAddress = JSON.parse(rawdata);
 
-const GetPositions = artifacts.require('./8.17/managers/GetPositionsBot.sol');
+const GetPositions = artifacts.require('./main/managers/GetPositionsBot.sol');
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing GetPositionsBot")

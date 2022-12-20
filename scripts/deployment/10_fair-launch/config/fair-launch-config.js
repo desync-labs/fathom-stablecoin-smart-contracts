@@ -5,7 +5,7 @@ let stablecoinAddress = JSON.parse(rawdata);
 require("dotenv").config();
 // const WXDCAdd = process.env.WXDC_ADDRESS;
 
-const IFairLaunch = artifacts.require('./8.17/apis/fathom/interfaces/IFairLaunch.sol');
+const IFairLaunch = artifacts.require('./fair-launch/interfaces/IFairLaunch.sol');
 
 module.exports = async function(deployer) {
     const fairLaunch = await artifacts.initializeInterfaceAt("IFairLaunch", "FairLaunch");

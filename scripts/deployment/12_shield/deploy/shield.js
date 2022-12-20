@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const Shield = artifacts.require('./8.17/apis/fathom/Shield.sol');
+const Shield = artifacts.require('./fair-launch/Shield.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -20,7 +20,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/apis/fathom/Shield.sol');
+  const deployed = artifacts.require('./fair-launch/Shield.sol');
 
   let addressesUpdate = { 
     shield:deployed.address,

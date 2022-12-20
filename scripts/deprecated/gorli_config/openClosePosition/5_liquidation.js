@@ -4,9 +4,9 @@ const fs = require('fs');
 
 const { parseEther, formatBytes32String, parseUnits } = require("ethers/lib/utils");
 const { BigNumber } = require("ethers");
-const ProxyWalletArtifact = require("../../../artifacts/contracts/8.17/proxy-wallet/ProxyWallet.sol/ProxyWallet.json");
-const WXDCArtifact = require("../../../artifacts/contracts/8.17/mocks/BEP20.sol/BEP20.json");
-const StableCoinArtifact = require("../../../artifacts/contracts/8.17/stablecoin-core/FathomStablecoin.sol/FathomStablecoin.json");
+const ProxyWalletArtifact = require("../../../artifacts/contracts/main/proxy-wallet/ProxyWallet.sol/ProxyWallet.json");
+const WXDCArtifact = require("../../../artifacts/contracts/main/mocks/BEP20.sol/BEP20.json");
+const StableCoinArtifact = require("../../../artifacts/contracts/main/stablecoin-core/FathomStablecoin.sol/FathomStablecoin.json");
 const MaxUint256 = require("@ethersproject/constants");
 const WeiPerWad = hre.ethers.constants.WeiPerEther
 

@@ -2,7 +2,7 @@ const fs = require('fs');
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
+const PriceOracle = artifacts.require('./main/stablecoin-core/PriceOracle.sol');
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing PriceOracle")

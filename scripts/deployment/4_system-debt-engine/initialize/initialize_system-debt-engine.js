@@ -2,7 +2,7 @@ const fs = require('fs');
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-const SystemDebtEngine = artifacts.require('./8.17/stablecoin-core/SystemDebtEngine.sol');
+const SystemDebtEngine = artifacts.require('./main/stablecoin-core/SystemDebtEngine.sol');
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing SystemDebtEngine")

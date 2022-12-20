@@ -18,10 +18,10 @@ const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-const CollateralPoolConfig = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
-const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
-const SimplePriceFeed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
-const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
+const CollateralPoolConfig = artifacts.require('./main/stablecoin-core/config/CollateralPoolConfig.sol');
+const BookKeeper = artifacts.require('./main/stablecoin-core/BookKeeper.sol');
+const SimplePriceFeed = artifacts.require('./tests/SimplePriceFeed.sol');
+const PriceOracle = artifacts.require('./main/stablecoin-core/PriceOracle.sol');
 
 module.exports = async function(deployer) {
 

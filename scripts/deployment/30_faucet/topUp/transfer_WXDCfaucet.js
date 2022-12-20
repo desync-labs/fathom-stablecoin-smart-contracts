@@ -10,7 +10,7 @@ const faucetAmount = BigNumber.from("300000000000000000000").toString();
 // for ganache
 const devAddress = "0x0CF4bC892112518f96506Df151185d0F572CfF5f";
 
-const WXDC = artifacts.require('./8.17/mocks/WXDC.sol');
+const WXDC = artifacts.require('./tests/mocks/WXDC.sol');
 
 // Apothem V1
 const WXDCAddress = "0xcEc1609Efd3f12d0Da63250eF6761A7482Dda3BF";

@@ -1,7 +1,7 @@
 const { ethers } = require("ethers");
 
-const StabilityFeeCollector = artifacts.require('./8.17/stablecoin-core/StabilityFeeCollector.sol');
-const StablecoinAdapter = artifacts.require('./8.17/stablecoin-core/adapters/StablecoinAdapter.sol');
+const StabilityFeeCollector = artifacts.require('./main/stablecoin-core/StabilityFeeCollector.sol');
+const StablecoinAdapter = artifacts.require('./main/stablecoin-core/adapters/StablecoinAdapter.sol');
 
 const openPositionAndDraw = async (proxyWallet, from, collateral_pool_id, collateral, stablecoin) => {
     const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");

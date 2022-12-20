@@ -1,37 +1,32 @@
-const AccessControlConfig = artifacts.require('./8.17/stablecoin-core/config/AccessControlConfig.sol');
-const CollateralPoolConfig = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
-const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
-const FathomStablecoin = artifacts.require('./8.17/stablecoin-core/FathomStablecoin.sol');
-const SystemDebtEngine = artifacts.require('./8.17/stablecoin-core/SystemDebtEngine.sol');
-const FathomOraclePriceFeed = artifacts.require('./8.17/price-feeders/FathomOraclePriceFeed.sol');
-const IbTokenPriceFeed = artifacts.require('./8.17/price-feeders/IbTokenPriceFeed.sol');
-const GetPositions = artifacts.require('./8.17/managers/GetPositions.sol');
-const StableSwapModule = artifacts.require('./8.17/stablecoin-core/StableSwapModule.sol');
-const AuthTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/AuthTokenAdapter.sol');
-const TokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/TokenAdapter.sol');
-const DexPriceOracle = artifacts.require('./8.17/price-oracles/DexPriceOracle.sol');
-const ProxyWalletRegistry = artifacts.require('./8.17/proxy-wallet/ProxyWalletRegistry.sol');
-const ProxyWalletFactory = artifacts.require('./8.17/proxy-wallet/ProxyWalletFactory.sol');
-const StabilityFeeCollector = artifacts.require('./8.17/stablecoin-core/StabilityFeeCollector.sol');
-const FathomStablecoinProxyActions = artifacts.require('./8.17/proxy-actions/FathomStablecoinProxyActions.sol');
-const FixedSpreadLiquidationStrategy = artifacts.require('./8.17/stablecoin-core/liquidation-strategies/FixedSpreadLiquidationStrategy.sol');
-const SimplePriceFeed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
-const CollateralTokenAdapterFactory = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapterFactory.sol');
-const PositionManager = artifacts.require('./8.17/managers/PositionManager.sol');
-const FathomToken = artifacts.require('./8.17/apis/fathom/FathomToken.sol');
-const ShowStopper = artifacts.require('./8.17/stablecoin-core/ShowStopper.sol');
-const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
-const StablecoinAdapter = artifacts.require('./8.17/stablecoin-core/adapters/StablecoinAdapter.sol');
-const LiquidationEngine = artifacts.require('./8.17/stablecoin-core/LiquidationEngine.sol');
-const WXDC = artifacts.require('./8.17/mocks/WXDC.sol');
-const USDT = artifacts.require('./8.17/mocks/USDT.sol');
-const FlashMintModule = artifacts.require('./8.17/flash-mint/FlashMintModule.sol');
+const AccessControlConfig = artifacts.require('./main/stablecoin-core/config/AccessControlConfig.sol');
+const CollateralPoolConfig = artifacts.require('./main/stablecoin-core/config/CollateralPoolConfig.sol');
+const BookKeeper = artifacts.require('./main/stablecoin-core/BookKeeper.sol');
+const FathomStablecoin = artifacts.require('./main/stablecoin-core/FathomStablecoin.sol');
+const SystemDebtEngine = artifacts.require('./main/stablecoin-core/SystemDebtEngine.sol');
+const FathomOraclePriceFeed = artifacts.require('./main/price-feeders/FathomOraclePriceFeed.sol');
+const StableSwapModule = artifacts.require('./main/stablecoin-core/StableSwapModule.sol');
+const AuthTokenAdapter = artifacts.require('./main/stablecoin-core/adapters/AuthTokenAdapter.sol');
+const TokenAdapter = artifacts.require('./main/stablecoin-core/adapters/TokenAdapter.sol');
+const DexPriceOracle = artifacts.require('./main/price-oracles/DexPriceOracle.sol');
+const ProxyWalletRegistry = artifacts.require('./main/proxy-wallet/ProxyWalletRegistry.sol');
+const ProxyWalletFactory = artifacts.require('./main/proxy-wallet/ProxyWalletFactory.sol');
+const StabilityFeeCollector = artifacts.require('./main/stablecoin-core/StabilityFeeCollector.sol');
+const FathomStablecoinProxyActions = artifacts.require('./main/proxy-actions/FathomStablecoinProxyActions.sol');
+const FixedSpreadLiquidationStrategy = artifacts.require('./main/stablecoin-core/liquidation-strategies/FixedSpreadLiquidationStrategy.sol');
+const SimplePriceFeed = artifacts.require('./main/price-feeders/SimplePriceFeed.sol');
+const CollateralTokenAdapterFactory = artifacts.require('./main/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapterFactory.sol');
+const PositionManager = artifacts.require('./main/managers/PositionManager.sol');
+const FathomToken = artifacts.require('./tests/FathomToken.sol');
+const ShowStopper = artifacts.require('./main/stablecoin-core/ShowStopper.sol');
+const PriceOracle = artifacts.require('./main/stablecoin-core/PriceOracle.sol');
+const StablecoinAdapter = artifacts.require('./main/stablecoin-core/adapters/StablecoinAdapter.sol');
+const LiquidationEngine = artifacts.require('./main/stablecoin-core/LiquidationEngine.sol');
+// const ERC20Mintable = artifacts.require('./tests/mocks/ERC20Mintable.sol');
+const FlashMintModule = artifacts.require('./main/flash-mint/FlashMintModule.sol');
 //for delayed price testing
-const MockDexPriceOracle = artifacts.require('./8.17/mocks/MockDexPriceOracle.sol');
-const DelayFathomOraclePriceFeed = artifacts.require('./8.17/price-feeders/DelayFathomOraclePriceFeed.sol');
-const MockPriceOracle = artifacts.require('./8.17/mocks/MockPriceOracle.sol');
-const FlashMintArbitrager = artifacts.require('./8.17/mocks/FlashMintArbitrager.sol');
-const BookKeeperFlashMintArbitrager = artifacts.require('./8.17/mocks/BookKeeperFlashMintArbitrager.sol');
+const DelayFathomOraclePriceFeed = artifacts.require('./main/price-feeders/DelayFathomOraclePriceFeed.sol');
+const FlashMintArbitrager = artifacts.require('./tests/mocks/FlashMintArbitrager.sol');
+const BookKeeperFlashMintArbitrager = artifacts.require('./tests/mocks/BookKeeperFlashMintArbitrager.sol');
 
 module.exports =  async function(deployer) {
   let promises = [
@@ -41,7 +36,6 @@ module.exports =  async function(deployer) {
       deployer.deploy(FathomStablecoin, { gas: 3050000 }),
       deployer.deploy(SystemDebtEngine, { gas: 3050000 }),
       deployer.deploy(FathomOraclePriceFeed, { gas: 3050000 }),
-      deployer.deploy(GetPositions, { gas: 3050000 }),
       deployer.deploy(AuthTokenAdapter, { gas: 3050000 }),
       deployer.deploy(StableSwapModule, { gas: 3050000 }),
       deployer.deploy(DexPriceOracle, { gas: 3050000 }),
@@ -58,15 +52,10 @@ module.exports =  async function(deployer) {
       deployer.deploy(StablecoinAdapter, { gas: 3050000 }),
       deployer.deploy(PriceOracle, { gas: 3050000 }),
       deployer.deploy(LiquidationEngine, { gas: 3050000 }),
-      deployer.deploy(WXDC, "WXDC", "WXDC", { gas: 3050000 }),
-      deployer.deploy(USDT, "USDT", "USDT", { gas: 3050000 }),
       deployer.deploy(FlashMintModule, { gas: 3050000 }),
 //for delayed price testing
-      deployer.deploy(MockDexPriceOracle, { gas: 3050000 }),
       deployer.deploy(DelayFathomOraclePriceFeed, { gas: 3050000 }),
-      deployer.deploy(MockPriceOracle, { gas: 3050000 }),
       deployer.deploy(TokenAdapter, { gas: 3050000 }),
-      deployer.deploy(IbTokenPriceFeed, { gas: 3050000 }),
       deployer.deploy(FlashMintArbitrager, { gas: 3050000 }),
       deployer.deploy(BookKeeperFlashMintArbitrager, { gas: 3050000 }),
   ];

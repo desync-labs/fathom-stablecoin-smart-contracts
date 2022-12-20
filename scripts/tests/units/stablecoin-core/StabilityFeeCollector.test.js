@@ -83,7 +83,7 @@ describe("StabilityFeeCollector", () => {
 
                 // rate ~ 0.01 ray ~ 1%
                 await mockedBookKeeper.mock.accrueStabilityFee.returns()
-                await stabilityFeeCollectorAsAlice.collect(formatBytes32String("BNB"), { gasLimit: 2000000 })
+                await stabilityFeeCollectorAsAlice.collect(formatBytes32String("WXDC"), { gasLimit: 2000000 })
 
                 var call = mockedBookKeeper.mock.accrueStabilityFee.getCall(0);
                 expect(call.args._collateralPoolId).to.be.equal()
@@ -235,7 +235,7 @@ describe("StabilityFeeCollector", () => {
                 await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(UnitHelpers.WeiPerRay)
                 await mockedBookKeeper.mock.accrueStabilityFee.returns()
 
-                await stabilityFeeCollector.collect(formatBytes32String("BNB"), { gasLimit: 2000000 })
+                await stabilityFeeCollector.collect(formatBytes32String("WXDC"), { gasLimit: 2000000 })
             })
         })
     })

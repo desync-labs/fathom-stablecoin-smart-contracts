@@ -1,7 +1,7 @@
 require("dotenv").config();
 const fs = require('fs');
 
-const ProxyWalletRegistry = artifacts.require('./8.17/proxy-wallet/ProxyWalletRegistry.sol');
+const ProxyWalletRegistry = artifacts.require('./main/proxy-wallet/ProxyWalletRegistry.sol');
 
 let rawdata = fs.readFileSync('../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);

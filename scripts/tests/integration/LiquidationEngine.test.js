@@ -27,12 +27,14 @@ const BPS = BigNumber.from(10000)
 const setup = async () => {
     const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
     const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
-    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
     const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
     const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
     const fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
     const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
     const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
+    const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
+    const wxdcAddr = await collateralTokenAdapter.collateralToken();
+    const WXDC = await artifacts.initializeInterfaceAt("ERC20Mintable", wxdcAddr);
     const stabilityFeeCollector = await artifacts.initializeInterfaceAt("StabilityFeeCollector", "StabilityFeeCollector");
     const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
     const fixedSpreadLiquidationStrategy = await artifacts.initializeInterfaceAt("FixedSpreadLiquidationStrategy", "FixedSpreadLiquidationStrategy");

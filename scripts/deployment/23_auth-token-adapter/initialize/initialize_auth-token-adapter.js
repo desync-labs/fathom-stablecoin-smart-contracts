@@ -3,7 +3,7 @@ const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 const { formatBytes32String } = require("ethers/lib/utils");
 
-const AuthTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/AuthTokenAdapter.sol');
+const AuthTokenAdapter = artifacts.require('./main/stablecoin-core/adapters/AuthTokenAdapter.sol');
 
 const COLLATERAL_POOL_ID = formatBytes32String("US+STABLE")
 const TOKEN_ADDR = stablecoinAddress.USDT // <- USDT address

@@ -94,12 +94,12 @@ describe("PriceOracle", () => {
           })
           await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             BigNumber.from("0")
           ).returns()
-          await expect(priceOracle.setPrice(formatBytes32String("BNB")))
+          await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
             .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(formatBytes32String("BNB"), formatBytes32BigNumber(One), 0)
+            .withArgs(formatBytes32String("WXDC"), formatBytes32BigNumber(One), 0, One)
         })
       })
 
@@ -132,12 +132,12 @@ describe("PriceOracle", () => {
           await priceOracle.setStableCoinReferencePrice(10 ** 10)
 
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             BigNumber.from("10").pow("43")
           ).returns()
-          await expect(priceOracle.setPrice(formatBytes32String("BNB")))
+          await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
             .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(formatBytes32String("BNB"), formatBytes32BigNumber(One), BigNumber.from("10").pow("43"))
+            .withArgs(formatBytes32String("WXDC"), formatBytes32BigNumber(One), BigNumber.from("10").pow("43"), One)
         })
       })
 
@@ -171,15 +171,16 @@ describe("PriceOracle", () => {
           await priceOracle.setStableCoinReferencePrice(2 ** 10)
 
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             BigNumber.from("931322574615478515625").mul(BigNumber.from("10").pow("33"))
           ).returns()
-          await expect(priceOracle.setPrice(formatBytes32String("BNB")))
+          await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
             .to.emit(priceOracle, "LogSetPrice")
             .withArgs(
-              formatBytes32String("BNB"),
+              formatBytes32String("WXDC"),
               formatBytes32BigNumber(One),
-              BigNumber.from("931322574615478515625").mul(BigNumber.from("10").pow("33"))
+              BigNumber.from("931322574615478515625").mul(BigNumber.from("10").pow("33")),
+              One
             )
         })
       })
@@ -215,12 +216,12 @@ describe("PriceOracle", () => {
           )
 
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             BigNumber.from("0")
           ).returns()
-          await expect(priceOracle.setPrice(formatBytes32String("BNB")))
+          await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
             .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(formatBytes32String("BNB"), formatBytes32BigNumber(BigNumber.from("700000000000")), 0)
+            .withArgs(formatBytes32String("WXDC"), formatBytes32BigNumber(BigNumber.from("700000000000")), 0, BigNumber.from("700000000000"))
         })
       })
 
@@ -255,18 +256,19 @@ describe("PriceOracle", () => {
           })
 
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("BNB"),
+            formatBytes32String("WXDC"),
             BigNumber.from("7").mul(BigNumber.from("10").pow("54"))
           ).returns()
 
           await priceOracle.setStableCoinReferencePrice(10 ** 10)
 
-          await expect(priceOracle.setPrice(formatBytes32String("BNB")))
+          await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
             .to.emit(priceOracle, "LogSetPrice")
             .withArgs(
-              formatBytes32String("BNB"),
+              formatBytes32String("WXDC"),
               formatBytes32BigNumber(BigNumber.from("700000000000")),
-              BigNumber.from("7").mul(BigNumber.from("10").pow("54"))
+              BigNumber.from("7").mul(BigNumber.from("10").pow("54")),
+              BigNumber.from("700000000000"),
             )
         })
       })
@@ -351,7 +353,7 @@ describe("PriceOracle", () => {
         })
 
         await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.returns()
-        await expect(priceOracle.setPrice(formatBytes32String("BNB"))).to.be.revertedWith("Pausable: paused")
+        await expect(priceOracle.setPrice(formatBytes32String("WXDC"))).to.be.revertedWith("Pausable: paused")
       })
     })
   })
@@ -411,13 +413,13 @@ describe("PriceOracle", () => {
         })
 
         await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-          formatBytes32String("BNB"),
+          formatBytes32String("WXDC"),
           BigNumber.from("0")
         ).returns()
 
-        await expect(priceOracle.setPrice(formatBytes32String("BNB")))
+        await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
           .to.emit(priceOracle, "LogSetPrice")
-          .withArgs(formatBytes32String("BNB"), formatBytes32BigNumber(One), 0)
+          .withArgs(formatBytes32String("WXDC"), formatBytes32BigNumber(One), 0, One)
       })
     })
   })

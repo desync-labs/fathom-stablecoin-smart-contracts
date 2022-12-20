@@ -34,12 +34,17 @@ const setup = async () => {
     const accessControlConfig = await artifacts.initializeInterfaceAt("AccessControlConfig", "AccessControlConfig");
     const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
     const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
-    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
-    const USDT = await artifacts.initializeInterfaceAt("USDT", "USDT");
     const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
 
     const wxdcTokenAdapter = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_WXDC);
     const usdtTokenAdapter = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_USDT);
+    const collateralTokenAdapterWXDC = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", wxdcTokenAdapter);
+    const collateralTokenAdapterUSDT = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", usdtTokenAdapter);
+
+    const wxdcAddr = await collateralTokenAdapterWXDC.collateralToken();
+    const usdtAddr = await collateralTokenAdapterUSDT.collateralToken();
+    const WXDC = await artifacts.initializeInterfaceAt("ERC20Mintable", wxdcAddr);
+    const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
 
     await initializeContracts();
     await addRoles();

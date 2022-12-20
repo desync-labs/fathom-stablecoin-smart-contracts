@@ -15,10 +15,10 @@ const loadFixtureHandler = async () => {
     const mockBookKeeper = await createMock("BookKeeper");
     const mockedAccessControlConfig = await createMock("AccessControlConfig");
     const mockFathomStablecoin = await createMock("FathomStablecoin");
-    const mockBEP20 = await createMock("BEP20");
+    const mockERC20 = await createMock("ERC20Mintable");
     const mockStablecoinAdapter = await createMock("StablecoinAdapter");
     const mockSystemDebtEngine = await createMock("SystemDebtEngine");
-    const mockMyFashLoan = await createMock("MockMyFlashLoan");
+    const mockMyFashLoan = await createMock("FlashLoanReceiverBase");
 
     await mockBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
     await mockBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
@@ -40,7 +40,7 @@ const loadFixtureHandler = async () => {
         flashMintModuleAsAlice,
         mockFathomStablecoin,
         mockMyFashLoan,
-        mockBEP20,
+        mockERC20,
         mockBookKeeper,
         mockStablecoinAdapter,
         mockedAccessControlConfig
@@ -50,7 +50,7 @@ const loadFixtureHandler = async () => {
 describe("FlashMintModule", () => {
     // Contracts
     let mockFathomStablecoin
-    let mockBEP20
+    let mockERC20
     let mockMyFashLoan
     let mockBookKeeper
     let mockStablecoinAdapter
@@ -61,8 +61,6 @@ describe("FlashMintModule", () => {
 
     before(async () => {
         await snapshot.revertToSnapshot();
-        // await Promise.all([deployer.deploy(artifacts.require('FlashMintModule.sol'), { gas: 5050000 })]);
-        // await snapshot.takeSnapshot();
     })
 
     beforeEach(async () => {
@@ -71,13 +69,11 @@ describe("FlashMintModule", () => {
             flashMintModuleAsAlice,
             mockFathomStablecoin,
             mockMyFashLoan,
-            mockBEP20,
+            mockERC20,
             mockBookKeeper,
             mockStablecoinAdapter,
             mockedAccessControlConfig,
         } = await loadFixture(loadFixtureHandler))
-
-        // await snapshot.revertToSnapshot();
     })
     describe("#setMax", () => {
         context("when the caller is not the owner", () => {
@@ -126,7 +122,7 @@ describe("FlashMintModule", () => {
     describe("#flashFee", () => {
         context("when token invalid", () => {
             it("should be revert", async () => {
-                expect(flashMintModule.flashFee(mockBEP20.address, WeiPerWad.mul(10))).to.be.revertedWith(
+                expect(flashMintModule.flashFee(mockERC20.address, WeiPerWad.mul(10))).to.be.revertedWith(
                     "FlashMintModule/token-unsupported"
                 )
             })
@@ -145,7 +141,7 @@ describe("FlashMintModule", () => {
                 await expect(
                     flashMintModule.flashLoan(
                         mockMyFashLoan.address,
-                        mockBEP20.address,
+                        mockERC20.address,
                         WeiPerWad.mul(10),
                         formatBytes32String("")
                     )

@@ -6,7 +6,7 @@ const { BigNumber } = require("ethers");
 
 const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
 
-const SimplePriceFeed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
+const SimplePriceFeed = artifacts.require('./tests/SimplePriceFeed.sol');
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing SimplePriceFeedUSDT")
