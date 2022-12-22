@@ -2,7 +2,7 @@ const fs = require('fs');
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-const FathomStablecoin = artifacts.require('./8.17/stablecoin-core/FathomStablecoin.sol');
+const FathomStablecoin = artifacts.require('./main/stablecoin-core/FathomStablecoin.sol');
 
 const STABLECOIN_ADAPTER_ADDR = stablecoinAddress.stablecoinAdapter
 module.exports =  async function(deployer) {

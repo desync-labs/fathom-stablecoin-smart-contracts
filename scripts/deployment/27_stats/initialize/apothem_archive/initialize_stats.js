@@ -6,7 +6,7 @@ require("dotenv").config();
 let stablecoinAddress = JSON.parse(rawdata);
 const { formatBytes32String } = require("ethers/lib/utils");
 
-const FathomStats = artifacts.require('./8.17/stats/FathomStats.sol');
+const FathomStats = artifacts.require('./main/stats/FathomStats.sol');
 const COLLATERAL_POOL_ID_FTHM = formatBytes32String("FTHM")
 
 module.exports =  async function(deployer) {

@@ -15,7 +15,7 @@ const loadFixtureHandler = async () => {
   const mockedAccessControlConfig = await createMock("AccessControlConfig");
   const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
   const mockedBookKeeper = await createMock("BookKeeper");
-  const mockedToken = await createMock("BEP20");
+  const mockedToken = await createMock("ERC20Mintable");
 
   await mockedToken.mock.decimals.returns(18)
   await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))

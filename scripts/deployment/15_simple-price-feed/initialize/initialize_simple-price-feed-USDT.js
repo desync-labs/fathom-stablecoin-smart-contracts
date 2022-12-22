@@ -3,7 +3,7 @@ const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
 
-const SimplePriceFeed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
+const SimplePriceFeed = artifacts.require('./tests/SimplePriceFeed.sol');
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing SimplePriceFeedUSDT")

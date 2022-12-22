@@ -4,8 +4,7 @@ const { BigNumber } = require("ethers");
 const { solidity } = require("ethereum-waffle");
 const { formatBytes32String } = require("ethers/lib/utils");
 const { loadFixture } = require("../helper/fixtures");
-const { addRoles } = require("../helper/access-roles");
-const { initializeContracts } = require("../helper/initializer");
+const { getProxy } = require("../../common/proxies");
 
 chai.use(solidity);
 
@@ -14,19 +13,20 @@ const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 const { DeployerAddress } = require("../helper/address");
 
 const setup = async () => {
-    const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
-    const accessControlConfig = await artifacts.initializeInterfaceAt("AccessControlConfig", "AccessControlConfig");
-    const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+
+    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
+    const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
+    const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
+    const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
+
     const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
     const fairLaunch = await artifacts.initializeInterfaceAt("FairLaunch", "FairLaunch");
     const shield = await artifacts.initializeInterfaceAt("Shield", "Shield");
-    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
-    const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
     const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID)
     const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
-
-    await initializeContracts();
-    await addRoles();
+    const wxdcAddr = await collateralTokenAdapter.collateralToken();
+    const WXDC = await artifacts.initializeInterfaceAt("ERC20Mintable", wxdcAddr);
 
     return {
         bookKeeper,

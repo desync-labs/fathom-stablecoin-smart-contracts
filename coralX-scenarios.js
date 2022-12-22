@@ -1,11 +1,13 @@
 module.exports = {
   deployLocal: [
     ['compile'],
-    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'development']
+    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'development'],
+    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'development']
   ],
   deployApothem: [
     ['compile'],
-    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'apothem']
+    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'apothem'],
+    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'apothem']
   ],
   deployTokensLocal: [
     ['compile'],
@@ -17,6 +19,7 @@ module.exports = {
   ],
   migrateAndConfigureForTests: [
     ['compile'],
-    ['execute', '--path', 'scripts/migrations/tests'],
+    ['execute', '--path', 'scripts/migrations/deployment'],
+    ['execute', '--path', 'scripts/migrations/test-configuration'],
   ],
 }

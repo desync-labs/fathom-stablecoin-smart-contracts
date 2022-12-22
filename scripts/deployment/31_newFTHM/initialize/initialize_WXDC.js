@@ -8,7 +8,7 @@ const walletDeployer = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
 // for ganache
 const devAddress = "0x0CF4bC892112518f96506Df151185d0F572CfF5f";
 
-const FTHM = artifacts.require('./8.17/mocks/FTHM.sol');
+const FTHM = artifacts.require('./tests/mocks/FTHM.sol');
 
 // ApothemV1
 const FTHMAddress = "0x4c52500DdC18EE0C6CB6155961347076E43ABb99";

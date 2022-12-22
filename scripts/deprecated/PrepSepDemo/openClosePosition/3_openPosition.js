@@ -19,11 +19,11 @@ let stablecoinAddress = JSON.parse(rawdata);
 let rawdata2 = fs.readFileSync('./scripts/PrepSepDemo/openClosePosition/cupcakes/2_proxyWalletAddresses.json');
 let proxyWallets = JSON.parse(rawdata2);
 
-const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
-const PositionManager = artifacts.require('./8.17/managers/PositionManager.sol');
-const FathomStablecoin = artifacts.require('./8.17/stablecoin-core/FathomStablecoin.sol');
-const WXDCArtifact = artifacts.require('./8.17/mocks/WXDC.sol');
-const ProxyWallet = artifacts.require('./8.17/proxy-wallet/ProxyWallet.sol');
+const BookKeeper = artifacts.require('./main/stablecoin-core/BookKeeper.sol');
+const PositionManager = artifacts.require('./main/managers/PositionManager.sol');
+const FathomStablecoin = artifacts.require('./main/stablecoin-core/FathomStablecoin.sol');
+const WXDCArtifact = artifacts.require('./main/mocks/WXDC.sol');
+const ProxyWallet = artifacts.require('./main/proxy-wallet/ProxyWallet.sol');
 
 async function main() {
 

@@ -8,8 +8,7 @@ const { weiToRay } = require("../helper/unit");
 const { advanceBlock } = require("../helper/time");
 const { DeployerAddress, AliceAddress, BobAddress, TreasuryAddress } = require("../helper/address");
 const { loadFixture } = require("../helper/fixtures");
-const { addRoles } = require("../helper/access-roles");
-const { initializeContracts } = require("../helper/initializer");
+const { getProxy } = require("../../common/proxies");
 
 const { formatBytes32String } = require("ethers/lib/utils");
 
@@ -18,19 +17,21 @@ const { expect } = chai
 const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 
 const setup = async () => {
-    const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
-    const accessControlConfig = await artifacts.initializeInterfaceAt("AccessControlConfig", "AccessControlConfig");
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+
+    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
+    const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
+    const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
+
     const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
     const fairLaunch = await artifacts.initializeInterfaceAt("FairLaunch", "FairLaunch");
     const shield = await artifacts.initializeInterfaceAt("Shield", "Shield");
-    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
 
-    const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
     const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID)
     const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
 
-    await initializeContracts();
-    await addRoles();
+    const wxdcAddr = await collateralTokenAdapter.collateralToken();
+    const WXDC = await artifacts.initializeInterfaceAt("ERC20Mintable", wxdcAddr);
 
     return {
         collateralPoolConfig,
@@ -74,7 +75,7 @@ describe("CollateralTokenAdapter", () => {
                     AliceAddress,
                     ethers.utils.parseEther("1"),
                     ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
-                    { from: AliceAddress, gasLimit: 1000000 }
+                    { from: AliceAddress, gasLimit: 2000000 }
                 )
 
                 expect(await collateralTokenAdapter.netAssetValuation()).to.be.eq(ethers.utils.parseEther("1"))

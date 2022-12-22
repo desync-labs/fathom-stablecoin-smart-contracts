@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const Faucet = artifacts.require('./8.17/faucet/Faucet.sol');
+const Faucet = artifacts.require('./main/faucet/Faucet.sol');
 
 const rawdata = fs.readFileSync('../../../../faucets.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/apis/fathom/FairLaunch.sol');
+  const deployed = artifacts.require('./fair-launch/FairLaunch.sol');
   let addressesUpdate = { 
     faucetUSDT:deployed.address,
   };

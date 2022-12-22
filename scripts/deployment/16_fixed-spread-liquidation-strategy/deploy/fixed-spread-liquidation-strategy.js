@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const FixedSpreadLiquidationStrategy = artifacts.require('./8.17/stablecoin-core/liquidation-strategies/FixedSpreadLiquidationStrategy.sol');
+const FixedSpreadLiquidationStrategy = artifacts.require('./main/stablecoin-core/liquidation-strategies/FixedSpreadLiquidationStrategy.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -14,7 +14,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed= artifacts.require('./8.17/stablecoin-core/liquidation-strategies/FixedSpreadLiquidationStrategy.sol');
+  const deployed= artifacts.require('./main/stablecoin-core/liquidation-strategies/FixedSpreadLiquidationStrategy.sol');
 
   let addressesUpdate = { 
     fixedSpreadLiquidationStrategy:deployed.address,

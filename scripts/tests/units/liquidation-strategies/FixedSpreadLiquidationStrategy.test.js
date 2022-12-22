@@ -20,7 +20,7 @@ const loadFixtureHandler = async () => {
     const mockedLiquidationEngine = await createMock("LiquidationEngine");
     const mockedSystemDebtEngine = await createMock("SystemDebtEngine");
     const mockedPriceOracle = await createMock("PriceOracle");
-    const mockedFlashLendingCallee = await createMock("MockFlashLendingCallee");
+    const mockedFlashLendingCallee = await createMock("IFlashLendingCallee");
     const mockedPriceFeed = await createMock("SimplePriceFeed");
 
     await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
@@ -97,7 +97,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
 
                 await expect(
                     fixedSpreadLiquidationStrategyAsAlice.execute(
-                        formatBytes32String("BNB"),
+                        formatBytes32String("WXDC"),
                         UnitHelpers.WeiPerRad,
                         UnitHelpers.WeiPerWad,
                         AliceAddress,
@@ -117,7 +117,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
 
                     await expect(
                         fixedSpreadLiquidationStrategy.execute(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             0,
                             UnitHelpers.WeiPerWad,
                             AliceAddress,
@@ -137,7 +137,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
 
                     await expect(
                         fixedSpreadLiquidationStrategy.execute(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             UnitHelpers.WeiPerWad,
                             0,
                             AliceAddress,
@@ -157,7 +157,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
 
                     await expect(
                         fixedSpreadLiquidationStrategy.execute(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             UnitHelpers.WeiPerWad,
                             UnitHelpers.WeiPerWad,
                             AddressZero,
@@ -184,7 +184,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
 
                     await expect(
                         fixedSpreadLiquidationStrategy.execute(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             UnitHelpers.WeiPerRad,
                             UnitHelpers.WeiPerWad,
                             AliceAddress,
@@ -206,7 +206,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
 
                     await expect(
                         fixedSpreadLiquidationStrategy.execute(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             UnitHelpers.WeiPerRad,
                             UnitHelpers.WeiPerWad,
                             AliceAddress,
@@ -238,7 +238,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                         await mockedCollateralTokenAdapter.mock.onMoveCollateral.returns()
 
                         await mockedBookKeeper.mock.confiscatePosition.withArgs(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             AliceAddress,
                             fixedSpreadLiquidationStrategy.address,
                             mockedSystemDebtEngine.address,
@@ -246,13 +246,13 @@ describe("FixedSpreadLiquidationStrategy", () => {
                             UnitHelpers.WeiPerWad.mul(-1)
                         ).returns()
                         await mockedBookKeeper.mock.moveCollateral.withArgs(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             fixedSpreadLiquidationStrategy.address,
                             DeployerAddress,
                             ethers.utils.parseEther("2.0375")
                         ).returns()
                         await mockedBookKeeper.mock.moveCollateral.withArgs(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             fixedSpreadLiquidationStrategy.address,
                             mockedSystemDebtEngine.address,
                             ethers.utils.parseEther("0.0125")
@@ -263,7 +263,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
 
                         await expect(
                             fixedSpreadLiquidationStrategy.execute(
-                                formatBytes32String("BNB"),
+                                formatBytes32String("WXDC"),
                                 UnitHelpers.WeiPerWad,
                                 UnitHelpers.WeiPerWad.mul(7),
                                 AliceAddress,
@@ -276,7 +276,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                         )
                             .to.emit(fixedSpreadLiquidationStrategy, "LogFixedSpreadLiquidate")
                             .withArgs(
-                                formatBytes32String("BNB"),
+                                formatBytes32String("WXDC"),
                                 UnitHelpers.WeiPerWad,
                                 UnitHelpers.WeiPerWad.mul(7),
                                 AliceAddress,
@@ -306,7 +306,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                         await mockedCollateralTokenAdapter.mock.onMoveCollateral.returns()
 
                         await mockedBookKeeper.mock.confiscatePosition.withArgs(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             AliceAddress,
                             fixedSpreadLiquidationStrategy.address,
                             mockedSystemDebtEngine.address,
@@ -314,13 +314,13 @@ describe("FixedSpreadLiquidationStrategy", () => {
                             UnitHelpers.WeiPerWad.mul(-25).div(100)
                         ).returns()
                         await mockedBookKeeper.mock.moveCollateral.withArgs(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             fixedSpreadLiquidationStrategy.address,
                             DeployerAddress,
                             ethers.utils.parseEther("1586.1781875")
                         ).returns()
                         await mockedBookKeeper.mock.moveCollateral.withArgs(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             fixedSpreadLiquidationStrategy.address,
                             mockedSystemDebtEngine.address,
                             ethers.utils.parseEther("3.2405625")
@@ -333,7 +333,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                         )
 
                         await fixedSpreadLiquidationStrategy.execute(
-                            formatBytes32String("BNB"),
+                            formatBytes32String("WXDC"),
                             UnitHelpers.WeiPerWad,
                             UnitHelpers.WeiPerWad.mul(98765),
                             AliceAddress,
@@ -366,7 +366,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                 await mockedCollateralTokenAdapter.mock.onMoveCollateral.returns()
 
                 await mockedBookKeeper.mock.confiscatePosition.withArgs(
-                    formatBytes32String("BNB"),
+                    formatBytes32String("WXDC"),
                     AliceAddress,
                     fixedSpreadLiquidationStrategy.address,
                     mockedSystemDebtEngine.address,
@@ -374,13 +374,13 @@ describe("FixedSpreadLiquidationStrategy", () => {
                     UnitHelpers.WeiPerWad.mul(-37).div(100)
                 ).returns()
                 await mockedBookKeeper.mock.moveCollateral.withArgs(
-                    formatBytes32String("BNB"),
+                    formatBytes32String("WXDC"),
                     fixedSpreadLiquidationStrategy.address,
                     mockedFlashLendingCallee.address,
                     ethers.utils.parseEther("1.1101108113")
                 ).returns()
                 await mockedBookKeeper.mock.moveCollateral.withArgs(
-                    formatBytes32String("BNB"),
+                    formatBytes32String("WXDC"),
                     fixedSpreadLiquidationStrategy.address,
                     mockedSystemDebtEngine.address,
                     ethers.utils.parseEther("0.0000001887")
@@ -395,7 +395,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
 
                 await expect(
                     fixedSpreadLiquidationStrategy.execute(
-                        formatBytes32String("BNB"),
+                        formatBytes32String("WXDC"),
                         UnitHelpers.WeiPerWad,
                         UnitHelpers.WeiPerWad.mul(8),
                         AliceAddress,
@@ -411,7 +411,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                 )
                     .to.emit(fixedSpreadLiquidationStrategy, "LogFixedSpreadLiquidate")
                     .withArgs(
-                        formatBytes32String("BNB"),
+                        formatBytes32String("WXDC"),
                         UnitHelpers.WeiPerWad,
                         UnitHelpers.WeiPerWad.mul(8),
                         AliceAddress,

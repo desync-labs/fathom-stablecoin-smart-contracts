@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const FathomOraclePriceFeed = artifacts.require('./8.17/price-feeders/FathomOraclePriceFeed.sol');
+const FathomOraclePriceFeed = artifacts.require('./main/price-feeders/FathomOraclePriceFeed.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -13,7 +13,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/price-feeders/FathomOraclePriceFeed.sol');
+  const deployed = artifacts.require('./main/price-feeders/FathomOraclePriceFeed.sol');
   console.log(deployed.address);
 
   let addressesUpdate = { 

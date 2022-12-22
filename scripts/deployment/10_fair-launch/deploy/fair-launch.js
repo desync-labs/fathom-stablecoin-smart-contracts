@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const FairLaunch = artifacts.require('./8.17/apis/fathom/FairLaunch.sol');
+const FairLaunch = artifacts.require('./fair-launch/FairLaunch.sol');
 
 const { parseEther } = require("ethers/lib/utils");
 
@@ -24,7 +24,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/apis/fathom/FairLaunch.sol');
+  const deployed = artifacts.require('./fair-launch/FairLaunch.sol');
   let addressesUpdate = { 
     fairLaunch:deployed.address,
   };
