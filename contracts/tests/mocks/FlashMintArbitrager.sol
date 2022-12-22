@@ -33,9 +33,7 @@ contract FlashMintArbitrager is OwnableUpgradeable, IERC3156FlashBorrower {
 
         // 2. Swap BUSD to AUSD at StableSwapModule
         stableSwapToken.safeApprove(address(IStableSwapModule(stableSwapModule).authTokenAdapter()), type(uint).max);
-        
         IStableSwapModule(stableSwapModule).swapTokenToStablecoin(address(this), balanceAfter.sub(balanceBefore));
-
         stableSwapToken.safeApprove(address(IStableSwapModule(stableSwapModule).authTokenAdapter()), 0);
 
         // 3. Approve AUSD for FlashMintModule
