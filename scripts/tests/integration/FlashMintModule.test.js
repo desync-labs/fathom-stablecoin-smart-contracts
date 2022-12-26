@@ -29,6 +29,7 @@ const loadFixtureHandler = async () => {
   const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
   const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
   const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
+  const priceOracle = await getProxy(proxyFactory, "PriceOracle");
 
   const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID)
   const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
@@ -53,9 +54,11 @@ const loadFixtureHandler = async () => {
     AddressZero,
     { gasLimit: 1000000 }
   )
+  await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
   await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(100000000000000), { gasLimit: 1000000 })
   await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRad.mul(100000000000000), { gasLimit: 1000000 })
   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
+  await priceOracle.setPrice(COLLATERAL_POOL_ID)
 
   await bookKeeper.whitelist(stablecoinAdapter.address, { gasLimit: 1000000 })
 

@@ -12,6 +12,7 @@ import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/ILiquidationStrategy.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ISetPrice.sol";
+import "../interfaces/IPriceFeed.sol";
 
 /** @notice A contract which is the manager for all of the liquidations of the protocol.
     LiquidationEngine will be the interface for the liquidator to trigger any positions into the liquidation process.
@@ -128,11 +129,12 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         address _collateralRecipient,
         bytes calldata _data
     ) internal {
-        ISetPrice(priceOracle).setPrice(_collateralPoolId);
-
         require(live == 1, "LiquidationEngine/not-live");
         require(_debtShareToBeLiquidated != 0, "LiquidationEngine/zero-debt-value-to-be-liquidated");
         require(_maxDebtShareToBeLiquidated != 0, "LiquidationEngine/zero-max-debt-value-to-be-liquidated");
+
+        IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_collateralPoolId));
+        require(_priceFeed.isPriceOk(), "LiquidationEngine/price-is-not-healthy");
 
         LocalVars memory _vars;
 
@@ -191,6 +193,8 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
                 -int256(_vars.newPositionDebtShare)
             );
         }
+
+        ISetPrice(priceOracle).setPrice(_collateralPoolId);
     }
 
     function setPriceOracle(address _priceOracle) external onlyOwnerOrShowStopper {

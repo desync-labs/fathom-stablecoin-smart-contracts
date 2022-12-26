@@ -53,7 +53,7 @@ describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () =
 
     it("Check timeDelay method returns correct default time delay value", async () => {
       const returnValue = await delayFathomOraclePriceFeed.timeDelay();
-      expect(returnValue).to.be.equal(0);
+      expect(returnValue).to.be.equal(900);
     });
 
     it("Check setTimeDelay function reverts with '!ownerRole' without access control", async () => {

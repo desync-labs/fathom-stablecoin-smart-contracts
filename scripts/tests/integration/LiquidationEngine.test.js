@@ -37,6 +37,7 @@ const setup = async () => {
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
     const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
+    const priceOracle = await getProxy(proxyFactory, "PriceOracle");
 
     const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
 
@@ -66,7 +67,7 @@ const setup = async () => {
     await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRad.mul(10000000), { gasLimit: 1000000 })
     await simplePriceFeed.setPrice(WeiPerWad, { gasLimit: 1000000 });
     await liquidationEngine.whitelist(BobAddress, { gasLimit: 1000000 });
-
+    await priceOracle.setPrice(COLLATERAL_POOL_ID);
     await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
 
     return {
@@ -81,7 +82,8 @@ const setup = async () => {
         liquidationEngine,
         systemDebtEngine,
         fathomStablecoin,
-        fixedSpreadLiquidationStrategy
+        fixedSpreadLiquidationStrategy,
+        priceOracle
     }
 }
 
@@ -101,6 +103,7 @@ describe("LiquidationEngine", () => {
     let simplePriceFeed
     let systemDebtEngine
     let collateralPoolConfig
+    let priceOracle
 
     before(async () => {
         await snapshot.revertToSnapshot();
@@ -119,7 +122,8 @@ describe("LiquidationEngine", () => {
             liquidationEngine,
             systemDebtEngine,
             fathomStablecoin,
-            fixedSpreadLiquidationStrategy
+            fixedSpreadLiquidationStrategy,
+            priceOracle
         } = await loadFixture(setup));
     })
 
@@ -128,6 +132,7 @@ describe("LiquidationEngine", () => {
             it("should revert", async () => {
                 // 1. Set price for WXDC to 2 USD
                 await simplePriceFeed.setPrice(WeiPerRay.mul(2), { gasLimit: 1000000 });
+                await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
                 await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress })
 
@@ -150,7 +155,7 @@ describe("LiquidationEngine", () => {
 
                 // 3. WXDC price drop to 1 USD
                 await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
-                // await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
+                await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
                 // 3.5 whitelist bob as liquidator
                 await liquidationEngine.whitelist(BobAddress);
@@ -165,6 +170,7 @@ describe("LiquidationEngine", () => {
             it("should success", async () => {
                 // 1. Set priceWithSafetyMargin for WXDC to 2 USD
                 await simplePriceFeed.setPrice(WeiPerRay.mul(2), { gasLimit: 1000000 });
+                await priceOracle.setPrice(COLLATERAL_POOL_ID);
                 await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
                 await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress })
 
@@ -192,6 +198,7 @@ describe("LiquidationEngine", () => {
 
                 // 3. WXDC price drop to 0.99 USD
                 await simplePriceFeed.setPrice(WeiPerRay.sub(1).div(1e9), { gasLimit: 1000000 })
+                await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
                 // 3.5 whitelist bob as liquidator
                 await liquidationEngine.whitelist(BobAddress);
@@ -433,6 +440,7 @@ describe("LiquidationEngine", () => {
                     await collateralPoolConfig.setLiquidatorIncentiveBps(COLLATERAL_POOL_ID, testParam.liquidatorIncentiveBps)
                     await collateralPoolConfig.setCloseFactorBps(COLLATERAL_POOL_ID, testParam.closeFactorBps)
                     await simplePriceFeed.setPrice(parseUnits(testParam.startingPrice, 18), { gasLimit: 3000000 })
+                    await priceOracle.setPrice(COLLATERAL_POOL_ID);
                     let ratio = WeiPerRay.mul(1000).div(parseUnits(testParam.collateralFactor, 3))
                     await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 3000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
@@ -467,6 +475,7 @@ describe("LiquidationEngine", () => {
 
                     // 3. WXDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 3000000 })
+                    await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
                     // 3.5 whitelist bob as liquidator
                     await liquidationEngine.whitelist(BobAddress);
@@ -560,6 +569,7 @@ describe("LiquidationEngine", () => {
                     await collateralPoolConfig.setLiquidatorIncentiveBps(COLLATERAL_POOL_ID, testParam.liquidatorIncentiveBps)
                     await collateralPoolConfig.setCloseFactorBps(COLLATERAL_POOL_ID, testParam.closeFactorBps)
                     await simplePriceFeed.setPrice(parseUnits(testParam.startingPrice, 18), { gasLimit: 1000000 })
+                    await priceOracle.setPrice(COLLATERAL_POOL_ID);
                     let ratio = WeiPerRay.mul(1000).div(parseUnits(testParam.collateralFactor, 3))
                     await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 1000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
@@ -593,6 +603,7 @@ describe("LiquidationEngine", () => {
 
                     // 3. WXDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 1000000 })
+                    await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
                     // 3.5 whitelist bob as liquidator
                     await liquidationEngine.whitelist(BobAddress);
@@ -685,6 +696,7 @@ describe("LiquidationEngine", () => {
 
                     // 1. Set priceWithSafetyMargin for WXDC to 420 USD
                     await simplePriceFeed.setPrice(parseUnits("367", 18), { gasLimit: 1000000 })
+                    await priceOracle.setPrice(COLLATERAL_POOL_ID);
                     let ratio = WeiPerRay.mul(1000).div(parseUnits("0.8", 3))
                     await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 1000000 })
                     //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, parseUnits("294", 27), { gasLimit: 1000000 })
@@ -739,8 +751,7 @@ describe("LiquidationEngine", () => {
                     )
                     //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, parseUnits("199.5", 27), { gasLimit: 1000000 })
                     await simplePriceFeed.setPrice(parseEther("249.37"), { gasLimit: 1000000 })
-
-
+                    await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther("1000")
@@ -831,6 +842,7 @@ describe("LiquidationEngine", () => {
                     await collateralPoolConfig.setLiquidatorIncentiveBps(COLLATERAL_POOL_ID, testParam.liquidatorIncentiveBps)
                     await collateralPoolConfig.setCloseFactorBps(COLLATERAL_POOL_ID, testParam.closeFactorBps)
                     await simplePriceFeed.setPrice(parseUnits(testParam.startingPrice, 18), { gasLimit: 1000000 })
+                    await priceOracle.setPrice(COLLATERAL_POOL_ID);
                     let ratio = WeiPerRay.mul(1000).div(parseUnits(testParam.collateralFactor, 3))
                     await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 1000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
@@ -853,6 +865,7 @@ describe("LiquidationEngine", () => {
 
                     // 3. WXDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 1000000 })
+                    await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
                     // 3.5 whitelist bob as liquidator
                     await liquidationEngine.whitelist(BobAddress);

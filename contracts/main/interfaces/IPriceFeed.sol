@@ -5,4 +5,6 @@ interface IPriceFeed {
     function readPrice() external view returns (bytes32); // [wad]
 
     function peekPrice() external returns (bytes32, bool); // [wad]
+
+    function isPriceOk() external view returns (bool);
 }

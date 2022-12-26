@@ -12,13 +12,16 @@ const { loadFixture } = require("../../helper/fixtures");
 
 const { formatBytes32String } = ethers.utils
 
+const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
+
 const loadFixtureHandler = async () => {
-  mockedAccessControlConfig = await createMock("AccessControlConfig");
-  mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
-  mockedBookKeeper = await createMock("BookKeeper");
-  mockedSystemDebtEngine = await createMock("SystemDebtEngine");
-  mockedPriceOracle = await createMock("PriceOracle");
-  mockedFixedSpreadLiquidationStrategy = await createMock("FixedSpreadLiquidationStrategy");
+  const mockedAccessControlConfig = await createMock("AccessControlConfig");
+  const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
+  const mockedBookKeeper = await createMock("BookKeeper");
+  const mockedSystemDebtEngine = await createMock("SystemDebtEngine");
+  const mockedPriceOracle = await createMock("PriceOracle");
+  const mockedFixedSpreadLiquidationStrategy = await createMock("FixedSpreadLiquidationStrategy");
+  const mockedPriceFeed = await createMock("SimplePriceFeed");
 
   await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
   await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
@@ -29,6 +32,8 @@ const loadFixtureHandler = async () => {
   await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
   await mockedAccessControlConfig.mock.hasRole.returns(true)
   await mockedPriceOracle.mock.setPrice.returns()
+  await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address);
+  await mockedPriceFeed.mock.isPriceOk.returns(true);
 
   liquidationEngine = getContract("LiquidationEngine", DeployerAddress)
   liquidationEngineAsAlice = getContract("LiquidationEngine", AliceAddress)
@@ -47,7 +52,8 @@ const loadFixtureHandler = async () => {
     mockedBookKeeper,
     mockedFixedSpreadLiquidationStrategy,
     mockedCollateralPoolConfig,
-    mockedAccessControlConfig
+    mockedAccessControlConfig,
+    mockedPriceFeed
   }
 }
 
@@ -57,6 +63,7 @@ describe("LiquidationEngine", () => {
   let mockedFixedSpreadLiquidationStrategy
   let mockedCollateralPoolConfig
   let mockedAccessControlConfig
+  let mockedPriceFeed
 
   let liquidationEngine
   let liquidationEngineAsAlice
@@ -73,15 +80,16 @@ describe("LiquidationEngine", () => {
       mockedFixedSpreadLiquidationStrategy,
       mockedCollateralPoolConfig,
       mockedAccessControlConfig,
+      mockedPriceFeed
     } = await loadFixture(loadFixtureHandler))
   })
 
   describe("#liquidate", () => {
     context("liquidator is not whitelisted", () => {
-      it("should be revert", async () => {
+      it("should revert", async () => {
         await expect(
           liquidationEngineAsBob.liquidate(
-            formatBytes32String("WXDC"),
+            COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
             WeiPerWad,
@@ -93,13 +101,13 @@ describe("LiquidationEngine", () => {
       })
     })
     context("liquidator removed from whitelist", () => {
-      it("should be revert", async () => {
+      it("should revert", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(true)
         await liquidationEngine.blacklist(AliceAddress);
 
         await expect(
           liquidationEngineAsAlice.liquidate(
-            formatBytes32String("WXDC"),
+            COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
             WeiPerWad,
@@ -111,14 +119,14 @@ describe("LiquidationEngine", () => {
       })
     })
     context("when liquidation engine does not live", () => {
-      it("should be revert", async () => {
+      it("should revert", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(true)
 
         await liquidationEngine.cage()
 
         await expect(
           liquidationEngine.liquidate(
-            formatBytes32String("WXDC"),
+            COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
             WeiPerWad,
@@ -130,10 +138,10 @@ describe("LiquidationEngine", () => {
       })
     })
     context("when debtShareToRepay == 0", () => {
-      it("should be revert", async () => {
+      it("should revert", async () => {
         await expect(
           liquidationEngine.liquidate(
-            formatBytes32String("WXDC"),
+            COLLATERAL_POOL_ID,
             AliceAddress,
             0,
             0,
@@ -145,7 +153,7 @@ describe("LiquidationEngine", () => {
       })
     })
     context("when liquidation engine colllteral pool does not set strategy", () => {
-      it("should be revert", async () => {
+      it("should revert", async () => {
         await mockedBookKeeper.mock.positions.returns(WeiPerWad.mul(10), WeiPerWad.mul(5))
         await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(WeiPerRay)
         await mockedCollateralPoolConfig.mock.getPriceWithSafetyMargin.returns(WeiPerRay)
@@ -153,7 +161,7 @@ describe("LiquidationEngine", () => {
 
         await expect(
           liquidationEngine.liquidate(
-            formatBytes32String("WXDC"),
+            COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
             WeiPerWad,
@@ -162,6 +170,27 @@ describe("LiquidationEngine", () => {
             { gasLimit: 1000000 }
           )
         ).to.be.revertedWith("LiquidationEngine/not-set-strategy")
+      })
+    })
+    context("when price is unhealthy", () => {
+      it("should revert", async () => {
+        await mockedBookKeeper.mock.positions.returns(WeiPerWad.mul(10), WeiPerWad.mul(5))
+        await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(WeiPerRay)
+        await mockedCollateralPoolConfig.mock.getPriceWithSafetyMargin.returns(WeiPerRay)
+        await mockedCollateralPoolConfig.mock.getStrategy.returns(AddressZero)
+        await mockedPriceFeed.mock.isPriceOk.returns(false);
+
+        await expect(
+          liquidationEngine.liquidate(
+            COLLATERAL_POOL_ID,
+            AliceAddress,
+            WeiPerWad,
+            WeiPerWad,
+            DeployerAddress,
+            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress]),
+            { gasLimit: 1000000 }
+          )
+        ).to.be.revertedWith("LiquidationEngine/price-is-not-healthy")
       })
     })
   })
@@ -289,7 +318,7 @@ describe("LiquidationEngine", () => {
 
         await expect(
           liquidationEngine.liquidate(
-            formatBytes32String("WXDC"),
+            COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
             WeiPerWad,
@@ -344,10 +373,10 @@ describe("LiquidationEngine", () => {
         await liquidationEngine.unpause()
 
         // mock contract
-        await mockedBookKeeper.mock.positions.withArgs(formatBytes32String("WXDC"), AliceAddress).returns(WeiPerWad.mul(10), WeiPerWad.mul(10))
+        await mockedBookKeeper.mock.positions.withArgs(COLLATERAL_POOL_ID, AliceAddress).returns(WeiPerWad.mul(10), WeiPerWad.mul(10))
         await mockedBookKeeper.mock.stablecoin.returns(0)
         await mockedFixedSpreadLiquidationStrategy.mock.execute.withArgs(
-          formatBytes32String("WXDC"),
+          COLLATERAL_POOL_ID,
           WeiPerWad.mul(10),
           WeiPerWad.mul(10),
           AliceAddress,
@@ -363,7 +392,7 @@ describe("LiquidationEngine", () => {
 
         await expect(
           liquidationEngine.liquidate(
-            formatBytes32String("WXDC"),
+            COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
             WeiPerWad,

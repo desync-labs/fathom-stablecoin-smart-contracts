@@ -77,7 +77,7 @@ describe("FathomOraclePriceFeed", () => {
                         token1Address
                     ).returns(WeiPerWad.mul(10), nHoursAgoInSec(now, 25))
 
-                    const [price, ok] = await fathomOraclePriceFeed.peekPrice()
+                    const [price, ok] = await fathomOraclePriceFeed.callStatic.peekPrice()
                     expect(price).to.be.equal(WeiPerWad.mul(10))
                     expect(ok).to.be.false
                 })
@@ -92,7 +92,7 @@ describe("FathomOraclePriceFeed", () => {
                     ).returns(WeiPerWad.mul(10), nHoursAgoInSec(now, 23))
                     await mockedAccessControlConfig.mock.hasRole.returns(true)
 
-                    const [price, ok] = await fathomOraclePriceFeed.peekPrice()
+                    const [price, ok] = await fathomOraclePriceFeed.callStatic.peekPrice()
                     expect(price).to.be.equal(WeiPerWad.mul(10))
                     expect(ok).to.be.true
                 })
@@ -110,7 +110,7 @@ describe("FathomOraclePriceFeed", () => {
                     await mockedAccessControlConfig.mock.hasRole.returns(true)
 
                     await fathomOraclePriceFeed.setPriceLife(2 * 60 * 60)
-                    const [price, ok] = await fathomOraclePriceFeed.peekPrice()
+                    const [price, ok] = await fathomOraclePriceFeed.callStatic.peekPrice()
                     expect(price).to.be.equal(WeiPerWad.mul(10))
                     expect(ok).to.be.false
                 })
@@ -125,7 +125,7 @@ describe("FathomOraclePriceFeed", () => {
                     await mockedAccessControlConfig.mock.hasRole.returns(true)
 
                     await fathomOraclePriceFeed.setPriceLife(2 * 60 * 60)
-                    const [price, ok] = await fathomOraclePriceFeed.peekPrice()
+                    const [price, ok] = await fathomOraclePriceFeed.callStatic.peekPrice()
                     expect(price).to.be.equal(WeiPerWad.mul(10))
                     expect(ok).to.be.true
                 })
@@ -143,7 +143,7 @@ describe("FathomOraclePriceFeed", () => {
                 await mockedAccessControlConfig.mock.hasRole.returns(true)
 
                 await fathomOraclePriceFeed.pause()
-                const [price, ok] = await fathomOraclePriceFeed.peekPrice()
+                const [price, ok] = await fathomOraclePriceFeed.callStatic.peekPrice()
                 expect(price).to.be.equal(WeiPerWad.mul(10))
                 expect(ok).to.be.false
             })

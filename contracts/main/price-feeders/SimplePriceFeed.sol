@@ -70,6 +70,10 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
         return (bytes32(price), _isPriceOk());
     }
 
+    function isPriceOk() external view override returns (bool) {
+        return _isPriceOk();
+    }
+
     function _isPriceFresh() internal view returns (bool) {
         return lastUpdate >= block.timestamp - priceLife;
     }

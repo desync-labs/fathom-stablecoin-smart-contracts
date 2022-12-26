@@ -30,6 +30,7 @@ const setup = async () => {
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
+    const priceOracle = await getProxy(proxyFactory, "PriceOracle");
 
     const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID)
     const tokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
@@ -59,6 +60,7 @@ const setup = async () => {
     await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(100), { gasLimit: 1000000 })
     await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress })
     await fathomStablecoin.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress })
+    await priceOracle.setPrice(COLLATERAL_POOL_ID)
 
     return {
         bookKeeper,

@@ -33,6 +33,7 @@ const setup = async () => {
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
     const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
+    const priceOracle = await getProxy(proxyFactory, "PriceOracle");
 
     const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID_WXDC);
     const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID_USDT);
@@ -79,6 +80,9 @@ const setup = async () => {
     )
 
     await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
+
+    await priceOracle.setPrice(COLLATERAL_POOL_ID_WXDC);
+    await priceOracle.setPrice(COLLATERAL_POOL_ID_USDT);
 
     await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID_WXDC, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
     await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID_USDT, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
