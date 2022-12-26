@@ -14,9 +14,9 @@
     "remove-cloud": "graph remove --node http://graph.composer.live fathomapp-subgraph",
     "deploy-cloud": "graph deploy --node http://graph.composer.live --ipfs http://graph.composer.live:5001 fathomapp-subgraph",
 
-    "create-test-cloud": "graph create --node http://159.223.112.169:8030/ fathomapp-subgraph",
-    "remove-test-cloud": "graph remove --node http://159.223.112.169:8030/ fathomapp-subgraph",
-    "deploy-test-cloud": "graph deploy --node http://159.223.112.169:8030/ --ipfs http://159.223.112.169:5001 fathomapp-subgraph",
+    "create-test-cloud": "graph create --node http://159.223.112.169:8020/ fathomapp-subgraph",
+    "remove-test-cloud": "graph remove --node http://159.223.112.169:8020/ fathomapp-subgraph",
+    "deploy-test-cloud": "graph deploy --node http://159.223.112.169:8020/ --ipfs http://159.223.112.169:5001 fathomapp-subgraph",
 
     "test": "graph test"
   },
