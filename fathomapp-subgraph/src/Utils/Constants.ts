@@ -22,4 +22,8 @@ export class Constants{
     public  static divByRAD(number: BigInt): BigInt {
         return number.div(Constants.WAD).div(Constants.WAD).div(BigInt.fromI64(10**9))
     }
+
+    public  static divByRADToDecimal(number: BigInt): BigDecimal {
+        return number.toBigDecimal().div(Constants.WAD.toBigDecimal()).div(Constants.WAD.toBigDecimal()).div(BigInt.fromI64(10**9).toBigDecimal())
+    }
 }

@@ -36,11 +36,14 @@ export function adjustPositionHandler(
     let position = Position.load(event.params._positionAddress.toHexString())
     if(position!=null && pool!=null){
         position.lockedCollateral =  event.params._lockedCollateral.toBigDecimal().div(Constants.WAD.toBigDecimal())
-        position.debtShare =  Constants.divByRAD(event.params._positionDebtValue)
+        position.debtShare =  Constants.divByRADToDecimal(event.params._positionDebtValue)
         position.tvl = position.lockedCollateral.times(pool.collateralPrice)
 
         //TODO: Review 'closed' and 'liquidated' checks here
-        if(position.debtShare.equals(BigInt.fromI32(0)) && position.positionStatus != 'closed' && position.positionStatus != 'liquidated'){
+        if(position.debtShare.equals(BigDecimal.fromString('0')) && 
+                  position.positionStatus != 'closed' && 
+                  position.positionStatus != 'liquidated'){
+
           position.positionStatus = 'closed'
 
           // decrement user position count
@@ -58,7 +61,7 @@ export function adjustPositionHandler(
                               
            let collateralAvailableToWithdraw = (
                                                 pool.priceWithSafetyMargin.times(
-                                                    position.lockedCollateral).minus(position.debtShare.toBigDecimal())
+                                                    position.lockedCollateral).minus(position.debtShare)
                                                 )
                                                 .div(pool.priceWithSafetyMargin)
                                                 

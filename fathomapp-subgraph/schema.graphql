@@ -7,7 +7,7 @@ enum PositionStatus {
 
 type User @entity {
   id: String!
-  address: Bytes! 
+  address: Bytes!
   activePositionsCount: BigInt!
 }
 
@@ -45,7 +45,7 @@ type Position @entity {
   collateralPoolName: String!
   positionId: BigInt!
   lockedCollateral: BigDecimal!
-  debtShare: BigInt!
+  debtShare: BigDecimal!
   safetyBuffer: BigDecimal!
   safetyBufferInPercent: BigDecimal!
   tvl: BigDecimal!
