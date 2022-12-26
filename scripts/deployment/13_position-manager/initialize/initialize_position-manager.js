@@ -2,7 +2,7 @@ const fs = require('fs');
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-const PositionManager = artifacts.require('./8.17/managers/PositionManager.sol');
+const PositionManager = artifacts.require('./main/managers/PositionManager.sol');
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing positionManager")
@@ -11,7 +11,8 @@ module.exports =  async function(deployer) {
 
   await positionManager.initialize(
     stablecoinAddress.bookKeeper,
-    stablecoinAddress.showStopper
+    stablecoinAddress.showStopper,
+    stablecoinAddress.priceOracle
     , { gasLimit: 1000000 }
   )
 

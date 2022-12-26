@@ -2,7 +2,7 @@ const fs = require('fs');
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-const LiquidationEngine = artifacts.require('./8.17/stablecoin-core/LiquidationEngine.sol');
+const LiquidationEngine = artifacts.require('./main/stablecoin-core/LiquidationEngine.sol');
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing LiquidationEngine")
@@ -13,6 +13,7 @@ module.exports =  async function(deployer) {
   await liquidationEngine.initialize(
     stablecoinAddress.bookKeeper,
     stablecoinAddress.systemDebtEngine,
+    stablecoinAddress.priceOracle
   )
 
 };

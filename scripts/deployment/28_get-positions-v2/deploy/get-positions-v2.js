@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const GetPositionsV2 = artifacts.require('./8.17/stats/GetPositionsV2.sol');
+const GetPositionsV2 = artifacts.require('./main/stats/GetPositionsV2.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -13,8 +13,9 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/stats/GetPositionsV2.sol');
+  const deployed = artifacts.require('./main/stats/GetPositionsV2.sol');
 
+  console.log(deployed.address);
   let addressesUpdate = { 
     getPositionsV2:deployed.address,
   };

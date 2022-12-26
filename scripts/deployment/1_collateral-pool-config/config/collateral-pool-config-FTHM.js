@@ -13,23 +13,29 @@ const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)  // <- 1.05
 const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
+// const rawdata = fs.readFileSync('../../../../addresses_ApothemV1.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
-const CollateralPoolConfig = artifacts.require('./8.17/stablecoin-core/config/CollateralPoolConfig.sol');
-const BookKeeper = artifacts.require('./8.17/stablecoin-core/BookKeeper.sol');
-const SimplePriceFeed = artifacts.require('./8.17/price-feeders/SimplePriceFeed.sol');
-const PriceOracle = artifacts.require('./8.17/stablecoin-core/PriceOracle.sol');
+const CollateralPoolConfig = artifacts.require('./main/stablecoin-core/config/CollateralPoolConfig.sol');
+const BookKeeper = artifacts.require('./main/stablecoin-core/BookKeeper.sol');
+const SimplePriceFeed = artifacts.require('./tests/SimplePriceFeed.sol');
+const PriceOracle = artifacts.require('./main/stablecoin-core/PriceOracle.sol');
 
 module.exports = async function(deployer) {
 
-  console.log(">> Initializing collateral-pool-config with USDT");
+  console.log(">> Initializing collateral-pool-config with FTHM");
   const collateralPoolConfig = await CollateralPoolConfig.at(stablecoinAddress.collateralPoolConfig);
 
   const bookKeeper = await BookKeeper.at(stablecoinAddress.bookKeeper);
 
-  const simplePriceFeedUSDT = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeedUSDT);
+  const simplePriceFeedFTHM = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeedFTHM);
 
   const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
+
+  console.log("stablecoinAddress.simplePriceFeedFTHM is " + stablecoinAddress.simplePriceFeedFTHM);
+  console.log("stablecoinAddress.collateralTokenAdapterFTHM is " + stablecoinAddress.collateralTokenAdapterFTHM);
+  console.log("stablecoinAddress.fixedSpreadLiquidationStrategy is " +   stablecoinAddress.fixedSpreadLiquidationStrategy);
+
 
   await collateralPoolConfig.initCollateralPool(
     COLLATERAL_POOL_ID,  //<-_collateralPoolId
@@ -43,7 +49,7 @@ module.exports = async function(deployer) {
     LIQUIDATOR_INCENTIVE_BPS,  //<-_liquidatorIncentiveBps
     TREASURY_FEE_BPS,  //<-_treasuryFeesBps
     stablecoinAddress.fixedSpreadLiquidationStrategy  //<-_strategy
-    , { gas : 5000000 } 
+    , { gas : 8000000 } 
   );
 //   await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, fixedSpreadLiquidationStrategy.address)
   const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);
@@ -52,6 +58,6 @@ module.exports = async function(deployer) {
   await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, debtCeilingSetUpUSDT, { gasLimit: 1000000 });
 //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay);
   //setting _rawPrice and _priceWithSafetyMargin of WXDC to 100
-  await simplePriceFeedUSDT.setPrice(WeiPerWad.mul(1), { gasLimit: 1000000 });
+  await simplePriceFeedFTHM.setPrice(WeiPerWad.mul(1), { gasLimit: 1000000 });
   await priceOracle.setPrice(COLLATERAL_POOL_ID, { gasLimit: 1000000 });
 }

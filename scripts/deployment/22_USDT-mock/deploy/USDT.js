@@ -1,6 +1,8 @@
 const fs = require('fs');
+// require("dotenv").config();
+// const WXDCAdd = process.env.WXDC_ADDRESS;
 
-const USDT = artifacts.require('./8.17/mocks/USDT.sol');
+const USDT = artifacts.require('./tests/mocks/USDT.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -15,15 +17,16 @@ module.exports =  async function(deployer) {
 
   console.log(">> Deploying a USDT contract")
   let promises = [
-      deployer.deploy(USDT, "USDT", "USDT", { gas: 4050000 }),
+      deployer.deploy(USDT, "US+", "US+", { gas: 4050000 }),
   ];
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./8.17/mocks/USDT.sol');
+  const deployed = artifacts.require('./tests/mocks/USDT.sol');
 
   let addressesUpdate = { 
     USDT:deployed.address,
+    // WXDC:WXDCAdd
   };
 
   const newAddresses = {

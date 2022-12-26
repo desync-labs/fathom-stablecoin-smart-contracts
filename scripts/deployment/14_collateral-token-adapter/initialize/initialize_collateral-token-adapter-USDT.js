@@ -4,14 +4,18 @@ let stablecoinAddress = JSON.parse(rawdata);
 const { formatBytes32String } = require("ethers/lib/utils");
 const { BigNumber } = require("ethers");
 
-const COLLATERAL_POOL_ID = formatBytes32String("USDT-STABLE")
+const COLLATERAL_POOL_ID = formatBytes32String("US+STABLE")
 
 
-const CollateralTokenAdapter = artifacts.require('./8.17/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
+const CollateralTokenAdapter = artifacts.require('./main/stablecoin-core/adapters/FarmableTokenAdapter/CollateralTokenAdapter.sol');
 
 //for testnet
-const deployerAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
-const devAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
+// const deployerAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
+// const devAddress = "0x46b5Da5314658b2ebEe832bB63a92Ac6BaedE2C0";
+
+//for ganache
+const deployerAddress = accounts[0];
+const devAddress = accounts[0];
 
 module.exports =  async function(deployer) {
   console.log(">> Initializing collateralTokenAdapterUSDT");
