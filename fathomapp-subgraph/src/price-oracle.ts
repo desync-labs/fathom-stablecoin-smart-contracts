@@ -18,7 +18,7 @@ export function priceUpdateHandler(event: LogSetPrice): void {
         }
 
         pool.priceWithSafetyMargin = Constants.divByRAYToDecimal(event.params._priceWithSafetyMargin)
-        pool.tvl = pool.lockedCollateral.toBigDecimal().times(pool.collateralPrice)
+        pool.tvl = pool.lockedCollateral.times(pool.collateralPrice)
         pool.save()
 
         //Update the safety buffer for positions
@@ -27,18 +27,17 @@ export function priceUpdateHandler(event: LogSetPrice): void {
         for (let i = 0; i < pool.positions.length; ++i) {
             let pos  = Position.load(pool.positions[i])
             if(pos != null && pos.debtShare.gt(BigInt.fromI32(0))){
-                let collateralValue = pos.lockedCollateral.toBigDecimal().times(pool.priceWithSafetyMargin)
-                let debtValue = pos.debtShare.toBigDecimal().times(_debtAccumulatedRate)
+                let collateralValue = pos.lockedCollateral.times(pool.priceWithSafetyMargin)
+                let debtValue = pos.debtShare.toBigDecimal()
                 pos.safetyBuffer = collateralValue.ge(debtValue) ? collateralValue.minus(debtValue) : BigDecimal.fromString('0')
 
                 //Check if position is unsafe or not
-                if(pos.safetyBuffer.equals(BigDecimal.fromString('0')) &&
-                 pos.debtShare.gt(BigInt.fromI32(0))){
+                if(pos.safetyBuffer.equals(BigDecimal.fromString('0')) && pos.debtShare.gt(BigInt.fromI32(0)) && pos.positionStatus != "liquidated"){
                     pos.positionStatus = 'unsafe'
-                 }
+                }
 
 
-                pos.tvl = pos.lockedCollateral.toBigDecimal().times(pool.collateralPrice) 
+                pos.tvl = pos.lockedCollateral.times(pool.collateralPrice) 
                 pos.save()
             }
         }
