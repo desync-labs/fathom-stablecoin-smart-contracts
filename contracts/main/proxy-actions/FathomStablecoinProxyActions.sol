@@ -312,6 +312,7 @@ contract FathomStablecoinProxyActions {
         address _positionAddress = IManager(_manager).positions(_positionId);
         tokenAdapterDeposit(_tokenAdapter, _positionAddress, _amount, _transferFrom, _data); // Takes token amount from user's wallet and joins into the bookKeeper
         adjustPosition(_manager, _positionId, _safeToInt(convertTo18(_tokenAdapter, _amount)), 0, _tokenAdapter, _data); // Locks token amount into the position manager
+        IManager(_manager).updatePrice(IManager(_manager).collateralPools(_positionId));
     }
 
     function safeLockToken(
@@ -339,6 +340,7 @@ contract FathomStablecoinProxyActions {
         IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _amount, _data); // Withdraws WXDC amount to proxy address as a token
         IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_amount); // Converts WXDC to XDC
         SafeToken.safeTransferETH(msg.sender, _amount); // Sends XDC back to the user's wallet
+        IManager(_manager).updatePrice(IManager(_manager).collateralPools(_positionId));
     }
 
     function unlockToken(
@@ -356,6 +358,7 @@ contract FathomStablecoinProxyActions {
         adjustPosition(_manager, _positionId, -_safeToInt(_amountInWad), 0, _tokenAdapter, _data); // Unlocks token amount from the position
         moveCollateral(_manager, _positionId, address(this), _amountInWad, _tokenAdapter, _data); // Moves the amount from the position to proxy's address
         IGenericTokenAdapter(_tokenAdapter).withdraw(msg.sender, _amount, _data); // Withdraws token amount to the user's wallet as a token
+        IManager(_manager).updatePrice(IManager(_manager).collateralPools(_positionId));
     }
 
     function withdrawXDC(
@@ -369,6 +372,7 @@ contract FathomStablecoinProxyActions {
         IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _amount, _data); // Withdraws WXDC amount to proxy address as a token
         IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_amount); // Converts WXDC to XDC
         SafeToken.safeTransferETH(msg.sender, _amount); // Sends XDC back to the user's wallet
+        IManager(_manager).updatePrice(IManager(_manager).collateralPools(_positionId));
     }
 
     function withdrawToken(
@@ -380,6 +384,7 @@ contract FathomStablecoinProxyActions {
     ) external {
         moveCollateral(_manager, _positionId, address(this), convertTo18(_tokenAdapter, _amount), _tokenAdapter, _data); // Moves the amount from the position to proxy's address
         IGenericTokenAdapter(_tokenAdapter).withdraw(msg.sender, _amount, _data); // Withdraws token amount to the user's wallet as a token
+        IManager(_manager).updatePrice(IManager(_manager).collateralPools(_positionId));
     }
 
     function draw(
@@ -412,6 +417,7 @@ contract FathomStablecoinProxyActions {
         }
 
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _amount, _data); // Withdraws Fathom Stablecoin to the user's wallet as a token
+        IManager(_manager).updatePrice(_collateralPoolId);
     }
 
     function wipe(
@@ -443,6 +449,7 @@ contract FathomStablecoinProxyActions {
             int256 _wipeDebtShare = _getWipeDebtShare(_bookKeeper, _amount * RAY, _positionAddress, _collateralPoolId); // Paybacks debt to the position
             IBookKeeper(_bookKeeper).adjustPosition(_collateralPoolId, _positionAddress, address(this), address(this), 0, _wipeDebtShare);
         }
+        IManager(_manager).updatePrice(_collateralPoolId);
     }
 
     function safeWipe(
@@ -484,6 +491,7 @@ contract FathomStablecoinProxyActions {
             );
             IBookKeeper(_bookKeeper).adjustPosition(_collateralPoolId, _positionAddress, address(this), address(this), 0, -int256(_debtShare)); // Paybacks debt to the position
         }
+        IManager(_manager).updatePrice(_collateralPoolId);
     }
 
     function safeWipeAll(
@@ -526,6 +534,7 @@ contract FathomStablecoinProxyActions {
             IBookKeeper(_bookKeeper).whitelist(_stablecoinAdapter);
         }
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data); // Withdraws Fathom Stablecoin to the user's wallet as a token
+        IManager(_manager).updatePrice(_collateralPoolId);
     }
 
     function openLockXDCAndDraw(
@@ -571,6 +580,7 @@ contract FathomStablecoinProxyActions {
             IBookKeeper(_manager.bookKeeper()).whitelist(_stablecoinAdapter);
         }
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data); // Withdraws Fathom Stablecoin to the user's wallet as a token
+        IManager(_manager).updatePrice(_collateralPoolId);
     }
 
     function openLockTokenAndDraw(
@@ -731,19 +741,21 @@ contract FathomStablecoinProxyActions {
         bytes calldata _data
     ) external {
         address _positionAddress = IManager(_manager).positions(_positionId);
+        bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
         stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _stablecoinAmount, _data); // Deposits Fathom Stablecoin amount into the bookKeeper
         // Paybacks debt to the position and unlocks WXDC amount from it
         int256 _wipeDebtShare = _getWipeDebtShare(
             IManager(_manager).bookKeeper(),
             IBookKeeper(IManager(_manager).bookKeeper()).stablecoin(_positionAddress),
             _positionAddress,
-            IManager(_manager).collateralPools(_positionId)
+            _collateralPoolId
         ); // [wad]
         adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmount), _wipeDebtShare, _xdcAdapter, _data);
         moveCollateral(_manager, _positionId, address(this), _collateralAmount, _xdcAdapter, _data); // Moves the amount from the position to proxy's address
         IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _collateralAmount, _data); // Withdraws WXDC amount to proxy address as a token
         IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_collateralAmount); // Converts WXDC to XDC
         SafeToken.safeTransferETH(msg.sender, _collateralAmount); // Sends XDC back to the user's wallet
+        IManager(_manager).updatePrice(_collateralPoolId);
     }
 
     function wipeAllAndUnlockXDC(
@@ -771,6 +783,7 @@ contract FathomStablecoinProxyActions {
         IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _collateralAmount, _data); // Withdraws WXDC amount to proxy address as a token
         IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_collateralAmount); // Converts WXDC to XDC
         SafeToken.safeTransferETH(msg.sender, _collateralAmount); // Sends XDC back to the user's wallet
+        IManager(_manager).updatePrice(_collateralPoolId);
     }
 
     function wipeAndUnlockToken(
@@ -783,6 +796,7 @@ contract FathomStablecoinProxyActions {
         bytes calldata _data
     ) public {
         address _positionAddress = IManager(_manager).positions(_positionId);
+        bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
         stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _stablecoinAmount, _data); // Deposits Fathom Stablecoin amount into the bookKeeper
         uint256 _collateralAmountInWad = convertTo18(_tokenAdapter, _collateralAmount);
         // Paybacks debt to the CDP and unlocks token amount from it
@@ -790,11 +804,12 @@ contract FathomStablecoinProxyActions {
             IManager(_manager).bookKeeper(),
             IBookKeeper(IManager(_manager).bookKeeper()).stablecoin(_positionAddress),
             _positionAddress,
-            IManager(_manager).collateralPools(_positionId)
+            _collateralPoolId
         );
         adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmountInWad), _wipeDebtShare, _tokenAdapter, _data);
         moveCollateral(_manager, _positionId, address(this), _collateralAmountInWad, _tokenAdapter, _data); // Moves the amount from the position to proxy's address
         IGenericTokenAdapter(_tokenAdapter).withdraw(msg.sender, _collateralAmount, _data); // Withdraws token amount to the user's wallet as a token
+        IManager(_manager).updatePrice(_collateralPoolId);
     }
 
     function wipeUnlockIbXDCAndCovertToXDC(
@@ -848,6 +863,7 @@ contract FathomStablecoinProxyActions {
         adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmountInWad), -int256(_debtShare), _tokenAdapter, _data);
         moveCollateral(_manager, _positionId, address(this), _collateralAmountInWad, _tokenAdapter, _data); // Moves the amount from the position to proxy's address
         IGenericTokenAdapter(_tokenAdapter).withdraw(msg.sender, _collateralAmount, _data); // Withdraws token amount to the user's wallet as a token
+        IManager(_manager).updatePrice(_collateralPoolId);
     }
 
     function wipeAllUnlockIbXDCAndConvertToXDC(

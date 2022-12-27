@@ -13,19 +13,20 @@ const { loadFixture } = require("../../helper/fixtures");
 const loadFixtureHandler = async () => {
     const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
     const mockedBookKeeper = await createMock("BookKeeper");
-    const mockedDummyToken = await createMock("ERC20Mintable");
     const mockedTokenAdapter = await createMock("TokenAdapter");
     const mockedShowStopper = await createMock("ShowStopper");
     const mockedPriceOracle = await createMock("PriceOracle");
+    const mockedPriceFeed = await createMock("SimplePriceFeed");
 
     await mockedShowStopper.mock.live.returns(1);
     await mockedBookKeeper.mock.totalStablecoinIssued.returns(0);
     await mockedBookKeeper.mock.whitelist.returns();
     await mockedPriceOracle.mock.setPrice.returns()
-    await mockedDummyToken.mock.decimals.returns(18)
     await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
     await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(WeiPerRay)
     await mockedCollateralPoolConfig.mock.getAdapter.returns(mockedTokenAdapter.address)
+    await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address);
+    await mockedPriceFeed.mock.isPriceOk.returns(true);
     await mockedCollateralPoolConfig.mock.collateralPools.returns({
         totalDebtShare: 0,
         debtAccumulatedRate: WeiPerRay,
@@ -53,13 +54,12 @@ const loadFixtureHandler = async () => {
         positionManager,
         positionManagerAsAlice,
         positionManagerAsBob,
-        mockedDummyToken,
         mockedBookKeeper,
-        mockedDummyToken,
         mockedTokenAdapter,
         mockedShowStopper,
         mockedCollateralPoolConfig,
-        mockedPriceOracle
+        mockedPriceOracle,
+        mockedPriceFeed
     }
 }
 
@@ -68,11 +68,11 @@ describe("PositionManager", () => {
     let positionManager
 
     let mockedBookKeeper
-    let mockedDummyToken
     let mockedTokenAdapter
     let mockedShowStopper
     let mockedCollateralPoolConfig
     let mockedPriceOracle
+    let mockedPriceFeed
 
     // Signer
     let positionManagerAsAlice
@@ -91,11 +91,12 @@ describe("PositionManager", () => {
             positionManagerAsBob,
             mockedDummyToken,
             mockedBookKeeper,
-            mockedDummyToken,
             mockedTokenAdapter,
             mockedShowStopper,
             mockedCollateralPoolConfig,
-            mockedPriceOracle
+            mockedPriceOracle,
+            mockedPriceFeed
+
         } = await loadFixture(loadFixtureHandler))
 
     })
@@ -277,6 +278,34 @@ describe("PositionManager", () => {
                 ).to.be.revertedWith("owner not allowed")
             })
         })
+        context("when price is not healthy", () => {
+            it("should revert", async () => {
+                await mockedPriceFeed.mock.isPriceOk.returns(false);
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
+                const positionAddress = await positionManager.positions(1)
+
+                await mockedBookKeeper.mock.adjustPosition.withArgs(
+                    formatBytes32String("WXDC"),
+                    positionAddress,
+                    positionAddress,
+                    positionAddress,
+                    parseEther("1"),
+                    parseEther("50")
+                ).returns()
+
+                await mockedTokenAdapter.mock.onAdjustPosition.withArgs(
+                    positionAddress,
+                    positionAddress,
+                    parseEther("1"),
+                    parseEther("50"),
+                    "0x"
+                ).returns()
+
+                await expect(
+                    positionManagerAsAlice.adjustPosition(1, parseEther("1"), parseEther("50"), mockedTokenAdapter.address, "0x")
+                ).to.be.revertedWith("PositionManager/price-is-not-healthy")
+            })
+        })
         context("when parameters are valid", async () => {
             it("should be able to call BookKeeper.adjustPosition", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
@@ -323,6 +352,37 @@ describe("PositionManager", () => {
                         "0x"
                     )
                 ).to.be.revertedWith("owner not allowed")
+            })
+        })
+        context("when price is not healthy", () => {
+            it("should revert", async () => {
+                await mockedPriceFeed.mock.isPriceOk.returns(false);
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
+                const positionAddress = await positionManager.positions(1)
+
+                await mockedBookKeeper.mock.moveCollateral.withArgs(
+                    formatBytes32String("WXDC"),
+                    positionAddress,
+                    BobAddress,
+                    parseEther("1")
+                ).returns()
+
+                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
+                    positionAddress,
+                    BobAddress,
+                    parseEther("1"),
+                    "0x"
+                ).returns()
+
+                await expect(
+                    positionManagerAsAlice["moveCollateral(uint256,address,uint256,address,bytes)"](
+                        1,
+                        AliceAddress,
+                        parseEther("50"),
+                        await mockedTokenAdapter.address,
+                        "0x"
+                    )
+                ).to.be.revertedWith("PositionManager/price-is-not-healthy")
             })
         })
         context("when parameters are valid", async () => {
@@ -372,6 +432,38 @@ describe("PositionManager", () => {
                 ).to.be.revertedWith("owner not allowed")
             })
         })
+        context("when price is not healthy", () => {
+            it("should revert", async () => {
+                await mockedPriceFeed.mock.isPriceOk.returns(false);
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
+                const positionAddress = await positionManager.positions(1)
+
+                await mockedBookKeeper.mock.moveCollateral.withArgs(
+                    formatBytes32String("WXDC"),
+                    positionAddress,
+                    BobAddress,
+                    parseEther("1")
+                ).returns()
+
+                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
+                    positionAddress,
+                    BobAddress,
+                    parseEther("1"),
+                    "0x"
+                ).returns()
+
+                await expect(
+                    positionManagerAsAlice["moveCollateral(bytes32,uint256,address,uint256,address,bytes)"](
+                        formatBytes32String("WXDC"),
+                        1,
+                        AliceAddress,
+                        parseEther("50"),
+                        await mockedTokenAdapter.address,
+                        "0x"
+                    )
+                ).to.be.revertedWith("PositionManager/price-is-not-healthy")
+            })
+        })
         context("when parameters are valid", async () => {
             it("should be able to call moveCollateral(bytes32,uint256,address,uint256,address,bytes)", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
@@ -399,6 +491,8 @@ describe("PositionManager", () => {
                     await mockedTokenAdapter.address,
                     "0x"
                 )
+
+                
             })
         })
     })

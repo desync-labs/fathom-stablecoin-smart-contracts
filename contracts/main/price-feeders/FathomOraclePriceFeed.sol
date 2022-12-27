@@ -13,6 +13,7 @@ contract FathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFeed {
     address public token0;
     address public token1;
     uint256 public priceLife; // [seconds] how old the price is considered stale, default 1 day
+    uint256 public lastUpdate;
 
     function initialize(address _fathomOracle, address _token0, address _token1, address _accessControlConfig) external initializer {
         PausableUpgradeable.__Pausable_init();
@@ -61,17 +62,22 @@ contract FathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFeed {
         return bytes32(_price);
     }
 
-    function peekPrice() external view override returns (bytes32, bool) {
+    function peekPrice() external override returns (bytes32, bool) {
         // [wad], [seconds]
         (uint256 _price, uint256 _lastUpdate) = fathomOracle.getPrice(token0, token1);
-        return (bytes32(_price), _isPriceOk(_lastUpdate));
+        lastUpdate = _lastUpdate;
+        return (bytes32(_price), _isPriceOk());
     }
 
-    function _isPriceFresh(uint256 _lastUpdate) internal view returns (bool) {
-        return _lastUpdate >= block.timestamp - priceLife;
+    function isPriceOk() external view override returns (bool) {
+        return _isPriceOk();
     }
 
-    function _isPriceOk(uint256 _lastUpdate) internal view returns (bool) {
-        return _isPriceFresh(_lastUpdate) && !paused();
+    function _isPriceFresh() internal view returns (bool) {
+        return lastUpdate >= block.timestamp - priceLife;
+    }
+
+    function _isPriceOk() internal view returns (bool) {
+        return _isPriceFresh() && !paused();
     }
 }

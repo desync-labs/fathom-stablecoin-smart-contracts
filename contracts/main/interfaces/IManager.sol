@@ -35,4 +35,6 @@ interface IManager {
     function movePosition(uint256, uint256) external;
 
     function redeemLockedCollateral(uint256, address, address, bytes calldata) external;
+
+    function updatePrice(bytes32 _poolId) external;
 }

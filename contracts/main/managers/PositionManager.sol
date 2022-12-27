@@ -10,6 +10,7 @@ import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/IShowStopper.sol";
 import "../interfaces/ISetPrice.sol";
+import "../interfaces/IPriceFeed.sol";
 
 contract PositionManager is PausableUpgradeable, IManager {
     address public override bookKeeper;
@@ -117,8 +118,6 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @param _collateralPoolId The collateral pool id that will be used for this position
     /// @param _user The user address that is owned this position
     function open(bytes32 _collateralPoolId, address _user) external override whenNotPaused returns (uint256) {
-        ISetPrice(priceOracle).setPrice(_collateralPoolId);
-
         require(_user != address(0), "PositionManager/user-address(0)");
         uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getDebtAccumulatedRate(
             _collateralPoolId
@@ -205,8 +204,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         bytes calldata _data
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
         bytes32 _collateralPoolId = collateralPools[_positionId];
-
-        ISetPrice(priceOracle).setPrice(_collateralPoolId);
+        require(_isPriceHealthy(_collateralPoolId), "PositionManager/price-is-not-healthy");
 
         address _positionAddress = positions[_positionId];
         IBookKeeper(bookKeeper).adjustPosition(
@@ -218,6 +216,8 @@ contract PositionManager is PausableUpgradeable, IManager {
             _debtShare
         );
         IGenericTokenAdapter(_adapter).onAdjustPosition(_positionAddress, _positionAddress, _collateralValue, _debtShare, _data);
+        
+        ISetPrice(priceOracle).setPrice(_collateralPoolId);
     }
 
     /// @dev Transfer wad amount of position's collateral from the positionHandler address to a destination address.
@@ -234,8 +234,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         bytes calldata _data
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
         bytes32 _collateralPoolId = collateralPools[_positionId];
-
-        ISetPrice(priceOracle).setPrice(_collateralPoolId);
+        require(_isPriceHealthy(_collateralPoolId), "PositionManager/price-is-not-healthy");
 
         IBookKeeper(bookKeeper).moveCollateral(collateralPools[_positionId], positions[_positionId], _destination, _wad);
         IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
@@ -257,7 +256,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         address _adapter,
         bytes calldata _data
     ) external whenNotPaused onlyOwnerAllowed(_positionId) {
-        ISetPrice(priceOracle).setPrice(_collateralPoolId);
+        require(_isPriceHealthy(_collateralPoolId), "PositionManager/price-is-not-healthy");
 
         IBookKeeper(bookKeeper).moveCollateral(_collateralPoolId, positions[_positionId], _destination, _wad);
         IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
@@ -370,5 +369,14 @@ contract PositionManager is PausableUpgradeable, IManager {
             _collateralReceiver,
             _data
         );
+    }
+
+    function updatePrice(bytes32 _poolId) external override whenNotPaused {
+        ISetPrice(priceOracle).setPrice(_poolId);
+    }
+
+    function _isPriceHealthy(bytes32 _poolId) internal view returns(bool) {
+        IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_poolId));
+        return _priceFeed.isPriceOk();
     }
 }

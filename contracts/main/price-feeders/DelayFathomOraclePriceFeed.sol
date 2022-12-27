@@ -31,7 +31,8 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
         require(_token0 != _token1, "FathomOraclePriceFeed/wrong-token0-token1");
         token0 = _token0;
         token1 = _token1;
-        priceLife = 1 days;
+        priceLife = 30 minutes;
+        timeDelay = 15 minutes;
     }
 
     modifier onlyOwner() {
@@ -52,13 +53,13 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
     event LogSetTimeDelay(address indexed _caller, uint256 _second);
 
     function setPriceLife(uint256 _second) external onlyOwner {
-        require(_second >= 1 hours && _second <= 1 days, "FathomOraclePriceFeed/bad-price-life");
+        require(_second >= 5 minutes && _second <= 1 days, "FathomOraclePriceFeed/bad-price-life");
         priceLife = _second;
         emit LogSetPriceLife(msg.sender, _second);
     }
 
     function setTimeDelay(uint256 _second) external onlyOwner {
-        require(_second >= 15 minutes && _second <= 1 days, "FathomOraclePriceFeed/bad-delay-time");
+        require(_second >= 5 minutes && _second <= 1 days, "FathomOraclePriceFeed/bad-delay-time");
         timeDelay = _second;
         emit LogSetTimeDelay(msg.sender, _second);
     }
@@ -77,23 +78,25 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
     }
 
     function peekPrice() external override returns (bytes32, bool) {
-        require(timeDelay >= 15 minutes && timeDelay <= 1 days, "FathomOraclePriceFeed/bad-or-no-delay-time");
-        // [wad], [seconds]
         if (currentPrice.price == 0 || block.timestamp >= currentPrice.lastUpdateTS + timeDelay) {
             (uint256 _price, uint256 _lastUpdate) = fathomOracle.getPrice(token0, token1);
             currentPrice.price = _price;
             currentPrice.lastUpdateTS = _lastUpdate;
-            return (bytes32(currentPrice.price), _isPriceOk(currentPrice.lastUpdateTS));
+            return (bytes32(currentPrice.price), _isPriceOk());
         } else {
-            return (bytes32(currentPrice.price), _isPriceOk(currentPrice.lastUpdateTS));
+            return (bytes32(currentPrice.price), _isPriceOk());
         }
     }
 
-    function _isPriceFresh(uint256 _lastUpdate) internal view returns (bool) {
-        return _lastUpdate >= block.timestamp - priceLife;
+    function isPriceOk() external view override returns (bool) {
+        return _isPriceOk();
     }
 
-    function _isPriceOk(uint256 _lastUpdate) internal view returns (bool) {
-        return _isPriceFresh(_lastUpdate) && !paused();
+    function _isPriceFresh() internal view returns (bool) {
+        return currentPrice.lastUpdateTS >= block.timestamp - priceLife;
+    }
+
+    function _isPriceOk() internal view returns (bool) {
+        return _isPriceFresh() && !paused();
     }
 }

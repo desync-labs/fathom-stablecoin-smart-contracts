@@ -82,6 +82,7 @@ const setup = async () => {
     )
     // set price with safety margin 1 ray (1 WXDC = 1 USD)
     await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID_WXDC, WeiPerRay, { gasLimit: 1000000 })
+    await priceOracle.setPrice(COLLATERAL_POOL_ID_WXDC)
 
     // init USDT pool
     await collateralPoolConfig.initCollateralPool(
@@ -100,6 +101,7 @@ const setup = async () => {
     )
     // set price with safety margin 1 ray (1 USDT = 1 USD)
     await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID_USDT, WeiPerRay, { gasLimit: 1000000 })
+    await priceOracle.setPrice(COLLATERAL_POOL_ID_USDT)
 
     return {
         bookKeeper,
