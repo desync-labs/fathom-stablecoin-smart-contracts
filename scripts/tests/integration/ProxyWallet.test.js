@@ -5,12 +5,12 @@ const { expect } = require("chai");
 
 const { AliceAddress, BobAddress, AddressZero } = require("../helper/address");
 const { loadFixture } = require("../helper/fixtures");
+const { getProxy } = require("../../common/proxies");
 
 const setup = async () => {
-    const proxyWalletRegistry = await artifacts.initializeInterfaceAt("ProxyWalletRegistry", "ProxyWalletRegistry");
-    const proxyWalletFactory = await artifacts.initializeInterfaceAt("ProxyWalletFactory", "ProxyWalletFactory");
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-    await proxyWalletRegistry.initialize(proxyWalletFactory.address, { gasLimit: 1000000 })
+    const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
 
     return { proxyWalletRegistry }
 }

@@ -2,6 +2,7 @@ const { formatBytes32String } = require("ethers/lib/utils");
 const COLLATERAL_POOL_ID_USDT = formatBytes32String("USDT")
 
 async function initializeContracts() {
+  const getPositions = await artifacts.initializeInterfaceAt("GetPositions", "GetPositions");
   const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
   const fixedSpreadLiquidationStrategy = await artifacts.initializeInterfaceAt("FixedSpreadLiquidationStrategy", "FixedSpreadLiquidationStrategy");
   const proxyWalletRegistry = await artifacts.initializeInterfaceAt("ProxyWalletRegistry", "ProxyWalletRegistry");
@@ -20,12 +21,9 @@ async function initializeContracts() {
   const stableSwapModule = await artifacts.initializeInterfaceAt("StableSwapModule", "StableSwapModule");
   const authTokenAdapter = await artifacts.initializeInterfaceAt("AuthTokenAdapter", "AuthTokenAdapter");
   const proxyWalletFactory = await artifacts.initializeInterfaceAt("ProxyWalletFactory", "ProxyWalletFactory");
+  const USDT = await artifacts.initializeInterfaceAt("USDT", "USDT");
   const flashMintArbitrager = await artifacts.initializeInterfaceAt("FlashMintArbitrager", "FlashMintArbitrager");
   const bookKeeperFlashMintArbitrager = await artifacts.initializeInterfaceAt("BookKeeperFlashMintArbitrager", "BookKeeperFlashMintArbitrager");
-  const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-  const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_USDT)
-  const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
-  const usdtAddr = await collateralTokenAdapter.collateralToken();
 
   let promises = [
     collateralPoolConfig.initialize(accessControlConfig.address, { gasLimit: 1000000 }),
@@ -79,6 +77,7 @@ async function initializeContracts() {
     proxyWalletRegistry.initialize(
       proxyWalletFactory.address
     ),
+    getPositions.initialize({ gaslimit: 4050000 }),
     flashMintModule.initialize(
       stablecoinAdapter.address,
       systemDebtEngine.address,
@@ -87,7 +86,7 @@ async function initializeContracts() {
     authTokenAdapter.initialize(
       bookKeeper.address,
       COLLATERAL_POOL_ID_USDT,
-      usdtAddr,
+      USDT.address,
       { gasLimit: 1000000 }
     ),
     stableSwapModule.initialize(

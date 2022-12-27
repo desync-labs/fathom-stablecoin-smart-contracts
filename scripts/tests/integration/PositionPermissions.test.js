@@ -5,37 +5,37 @@ const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
-const { createProxyWallets } = require("../helper/proxy");
+const { createProxyWallets } = require("../helper/proxy-wallets");
 const { AliceAddress, BobAddress, AddressZero } = require("../helper/address");
 const PositionHelper = require("../helper/positions");
 const { formatBytes32String } = require("ethers/lib/utils");
 const { loadFixture } = require("../helper/fixtures");
-const { initializeContracts } = require("../helper/initializer");
-const { addRoles } = require("../helper/access-roles");
+const { getProxy } = require("../../common/proxies");
 
 const { expect } = chai
 
 const COLLATERAL_POOL_ID_WXDC = formatBytes32String("WXDC")
-const COLLATERAL_POOL_ID_USDT = formatBytes32String("USDT")
+const COLLATERAL_POOL_ID_USDT = formatBytes32String("USDT-COL")
 const CLOSE_FACTOR_BPS = "5000"
 const LIQUIDATOR_INCENTIVE_BPS = "10250"
 const TREASURY_FEE_BPS = "100"
 
-const StabilityFeeCollector = artifacts.require('./main/stablecoin-core/StabilityFeeCollector.sol');
-
 const setup = async () => {
-    const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
-    const stablecoinAdapter = await artifacts.initializeInterfaceAt("StablecoinAdapter", "StablecoinAdapter");
-    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
-    const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
-    const fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
-    const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
-    const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
-    const fixedSpreadLiquidationStrategy = await artifacts.initializeInterfaceAt("FixedSpreadLiquidationStrategy", "FixedSpreadLiquidationStrategy");
-    const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-    const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_WXDC);
-    const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_USDT);
+    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
+    const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
+    const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
+    const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
+    const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
+    const positionManager = await getProxy(proxyFactory, "PositionManager");
+    const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
+    const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
+    const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
+    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
+
+    const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID_WXDC);
+    const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID_USDT);
     const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterWXDC);
     const collateralTokenAdapter2 = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterUSDT);
 
@@ -43,9 +43,6 @@ const setup = async () => {
     const usdtAddr = await collateralTokenAdapter2.collateralToken();
     const WXDC = await artifacts.initializeInterfaceAt("ERC20Mintable", wxdcAddr);
     const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
-
-    await initializeContracts();
-    await addRoles();
 
     ({
         proxyWallets: [aliceProxyWallet, bobProxyWallet],
@@ -101,7 +98,8 @@ const setup = async () => {
         bobProxyWallet,
         fathomStablecoin,
         fathomStablecoinProxyActions,
-        stablecoinAdapter
+        stablecoinAdapter,
+        stabilityFeeCollector
     }
 }
 
@@ -116,6 +114,7 @@ describe("PositionPermissions", () => {
     let positionManager
     let fathomStablecoinProxyActions
     let fathomStablecoin
+    let stabilityFeeCollector
 
     before(async () => {
         await snapshot.revertToSnapshot();
@@ -131,7 +130,8 @@ describe("PositionPermissions", () => {
             bobProxyWallet,
             fathomStablecoin,
             fathomStablecoinProxyActions,
-            stablecoinAdapter
+            stablecoinAdapter,
+            stabilityFeeCollector
         } = await loadFixture(setup));
     })
 
@@ -1621,7 +1621,7 @@ describe("PositionPermissions", () => {
                     let drawTokenIFace = new ethers.utils.Interface(drawTokenAbi);
                     let drawTokenCall = drawTokenIFace.encodeFunctionData("draw", [
                         positionManager.address,
-                        StabilityFeeCollector.address,
+                        stabilityFeeCollector.address,
                         collateralTokenAdapter.address,
                         stablecoinAdapter.address,
                         await positionManager.ownerLastPositionId(aliceProxyWallet.address),

@@ -3,11 +3,11 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "../interfaces/IPriceFeed.sol";
+import "../interfaces/IFathomOraclePriceFeed.sol";
 import "../interfaces/IFathomOracle.sol";
 import "../interfaces/IAccessControlConfig.sol";
 
-contract FathomOraclePriceFeed is PausableUpgradeable, IPriceFeed {
+contract FathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFeed {
     IFathomOracle public fathomOracle;
     IAccessControlConfig public accessControlConfig;
     address public token0;

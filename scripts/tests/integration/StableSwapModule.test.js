@@ -9,36 +9,34 @@ const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
 const { DeployerAddress, AddressZero } = require("../helper/address");
 const { formatBytes32String } = require("ethers/lib/utils");
 const { loadFixture } = require("../helper/fixtures");
-const { initializeContracts } = require("../helper/initializer");
-const { addRoles } = require("../helper/access-roles");
+const { getProxy } = require("../../common/proxies");
 
 const { expect } = chai
 
-const COLLATERAL_POOL_ID = formatBytes32String("USDT")
+const COLLATERAL_POOL_ID = formatBytes32String("USDT-COL")
 
 const CLOSE_FACTOR_BPS = BigNumber.from(5000)
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(12500)
 const TREASURY_FEE_BPS = BigNumber.from(2500)
 
 const setup = async () => {
-    const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
-    const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
-    const fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
-    const systemDebtEngine = await artifacts.initializeInterfaceAt("SystemDebtEngine", "SystemDebtEngine");
-    const flashMintModule = await artifacts.initializeInterfaceAt("FlashMintModule", "FlashMintModule");
-    const stablecoinAdapter = await artifacts.initializeInterfaceAt("StablecoinAdapter", "StablecoinAdapter");
-    const stableSwapModule = await artifacts.initializeInterfaceAt("StableSwapModule", "StableSwapModule");
-    const authTokenAdapter = await artifacts.initializeInterfaceAt("AuthTokenAdapter", "AuthTokenAdapter");
-    const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-    const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
+    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
+    const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
+    const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
+    const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
+    const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
+    const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
+    const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
+    const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
+    const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
+    const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
+
+    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID)
     const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
     const usdtAddr = await collateralTokenAdapter.collateralToken();
     const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
-
-    await initializeContracts();
-    await addRoles();
 
     await collateralPoolConfig.initCollateralPool(
         COLLATERAL_POOL_ID,
@@ -54,7 +52,6 @@ const setup = async () => {
         AddressZero
     )
 
-    await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), stablecoinAdapter.address);
     await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(100000000000000), { gasLimit: 1000000 })
     await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
 

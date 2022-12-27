@@ -3,11 +3,11 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "../interfaces/IPriceFeed.sol";
+import "../interfaces/IFathomOraclePriceFeed.sol";
 import "../interfaces/IFathomOracle.sol";
 import "../interfaces/IAccessControlConfig.sol";
 
-contract DelayFathomOraclePriceFeed is PausableUpgradeable, IPriceFeed {
+contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFeed {
     struct Feed {
         uint256 price;
         uint256 lastUpdateTS;

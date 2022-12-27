@@ -1,60 +1,25 @@
 module.exports = {
-  deployMainnet: [
-    ['execute', '--path', 'scripts/migrations/compliance-upgradability', '--network', 'mainnet'],
-    ['execute', '--path', 'scripts/migrations/tokens-creation-service', '--network', 'mainnet'],
-    ['execute', '--path', 'scripts/configurations/1_base_config.js', '--network', 'mainnet'],
-    ['execute', '--path', 'scripts/configurations/2_tokens_factory.js', '--network', 'mainnet'],
-    ['execute', '--path', 'scripts/custom/white-list-setup.js', '--network', 'mainnet'],
+  deployLocal: [
+    ['compile'],
+    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'development'],
+    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'development']
   ],
-  deployKovan: [
-    ['execute', '--path', 'scripts/migrations/compliance-upgradability', '--network', 'kovan'],
-    ['execute', '--path', 'scripts/migrations/tokens-creation-service', '--network', 'kovan'],
-    ['execute', '--path', 'scripts/configurations/1_base_config.js', '--network', 'kovan'],
-    ['execute', '--path', 'scripts/configurations/2_tokens_factory.js', '--network', 'kovan'],
-    ['execute', '--path', 'scripts/custom/white-list-setup.js', '--network', 'kovan'],
+  deployApothem: [
+    ['compile'],
+    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'apothem'],
+    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'apothem']
   ],
-  deployRopsten: [
-    // ['execute', '--path', 'scripts/migrations/compliance-upgradability', '--network', 'ropsten'],
-    // ['execute', '--path', 'scripts/migrations/tokens-creation-service', '--network', 'ropsten'],
-    // ['execute', '--path', 'scripts/configurations/1_base_config.js', '--network', 'ropsten'],
-    // ['execute', '--path', 'scripts/configurations/2_tokens_factory.js', '--network', 'ropsten'],
-    // ['execute', '--path', 'scripts/custom/white-list-setup.js', '--network', 'ropsten'],
-    ['execute', '--path', 'scripts/migrations/governance', '--network', 'ropsten'],
+  deployTokensLocal: [
+    ['compile'],
+    ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'development']
   ],
-  deployACMainnet: [
-    ['execute', '--path', 'scripts/migrations/compliance-upgradability', '--network', 'mainnet'],
-    ['execute', '--path', 'scripts/migrations/tokens-creation-service', '--network', 'mainnet'],
-    ['execute', '--path', 'scripts/migrations/composer', '--network', 'mainnet'],
-    ['execute', '--path', 'scripts/configurations/1_base_config.js', '--network', 'mainnet'],
-    ['execute', '--path', 'scripts/configurations/2_tokens_factory.js', '--network', 'mainnet'],
-    ['execute', '--path', 'scripts/configurations/3_composer.js', '--network', 'mainnet'],
-    ['execute', '--path', 'scripts/custom/white-list-setup.js', '--network', 'mainnet'],
-  ],
-  deployACKovan: [
-    ['execute', '--path', 'scripts/migrations/compliance-upgradability', '--network', 'kovan'],
-    ['execute', '--path', 'scripts/migrations/tokens-creation-service', '--network', 'kovan'],
-    ['execute', '--path', 'scripts/migrations/composer', '--network', 'kovan'],
-    ['execute', '--path', 'scripts/configurations/1_base_config.js', '--network', 'kovan'],
-    ['execute', '--path', 'scripts/configurations/2_tokens_factory.js', '--network', 'kovan'],
-    ['execute', '--path', 'scripts/configurations/3_composer.js', '--network', 'kovan'],
-    ['execute', '--path', 'scripts/custom/white-list-setup.js', '--network', 'kovan'],
-  ],
-  deployACRopsten: [
-    ['execute', '--path', 'scripts/migrations/compliance-upgradability', '--network', 'ropsten'],
-    ['execute', '--path', 'scripts/migrations/tokens-creation-service', '--network', 'ropsten'],
-    ['execute', '--path', 'scripts/migrations/composer', '--network', 'ropsten'],
-    ['execute', '--path', 'scripts/configurations/1_base_config.js', '--network', 'ropsten'],
-    ['execute', '--path', 'scripts/configurations/2_tokens_factory.js', '--network', 'ropsten'],
-    ['execute', '--path', 'scripts/configurations/3_composer.js', '--network', 'ropsten'],
-    ['execute', '--path', 'scripts/custom/white-list-setup.js', '--network', 'ropsten'],
+  deployTokensApothem: [
+    ['compile'],
+    ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'apothem']
   ],
   migrateAndConfigureForTests: [
     ['compile'],
-    ['execute', '--path', 'scripts/migrations/tests'],
-  ],
-  deployLocal: [
-    ['compile'],
-    ['execute', '--path', 'scripts/migrations/governance'],
-    // ['execute', '--path', 'scripts/migrations/governance', '--network', 'ropsten'],
+    ['execute', '--path', 'scripts/migrations/deployment'],
+    ['execute', '--path', 'scripts/migrations/test-configuration'],
   ],
 }

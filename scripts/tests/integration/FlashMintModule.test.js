@@ -10,37 +10,35 @@ const { WeiPerRad, WeiPerRay } = require("../helper/unit");
 const { AddressZero } = require("../helper/address");
 const { formatBytes32String } = require("ethers/lib/utils");
 const { loadFixture } = require("../helper/fixtures");
-const { initializeContracts } = require("../helper/initializer");
-const { addRoles } = require("../helper/access-roles");
+const { getProxy } = require("../../common/proxies");
 
-const COLLATERAL_POOL_ID = formatBytes32String("USDT")
+const COLLATERAL_POOL_ID = formatBytes32String("USDT-COL")
 
 const CLOSE_FACTOR_BPS = BigNumber.from(5000)
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(12500)
 const TREASURY_FEE_BPS = BigNumber.from(2500)
 
 const loadFixtureHandler = async () => {
-  const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-  const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID)
+  const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+
+  const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
+  const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
+  const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
+  const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
+  const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
+  const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
+  const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
+  const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
+
+  const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID)
   const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
   const usdtAddr = await collateralTokenAdapter.collateralToken();
   const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
 
-  const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
-  const collateralPoolConfig = await artifacts.initializeInterfaceAt("CollateralPoolConfig", "CollateralPoolConfig");
-  const fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
-  const flashMintModule = await artifacts.initializeInterfaceAt("FlashMintModule", "FlashMintModule");
-  const stablecoinAdapter = await artifacts.initializeInterfaceAt("StablecoinAdapter", "StablecoinAdapter");
-  const stableSwapModule = await artifacts.initializeInterfaceAt("StableSwapModule", "StableSwapModule");
-  const authTokenAdapter = await artifacts.initializeInterfaceAt("AuthTokenAdapter", "AuthTokenAdapter");
-  const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
+  const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
   const router = await artifacts.initializeInterfaceAt("MockedDexRouter", "MockedDexRouter");
-  const flashMintArbitrager = await artifacts.initializeInterfaceAt("FlashMintArbitrager", "FlashMintArbitrager");
-  const bookKeeperFlashMintArbitrager = await artifacts.initializeInterfaceAt("BookKeeperFlashMintArbitrager", "BookKeeperFlashMintArbitrager");
-
-  await initializeContracts();
-  await addRoles();
-
+  const flashMintArbitrager = await getProxy(proxyFactory, "FlashMintArbitrager");
+  const bookKeeperFlashMintArbitrager = await getProxy(proxyFactory, "BookKeeperFlashMintArbitrager");
   await collateralPoolConfig.initCollateralPool(
     COLLATERAL_POOL_ID,
     0,
@@ -169,7 +167,7 @@ describe("FlastMintModule", () => {
     })
 
     context("receiver has enough tokens to return the loan + fee", async () => {
-      it("should success", async () => {
+     it("should success", async () => {
         // mocked router will return all tokens it has
         await USDT.mint(router.address, parseEther("110"), { gasLimit: 1000000 })
 

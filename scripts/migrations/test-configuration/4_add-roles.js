@@ -1,27 +1,25 @@
-const { formatBytes32String } = require("ethers/lib/utils");
-const { DeployerAddress } = require("./address");
-const COLLATERAL_POOL_ID_WXDC = formatBytes32String("WXDC")
-const COLLATERAL_POOL_ID_USDT = formatBytes32String("USDT")
+const { getProxy } = require("../../common/proxies");
+const pools = require("../../common/collateral");
 
 const DeployerWallet = "0x4C5F0f90a2D4b518aFba11E22AC9b8F6B031d204";
 
-async function addRoles() {
-    const accessControlConfig = await artifacts.initializeInterfaceAt("AccessControlConfig", "AccessControlConfig");
-    const fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
-    const collateralTokenAdapterFactory = await artifacts.initializeInterfaceAt("CollateralTokenAdapterFactory", "CollateralTokenAdapterFactory");
-    const authTokenAdapter = await artifacts.initializeInterfaceAt("AuthTokenAdapter", "AuthTokenAdapter");
-    const stableSwapModule = await artifacts.initializeInterfaceAt("StableSwapModule", "StableSwapModule");
-    const flashMintModule = await artifacts.initializeInterfaceAt("FlashMintModule", "FlashMintModule");
-    const showStopper = await artifacts.initializeInterfaceAt("ShowStopper", "ShowStopper");
-    const priceOracle = await artifacts.initializeInterfaceAt("PriceOracle", "PriceOracle");
-    const fixedSpreadLiquidationStrategy = await artifacts.initializeInterfaceAt("FixedSpreadLiquidationStrategy", "FixedSpreadLiquidationStrategy");
-    const bookKeeper = await artifacts.initializeInterfaceAt("BookKeeper", "BookKeeper");
-    const stabilityFeeCollector = await artifacts.initializeInterfaceAt("StabilityFeeCollector", "StabilityFeeCollector");
-    const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "PositionManager");
-    const stablecoinAdapter = await artifacts.initializeInterfaceAt("StablecoinAdapter", "StablecoinAdapter");
-    const liquidationEngine = await artifacts.initializeInterfaceAt("LiquidationEngine", "LiquidationEngine");
-  
-    await accessControlConfig.initialize({ gasLimit: 1000000 });
+module.exports =  async function(deployer) {
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+
+    const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
+    const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
+    const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
+    const showStopper = await getProxy(proxyFactory, "ShowStopper");
+    const priceOracle = await getProxy(proxyFactory, "PriceOracle");
+    const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
+    const positionManager = await getProxy(proxyFactory, "PositionManager");
+    const liquidationEngine = await getProxy(proxyFactory, "LiquidationEngine");
+    const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
+    const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
+    const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
+    const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
+    const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
+    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
     
     await accessControlConfig.grantRole(await accessControlConfig.BOOK_KEEPER_ROLE(), bookKeeper.address)
   
@@ -40,11 +38,15 @@ async function addRoles() {
   
     await accessControlConfig.grantRole(await accessControlConfig.PRICE_ORACLE_ROLE(), priceOracle.address)
   
-    const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_WXDC)
-    const collateralTokenAdapterUSDT = await collateralTokenAdapterFactory.getAdapter(COLLATERAL_POOL_ID_USDT)
+    const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.adapters(pools.WXDC)
+    const collateralTokenAdapterUSDT_stbl = await collateralTokenAdapterFactory.adapters(pools.USDT_STABLE)
+    const collateralTokenAdapterUSDT_col = await collateralTokenAdapterFactory.adapters(pools.USDT_COL)
+    const collateralTokenAdapterFTHM = await collateralTokenAdapterFactory.adapters(pools.FTHM)
   
     await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterWXDC)
-    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterUSDT)
+    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterUSDT_stbl)
+    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterUSDT_col)
+    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterFTHM)
   
     await accessControlConfig.grantRole(await accessControlConfig.MINTABLE_ROLE(), flashMintModule.address)
   
@@ -56,11 +58,9 @@ async function addRoles() {
     await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), stableSwapModule.address)
 
     await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), stablecoinAdapter.address);
-    await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), DeployerAddress);
+    await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), DeployerWallet);
 
     await accessControlConfig.grantRole(await accessControlConfig.PRICE_ORACLE_ROLE(), DeployerWallet)
     await accessControlConfig.grantRole(await accessControlConfig.MINTABLE_ROLE(), DeployerWallet)
     await accessControlConfig.grantRole(await accessControlConfig.OWNER_ROLE(), DeployerWallet)
 }
-
-module.exports = { addRoles }

@@ -104,15 +104,15 @@ contract FlashMintModule is PausableUpgradeable, IERC3156FlashLender, IBookKeepe
         uint256 _amt = _mul(_amount, RAY);
         uint256 _fee = _mul(_amount, feeRate) / WAD;
         uint256 _total = _add(_amount, _fee);
+
         //_amt is in RAD, to calculat internal balance of stablecoin
         bookKeeper.mintUnbackedStablecoin(address(this), address(this), _amt);
         //minting requested amount to flashMint receiver
         stablecoinAdapter.withdraw(address(_receiver), _amount, abi.encode(0));
 
         emit LogFlashLoan(address(_receiver), _token, _amount, _fee);
-
+        
         require(_receiver.onFlashLoan(msg.sender, _token, _amount, _fee, _data) == CALLBACK_SUCCESS, "FlashMintModule/callback-failed");
-
         address(stablecoin).safeTransferFrom(address(_receiver), address(this), _total); // The fee is also enforced here
         stablecoinAdapter.deposit(address(this), _total, abi.encode(0));
         bookKeeper.settleSystemBadDebt(_amt);

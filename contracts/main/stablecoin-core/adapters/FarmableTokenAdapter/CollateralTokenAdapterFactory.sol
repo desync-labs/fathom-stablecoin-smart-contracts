@@ -2,11 +2,22 @@
 pragma solidity 0.8.17;
 
 import "./CollateralTokenAdapter.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
-contract CollateralTokenAdapterFactory {
-    mapping(bytes32 => address) private _adapters;
+contract CollateralTokenAdapterFactory is OwnableUpgradeable {
+    address public implementation;
+    mapping(bytes32 => address) public adapters;
 
-    event CollateralTokenAdapterCreated(bytes32 indexed collateralPoolId, address adapterAddress);
+    event CollateralTokenAdapterCreated(
+        bytes32 indexed collateralPoolId,
+        address adapterAddress
+    );
+
+    function initialize(address impl) external initializer {
+        OwnableUpgradeable.__Ownable_init();
+        implementation = impl;
+    }
 
     function createAdapter(
         address bookKeeper,
@@ -20,34 +31,26 @@ contract CollateralTokenAdapterFactory {
         uint256 treasuryFeeBps,
         address treasuryAccount,
         address positionManager
-    ) external returns (address adapterAddress) {
-        try new CollateralTokenAdapter() returns (CollateralTokenAdapter res) {
-            adapterAddress = address(res);
+    ) external onlyOwner {
+        CollateralTokenAdapter adapter = CollateralTokenAdapter(
+            Clones.clone(implementation)
+        );
 
-            res.initialize(
-                bookKeeper,
-                collateralPoolId,
-                collateralToken,
-                rewardToken,
-                fairlaunch,
-                pid,
-                shield,
-                timelock,
-                treasuryFeeBps,
-                treasuryAccount,
-                positionManager
-            );
-            _adapters[collateralPoolId] = adapterAddress;
+        adapter.initialize(
+            bookKeeper,
+            collateralPoolId,
+            collateralToken,
+            rewardToken,
+            fairlaunch,
+            pid,
+            shield,
+            timelock,
+            treasuryFeeBps,
+            treasuryAccount,
+            positionManager
+        );
+        adapters[collateralPoolId] = address(adapter);
 
-            emit CollateralTokenAdapterCreated(collateralPoolId, adapterAddress);
-        } catch Error(string memory reason) {
-            revert(reason);
-        } catch (bytes memory reason) {
-            revert(string(reason));
-        }
-    }
-
-    function getAdapter(bytes32 collateralPoolId) external view returns (address adapterAddress) {
-        adapterAddress = _adapters[collateralPoolId];
+        emit CollateralTokenAdapterCreated(collateralPoolId, address(adapter));
     }
 }
