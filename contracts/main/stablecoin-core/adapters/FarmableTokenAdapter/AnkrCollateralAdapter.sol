@@ -40,9 +40,11 @@ contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, R
     //@Sangjun left below getter for compilation since interface of tokenAdapter requires collateralToken getter fn. Later needs to be removed for audit.
     address public override collateralToken;
     uint256 public override decimals;
-    IToken public rewardToken;
 
     IManager public positionManager;
+
+    IAnkrStakingPool public XDCPoolAddress;
+    ICertToken public aXDCcAddress;
 
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
@@ -399,7 +401,6 @@ contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, R
 
     function uncage() external override onlyOwner {
         require(live == 0, "CollateralTokenAdapter/not-caged");
-        fairlaunch.deposit(address(this), pid, totalShare);
         live = 1;
         emit LogUncage();
     }
