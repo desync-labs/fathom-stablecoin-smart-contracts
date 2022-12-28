@@ -113,6 +113,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     }
   }
 
+  //This function is overload implementation of liquidate() and will only be called from LiquidationEngine contract to support batch liquidation, 
   function liquidate(
     bytes32 _collateralPoolId,
     address _positionAddress,
