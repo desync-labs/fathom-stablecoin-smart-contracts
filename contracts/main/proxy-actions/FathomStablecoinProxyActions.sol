@@ -127,10 +127,7 @@ contract FathomStablecoinProxyActions {
     }
 
     function xdcAdapterDeposit(address _adapter, address _positionAddress, bytes calldata _data) public payable {
-        address _collateralToken = address(IGenericTokenAdapter(_adapter).collateralToken());
-        IWXDC(_collateralToken).deposit{ value: msg.value }(); // Wraps XDC into WXDC
-        _collateralToken.safeApprove(address(_adapter), msg.value); // Approves adapter to take the WXDC amount
-        IGenericTokenAdapter(_adapter).deposit(_positionAddress, msg.value, _data); // Deposits WXDC collateral into the bookKeeper
+       IGenericTokenAdapter(_adapter).deposit{value: msg.value}(_positionAddress, msg.value, _data); //XDC collateral into the bookKeeper
     }
 
     function tokenAdapterDeposit(
@@ -145,7 +142,7 @@ contract FathomStablecoinProxyActions {
         // Only executes for tokens that have approval/transferFrom implementation
         if (_transferFrom) {
             _collateralToken.safeTransferFrom(msg.sender, address(this), _amount); // Gets token from the user's wallet
-        }
+        }   
         _collateralToken.safeApprove(_adapter, _amount); // Approves adapter to take the token amount
         IGenericTokenAdapter(_adapter).deposit(_positionAddress, _amount, _data); // Deposits token collateral into the bookKeeper
     }
@@ -292,8 +289,8 @@ contract FathomStablecoinProxyActions {
 
     function lockXDC(address _manager, address _xdcAdapter, uint256 _positionId, bytes calldata _data) public payable {
         address _positionAddress = IManager(_manager).positions(_positionId);
-        xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data); // Receives XDC amount, converts it to WXDC and joins it into the bookKeeper
-        adjustPosition(_manager, _positionId, _safeToInt(msg.value), 0, _xdcAdapter, _data); // Locks WXDC amount into the CDP
+        xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data); // Receives XDC, stake it to Ankr staking pool.
+        adjustPosition(_manager, _positionId, _safeToInt(msg.value), 0, _xdcAdapter, _data); // Locks XDC amount into the CDP
     }
 
     function safeLockXDC(address _manager, address _xdcAdapter, uint256 _positionId, address _owner, bytes calldata _data) external payable {
@@ -518,22 +515,26 @@ contract FathomStablecoinProxyActions {
         address _positionAddress = IManager(_manager).positions(_positionId);
         address _bookKeeper = IManager(_manager).bookKeeper();
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
-        xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data); // Receives XDC amount, converts it to WXDC and joins it into the bookKeeper
-        // Locks WXDC amount into the CDP and generates debt
+
+        // 2022 Dec 28th deposits XDC to AnkrCollateralAdapter
+        xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data);
+        // Locks XDC amount into the CDP and generates debt
         adjustPosition(
-            _manager,
-            _positionId,
-            _safeToInt(msg.value),
-            _getDrawDebtShare(_bookKeeper, _stabilityFeeCollector, _positionAddress, _collateralPoolId, _stablecoinAmount),
-            _xdcAdapter,
-            _data
+        _manager,
+        _positionId,
+        _safeToInt(msg.value),
+        _getDrawDebtShare(_bookKeeper, _stabilityFeeCollector, _positionAddress, _collateralPoolId, _stablecoinAmount),
+        _xdcAdapter,
+        _data
         );
-        moveStablecoin(_manager, _positionId, address(this), _toRad(_stablecoinAmount)); // Moves the Fathom Stablecoin amount (balance in the bookKeeper in rad) to proxy's address
+        // Moves the Fathom Stablecoin amount (balance in the bookKeeper in rad) to proxy's address
+        moveStablecoin(_manager, _positionId, address(this), _toRad(_stablecoinAmount));
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_bookKeeper).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
-            IBookKeeper(_bookKeeper).whitelist(_stablecoinAdapter);
+        IBookKeeper(_bookKeeper).whitelist(_stablecoinAdapter);
         }
-        IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data); // Withdraws Fathom Stablecoin to the user's wallet as a token
+        // Withdraws Fathom Stablecoin to the user's wallet as a token
+        IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data);
         IManager(_manager).updatePrice(_collateralPoolId);
     }
 
