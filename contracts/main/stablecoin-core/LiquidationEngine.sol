@@ -123,7 +123,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     bytes calldata _data,
     address sender
   ) external override whenNotPaused {
-    require(msg.sender == address(this));
+    require(msg.sender == address(this),"LiquidationEngine/invalid-sender");
     _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated,_maxDebtShareToBeLiquidated, _collateralRecipient, _data,sender);
   }
 
@@ -148,8 +148,6 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     bytes calldata _data,
     address sender
   ) internal {
-
-    ISetPrice(priceOracle).setPrice(_collateralPoolId);
 
     require(live == 1, "LiquidationEngine/not-live");
     require(_debtShareToBeLiquidated != 0, "LiquidationEngine/zero-debt-value-to-be-liquidated");
@@ -227,6 +225,8 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         -int256(_vars.newPositionDebtShare)
       );
     }
+
+    ISetPrice(priceOracle).setPrice(_collateralPoolId);
   }
 
   function setPriceOracle(address _priceOracle) external onlyOwnerOrShowStopper {
