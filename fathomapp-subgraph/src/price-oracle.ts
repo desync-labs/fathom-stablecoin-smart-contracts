@@ -26,13 +26,13 @@ export function priceUpdateHandler(event: LogSetPrice): void {
         // let _priceWithSafetyMargin = event.params._priceWithSafetyMargin
         for (let i = 0; i < pool.positions.length; ++i) {
             let pos  = Position.load(pool.positions[i])
-            if(pos != null && pos.debtShare.gt(BigInt.fromI32(0))){
+            if(pos != null && pos.debtShare.gt(BigDecimal.fromString('0'))){
                 let collateralValue = pos.lockedCollateral.times(pool.priceWithSafetyMargin)
-                let debtValue = pos.debtShare.toBigDecimal()
+                let debtValue = pos.debtShare
                 pos.safetyBuffer = collateralValue.ge(debtValue) ? collateralValue.minus(debtValue) : BigDecimal.fromString('0')
 
                 //Check if position is unsafe or not
-                if(pos.safetyBuffer.equals(BigDecimal.fromString('0')) && pos.debtShare.gt(BigInt.fromI32(0)) && pos.positionStatus != "liquidated"){
+                if(pos.safetyBuffer.equals(BigDecimal.fromString('0')) && pos.debtShare.gt(BigDecimal.fromString('0')) && pos.positionStatus != "liquidated"){
                     pos.positionStatus = 'unsafe'
                 }
 

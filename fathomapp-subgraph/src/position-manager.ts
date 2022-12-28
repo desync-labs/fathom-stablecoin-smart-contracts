@@ -28,7 +28,7 @@ export function newPositionHandler(event: LogNewPosition): void {
     position.collateralPool = poolId
     position.collateralPoolName = poolId.toString()
     position.lockedCollateral = BigDecimal.fromString('0')
-    position.debtShare = BigInt.fromString('0')
+    position.debtShare = BigDecimal.fromString('0')
     position.safetyBuffer = BigDecimal.fromString('1')
     position.safetyBufferInPercent = BigDecimal.fromString('0')
     position.tvl = BigDecimal.fromString('0')
