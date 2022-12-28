@@ -8,9 +8,6 @@ import { Constants } from "./Utils/Constants"
 export function handleLogInitCollateralPoolId(
   event: LogInitCollateralPoolId
 ): void {
-  //Create Protocol stat entity if not exist
-
-
   //Save Pool
   let poolId = event.params._collateralPoolId
   let pool  = Pool.load(poolId.toHexString())
@@ -22,7 +19,7 @@ export function handleLogInitCollateralPoolId(
     pool.liquidationRatio = Constants.divByRAYToDecimal(event.params._liquidtionRatio)
     pool.stabilityFeeRate = Constants.divByRAY(event.params._stabilityFeeRate)
     pool.tokenAdapterAddress = event.params._adapter
-    pool.lockedCollateral = BigInt.fromI32(0)
+    pool.lockedCollateral = Constants.DEFAULT_PRICE
     pool.collateralPrice = Constants.DEFAULT_PRICE
     pool.collateralLastPrice = Constants.DEFAULT_PRICE
     pool.priceWithSafetyMargin = Constants.DEFAULT_PRICE
@@ -38,7 +35,8 @@ export function handleLogInitCollateralPoolId(
 
     log.info('Saving pool information in protocol stat',[])
     let protocolStat  = ProtocolStat.load(Constants.FATHOM_STATS_KEY)
-
+    
+    //Create Protocol stat entity if not exist
     if(protocolStat == null){
       protocolStat = new ProtocolStat(Constants.FATHOM_STATS_KEY)
       protocolStat.tvl = BigDecimal.fromString('0')

@@ -15,3 +15,7 @@ typechain-types
 cache
 artifacts
 
+fathomapp-subgraph/build
+fathomapp-subgraph/generated
+fathomapp-subgraph/node_modules
+

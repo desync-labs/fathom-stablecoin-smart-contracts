@@ -5,12 +5,14 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ fathomapp-subgraph",
+
     "create-local": "graph create --node http://localhost:8020/ fathomapp-subgraph",
     "remove-local": "graph remove --node http://localhost:8020/ fathomapp-subgraph",
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 fathomapp-subgraph",
-    "create-cloud": "graph create --node http://139.59.27.103:8020/ fathomapp-subgraph",
-    "remove-cloud": "graph remove --node http://139.59.27.103:8020/ fathomapp-subgraph",
-    "deploy-cloud": "graph deploy --node http://139.59.27.103:8020/ --ipfs http://139.59.27.103:5001 fathomapp-subgraph",
+
+    "create-cloud": "graph create --node http://graph.composer.live fathomapp-subgraph",
+    "remove-cloud": "graph remove --node http://graph.composer.live fathomapp-subgraph",
+    "deploy-cloud": "graph deploy --node http://graph.composer.live --ipfs http://graph.composer.live:5001 fathomapp-subgraph",
     "test": "graph test"
   },
   "dependencies": {
