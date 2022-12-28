@@ -105,13 +105,27 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     bytes[] calldata datas
   ) external override nonReentrant whenNotPaused onlyWhitelisted {
 
-    for(uint i = 0; i < _collateralPoolIds.length; i++)
-      try this.liquidate(_collateralPoolIds[i], _positionAddresses[i],_debtShareToBeLiquidateds[i], _maxDebtShareToBeLiquidateds[i], _collateralRecipients[i], datas[i]){
-      } 
-      catch{
-          continue;
-      }
+    for(uint i = 0; i < _collateralPoolIds.length; i++){
+        try this.liquidate(_collateralPoolIds[i], _positionAddresses[i],_debtShareToBeLiquidateds[i], _maxDebtShareToBeLiquidateds[i], _collateralRecipients[i], datas[i],msg.sender){
+        }catch{
+            continue;
+        }
+    }
   }
+
+  function liquidate(
+    bytes32 _collateralPoolId,
+    address _positionAddress,
+    uint256 _debtShareToBeLiquidated, // [rad]
+    uint256 _maxDebtShareToBeLiquidated, // [wad]
+    address _collateralRecipient,
+    bytes calldata _data,
+    address sender
+  ) external override whenNotPaused {
+    require(msg.sender == address(this));
+    _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated,_maxDebtShareToBeLiquidated, _collateralRecipient, _data,sender);
+  }
+
 
   function liquidate(
     bytes32 _collateralPoolId,
@@ -121,7 +135,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     address _collateralRecipient,
     bytes calldata _data
   ) external override nonReentrant whenNotPaused onlyWhitelisted {
-    _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated,_maxDebtShareToBeLiquidated, _collateralRecipient, _data);
+    _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated,_maxDebtShareToBeLiquidated, _collateralRecipient, _data, msg.sender);
   }
 
   function _liquidate(
@@ -130,7 +144,8 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     uint256 _debtShareToBeLiquidated, // [rad]
     uint256 _maxDebtShareToBeLiquidated, // [wad]
     address _collateralRecipient,
-    bytes calldata _data
+    bytes calldata _data,
+    address sender
   ) internal {
 
     ISetPrice(priceOracle).setPrice(_collateralPoolId);
@@ -176,7 +191,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
       _positionAddress,
       _debtShareToBeLiquidated,
       _maxDebtShareToBeLiquidated,
-      msg.sender,
+      sender,
       _collateralRecipient,
       _data
     );
