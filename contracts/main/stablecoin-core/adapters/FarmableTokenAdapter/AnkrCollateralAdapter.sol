@@ -206,6 +206,7 @@ contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, R
     /// @param _amount The amount to be deposited
     function _deposit(address _positionAddress, uint256 _amount, bytes calldata /* _data */) private {
     require(live == 1, "CollateralTokenAdapter/not live");
+    require(_amount == msg.value, "CollateralTokenAdapter/DepositAmountMismatch");
 
     if (_amount > 0) {
       uint256 _share = wdiv(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
