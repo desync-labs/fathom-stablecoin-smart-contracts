@@ -2,7 +2,7 @@ const fs = require('fs');
 // require("dotenv").config();
 // const WXDCAdd = process.env.WXDC_ADDRESS;
 
-const USDT = artifacts.require('./tests/mocks/USDT.sol');
+const USDT = artifacts.require('./tests/mocks/ERC20Mintable.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -22,7 +22,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./tests/mocks/USDT.sol');
+  const deployed = artifacts.require('./tests/mocks/ERC20Mintable.sol');
 
   let addressesUpdate = { 
     USDT:deployed.address,

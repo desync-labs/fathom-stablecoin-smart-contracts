@@ -5,7 +5,6 @@ const addresses = require("../../common/addresses");
 
 module.exports = async function (deployer) {
 
-
   await deployer.deploy(ERC20, "WXDC", "WXDC", { gas: 3050000 });
   const wxdc = await artifacts.initializeInterfaceAt("ERC20Mintable", "ERC20Mintable");
   await deployer.deploy(ERC20, "USDT", "USDT", { gas: 3050000 });

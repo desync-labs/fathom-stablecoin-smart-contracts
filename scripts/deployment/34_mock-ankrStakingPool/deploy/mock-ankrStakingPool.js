@@ -1,23 +1,22 @@
 const fs = require('fs');
 
-const SimplePriceFeed = artifacts.require('./main/price-feeders/SimplePriceFeed.sol');
+const MockXDCStakingPool = artifacts.require('./main/mocks/MockXDCStakingPool.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
-
 module.exports =  async function(deployer) {
 
-  console.log(">> Deploying an upgradable SimplePriceFeed contract")
+  console.log(">> Deploying an upgradable GetPositions contract")
   let promises = [
-      deployer.deploy(SimplePriceFeed, { gas: 4050000 }),
+    deployer.deploy(MockXDCStakingPool, stablecoinAddress.mockaXDCc, { gas: 4050000 }),
   ];
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./main/price-feeders/SimplePriceFeed.sol');
-
+  const deployed = artifacts.require('./main/mocks/MockXDCStakingPool.sol');
+  console.log("MockXDCStakingPool is "+ deployed.address);
   let addressesUpdate = { 
-    simplePriceFeed:deployed.address,
+    mockXDCStakingPool : deployed.address,
   };
 
   const newAddresses = {
