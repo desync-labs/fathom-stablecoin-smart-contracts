@@ -5,10 +5,8 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../../../interfaces/IFathomFairLaunch.sol";
 import "../../../interfaces/IBookKeeper.sol";
 import "../../../interfaces/IFarmableTokenAdapter.sol";
-import "../../../../fair-launch/interfaces/IShield.sol";
 import "../../../interfaces/ICagable.sol";
 import "../../../interfaces/IManager.sol";
 import "../../../utils/SafeToken.sol";
@@ -17,7 +15,7 @@ import "../../../apis/ankr/interfaces/IAnkrStakingPool.sol";
 import "../../../apis/ankr/interfaces/ICertToken.sol";
 
 /// @dev receives XDC from users and deposit in Ankr's staking. Hence, users will still earn reward from changing aXDCc ratio
-contract CollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+contract AnkrCollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
 
     uint256 internal constant WAD = 10 ** 18;

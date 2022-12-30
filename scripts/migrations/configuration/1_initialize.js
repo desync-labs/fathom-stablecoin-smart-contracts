@@ -8,6 +8,8 @@ const FathomStablecoinProxyActions = artifacts.require('FathomStablecoinProxyAct
 const Shield = artifacts.require('Shield.sol');
 const FathomToken = artifacts.require('FathomToken.sol');
 
+const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
+
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
@@ -33,7 +35,8 @@ module.exports = async function (deployer) {
     const fathomOraclePriceFeedFactory = await getProxy(proxyFactory, "FathomOraclePriceFeedFactory");
     const dexPriceOracle = await getProxy(proxyFactory, "DexPriceOracle");
     const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
-
+    const ankrCollateralTokenAdapter = await getProxy(proxyFactory, "AnkrCollateralTokenAdapter");
+    
     const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", "CollateralTokenAdapter");
     const fairLaunch = await artifacts.initializeInterfaceAt("FairLaunch", "FairLaunch");
     const fathomOraclePriceFeed = await artifacts.initializeInterfaceAt("FathomOraclePriceFeed", "FathomOraclePriceFeed");
@@ -113,7 +116,17 @@ module.exports = async function (deployer) {
         bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
         fathomOraclePriceFeedFactory.initialize(fathomOraclePriceFeed.address, { gasLimit: 1000000 }),
         dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
-        collateralTokenAdapterFactory.initialize(collateralTokenAdapter.address, { gasLimit: 1000000 })
+        collateralTokenAdapterFactory.initialize(collateralTokenAdapter.address, { gasLimit: 1000000 }),
+        ankrCollateralTokenAdapter.initialize(),
+        ankrAdapter.initialize(
+            bookKeeper.address,
+            pools.WXDC,
+            addresses.xdcPool,
+            addresses.aXDCc,
+            TREASURY_FEE_BPS,
+            DeployerWallet,
+            positionManager.address
+        )
     ];
 
     await Promise.all(promises);
