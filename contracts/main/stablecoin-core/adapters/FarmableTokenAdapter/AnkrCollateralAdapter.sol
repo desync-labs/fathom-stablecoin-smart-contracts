@@ -15,7 +15,7 @@ import "../../../apis/ankr/interfaces/IAnkrStakingPool.sol";
 import "../../../apis/ankr/interfaces/ICertToken.sol";
 
 /// @dev receives XDC from users and deposit in Ankr's staking. Hence, users will still earn reward from changing aXDCc ratio
-contract AnkrCollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
 
     uint256 internal constant WAD = 10 ** 18;
@@ -204,6 +204,7 @@ contract AnkrCollateralTokenAdapter is IFarmableTokenAdapter, PausableUpgradeabl
     /// @param _amount The amount to be deposited
     function _deposit(address _positionAddress, uint256 _amount, bytes calldata /* _data */) private {
     require(live == 1, "CollateralTokenAdapter/not live");
+    require(_amount == msg.value, "CollateralTokenAdapter/DepositAmountMismatch");
 
     if (_amount > 0) {
       uint256 _share = wdiv(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]

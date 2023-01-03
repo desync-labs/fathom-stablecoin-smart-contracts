@@ -1,23 +1,23 @@
 const fs = require('fs');
 
-const SimplePriceFeed = artifacts.require('./main/price-feeders/SimplePriceFeed.sol');
+const AnkrCollateralAdapter = artifacts.require('./main/stablecoin-core/adapters/FarmableTokenAdapter/AnkrCollateralAdapter.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
 
 module.exports =  async function(deployer) {
 
-  console.log(">> Deploying an upgradable SimplePriceFeed contract")
+  console.log(">> Deploying an upgradable AnkrCollateralAdapter contract")
   let promises = [
-      deployer.deploy(SimplePriceFeed, { gas: 4050000 }),
+      deployer.deploy(AnkrCollateralAdapter, { gas: 5050000 }),
   ];
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./main/price-feeders/SimplePriceFeed.sol');
+  const deployed = artifacts.require('./main/stablecoin-core/adapters/FarmableTokenAdapter/AnkrCollateralAdapter.sol');
 
   let addressesUpdate = { 
-    simplePriceFeed:deployed.address,
+    ankrCollateralAdapter:deployed.address,
   };
 
   const newAddresses = {
