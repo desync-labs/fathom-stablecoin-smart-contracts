@@ -286,6 +286,8 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
             ),
             "BookKeeper/ceiling-exceeded"
         );
+        //debugging 2022 Dec 30th Friday
+        //priceWithSafetyMargin is more than 0
         require(
             either(both(_debtShare <= 0, _collateralValue >= 0), _positionDebtValue <= mul(position.lockedCollateral, _vars.priceWithSafetyMargin)),
             "BookKeeper/not-safe"
