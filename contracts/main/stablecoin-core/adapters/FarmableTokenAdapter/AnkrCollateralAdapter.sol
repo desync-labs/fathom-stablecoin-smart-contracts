@@ -7,8 +7,6 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 
 import "../../../utils/BytesHelper.sol";
 
-
-import "../../../interfaces/IFathomFairLaunch.sol";
 import "../../../interfaces/IBookKeeper.sol";
 import "../../../interfaces/IFarmableTokenAdapter.sol";
 import "../../../../fair-launch/interfaces/IShield.sol";
