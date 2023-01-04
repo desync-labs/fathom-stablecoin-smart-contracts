@@ -19,4 +19,5 @@ module.exports = async function (deployer) {
     await stableSwapModule.setFeeOut(SSM_FEE_OUT, { gasLimit: 1000000 })
 
     await flashMintModule.setFeeRate(FMM_FEE, { gasLimit: 1000000 })
+    await flashMintModule.setMax(WeiPerWad.mul("1000000000"), { gasLimit: 1000000 })
 }
