@@ -1,4 +1,7 @@
 deploy:
+	rm -r build
+	rm addresses.json
+	coralX compile
 # deploy accessControl
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
 	coralX execute --network development --path scripts/deployment/0_access-control-config/initialize/initialize_accessControlConfig.js
@@ -268,6 +271,17 @@ tankWXDC:
 	# Second set price to update priceWithSafetyMargin in PriceOracle for WXDC
 	coralX execute --network development --path scripts/deployment/7_price-oracle/config/setPrice.js
 
+tankXDC:
+#for some reason, USDT-STABLE is used to open position.
+#and unfortunately, USDT-COL does not really work and it fails.
+#better be tested locally
+	# for quick price manipulation, running scripts below will make your life easier.
+	# First set price to change prce in simplePriceFeed
+	coralX execute --network development --path scripts/deployment/15_simple-price-feed/config/config_simple-price-feed-WXDC.js
+	# Second set price to update priceWithSafetyMargin in PriceOracle for WXDC
+	coralX execute --network development --path scripts/deployment/7_price-oracle/config/setPriceXDC.js
+
+
 tankFTHM:
 #for some reason, USDT-STABLE is used to open position.
 #and unfortunately, USDT-COL does not really work and it fails.
@@ -292,3 +306,9 @@ mintable-role-bot:
 whiteListBot:
 	# I would have to whitelist bot to liq. engine
 	coralX execute --network development --path scripts/deployment/5_liquidation-engine/config/config_liquidation-engine-whiteListBot.js
+
+makeWallet:
+	coralX execute --network development --path scripts/ankrIntTest/positionOpening.js
+closePositionFull:
+	coralX execute --network development --path scripts/ankrIntTest/closePositionFull.js
+

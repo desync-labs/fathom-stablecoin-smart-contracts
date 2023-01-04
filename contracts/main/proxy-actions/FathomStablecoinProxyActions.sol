@@ -116,6 +116,7 @@ contract FathomStablecoinProxyActions {
         address _stablecoin = address(IStablecoinAdapter(_adapter).stablecoin());
         // Gets Fathom Stablecoin from the user's wallet
         _stablecoin.safeTransferFrom(msg.sender, address(this), _stablecoinAmount);
+
         // Approves adapter to take the Fathom Stablecoin amount
         _stablecoin.safeApprove(_adapter, _stablecoinAmount);
         // Deposits Fathom Stablecoin into the bookKeeper
@@ -211,7 +212,7 @@ contract FathomStablecoinProxyActions {
         int256 _debtShare, // [wad]
         address _adapter,
         bytes calldata _data
-    ) public {
+    ) public {  
         IManager(_manager).adjustPosition(_positionId, _collateralValue, _debtShare, _adapter, _data);
     }
 
@@ -516,9 +517,9 @@ contract FathomStablecoinProxyActions {
         address _bookKeeper = IManager(_manager).bookKeeper();
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
 
-        // 2022 Dec 28th deposits XDC to AnkrCollateralAdapter
+        // deposits XDC to AnkrStakingPool via AnkrCollateralAdapter
         xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data);
-        // Locks XDC amount into the CDP and generates debt
+
         adjustPosition(
         _manager,
         _positionId,
@@ -767,6 +768,7 @@ contract FathomStablecoinProxyActions {
         uint256 _collateralAmount, // [wad]
         bytes calldata _data
     ) external {
+        // revert("FSPA/wipeAllAndUnlockXDC");
         address _bookKeeper = IManager(_manager).bookKeeper();
         address _positionAddress = IManager(_manager).positions(_positionId);
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
@@ -779,11 +781,11 @@ contract FathomStablecoinProxyActions {
             _getWipeAllStablecoinAmount(_bookKeeper, _positionAddress, _positionAddress, _collateralPoolId),
             _data
         );
+
         adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmount), -int256(_debtShare), _xdcAdapter, _data); // Paybacks debt to the CDP and unlocks WXDC amount from it
         moveCollateral(_manager, _positionId, address(this), _collateralAmount, _xdcAdapter, _data); // Moves the amount from the CDP positionAddress to proxy's address
-        IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _collateralAmount, _data); // Withdraws WXDC amount to proxy address as a token
-        IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_collateralAmount); // Converts WXDC to XDC
-        SafeToken.safeTransferETH(msg.sender, _collateralAmount); // Sends XDC back to the user's wallet
+        IGenericTokenAdapter(_xdcAdapter).withdraw(msg.sender, _collateralAmount, _data); // Withdraw aXDCc from AnkrCollateralAdapter, fee deducted amount
+
         IManager(_manager).updatePrice(_collateralPoolId);
     }
 
