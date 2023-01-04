@@ -370,8 +370,8 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         bytes calldata _data
     ) external override nonReentrant whenNotPaused {
         _deposit(_source, 0, _data);
-        _moveStake(_source, _destination, _share, _data);
         _moveCerts(_source, _destination, _share, _data);
+        _moveStake(_source, _destination, _share, _data);
     }
 
     function _moveCerts(
@@ -382,9 +382,10 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
   ) internal onlyCollateralManager {
         //stake might be not WAD but sth else
         uint256 certsToMoveRatio;
-        if(_share >= stake[_source]){
+        if(_share == stake[_source]){
             certsToMoveRatio = 1*WAD;
         } else {
+            require(_share > stake[_source], "AnkrCollateralAdapter/tooMuchShare");
             certsToMoveRatio = wdiv(_share, stake[_source]);
         }
         uint256 certsMove = wmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
