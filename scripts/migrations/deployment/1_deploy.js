@@ -22,10 +22,8 @@ const FlashMintArbitrager = artifacts.require('FlashMintArbitrager.sol');
 const BookKeeperFlashMintArbitrager = artifacts.require('BookKeeperFlashMintArbitrager.sol');
 const FathomProxyFactory = artifacts.require('FathomProxyFactory.sol');
 const FathomProxyAdmin = artifacts.require('FathomProxyAdmin.sol');
-const FathomOraclePriceFeedFactory = artifacts.require('FathomOraclePriceFeedFactory.sol');
-const FathomOraclePriceFeed = artifacts.require('FathomOraclePriceFeed.sol');
 const DelayFathomOraclePriceFeed = artifacts.require('DelayFathomOraclePriceFeed.sol');
-const AnkrCollateralTokenAdapter = artifacts.require('AnkrCollateralTokenAdapter.sol');
+const AnkrCollateralAdapter = artifacts.require('AnkrCollateralAdapter.sol');
 
 module.exports =  async function(deployer) {
   let promises = [
@@ -39,7 +37,6 @@ module.exports =  async function(deployer) {
       deployer.deploy(PriceOracle, { gas: 7050000 }),
       deployer.deploy(ShowStopper, { gas: 7050000 }),
       deployer.deploy(PositionManager, { gas: 7050000 }),
-      deployer.deploy(FathomOraclePriceFeed, { gas: 7050000 }),
       deployer.deploy(SimplePriceFeed, { gas: 7050000 }),
       deployer.deploy(FixedSpreadLiquidationStrategy, { gas: 7050000 }),
       deployer.deploy(FathomStablecoinProxyActions, { gas: 7050000 }),
@@ -54,9 +51,8 @@ module.exports =  async function(deployer) {
       deployer.deploy(BookKeeperFlashMintArbitrager, { gas: 7050000 }),
       deployer.deploy(FathomProxyFactory, { gas: 7050000 }),
       deployer.deploy(FathomProxyAdmin, { gas: 7050000 }),
-      deployer.deploy(FathomOraclePriceFeedFactory, { gas: 7050000 }),
       deployer.deploy(DelayFathomOraclePriceFeed, { gas: 7050000 }),
-      deployer.deploy(AnkrCollateralTokenAdapter, { gas: 7050000 }),
+      deployer.deploy(AnkrCollateralAdapter, { gas: 7050000 }),
   ];
 
   await Promise.all(promises);

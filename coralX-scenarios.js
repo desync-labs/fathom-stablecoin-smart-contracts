@@ -19,7 +19,7 @@ module.exports = {
   ],
   migrateAndConfigureForTests: [
     ['compile'],
-    ['execute', '--path', 'scripts/migrations/test/deployment'],
+    ['execute', '--path', 'scripts/migrations/test/pre-deployment'],
     ['execute', '--path', 'scripts/migrations/deployment'],
     ['execute', '--path', 'scripts/migrations/test/configuration'],
   ],

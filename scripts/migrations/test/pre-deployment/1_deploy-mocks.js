@@ -8,6 +8,8 @@ const TokenAdapter = artifacts.require('TokenAdapter.sol');
 const aXDCcMocked = artifacts.require('MockaXDCc.sol');
 const MockedXDCStakingPool = artifacts.require('MockXDCStakingPool.sol');
 const ERC20 = artifacts.require('ERC20Mintable.sol');
+// const mockedDexFactory = artifacts.require('MockedDexFactory.sol');
+
 
 module.exports =  async function(deployer) {
   const promises = [
@@ -21,10 +23,13 @@ module.exports =  async function(deployer) {
 
   await deployer.deploy(MockedXDCStakingPool, aXDCcMocked.address, { gas: 3050000 });
 
-  const chainId = deployer.networkId();
+  const chainId = deployer.networkId(ERC20.address);
   addresses[chainId].USD = ERC20.address;
   addresses[chainId].xdcPool = MockedXDCStakingPool.address;
   addresses[chainId].aXDCc = aXDCcMocked.address;
+
+  await deployer.deploy(ERC20, "WXDC", "WXDC", { gas: 3050000 }),
+  addresses[chainId].WXDC = ERC20.address;
 
   fs.writeFileSync('./externalAddresses.json', JSON.stringify(addresses));
 };
