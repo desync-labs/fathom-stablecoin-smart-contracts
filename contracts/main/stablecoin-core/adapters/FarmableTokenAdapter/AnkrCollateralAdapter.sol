@@ -388,7 +388,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         //stake might be not WAD but sth else
         uint256 certsToMoveRatio;
         // revert(string(_share._uintToASCIIBytes()));
-        revert(string(stake[_source]._uintToASCIIBytes()));
+        // revert(string(stake[_source]._uintToASCIIBytes()));
         if(_share == stake[_source]){
             certsToMoveRatio = 1*WAD;
         } else {
@@ -396,6 +396,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             certsToMoveRatio = wdiv(_share, stake[_source]);
         }
         uint256 certsMove = wmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
+        revert(string(certsMove._uintToASCIIBytes()));
         recordRatioNCerts[_source].CertsAmount -= certsMove;
         //destination should have ratio adjusted
 
