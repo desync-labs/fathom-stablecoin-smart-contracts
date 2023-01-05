@@ -1,6 +1,6 @@
 deploy:
-	rm -r build
-	rm addresses.json
+	# rm -r build
+	# rm addresses.json
 	coralX compile
 # deploy accessControl
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
@@ -311,4 +311,8 @@ makeWallet:
 	coralX execute --network development --path scripts/ankrIntTest/positionOpening.js
 closePositionFull:
 	coralX execute --network development --path scripts/ankrIntTest/closePositionFull.js
+
+partialClosePosition:
+	coralX execute --network development --path scripts/ankrIntTest/closePositionPartial.js
+
 
