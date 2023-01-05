@@ -385,7 +385,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         if(_share == stake[_source]){
             certsToMoveRatio = 1*WAD;
         } else {
-            require(_share > stake[_source], "AnkrCollateralAdapter/tooMuchShare");
+            require(_share < stake[_source], "AnkrCollateralAdapter/tooMuchShare");
             certsToMoveRatio = wdiv(_share, stake[_source]);
         }
         uint256 certsMove = wmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
