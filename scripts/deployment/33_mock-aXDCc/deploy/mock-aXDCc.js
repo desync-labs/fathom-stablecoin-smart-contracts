@@ -17,11 +17,9 @@ module.exports =  async function(deployer) {
   const deployed = artifacts.require('./contracts/tests/mocks/MockaXDCc.sol');
   console.log("mockaXDCc is "+ deployed.address);
 
-
   const MockaXDCcInstance = await MockaXDCc.at(deployed.address);
-  // const WXDCInstance = await FTHM.at(stablecoinAddress.FTHM);
 
-  //mint to V1 faucet
+  // set ratio
   await MockaXDCcInstance.setRatio(
     BigNumber.from('878076691684207684'), { gasLimit: 1000000 }
   )
