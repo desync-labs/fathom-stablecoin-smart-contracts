@@ -215,9 +215,13 @@ checkProxyWallet:
 
 	coralX execute --network development --path scripts/tests/0_makeWallet/2_makeWallet.js
 
+<<<<<<< Updated upstream
 bot:
 	# give minter role to liquidation bot 0xe7B11F39E08089B1d76A79D6272AC7Ad11E8eFe9
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-mintable-role-liquidation-bot.js
+=======
+
+>>>>>>> Stashed changes
 bot2:
 # deploy getPositionsBot for liquidation bot
 	coralX execute --network development --path scripts/deployment/29_get-positions-bot/deploy/get-positions-bot.js
@@ -301,6 +305,10 @@ stableSwap to generate FXD for providing liquidity:
 	coralX execute --network development --path scripts/PrepSepDemo/stableSwap/2_swapThreeMilUSDT.js
 mockPoolInfo:
 	coralX execute --network development --path scripts/deployment/27_stats/deploy/mockPoolInfo.js
+	coralX execute --network apothem --path scripts/deployment/27_stats/deploy/mockPoolInfo.js
+minterRoleBot:
+	# give minter role to liquidation bot 0xe7B11F39E08089B1d76A79D6272AC7Ad11E8eFe9
+	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-mintable-role-liquidation-bot.js
 mintable-role-bot:
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/archive_apothem/grant-mintable-role-liquidation-bot.js
 whiteListBot:
