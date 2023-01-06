@@ -55,5 +55,11 @@ module.exports = async function(deployer) {
   // console.log(AliceAddress == proxyWalletAsAliceOwner);
 
   //here return 1 FXD and ask 0.5 XDC worth of aXDCc
-  await wipeAndUnlockXDC(proxyWalletAsAlice, AliceAddress, 1, WeiPerWad.div(2), WeiPerWad);
+  await wipeAndUnlockXDC(proxyWalletAsAlice, AliceAddress, 1, WeiPerWad.div(3), WeiPerWad);
 };
+
+// 2 FXD borrowed, 1 XDC paid.
+
+// when partiially closing, 0.5 XDC 1 FXD will pay
+
+//
