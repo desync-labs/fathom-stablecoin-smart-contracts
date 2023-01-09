@@ -1,6 +1,6 @@
 deploy:
-	rm -r build
-	rm addresses.json
+	# rm -r build
+	# rm addresses.json
 	coralX compile
 # deploy accessControl
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js

@@ -5,6 +5,8 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
+import "../../../../utils/BytesHelper.sol";
+
 import "../../../interfaces/IFathomFairLaunch.sol";
 import "../../../interfaces/IBookKeeper.sol";
 import "../../../interfaces/IFarmableTokenAdapter.sol";
@@ -19,6 +21,7 @@ import "../../../apis/ankr/interfaces/ICertToken.sol";
 /// @dev receives XDC from users and deposit in Ankr's staking. Hence, users will still earn reward from changing aXDCc ratio
 contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
+    using BytesHelper for *;
 
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAY = 10 ** 27;
@@ -396,8 +399,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         } else {
             require(_share < stake[_source], "AnkrCollateralAdapter/tooMuchShare");
             //share from WAD to RAY
-            uint256 _shareRAY = mul(_share, 10**9);
-
             certsToMoveRatio = rdiv(mul(_share, 10**9), mul(stake[_source], 10**9));
         }
         uint256 certsMove = rmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
