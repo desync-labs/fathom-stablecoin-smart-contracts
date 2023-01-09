@@ -375,8 +375,9 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         bytes calldata _data
     ) external override nonReentrant whenNotPaused {
         _deposit(_source, 0, _data);
-        _moveStake(_source, _destination, _share, _data);
         _moveCerts(_source, _destination, _share, _data);
+        _moveStake(_source, _destination, _share, _data);
+        
     }
 
     function _moveCerts(
