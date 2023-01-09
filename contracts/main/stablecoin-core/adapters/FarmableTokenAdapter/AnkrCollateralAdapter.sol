@@ -292,7 +292,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             //if ratio on recordRatioNCerts is bigger or equal to ratioaXDCc,
             //send all certs that the position owner has
             if (ratio >= ratioaXDCc) {
-                SafeToken.safeTransfer(address(aXDCcAddress), _usr, div(certsAmount, 10**9);
+                SafeToken.safeTransfer(address(aXDCcAddress), _usr, div(certsAmount, 10**9));
             } else {
                 //otherwise calculate reward and deduct fee, then transfer the rest of certs
                     //Q.. change to ray below
@@ -398,7 +398,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             //share from WAD to RAY
             uint256 _shareRAY = mul(_share, 10**9);
 
-            certsToMoveRatio = rdiv(mul(_share, 10**9), mul(stake[_source], 10**9);
+            certsToMoveRatio = rdiv(mul(_share, 10**9), mul(stake[_source], 10**9));
         }
         uint256 certsMove = rmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
         // revert(string(certsMove._uintToASCIIBytes()));
