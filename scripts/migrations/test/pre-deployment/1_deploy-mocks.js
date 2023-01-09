@@ -1,5 +1,6 @@
 const fs = require('fs');
-// const addresses = require('./externalAddresses.json');
+const { BigNumber } = require('ethers');
+
 const rawdata = fs.readFileSync('../../../../externalAddresses.json');
 let addresses = JSON.parse(rawdata);
 
@@ -8,8 +9,6 @@ const TokenAdapter = artifacts.require('TokenAdapter.sol');
 const aXDCcMocked = artifacts.require('MockaXDCc.sol');
 const MockedXDCStakingPool = artifacts.require('MockXDCStakingPool.sol');
 const ERC20 = artifacts.require('ERC20Mintable.sol');
-// const mockedDexFactory = artifacts.require('MockedDexFactory.sol');
-
 
 module.exports =  async function(deployer) {
   const promises = [
@@ -22,6 +21,12 @@ module.exports =  async function(deployer) {
   await Promise.all(promises);
 
   await deployer.deploy(MockedXDCStakingPool, aXDCcMocked.address, { gas: 3050000 });
+
+  // set ratio
+  const aXDCc = await aXDCcMocked.at(aXDCcMocked.address);
+  await aXDCc.setRatio(
+    BigNumber.from('878076691684207684'), { gasLimit: 1000000 }
+  )
 
   const chainId = deployer.networkId(ERC20.address);
   addresses[chainId].USD = ERC20.address;

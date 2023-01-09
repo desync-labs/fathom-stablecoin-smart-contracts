@@ -3,25 +3,19 @@ const chai = require('chai');
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 
-const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
+const { WeiPerRay, WeiPerWad } = require("../helper/unit");
 const TimeHelpers = require("../helper/time");
 const AssertHelpers = require("../helper/assert");
 const { createProxyWallets } = require("../helper/proxy-wallets");
-const { AliceAddress, DevAddress, AddressZero } = require("../helper/address");
-const { formatBytes32String } = require("ethers/lib/utils");
+const { AliceAddress, DevAddress } = require("../helper/address");
 const PositionHelper = require("../helper/positions");
 const { loadFixture } = require("../helper/fixtures");
 const { getProxy } = require("../../common/proxies");
 const pools = require("../../common/collateral");
 
-const CLOSE_FACTOR_BPS = BigNumber.from(5000)
-const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(12500)
-const TREASURY_FEE_BPS = BigNumber.from(2500)
-
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-    // const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
@@ -31,35 +25,15 @@ const setup = async () => {
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
     const priceOracle = await getProxy(proxyFactory, "PriceOracle");
 
-    // const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(pools.XDC)
-    // const tokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
-    // const wxdcAddr = await tokenAdapter.collateralToken();
-    // const WXDC = await artifacts.initializeInterfaceAt("ERC20Mintable", wxdcAddr);
-
     ({
         proxyWallets: [aliceProxyWallet],
     } = await createProxyWallets([AliceAddress]));
 
     await stabilityFeeCollector.setSystemDebtEngine(DevAddress)
-    // await collateralPoolConfig.initCollateralPool(
-    //     pools.XDC,
-    //     WeiPerRad.mul(100),
-    //     WeiPerRad.mul(1),
-    //     simplePriceFeed.address,
-    //     WeiPerRay,
-    //     WeiPerRay,
-    //     tokenAdapter.address,
-    //     CLOSE_FACTOR_BPS,
-    //     LIQUIDATOR_INCENTIVE_BPS,
-    //     TREASURY_FEE_BPS,
-    //     AddressZero
-    // )
 
-    await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
-    // await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(100), { gasLimit: 1000000 })
-    // await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress })
+    // await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
     await fathomStablecoin.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress })
-    await priceOracle.setPrice(pools.XDC, { gasLimit: 2000000 })
+    // await priceOracle.setPrice(pools.XDC, { gasLimit: 2000000 })
 
     return {
         bookKeeper,

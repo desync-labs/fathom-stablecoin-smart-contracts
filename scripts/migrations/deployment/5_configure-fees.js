@@ -14,7 +14,6 @@ module.exports = async function (deployer) {
     const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule")
     const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
 
-
     await stableSwapModule.setFeeIn(SSM_FEE_IN, { gasLimit: 1000000 })
     await stableSwapModule.setFeeOut(SSM_FEE_OUT, { gasLimit: 1000000 })
 

@@ -268,7 +268,6 @@ const movePosition = async (proxyWallet, from, src, dst) => {
 }
 
 const tokenAdapterDeposit = async (proxyWallet, from, positionAddress, amount, collateralTokenAdapterAddress) => {
-    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const tokenAdapterDepositAbi = [
@@ -285,9 +284,10 @@ const tokenAdapterDeposit = async (proxyWallet, from, positionAddress, amount, c
     await proxyWallet.execute2(fathomStablecoinProxyActions.address, tokenAdapterDepositCall, { from: from })
 }
 
-const redeemLockedCollateral = async (proxyWallet, from, positionId, tokenAdapter) => {
+const redeemLockedCollateral = async (proxyWallet, from, positionId) => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const abi = [
@@ -297,7 +297,7 @@ const redeemLockedCollateral = async (proxyWallet, from, positionId, tokenAdapte
     const call = interface.encodeFunctionData("redeemLockedCollateral", [
         positionManager.address,
         positionId,
-        tokenAdapter,
+        ankrCollateralAdapter.address,
         ethers.utils.defaultAbiCoder.encode(["address"], [from])
     ]);
     await proxyWallet.execute2(fathomStablecoinProxyActions.address, call, { from: from })

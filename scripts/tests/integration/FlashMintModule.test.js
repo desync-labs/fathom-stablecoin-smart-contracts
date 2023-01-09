@@ -7,21 +7,16 @@ chai.use(solidity);
 const { expect } = chai
 
 const { WeiPerRay } = require("../helper/unit");
-const { formatBytes32String } = require("ethers/lib/utils");
 const { loadFixture } = require("../helper/fixtures");
 const { getProxy } = require("../../common/proxies");
-
-const COLLATERAL_POOL_ID = formatBytes32String("USDT-COL")
 
 const loadFixtureHandler = async () => {
   const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-  const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
   const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
   const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
   const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
   const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
-  const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
 
   const usdtAddr = await authTokenAdapter.token();
   const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
@@ -30,9 +25,6 @@ const loadFixtureHandler = async () => {
   const router = await artifacts.initializeInterfaceAt("MockedDexRouter", "MockedDexRouter");
   const flashMintArbitrager = await getProxy(proxyFactory, "FlashMintArbitrager");
   const bookKeeperFlashMintArbitrager = await getProxy(proxyFactory, "BookKeeperFlashMintArbitrager");
-
-  // await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
-  // await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
 
   return {
     bookKeeper,
