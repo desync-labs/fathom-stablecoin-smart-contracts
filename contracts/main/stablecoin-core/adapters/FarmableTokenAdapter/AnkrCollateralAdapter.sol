@@ -300,9 +300,11 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             totalShare = sub(totalShare, _share);
             stake[msg.sender] = sub(stake[msg.sender], _share);
 
-
             // *******below code is made for testing for testing flow without fee taking***********
-            SafeToken.safeTransfer(address(aXDCcAddress), _usr, recordRatioNCerts[msg.sender].CertsAmount);
+
+            uint256 withdrawAmount = recordRatioNCerts[msg.sender].CertsAmount;
+            recordRatioNCerts[msg.sender].CertsAmount = 0;
+            SafeToken.safeTransfer(address(aXDCcAddress), _usr, withdrawAmount);
             // revert("AnkrColAdapter/RightAfterSafeTransfer");
             // *******above code is made for testing for testing flow without fee taking***********
 
@@ -471,7 +473,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             recordRatioNCerts[_destination].ratio = calculatedNewRatio;
         }
         recordRatioNCerts[_destination].CertsAmount +=  certsMove;
-
   }
 
 
