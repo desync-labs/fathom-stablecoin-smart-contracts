@@ -4,8 +4,8 @@ const { BigNumber } = require("ethers");
 const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
 
 // [wad = 100%]
-const SSM_FEE_IN = WeiPerWad.mul(1).div(1000); 
-const SSM_FEE_OUT = WeiPerWad.mul(1).div(1000);
+const SSM_FEE_IN = WeiPerWad.div(100); 
+const SSM_FEE_OUT = WeiPerWad.div(100);
 const FMM_FEE = WeiPerWad.mul(4).div(1000);
 
 module.exports = async function (deployer) {
