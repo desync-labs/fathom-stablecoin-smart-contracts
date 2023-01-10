@@ -15,5 +15,6 @@ module.exports =  async function(deployer) {
     stablecoinAddress.priceOracle,
     stablecoinAddress.liquidationEngine,
     stablecoinAddress.systemDebtEngine,
+    stablecoinAddress.stablecoinAdapter
   );
 };
