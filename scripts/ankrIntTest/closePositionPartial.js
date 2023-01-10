@@ -1,6 +1,6 @@
 const { ethers } = require("ethers");
 
-
+const { BigNumber } = require("ethers");
 const { formatBytes32String } = require("ethers/lib/utils");
 
 const COLLATERAL_POOL_ID = formatBytes32String("XDC");
@@ -8,6 +8,7 @@ const COLLATERAL_POOL_ID = formatBytes32String("XDC");
 const { AliceAddress } = require("../tests/helper/address");
 
 const { WeiPerWad } = require("../tests/helper/unit");
+const MaxUint256 = require("@ethersproject/constants");
 
 
 const wipeAndUnlockXDC = async (proxyWallet, from, positionId, collateralAmount, stablecoinAmount) => {
@@ -18,7 +19,8 @@ const wipeAndUnlockXDC = async (proxyWallet, from, positionId, collateralAmount,
   const xdcAdapter = await artifacts.initializeInterfaceAt("AnkrCollateralAdapter", "AnkrCollateralAdapter");
   const fathomStablecoin = await artifacts.initializeInterfaceAt("FathomStablecoin", "FathomStablecoin");
 
-  await fathomStablecoin.approve(proxyWallet.address, stablecoinAmount, { from: from})
+  // await fathomStablecoin.approve(proxyWallet.address, stablecoinAmount, { from: from})
+  await fathomStablecoin.approve(proxyWallet.address, WeiPerWad.mul(10000), { from: from})
 
   console.log("parial closePosition");
 
@@ -55,7 +57,14 @@ module.exports = async function(deployer) {
   // console.log(AliceAddress == proxyWalletAsAliceOwner);
 
   //here return 1 FXD and ask 0.5 XDC worth of aXDCc
-  await wipeAndUnlockXDC(proxyWalletAsAlice, AliceAddress, 1, WeiPerWad.div(2), WeiPerWad);
+  await wipeAndUnlockXDC(proxyWalletAsAlice, AliceAddress, 2, WeiPerWad.div(3), WeiPerWad);
+
+  //what if I full liquidate with partial liq. fns?
+  //well full liq works, this means sth is wrong with partial liq.
+  //let's debug it line by lien with revert messages
+  //2023 Jan 19th 
+  // await wipeAndUnlockXDC(proxyWalletAsAlice, AliceAddress, 4, WeiPerWad, WeiPerWad.mul(2));
+
 };
 
 // 2 FXD borrowed, 1 XDC paid.

@@ -47,13 +47,12 @@ module.exports = async function(deployer) {
   const proxyWalletRegistry = await artifacts.initializeInterfaceAt("ProxyWalletRegistry", "ProxyWalletRegistry");
 
   //uncomment below to make wallet
-  await proxyWalletRegistry.build(AliceAddress, { from: AliceAddress, gasLimit: 2000000 })
+  // await proxyWalletRegistry.build(AliceAddress, { from: AliceAddress, gasLimit: 2000000 })
   const proxyWalletAliceAddress = await proxyWalletRegistry.proxies(AliceAddress)
 
   const proxyWalletAsAlice = await artifacts.initializeInterfaceAt("ProxyWallet", proxyWalletAliceAddress);
   const proxyWalletAsAliceOwner = await proxyWalletAsAlice.owner({ from: AliceAddress });
   console.log(AliceAddress == proxyWalletAsAliceOwner);
 
-  await openPositionAndDraw(proxyWalletAsAlice, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad.mul(2));
-
+  await openPositionAndDraw(proxyWalletAsAlice, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad.mul(3));
 };

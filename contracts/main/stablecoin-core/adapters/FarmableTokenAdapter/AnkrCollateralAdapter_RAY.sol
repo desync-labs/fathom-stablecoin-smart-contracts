@@ -5,10 +5,11 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
+import "../../../../utils/BytesHelper.sol";
+
 import "../../../interfaces/IFathomFairLaunch.sol";
 import "../../../interfaces/IBookKeeper.sol";
 import "../../../interfaces/IFarmableTokenAdapter.sol";
-import "../../../../fair-launch/interfaces/IShield.sol";
 import "../../../interfaces/ICagable.sol";
 import "../../../interfaces/IManager.sol";
 import "../../../utils/SafeToken.sol";
@@ -17,8 +18,9 @@ import "../../../apis/ankr/interfaces/IAnkrStakingPool.sol";
 import "../../../apis/ankr/interfaces/ICertToken.sol";
 
 /// @dev receives XDC from users and deposit in Ankr's staking. Hence, users will still earn reward from changing aXDCc ratio
-contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+contract AnkrCollateralAdapterRAY is IFarmableTokenAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
+    using BytesHelper for *;
 
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAY = 10 ** 27;
@@ -283,7 +285,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
             totalShare = sub(totalShare, _share);
             stake[msg.sender] = sub(stake[msg.sender], _share);
-
+            //ratio in recordRatioNCerts is already in RAY
             uint256 ratio = recordRatioNCerts[msg.sender].ratio;
             //ratioaXDCc WAD to RAY
             uint256 ratioaXDCc = mul(aXDCcAddress.ratio(), 10**9);
@@ -292,7 +294,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             //if ratio on recordRatioNCerts is bigger or equal to ratioaXDCc,
             //send all certs that the position owner has
             if (ratio >= ratioaXDCc) {
-                SafeToken.safeTransfer(address(aXDCcAddress), _usr, div(certsAmount, 10**9);
+                SafeToken.safeTransfer(address(aXDCcAddress), _usr, div(certsAmount, 10**9));
             } else {
                 //otherwise calculate reward and deduct fee, then transfer the rest of certs
                     //Q.. change to ray below
@@ -310,6 +312,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
                 //before transfering aXDCc to proxyWallet, deduct balance on ratioNCerts
                 // *****
                 // transfer aXDCc to proxyWallet
+                recordRatioNCerts[msg.sender] = RatioNCerts(0, 0);
                 SafeToken.safeTransfer(address(aXDCcAddress), _usr, div(returnAmount, 10**9));
             }
         }
@@ -377,7 +380,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         _deposit(_source, 0, _data);
         _moveCerts(_source, _destination, _share, _data);
         _moveStake(_source, _destination, _share, _data);
-        
     }
 
     function _moveCerts(
@@ -385,10 +387,20 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         address _destination,
         uint256 _share,
         bytes calldata _data
-  ) internal nonReentrant whenNotPaused {
-        uint256 certsToMoveRatio = wdiv(_share, stake[_source]);
-
-        uint256 certsMove = wmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
+  ) internal onlyCollateralManager {
+        //stake might be not WAD but sth else
+        uint256 certsToMoveRatio;
+        // revert(string(_share._uintToASCIIBytes()));
+        // revert(string(stake[_source]._uintToASCIIBytes()));
+        if(_share == stake[_source]){
+            certsToMoveRatio = 1*WAD;
+        } else {
+            require(_share < stake[_source], "AnkrCollateralAdapter/tooMuchShare");
+            //share from WAD to RAY
+            certsToMoveRatio = rdiv(mul(_share, 10**9), mul(stake[_source], 10**9));
+        }
+        uint256 certsMove = rmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
+        revert(string(certsMove._uintToASCIIBytes()));
         recordRatioNCerts[_source].CertsAmount -= certsMove;
         //destination should have ratio adjusted
 
@@ -397,18 +409,18 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
         recordRatioNCerts[_destination].ratio = 
             add(
-            wmul(
-            ratioBefore,
-                wdiv(certsBefore, 
-                add(certsBefore,certsMove) 
+                rmul(
+                ratioBefore,
+                    rdiv(certsBefore, 
+                        add(certsBefore,certsMove) 
+                    )
+                ),
+                rmul(
+                recordRatioNCerts[_source].ratio,
+                    rdiv(certsMove, 
+                        add(certsBefore,certsMove) 
+                    )
                 )
-            ),
-            wmul(
-            recordRatioNCerts[_source].ratio,
-                wdiv(certsMove, 
-                add(certsBefore,certsMove) 
-                )
-            )
             );
 
         recordRatioNCerts[_destination].CertsAmount +=  certsMove;

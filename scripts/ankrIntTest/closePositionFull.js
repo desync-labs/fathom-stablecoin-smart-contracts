@@ -59,4 +59,5 @@ module.exports = async function(deployer) {
 
 
   await wipeAllAndUnlockXDC(proxyWalletAsAlice, AliceAddress, 1, WeiPerWad, WeiPerWad.mul(2));
+  
 };

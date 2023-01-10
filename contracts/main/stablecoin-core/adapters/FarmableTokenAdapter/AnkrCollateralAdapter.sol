@@ -5,12 +5,11 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
+
 import "../../../../utils/BytesHelper.sol";
 
-import "../../../interfaces/IFathomFairLaunch.sol";
 import "../../../interfaces/IBookKeeper.sol";
 import "../../../interfaces/IFarmableTokenAdapter.sol";
-import "../../../../fair-launch/interfaces/IShield.sol";
 import "../../../interfaces/ICagable.sol";
 import "../../../interfaces/IManager.sol";
 import "../../../utils/SafeToken.sol";
@@ -33,7 +32,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
     uint256 public pid;
 
-    uint256 public treasuryFeeBps = 100000000000000000000000000;  // 0.1 RAY
+    uint256 public treasuryFeeBps;
     address public treasuryAccount;
 
     uint256 public live;
@@ -51,6 +50,8 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
+
+    uint256 public treasuryFee = 100000000000000000;  // 0.1 WAD
 
     /// @dev Mapping of user(positionAddress) => recordRatioNCerts that he has ownership over.
     mapping(address => RatioNCerts) public recordRatioNCerts;
@@ -208,58 +209,70 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     /// @param _positionAddress The position address to be updated
     /// @param _amount The amount to be deposited
     function _deposit(address _positionAddress, uint256 _amount, bytes calldata /* _data */) private {
-        require(live == 1, "CollateralTokenAdapter/not live");
-        require(_amount == msg.value, "CollateralTokenAdapter/DepositAmountMismatch");
+    require(live == 1, "CollateralTokenAdapter/not live");
+    require(_amount == msg.value, "CollateralTokenAdapter/DepositAmountMismatch");
 
-        if (_amount > 0) {
-            uint256 _share = wdiv(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
-            // Overflow check for int256(wad) cast below
-            // Also enforces a non-zero wad
-            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
+    if (_amount > 0) {
+      uint256 _share = wdiv(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
+      // Overflow check for int256(wad) cast below
+      // Also enforces a non-zero wad
+      require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
 
-            //bookKeeping
-            bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
-            totalShare = add(totalShare, _share);
-            stake[_positionAddress] = add(stake[_positionAddress], _share);
+      //bookKeeping
+      bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
+      totalShare = add(totalShare, _share);
+      stake[_positionAddress] = add(stake[_positionAddress], _share);
 
-            //record aXDCc amount before stakeCerts
-            uint256 aXDCcBefore = aXDCcAddress.balanceOf(address(this));
-            XDCPoolAddress.stakeCerts{value : msg.value}();
-            uint256 aXDCcAfter = aXDCcAddress.balanceOf(address(this));
+      //record aXDCc amount before stakeCerts
+      uint256 aXDCcBefore = aXDCcAddress.balanceOf(address(this));
+      XDCPoolAddress.stakeCerts{value : msg.value}();
+      uint256 aXDCcAfter = aXDCcAddress.balanceOf(address(this));
 
-            //certsIn from WAD to RAY
-            uint256 certsIn = mul((aXDCcAfter - aXDCcBefore), 10**9);
-            //ratio from WAD to RAY
-            RatioNCerts memory ratioNCerts = RatioNCerts(mul(aXDCcAddress.ratio(), 10**9), certsIn);
+      uint256 certsIn = (aXDCcAfter - aXDCcBefore);
+      RatioNCerts memory ratioNCerts = RatioNCerts(aXDCcAddress.ratio(), certsIn);
 
-            // if it is first record of staking
-            if (recordRatioNCerts[_positionAddress].ratio == 0 && recordRatioNCerts[_positionAddress].CertsAmount == 0) {
-                recordRatioNCerts[_positionAddress] = ratioNCerts;
-            } else {
-            // if it is not the first record of staking
-            // calculate weighted average of ratio from already existing ratio&CertsAmount and incoming ratio&CertsAmount
-                uint256 certsBefore = recordRatioNCerts[_positionAddress].CertsAmount;
-                uint256 ratioBefore = recordRatioNCerts[_positionAddress].ratio;
-                    //Q.. to make below calculation to ray cal. what to change
-                recordRatioNCerts[_positionAddress].ratio = 
-                    add(
-                        rmul(
-                        ratioBefore,
-                            rdiv(certsBefore, 
-                                add(certsBefore,certsIn) 
-                            )
-                        ),
-                        rmul(
-                            mul(aXDCcAddress.ratio(), 10**9),
-                            rdiv(certsIn, 
-                                add(certsBefore,certsIn) 
-                            )
-                        )
-                    );
-                recordRatioNCerts[_positionAddress].CertsAmount = add(recordRatioNCerts[_positionAddress].CertsAmount, certsIn);   
-            }
+      // if it is first record of staking
+      if (recordRatioNCerts[_positionAddress].ratio == 0 && recordRatioNCerts[_positionAddress].CertsAmount == 0) {
+        recordRatioNCerts[_positionAddress] = ratioNCerts;
+      } else {
+      // if it is not the first record of staking
+      // calculate weighted average of ratio from already existing ratio&CertsAmount and incoming ratio&CertsAmount
+        uint256 certsBefore = recordRatioNCerts[_positionAddress].CertsAmount;
+        uint256 ratioBefore = recordRatioNCerts[_positionAddress].ratio;
+            //Q.. to make below calculation to ray cal. what to change
+        uint256 aXDCcRatio = aXDCcAddress.ratio();
+        uint256 calculatedNewRatio = 
+          add(
+              //precision lost wiht wmul since there is /WAD in the end
+              //but thankfully, it makes the ratio lower than it actually is, so it's okei
+          wmul(
+          ratioBefore,
+            //round down #1
+            wdiv(certsBefore, 
+              add(certsBefore,certsIn) 
+            )
+          ),
+          wmul(
+          aXDCcRatio,
+            //round down #1
+            wdiv(certsIn, 
+              add(certsBefore,certsIn) 
+            )
+          )
+        );
+        //in case calculated new ratio is smaller(because of rounding down) or equal to aXDCcRatio on chain, make it same 
+        if(calculatedNewRatio <= aXDCcRatio) {
+        recordRatioNCerts[_positionAddress].ratio = aXDCcRatio;
+        } else {
+            recordRatioNCerts[_positionAddress].ratio = calculatedNewRatio;
         }
-        emit LogDeposit(_amount);
+
+        recordRatioNCerts[_positionAddress].CertsAmount = add(recordRatioNCerts[_positionAddress].CertsAmount, certsIn);   
+      }
+
+    }
+
+    emit LogDeposit(_amount);
     }
 
     /// @dev Withdraw aXDCc from AnkrCollateralAdapter
@@ -286,36 +299,52 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
             totalShare = sub(totalShare, _share);
             stake[msg.sender] = sub(stake[msg.sender], _share);
-            //ratio in recordRatioNCerts is already in RAY
-            uint256 ratio = recordRatioNCerts[msg.sender].ratio;
-            //ratioaXDCc WAD to RAY
-            uint256 ratioaXDCc = mul(aXDCcAddress.ratio(), 10**9);
-            uint256 certsAmount = recordRatioNCerts[msg.sender].CertsAmount;
 
-            //if ratio on recordRatioNCerts is bigger or equal to ratioaXDCc,
+
+            // *******below code is made for testing for testing flow without fee taking***********
+            SafeToken.safeTransfer(address(aXDCcAddress), _usr, recordRatioNCerts[msg.sender].CertsAmount);
+            // revert("AnkrColAdapter/RightAfterSafeTransfer");
+            // *******above code is made for testing for testing flow without fee taking***********
+
+
+            // *******commented out for testing flow without fee taking***********
+            // uint256 ratio = recordRatioNCerts[msg.sender].ratio;
+            // uint256 ratioaXDCc = aXDCcAddress.ratio();
+            // uint256 certsAmount = recordRatioNCerts[msg.sender].CertsAmount;
+
+
+            //2023 Taking fee should happen here
+
+            //if ratio on recordRatioNCerts is less or equal to ratioaXDCc because of round down or whatever,
             //send all certs that the position owner has
-            if (ratio >= ratioaXDCc) {
-                SafeToken.safeTransfer(address(aXDCcAddress), _usr, div(certsAmount, 10**9));
-            } else {
-                //otherwise calculate reward and deduct fee, then transfer the rest of certs
-                    //Q.. change to ray below
-                uint256 xdc0 = rdiv(certsAmount, ratio);
-                uint256 xdc1 = rdiv(certsAmount, ratioaXDCc);
-                // calculate reward
-                uint256 reward = sub(xdc1, xdc0);
-                // calculate fee
-                    //Q.. change to ray treasury fee and rmul below
-                uint256 fee = rmul(reward, treasuryFeeBps);
-                // calculate return amount
-                    //Q.. change to ray... ratioaXDCc to ray... wmul to rmul
-                uint256 returnAmount = rmul(add(sub(reward,fee), xdc0), ratioaXDCc);
-                    //Q.. then returnAmount.. ray to wad and then transfer
-                //before transfering aXDCc to proxyWallet, deduct balance on ratioNCerts
-                // *****
-                // transfer aXDCc to proxyWallet
-                recordRatioNCerts[msg.sender] = RatioNCerts(0, 0);
-                SafeToken.safeTransfer(address(aXDCcAddress), _usr, div(returnAmount, 10**9));
-            }
+            //because if ratio in a position is 0.7, and then ratio in aXDCc is 0.71, that means
+            //there was no profit made. 
+
+            // if (ratio <= ratioaXDCc) {
+            //     SafeToken.safeTransfer(address(aXDCcAddress), _usr, certsAmount);
+            // } else {
+            //     //otherwise calculate reward and deduct fee, then transfer the rest of certs
+
+            //     // 2023 let's keep smoothing here and there
+            //     // compare it with certsAmount in proxy wallet,
+            //     // the difference shall go to protocol(recorded in recordRatioNCerts)
+
+            //     //maybe I should do it in RAY?
+            //     //but below only has meaning only if we will take money from them.
+            //     //let's test things out without fee taking and see how partial liquidation works.
+            //     uint256 xdc0 = wdiv(certsAmount, ratio);
+            //     uint256 xdc1 = wdiv(certsAmount, ratioaXDCc);
+            //     // calculate reward
+            //     uint256 reward = sub(xdc1, xdc0);
+            //     // calculate fee
+            //     uint256 fee = wmul(reward, treasuryFee);
+            //     // calculate return amount
+            //     uint256 returnAmount = wmul(add(sub(reward,fee), xdc0), ratioaXDCc);
+
+            //     recordRatioNCerts[msg.sender] = RatioNCerts(0, 0);
+            //     SafeToken.safeTransfer(address(aXDCcAddress), _usr, returnAmount);
+            // }
+            // *******commented out for testing flow without fee taking***********
         }
             emit LogWithdraw(_amount);
     }
@@ -381,7 +410,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         _deposit(_source, 0, _data);
         _moveCerts(_source, _destination, _share, _data);
         _moveStake(_source, _destination, _share, _data);
-        
     }
 
     function _moveCerts(
@@ -394,37 +422,54 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         uint256 certsToMoveRatio;
         // revert(string(_share._uintToASCIIBytes()));
         // revert(string(stake[_source]._uintToASCIIBytes()));
-        if(_share == stake[_source]){
-            certsToMoveRatio = 1*WAD;
+        // first closure, 1 XDC in, I ask for 0.3333
+        // second closure 0.6666in, I asked for 0.3333
+        //
+        if(_share >= stake[_source]){
+            uint256 CertsMove = recordRatioNCerts[_source].CertsAmount;
+            recordRatioNCerts[_source].CertsAmount = 0;
+            recordRatioNCerts[_destination].CertsAmount = CertsMove;
         } else {
             require(_share < stake[_source], "AnkrCollateralAdapter/tooMuchShare");
-            //share from WAD to RAY
-            certsToMoveRatio = rdiv(mul(_share, 10**9), mul(stake[_source], 10**9));
+            certsToMoveRatio = wdiv(_share, stake[_source]);
         }
-        uint256 certsMove = rmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
+        uint256 certsMove = wmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
         // revert(string(certsMove._uintToASCIIBytes()));
+
+        //smoothing things out some numbers//intentionaly making some residual aXDCc made in certsMove
+        //so that later when there will be full closure, rest of the residual aXDCc can be returned
+        //to the user.
+        certsMove = certsMove / (10**6) * (10**6);
+
         recordRatioNCerts[_source].CertsAmount -= certsMove;
         //destination should have ratio adjusted
 
         uint256 certsBefore = recordRatioNCerts[_destination].CertsAmount;
         uint256 ratioBefore = recordRatioNCerts[_destination].ratio;
 
-        recordRatioNCerts[_destination].ratio = 
+        uint256 calculatedNewRatio = 
             add(
-                rmul(
+                wmul(
                 ratioBefore,
-                    rdiv(certsBefore, 
+                    wdiv(certsBefore, 
                         add(certsBefore,certsMove) 
                     )
                 ),
-                rmul(
+                wmul(
                 recordRatioNCerts[_source].ratio,
-                    rdiv(certsMove, 
+                    wdiv(certsMove, 
                         add(certsBefore,certsMove) 
                     )
                 )
             );
+        
+        uint256 aXDCcRatio = aXDCcAddress.ratio();
 
+        if(calculatedNewRatio <= aXDCcRatio) {
+        recordRatioNCerts[_destination].ratio = aXDCcRatio;
+        } else {
+            recordRatioNCerts[_destination].ratio = calculatedNewRatio;
+        }
         recordRatioNCerts[_destination].CertsAmount +=  certsMove;
 
   }
