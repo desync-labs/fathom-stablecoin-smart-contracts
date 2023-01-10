@@ -441,7 +441,9 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         //smoothing things out some numbers//intentionaly making some residual aXDCc made in certsMove
         //so that later when there will be full closure, rest of the residual aXDCc can be returned
         //to the user.
-        certsMove = certsMove / (10**6) * (10**6);
+        // 2023 Jan 10th Tue 4:05 PM
+        //let's see what happens if I get rid of smoothing
+        // certsMove = certsMove / (10**6) * (10**6);
 
         recordRatioNCerts[_source].CertsAmount -= certsMove;
         //destination should have ratio adjusted
