@@ -54,5 +54,5 @@ module.exports = async function(deployer) {
   const proxyWalletAsAliceOwner = await proxyWalletAsAlice.owner({ from: AliceAddress });
   console.log(AliceAddress == proxyWalletAsAliceOwner);
 
-  await openPositionAndDraw(proxyWalletAsAlice, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad.mul(3));
+  await openPositionAndDraw(proxyWalletAsAlice, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad.mul(11));
 };

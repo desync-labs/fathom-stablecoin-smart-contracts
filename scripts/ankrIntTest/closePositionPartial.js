@@ -57,7 +57,7 @@ module.exports = async function(deployer) {
   // console.log(AliceAddress == proxyWalletAsAliceOwner);
 
   //here return 1 FXD and ask 0.5 XDC worth of aXDCc
-  await wipeAndUnlockXDC(proxyWalletAsAlice, AliceAddress, 1, WeiPerWad.div(3), WeiPerWad);
+  await wipeAndUnlockXDC(proxyWalletAsAlice, AliceAddress, 1, WeiPerWad.div(11), WeiPerWad);
 
   //what if I full liquidate with partial liq. fns?
   //well full liq works, this means sth is wrong with partial liq.

@@ -58,6 +58,6 @@ module.exports = async function(deployer) {
   // console.log(AliceAddress == proxyWalletAsAliceOwner);
 
 
-  await wipeAllAndUnlockXDC(proxyWalletAsAlice, AliceAddress, 1, WeiPerWad, WeiPerWad.mul(2));
+  await wipeAllAndUnlockXDC(proxyWalletAsAlice, AliceAddress, 1, WeiPerWad, WeiPerWad.mul(3));
   
 };
