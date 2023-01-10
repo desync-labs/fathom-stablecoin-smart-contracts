@@ -103,7 +103,7 @@ describe("FlastMintModule", () => {
         )
 
         const profitFromArbitrage = await fathomStablecoin.balanceOf(flashMintArbitrager.address)
-        expect(profitFromArbitrage).to.be.equal(parseEther("9.49"))
+        expect(profitFromArbitrage).to.be.equal(parseEther("8.5"))
 
         const feeCollectedFromFlashMint = await bookKeeper.stablecoin(flashMintModule.address)
         expect(feeCollectedFromFlashMint).to.be.equal(parseEther("0.4").mul(WeiPerRay))
@@ -146,7 +146,7 @@ describe("FlastMintModule", () => {
         )
 
         const profitFromArbitrage = await fathomStablecoin.balanceOf(bookKeeperFlashMintArbitrager.address)
-        expect(profitFromArbitrage).to.be.equal(parseEther("9.49"))
+        expect(profitFromArbitrage).to.be.equal(parseEther("8.5"))
 
         const feeCollectedFromFlashMint = await bookKeeper.stablecoin(flashMintModule.address)
         expect(feeCollectedFromFlashMint).to.be.equal(parseEther("0.4").mul(WeiPerRay))

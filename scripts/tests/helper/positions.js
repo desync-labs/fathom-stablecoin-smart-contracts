@@ -52,7 +52,7 @@ const openXDCPositionAndDraw = async (proxyWallet, from, collateral_pool_id, col
         stablecoin,
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, call, {  value: collateral,  from: from, gasLimit: 2000000 })
+    await proxyWallet.execute2(fathomStablecoinProxyActions.address, call, {  value: collateral,  from: from})
 }
 
 const openPosition = async (proxyWallet, from, collateral_pool_id) => {
@@ -208,10 +208,9 @@ const draw = async (proxyWallet, from, collateral_pool_id, positionId, amount) =
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
-    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
-    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(collateral_pool_id)
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
 
     const drawTokenAbi = [
         "function draw(address _manager, address _stabilityFeeCollector, address _tokenAdapter, address _stablecoinAdapter, uint256 _positionId, uint256 _amount, bytes calldata _data)"
@@ -220,7 +219,7 @@ const draw = async (proxyWallet, from, collateral_pool_id, positionId, amount) =
     const drawTokenCall = drawTokenIFace.encodeFunctionData("draw", [
         positionManager.address,
         stabilityFeeCollector.address,
-        collateralTokenAdapterAddress,
+        ankrCollateralAdapter.address,
         stablecoinAdapter.address,
         positionId,
         amount,

@@ -6,27 +6,19 @@ chai.use(solidity);
 
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
 const { createProxyWallets } = require("../helper/proxy-wallets");
-const { AliceAddress, BobAddress, AddressZero } = require("../helper/address");
+const { AliceAddress, BobAddress } = require("../helper/address");
 const PositionHelper = require("../helper/positions");
-const { formatBytes32String } = require("ethers/lib/utils");
 const { loadFixture } = require("../helper/fixtures");
 const { getProxy } = require("../../common/proxies");
 const pools = require("../../common/collateral");
 
 const { expect } = chai
 
-const COLLATERAL_POOL_ID_USDT = formatBytes32String("USDT-COL")
-const CLOSE_FACTOR_BPS = "5000"
-const LIQUIDATOR_INCENTIVE_BPS = "10250"
-const TREASURY_FEE_BPS = "100"
-
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-    const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
-    const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
@@ -34,47 +26,20 @@ const setup = async () => {
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
     const priceOracle = await getProxy(proxyFactory, "PriceOracle");
     const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
-
-
-    // const WXDC = await artifacts.initializeInterfaceAt("ERC20Mintable", wxdcAddr);
-    // const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
+    const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
 
     ({
         proxyWallets: [aliceProxyWallet, bobProxyWallet],
     } = await createProxyWallets([AliceAddress, BobAddress]));
 
-    // await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(1000), { gasLimit: 1000000 })
-
-    // await collateralPoolConfig.initCollateralPool(
-    //     pools.XDC,
-    //     WeiPerRad.mul(1000),
-    //     0,
-    //     simplePriceFeed.address,
-    //     WeiPerRay,
-    //     WeiPerRay,
-    //     ankrCollateralAdapter.address,
-    //     CLOSE_FACTOR_BPS,
-    //     LIQUIDATOR_INCENTIVE_BPS,
-    //     TREASURY_FEE_BPS,
-    //     AddressZero
-    // )
-
-
     await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
+    await collateralPoolConfig.setStabilityFeeRate(pools.XDC, WeiPerRay, { gasLimit: 1000000 });
 
     await priceOracle.setPrice(pools.XDC);
-    // await collateralPoolConfig.setStrategy(pools.XDC, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
-
-    // await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress, gasLimit: 1000000 })
-    // await WXDC.approve(bobProxyWallet.address, WeiPerWad.mul(10000), { from: BobAddress, gasLimit: 1000000 })
-
-    // await USDT.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress, gasLimit: 1000000 })
-    // await USDT.approve(bobProxyWallet.address, WeiPerWad.mul(10000), { from: BobAddress, gasLimit: 1000000 })
 
     return {
         bookKeeper,
-        // collateralTokenAdapter,
-        // collateralTokenAdapter2,
+        ankrCollateralAdapter,
         positionManager,
         aliceProxyWallet,
         bobProxyWallet,
@@ -89,8 +54,7 @@ describe("PositionPermissions", () => {
     // Contracts
     let aliceProxyWallet
     let bobProxyWallet
-    // let collateralTokenAdapter
-    // let collateralTokenAdapter2
+    let ankrCollateralAdapter
     let stablecoinAdapter
     let bookKeeper
     let positionManager
@@ -103,12 +67,9 @@ describe("PositionPermissions", () => {
     })
 
     beforeEach(async () => {
-        await snapshot.revertToSnapshot();
-
         ({
             bookKeeper,
-            // collateralTokenAdapter,
-            // collateralTokenAdapter2,
+            ankrCollateralAdapter,
             positionManager,
             aliceProxyWallet,
             bobProxyWallet,
@@ -134,9 +95,9 @@ describe("PositionPermissions", () => {
                         alicePosition.lockedCollateral,
                         "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
                     ).to.be.equal(WeiPerWad)
-                    // expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
-                    //     WeiPerWad
-                    // )
+                    expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
+                        WeiPerWad
+                    )
                     expect(
                         await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
                         "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
@@ -145,7 +106,7 @@ describe("PositionPermissions", () => {
                     // 2. Alice try to adjust position, add 2 WXDC to position
                     const posId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                     const own = await positionManager.owners(1)
-                    await PositionHelper.lockXDC(aliceProxyWallet, AliceAddress, pools.XDC, 1, WeiPerWad.mul(2))
+                    await PositionHelper.lockXDC(aliceProxyWallet, AliceAddress, 1, WeiPerWad.mul(2))
                     const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
                     expect(
                         aliceAdjustPosition.lockedCollateral,
@@ -168,7 +129,7 @@ describe("PositionPermissions", () => {
                     context(
                         "call openLockTokenAndDraw, unlock collateral and move the collateral from one position to another position within the same collateral pool",
                         async () => {
-                            xit("should success", async () => {
+                            it("should success", async () => {
                                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
 
                                 const alicePositionAddress = await positionManager.positions(1)
@@ -264,7 +225,7 @@ describe("PositionPermissions", () => {
                     context(
                         "open position, deposit collateral and move collateral from one position to another position",
                         async () => {
-                            xit("should success", async () => {
+                            it("should success", async () => {
                                 // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
 
@@ -340,7 +301,7 @@ describe("PositionPermissions", () => {
                         }
                     )
                     context("Alice open a position, lock collateral and move collateral to Bob's position", async () => {
-                        xit("should success", async () => {
+                        it("should success", async () => {
                             // 1. Alice open position
                             await PositionHelper.openPosition(aliceProxyWallet, AliceAddress, pools.XDC)
                             const alicePositionAddress = await positionManager.positions(1)
@@ -411,7 +372,7 @@ describe("PositionPermissions", () => {
             })
 
             context("mint FXD", async () => {
-                xit("should success", async () => {
+                it("should success", async () => {
                     // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                     await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
 
@@ -464,7 +425,7 @@ describe("PositionPermissions", () => {
                     context(
                         "call openLockTokenAndDraw, unlock collateral and move the collateral from one position to another position within the same collateral pool",
                         async () => {
-                            xit("should success", async () => {
+                            it("should success", async () => {
                                 // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
 
@@ -557,7 +518,7 @@ describe("PositionPermissions", () => {
                                     fathomStablecoinBalancefinal,
                                     "Alice should receive 2 FXD from drawing 2 FXD, because Alice drew 2 times"
                                 ).to.be.equal(WeiPerWad.mul(2))
-                                const alicePosition1Stake = await collateralTokenAdapter.stake(alicePositionAddress)
+                                const alicePosition1Stake = await ankrCollateralAdapter.stake(alicePositionAddress)
                                 expect(alicePosition1Stake, "Stake must be correctly updated after movePosition").to.be.equal(
                                     WeiPerWad.mul(2)
                                 )
@@ -570,7 +531,7 @@ describe("PositionPermissions", () => {
 
         context("position owner allow other user to manage position with proxy wallet", async () => {
             context("lock collateral into their own position", async () => {
-                xit("should success", async () => {
+                it("should success", async () => {
                     // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                     await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
 
@@ -595,7 +556,7 @@ describe("PositionPermissions", () => {
                         1
                     )
                     // 3. Bob try to adjust Alice's position, add 2 WXDC to position
-                    await PositionHelper.lockXDC(bobProxyWallet, BobAddress, pools.XDC, 1, WeiPerWad.mul(2))
+                    await PositionHelper.lockXDC(bobProxyWallet, BobAddress, 1, WeiPerWad.mul(2))
 
                     const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
                     expect(
@@ -607,7 +568,7 @@ describe("PositionPermissions", () => {
             context("move collateral", async () => {
                 context("same collateral pool", async () => {
                     context("and Bob move collateral of Alice to himself", async () => {
-                        xit("should success", async () => {
+                        it("should success", async () => {
                             // 1. Alice open a new position with 2 WXDC and draw 1 FXD
                             await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
 
@@ -701,7 +662,7 @@ describe("PositionPermissions", () => {
                 })
             })
             context("mint FXD", async () => {
-                xit("should success", async () => {
+                it("should success", async () => {
                     // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                     await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
 
@@ -755,7 +716,7 @@ describe("PositionPermissions", () => {
             })
             context("move position", async () => {
                 context("same collateral pool", async () => {
-                    xit("should success", async () => {
+                    it("should success", async () => {
                         // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                         await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
 
@@ -833,7 +794,7 @@ describe("PositionPermissions", () => {
 
         context("position owner not allow other user to manage position with proxy wallet", async () => {
             context("lock collateral into their own position", async () => {
-                xit("should revert", async () => {
+                it("should revert", async () => {
                     // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                     await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
 
@@ -855,27 +816,25 @@ describe("PositionPermissions", () => {
 
                     // 2. Bob try to adjust Alice's position, add 2 WXDC to position
                     const lockAbi = [
-                        "function lockToken(address _manager, address _tokenAdapter, uint256 _positionId, uint256 _amount, bool _transferFrom, bytes calldata _data)"
+                        "function lockXDC(address _manager, address _xdcAdapter, uint256 _positionId, bytes calldata _data)"
                     ];
                     let lockIFace = new ethers.utils.Interface(lockAbi);
-                    const lockTokenCall = lockIFace.encodeFunctionData("lockToken", [
+                    const lockTokenCall = lockIFace.encodeFunctionData("lockXDC", [
                         positionManager.address,
                         ankrCollateralAdapter.address,
                         await positionManager.ownerLastPositionId(aliceProxyWallet.address),
-                        WeiPerWad.mul(2),
-                        true,
                         ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
                     ])
 
                     await expect(
-                        bobProxyWallet.execute2(fathomStablecoinProxyActions.address, lockTokenCall, { from: BobAddress })
+                        bobProxyWallet.execute2(fathomStablecoinProxyActions.address, lockTokenCall, { value: WeiPerWad, from: BobAddress })
                     ).to.be.revertedWith("owner not allowed")
                 })
             })
             context("move collateral", async () => {
                 context("same collateral pool", async () => {
                     context("and Bob move collateral to Alice", async () => {
-                        xit("should success", async () => {
+                        it("should success", async () => {
                             // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                             await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
 
@@ -964,7 +923,7 @@ describe("PositionPermissions", () => {
                 })
             })
             context("mint FXD", async () => {
-                xit("should revert", async () => {
+                it("should revert", async () => {
                     // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                     await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
 
@@ -1004,7 +963,7 @@ describe("PositionPermissions", () => {
             })
             context("move position", async () => {
                 context("same collateral pool", async () => {
-                    xit("should revert", async () => {
+                    it("should revert", async () => {
                         // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                         await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
                         const alicePositionAddress = await positionManager.positions(1)
@@ -1059,7 +1018,7 @@ describe("PositionPermissions", () => {
             context("move collateral", async () => {
                 context("same collateral pool", async () => {
                     context("and Bob move collateral of Alice to himself", async () => {
-                        xit("should success", async () => {
+                        it("should success", async () => {
                             // 1. Alice open a new position with 2 WXDC and draw 1 FXD
                             await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
                             const alicePositionAddress = await positionManager.positions(1)
@@ -1154,7 +1113,7 @@ describe("PositionPermissions", () => {
                 })
             })
             context("mint FXD", async () => {
-                xit("should success", async () => {
+                it("should success", async () => {
                     // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                     await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
                     const alicePositionAddress = await positionManager.positions(1)
@@ -1225,7 +1184,7 @@ describe("PositionPermissions", () => {
             })
             context("move position", async () => {
                 context("same collateral pool", async () => {
-                    xit("should success", async () => {
+                    it("should success", async () => {
                         // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                         await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
                         const alicePositionAddress = await positionManager.positions(1)
@@ -1303,7 +1262,7 @@ describe("PositionPermissions", () => {
             context("move collateral", async () => {
                 context("same collateral pool", async () => {
                     context("and Bob move collateral of Alice to himself", async () => {
-                        xit("should revert", async () => {
+                        it("should revert", async () => {
                             // 1. Alice open a new position with 2 WXDC and draw 1 FXD
                             await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
                             const alicePositionAddress = await positionManager.positions(1)
@@ -1378,7 +1337,7 @@ describe("PositionPermissions", () => {
             })
 
             context("mint FXD", async () => {
-                xit("should revert", async () => {
+                it("should revert", async () => {
                     // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                     await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
                     const alicePositionAddress = await positionManager.positions(1)
@@ -1413,7 +1372,7 @@ describe("PositionPermissions", () => {
 
             context("move position", async () => {
                 context("same collateral pool", async () => {
-                    xit("should revert", async () => {
+                    it("should revert", async () => {
                         // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                         await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
                         const alicePositionAddress = await positionManager.positions(1)
@@ -1455,7 +1414,7 @@ describe("PositionPermissions", () => {
         })
 
         context("position owner can export and can import", async () => {
-            xit("should success", async () => {
+            it("should success", async () => {
                 // 1. Alice open a new position with 1 WXDC and draw 1 FXD
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
                 const alicePositionAddress = await positionManager.positions(1)
@@ -1505,7 +1464,7 @@ describe("PositionPermissions", () => {
                     alicePositionWalletPositionAfterExport.debtShare,
                     "debtShare should be 0 FXD, because Alice export"
                 ).to.be.equal(0)
-                const AliceAddressStake = await collateralTokenAdapter.stake(AliceAddress)
+                const AliceAddressStake = await ankrCollateralAdapter.stake(AliceAddress)
                 expect(AliceAddressStake, "Stake must be correctly updated after exportPosition").to.be.equal(WeiPerWad)
 
                 //6. alice import position back
@@ -1528,7 +1487,7 @@ describe("PositionPermissions", () => {
                     alicePositionWalletPositionAfterImport.debtShare,
                     "debtShare should be 1 FXD, because Alice Import"
                 ).to.be.equal(WeiPerWad)
-                const alicePositionStake = await collateralTokenAdapter.stake(alicePositionAddress)
+                const alicePositionStake = await ankrCollateralAdapter.stake(alicePositionAddress)
                 expect(alicePositionStake, "Stake must be correctly updated after importPosition").to.be.equal(WeiPerWad)
 
             })

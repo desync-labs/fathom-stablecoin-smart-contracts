@@ -107,13 +107,13 @@ describe("StableSwapModule", () => {
                 await USD.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // 1000 * 0.001 = 1
+                // 1000 * 0.01 = 10
                 const feeFromSwap = await bookKeeper.stablecoin(systemDebtEngine.address)
-                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("1").mul(WeiPerRay))
+                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("10").mul(WeiPerRay))
 
-                // stablecoinReceived = swapAmount - fee = 1000 - 1 = 999
+                // stablecoinReceived = swapAmount - fee = 1000 - 10 = 990
                 const stablecoinReceived = await fathomStablecoin.balanceOf(DeployerAddress)
-                expect(stablecoinReceived).to.be.equal(ethers.utils.parseEther("999"))
+                expect(stablecoinReceived).to.be.equal(ethers.utils.parseEther("990"))
 
                 const USDCollateralAmount = (await bookKeeper.positions(pools.USD_STABLE, stableSwapModule.address))
                     .lockedCollateral
@@ -152,20 +152,20 @@ describe("StableSwapModule", () => {
 
                 // Swap 990 FXD to USD
                 await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
-                await stableSwapModule.swapStablecoinToToken(DeployerAddress, ethers.utils.parseEther("995"), { gasLimit: 1000000 })
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress, ethers.utils.parseEther("900"), { gasLimit: 1000000 })
 
-                // first swap = 1000 * 0.001 = 1 FXD
-                // second swap = 995 * 0.001 = 0.995 FXD
-                // total fee = 1 + 0.995 = 1.995 FXD
+                // first swap = 1000 * 0.01 = 10 FXD
+                // second swap = 900 * 0.01 = 9 FXD
+                // total fee = 10 + 9 = 19 FXD
                 const feeFromSwap = await bookKeeper.stablecoin(systemDebtEngine.address)
-                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("1.995").mul(WeiPerRay))
+                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("19").mul(WeiPerRay))
 
                 const USDReceived = await USD.balanceOf(DeployerAddress)
-                expect(USDReceived).to.be.equal(ethers.utils.parseEther("995"))
+                expect(USDReceived).to.be.equal(ethers.utils.parseEther("900"))
 
                 const USDCollateralAmount = (await bookKeeper.positions(pools.USD_STABLE, stableSwapModule.address))
                     .lockedCollateral
-                expect(USDCollateralAmount).to.be.equal(ethers.utils.parseEther("5"))
+                expect(USDCollateralAmount).to.be.equal(ethers.utils.parseEther("100"))
             })
         })
     })
