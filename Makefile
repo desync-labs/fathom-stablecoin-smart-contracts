@@ -319,3 +319,10 @@ closePositionFull:
 
 partialClosePosition:
 	coralX execute --network development --path scripts/ankrIntTest/closePositionPartial.js
+
+getEncodeOpenPosition:
+   	coralX execute --network development --path scripts/ankrIntTest/positionOpening_getEncodedData.js
+
+getEncodeFullClosure:
+	coralX execute --network development --path scripts/ankrIntTest/closePositionFull_getEncodedData.js
+
