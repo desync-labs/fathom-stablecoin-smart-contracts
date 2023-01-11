@@ -240,19 +240,21 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
                                 //src                 dest
         _adapter.onMoveCollateral(_positionAddress, address(this), info.collateralAmountToBeLiquidated, abi.encode(0));
 
-                                                        //accounting on bookKeeper
-                                                        //src               dest
+
                                                         // below should be commented out since
                                                         // col balance in bookKeeper for FSL strategy will be
                                                         //deducted as much as withdrawn
                                                         //but where does FSL Strategy have collateral on bookKeeper
                                                         //from the first place..?
-        // bookKeeper.moveCollateral(_collateralPoolId, address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees));
-                                //src                   dest
+                                                        //accounting on bookKeeper
+                                                        //src               dest
+        bookKeeper.moveCollateral(_collateralPoolId, address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees));
 
         //accounting on adapter side, moving col&certs from FSL strategy to colReceiver
         //I don't need this
         //maybe I can just comment this line below so that the stake will stay to FSL strategy
+                                   //src                   dest
+
         // _adapter.onMoveCollateral(address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
 
 
@@ -265,13 +267,18 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
                         // msg.sender in normal .withdraw case.. it was proxyWallet.
                         // then deQuestion is does FixedSpreadLiquidationStrategy has any stake[] in ankrColAdapter
 
-        _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
+        // _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
 
-
+        // revert("revert3");
         if (info.treasuryFees > 0) {
             bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
+            // revert("inside treasury condition1");
             _adapter.onMoveCollateral(address(this), address(systemDebtEngine), info.treasuryFees, abi.encode(0));
+            // revert("inside treasury condition2");
         }
+        _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
+        revert("here4");
+
 
         if (
             flashLendingEnabled == 1 &&

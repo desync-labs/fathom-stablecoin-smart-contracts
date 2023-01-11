@@ -1,6 +1,6 @@
 deploy:
-	# rm -r build
-	# rm addresses.json
+	rm -r build
+	rm addresses.json
 	coralX compile
 # deploy accessControl
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
@@ -120,7 +120,6 @@ deploy:
 # grant LIQUIDATION_ENGINE_ROLE() to LIQUIDATION_ENGINE_ADDR
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-liquidation-engine-role.js
 # grant LIQUIDATION_ENGINE_ROLE() to LIQUIDATION_STRATEGY_ADDR
-
 	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-liquidation-strategy-role.js
 # skip granting MINTABLE_ROLE() to flashMintModule
 	# coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-mintable-role.js
@@ -311,6 +310,27 @@ mintable-role-bot:
 whiteListBot:
 	# I would have to whitelist bot to liq. engine
 	coralX execute --network development --path scripts/deployment/5_liquidation-engine/config/config_liquidation-engine-whiteListBot.js
+
+newStrategy:
+# first deploy new strategy
+# deploy FSL strategy
+	coralX compile
+	coralX execute --network development --path scripts/deployment/16_fixed-spread-liquidation-strategy/deploy/fixed-spread-liquidation-strategy.js
+	coralX execute --network development --path scripts/deployment/16_fixed-spread-liquidation-strategy/initialize/initialize_fixed-spread-liquidation-strategy.js
+# update it on collateralPoolconfig with setStrategy fn.
+	coralX execute --network development --path scripts/deployment/1_collateral-pool-config/config/setStrategy.js
+# grant COLLATERAL_MANAGER_ROLE() to fixedSpreadLiquidationStrategy/positionManager/stableSwapModule
+	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-collateral-manager-role.js
+# grant LIQUIDATION_ENGINE_ROLE() to LIQUIDATION_STRATEGY_ADDR
+	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-liquidation-strategy-role.js
+
+
+# grant LIQUIDATION_ENGINE_ROLE() to LIQUIDATION_ENGINE_ADDR
+	coralX execute --network development --path scripts/deployment/0_access-control-config/config/grant-liquidation-engine-role.js
+
+# Adding priceOracle address to liquidation-engine's storage
+	coralX execute --network development --path scripts/deployment/5_liquidation-engine/config/config_liquidation-engine.js
+    
 
 makeWallet:
 	coralX execute --network development --path scripts/ankrIntTest/positionOpening.js
