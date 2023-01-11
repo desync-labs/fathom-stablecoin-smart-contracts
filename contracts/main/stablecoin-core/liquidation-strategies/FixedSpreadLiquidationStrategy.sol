@@ -18,10 +18,12 @@ import "../../interfaces/IManager.sol";
 
 import "../../interfaces/IStablecoinAdapter.sol";
 import "../../utils/SafeToken.sol";
+import "../../../utils/BytesHelper.sol";
 
 contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
     using SafeMathUpgradeable for uint256;
     using SafeToken for address;
+    using BytesHelper for *;
 
 
     struct LiquidationInfo {
@@ -226,6 +228,12 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
             info.collateralAmountToBeLiquidated < 2 ** 255 && info.actualDebtShareToBeLiquidated < 2 ** 255,
             "FixedSpreadLiquidationStrategy/overflow"
         );
+        //2023 Jan 11th, Wed
+        //deducting booKeeper.positions[positionADdress] of positionADdress that is being liquidated
+        // revert(string(bookKeeper.collateralToken(_collateralPoolId, address(this))._uintToASCIIBytes()));
+
+        //fn below increases bookKeeper.collateralToken(_collateralPoolId, address(this)) balance
+
         bookKeeper.confiscatePosition(
             _collateralPoolId,
             _positionAddress,
@@ -235,6 +243,7 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
             -int256(info.actualDebtShareToBeLiquidated)
         );
         IGenericTokenAdapter _adapter = IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId));
+
 
                                 //accounting on Adapter side
                                 //src                 dest
@@ -248,13 +257,19 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
                                                         //from the first place..?
                                                         //accounting on bookKeeper
                                                         //src               dest
-        bookKeeper.moveCollateral(_collateralPoolId, address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees));
+        
 
-        //accounting on adapter side, moving col&certs from FSL strategy to colReceiver
-        //I don't need this
-        //maybe I can just comment this line below so that the stake will stay to FSL strategy
+        // revert(string(bookKeeper.collateralToken(_collateralPoolId, address(this))._uintToASCIIBytes()));
+        // amazingly, now FSLS has 1000000000000000000 as collateralToken 1WAd.. where did that happen, mystery 
+
+
+        //bookKeeper accounting #1, comment line below and keep the collateralToken inside bookKeeper to FSLS
+        // he can not move this to _collateralRecipient, but just keep it as is.
+        // bookKeeper.moveCollateral(_collateralPoolId, address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees));
+
+
+        //Adapter accounting #1, comment line below also keep the stake and certs to FSLS
                                    //src                   dest
-
         // _adapter.onMoveCollateral(address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
 
 
@@ -270,14 +285,24 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         // _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
 
         // revert("revert3");
+
         if (info.treasuryFees > 0) {
             bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
-            // revert("inside treasury condition1");
             _adapter.onMoveCollateral(address(this), address(systemDebtEngine), info.treasuryFees, abi.encode(0));
-            // revert("inside treasury condition2");
         }
+        // revert("revert4");
         _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
-        revert("here4");
+        // revert("revert5");
+        //get rid of bookKeeper accounting of colToken for FSLS to zero.
+        //added at 8:26 PM 2023 Jan 11 Wed
+        //burn col amount in bookKeeper and also Stake Value and Certs in Adapter that were before going to colReceiver
+
+        //24 Jan 11 wed 8:34 PM
+        //I am commenting this out, but what to do with...remaining colltoken accounting in bookKeeper?
+        // bookKeeper.moveCollateral(_collateralPoolId, address(this), address(0), info.collateralAmountToBeLiquidated.sub(info.treasuryFees));
+        // revert("revert6");
+        // _adapter.onMoveCollateral(address(this), address(0), info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
+
 
 
         if (
@@ -313,7 +338,9 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         //from
         // bookKeeper.moveStablecoin(_liquidatorAddress, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
         // to
+        // revert("revertHere1");
         bookKeeper.moveStablecoin(_collateralRecipient, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
+        // revert("revertHere2");
 
         info.positionDebtShare = _positionDebtShare;
         info.positionCollateralAmount = _positionCollateralAmount;

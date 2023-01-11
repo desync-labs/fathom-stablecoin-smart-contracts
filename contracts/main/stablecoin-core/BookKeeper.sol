@@ -230,7 +230,7 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
         address _dst,
         uint256 _amount
     ) external override nonReentrant whenNotPaused onlyCollateralManager {
-        require(wish(_src, msg.sender), "BookKeeper/not-allowed");
+        require(wish(_src, msg.sender), "BookKeeper/moveCollateral/not-allowed");
         collateralToken[_collateralPoolId][_src] = sub(collateralToken[_collateralPoolId][_src], _amount);
         collateralToken[_collateralPoolId][_dst] = add(collateralToken[_collateralPoolId][_dst], _amount);
         emit LogMoveCollateral(msg.sender, _collateralPoolId, _src, _dst, _amount);
@@ -340,7 +340,7 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
         uint256 _utab = mul(_positionSrc.debtShare, _vars.debtAccumulatedRate);
         uint256 _vtab = mul(_positionDst.debtShare, _vars.debtAccumulatedRate);
 
-        require(both(wish(_src, msg.sender), wish(_dst, msg.sender)), "BookKeeper/not-allowed");
+        require(both(wish(_src, msg.sender), wish(_dst, msg.sender)), "BookKeeper/movePosition/not-allowed");
 
         require(_utab <= mul(_positionSrc.lockedCollateral, _vars.priceWithSafetyMargin), "BookKeeper/not-safe-src");
         require(_vtab <= mul(_positionDst.lockedCollateral, _vars.priceWithSafetyMargin), "BookKeeper/not-safe-dst");
