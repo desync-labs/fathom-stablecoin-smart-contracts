@@ -1,6 +1,6 @@
 deploy:
-	rm -r build
-	rm addresses.json
+	# rm -r build
+	# rm addresses.json
 	coralX compile
 # deploy accessControl
 	coralX execute --network development --path scripts/deployment/0_access-control-config/deploy/deploy_accessControlConfig.js
@@ -320,12 +320,12 @@ closePositionFull:
 partialClosePosition:
 	coralX execute --network development --path scripts/ankrIntTest/closePositionPartial.js
 
-getEncodeOpenPosition:
-   	coralX execute --network development --path scripts/ankrIntTest/positionOpening_getEncodedData.js
+# getEncodeOpenPosition:
+#   coralX execute --network development --path scripts/ankrIntTest/positionOpening_getEncodedData.js
 
-getEncodeFullClosure:
-	coralX execute --network development --path scripts/ankrIntTest/closePositionFull_getEncodedData.js
+# getEncodeFullClosure:
+# 	coralX execute --network development --path scripts/ankrIntTest/closePositionFull_getEncodedData.js
 
-getEncodePartialClosure:
-	coralX execute --network development --path scripts/ankrIntTest/closePositionPartial_getencodedData.js
+# getEncodePartialClosure:
+# 	coralX execute --network development --path scripts/ankrIntTest/closePositionPartial_getencodedData.js
 
