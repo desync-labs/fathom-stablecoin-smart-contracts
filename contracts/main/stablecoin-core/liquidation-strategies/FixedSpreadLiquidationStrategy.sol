@@ -235,13 +235,35 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
             -int256(info.actualDebtShareToBeLiquidated)
         );
         IGenericTokenAdapter _adapter = IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId));
+
+                                //accounting on Adapter side
+                                //src                 dest
         _adapter.onMoveCollateral(_positionAddress, address(this), info.collateralAmountToBeLiquidated, abi.encode(0));
 
-        bookKeeper.moveCollateral(_collateralPoolId, address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees));
-        _adapter.onMoveCollateral(address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
+                                                        //accounting on bookKeeper
+                                                        //src               dest
+                                                        // below should be commented out since
+                                                        // col balance in bookKeeper for FSL strategy will be
+                                                        //deducted as much as withdrawn
+                                                        //but where does FSL Strategy have collateral on bookKeeper
+                                                        //from the first place..?
+        // bookKeeper.moveCollateral(_collateralPoolId, address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees));
+                                //src                   dest
+
+        //accounting on adapter side, moving col&certs from FSL strategy to colReceiver
+        //I don't need this
+        //maybe I can just comment this line below so that the stake will stay to FSL strategy
+        // _adapter.onMoveCollateral(address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
+
+
         // 2023 Jan 10th Tue
         // withdraw collateral
         // gives aXDCc straight to liquidator's EOA
+        //              2024 Jan 11th Wed
+                        //  share of msg.sender decreases and usr(_collateralRecipient) gets aXDCc
+                        // who de heck is msg.sender here? it's 
+                        // msg.sender in normal .withdraw case.. it was proxyWallet.
+                        // then deQuestion is does FixedSpreadLiquidationStrategy has any stake[] in ankrColAdapter
 
         _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
 

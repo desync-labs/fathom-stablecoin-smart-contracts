@@ -15,5 +15,5 @@ module.exports =  async function(deployer) {
 
   // await simplePriceFeedUSDT.setPrice(WeiPerWad.div(100).toString());
 
-  await simplePriceFeedWXDC.setPrice(WeiPerWad.mul(100).toString());
+  await simplePriceFeedWXDC.setPrice(WeiPerWad.mul(1).toString());
 };

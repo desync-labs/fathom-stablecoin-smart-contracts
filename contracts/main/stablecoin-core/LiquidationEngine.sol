@@ -205,6 +205,9 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     _vars.wantStablecoinValueFromLiquidation = _vars.positionDebtShare.sub(_vars.newPositionDebtShare).mul(
       _collateralPoolLocalVars.debtAccumulatedRate
     ); // [rad]
+    //2024 Jan 11th
+    // in like 309 ish, there is a part where stablecoin is moved from _colRecipient to systemDebtEngine.
+    //so it's covered
     require(
       bookKeeper.stablecoin(address(systemDebtEngine)).sub(_vars.systemDebtEngineStablecoinBefore) >=
         _vars.wantStablecoinValueFromLiquidation,
