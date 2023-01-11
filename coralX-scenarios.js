@@ -21,7 +21,6 @@ module.exports = {
     ['compile'],
     ['execute', '--path', 'scripts/migrations/test/pre-deployment'],
     ['execute', '--path', 'scripts/migrations/deployment'],
-    // ['execute', '--path', 'scripts/migrations/configuration'],
     ['execute', '--path', 'scripts/migrations/test/configuration'],
   ],
 }

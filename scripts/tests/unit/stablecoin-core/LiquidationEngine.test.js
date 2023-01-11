@@ -87,8 +87,8 @@ describe("LiquidationEngine", () => {
   describe("#liquidate", () => {
     context("liquidator is not whitelisted", () => {
       it("should revert", async () => {
-        await expect(
-          liquidationEngineAsBob.liquidate(
+      await expect(
+          liquidationEngineAsBob["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
             COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
@@ -106,7 +106,7 @@ describe("LiquidationEngine", () => {
         await liquidationEngine.blacklist(AliceAddress);
 
         await expect(
-          liquidationEngineAsAlice.liquidate(
+          liquidationEngineAsAlice["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
             COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
@@ -125,7 +125,7 @@ describe("LiquidationEngine", () => {
         await liquidationEngine.cage()
 
         await expect(
-          liquidationEngine.liquidate(
+          liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
             COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
@@ -140,7 +140,7 @@ describe("LiquidationEngine", () => {
     context("when debtShareToRepay == 0", () => {
       it("should revert", async () => {
         await expect(
-          liquidationEngine.liquidate(
+          liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
             COLLATERAL_POOL_ID,
             AliceAddress,
             0,
@@ -160,7 +160,7 @@ describe("LiquidationEngine", () => {
         await mockedCollateralPoolConfig.mock.getStrategy.returns(AddressZero)
 
         await expect(
-          liquidationEngine.liquidate(
+          liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
             COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
@@ -181,7 +181,7 @@ describe("LiquidationEngine", () => {
         await mockedPriceFeed.mock.isPriceOk.returns(false);
 
         await expect(
-          liquidationEngine.liquidate(
+          liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
             COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
@@ -317,7 +317,7 @@ describe("LiquidationEngine", () => {
         await mockedFixedSpreadLiquidationStrategy.mock.execute.returns()
 
         await expect(
-          liquidationEngine.liquidate(
+          liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
             COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,
@@ -391,7 +391,7 @@ describe("LiquidationEngine", () => {
         await mockedCollateralPoolConfig.mock.getStrategy.returns(mockedFixedSpreadLiquidationStrategy.address)
 
         await expect(
-          liquidationEngine.liquidate(
+          liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
             COLLATERAL_POOL_ID,
             AliceAddress,
             WeiPerWad,

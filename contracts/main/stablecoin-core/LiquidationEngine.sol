@@ -136,6 +136,9 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     address _collateralRecipient,
     bytes calldata _data
   ) external override nonReentrant whenNotPaused onlyWhitelisted {
+      IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_collateralPoolId));
+      require(_priceFeed.isPriceOk(), "LiquidationEngine/price-is-not-healthy");
+
     _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated,_maxDebtShareToBeLiquidated, _collateralRecipient, _data, msg.sender);
   }
 
