@@ -292,18 +292,7 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         }
         // revert("revert4");
         _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
-        // revert("revert5");
-        //get rid of bookKeeper accounting of colToken for FSLS to zero.
-        //added at 8:26 PM 2023 Jan 11 Wed
-        //burn col amount in bookKeeper and also Stake Value and Certs in Adapter that were before going to colReceiver
-
-        //24 Jan 11 wed 8:34 PM
-        //I am commenting this out, but what to do with...remaining colltoken accounting in bookKeeper?
-        // bookKeeper.moveCollateral(_collateralPoolId, address(this), address(0), info.collateralAmountToBeLiquidated.sub(info.treasuryFees));
-        // revert("revert6");
-        // _adapter.onMoveCollateral(address(this), address(0), info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
-
-
+        //above line of code gets rid of address(this)'s collateralTokenAmount in bookKeeper
 
         if (
             flashLendingEnabled == 1 &&

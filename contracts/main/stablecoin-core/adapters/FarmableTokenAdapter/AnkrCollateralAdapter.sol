@@ -279,6 +279,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     /// @param _usr The address that holding states of the position
     /// @param _amount The ibToken amount to be withdrawn from FairLaunch and return to user
     function withdraw(address _usr, uint256 _amount, bytes calldata /* _data */) external override nonReentrant whenNotPaused {
+        //I think there needs to be some protection for withdraw function
         if (live == 1) {
             _withdraw(_usr, _amount);
         }
