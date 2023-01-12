@@ -28,6 +28,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
     uint256 public pid;
 
+    //below state variables left for future change of fee from staking reward
     uint256 public treasuryFeeBps;
     address public treasuryAccount;
 
@@ -35,7 +36,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
     IBookKeeper public bookKeeper;
     bytes32 public override collateralPoolId;
-    //@Sangjun left below getter for compilation since interface of tokenAdapter requires collateralToken getter fn. Later needs to be removed for audit.
+
     address public override collateralToken;
     uint256 public override decimals;
 
@@ -46,8 +47,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
-
-    uint256 public treasuryFee = 100000000000000000;  // 0.1 WAD
 
     /// @dev Mapping of user(positionAddress) => recordRatioNCerts that he has ownership over.
     mapping(address => RatioNCerts) public recordRatioNCerts;
@@ -235,8 +234,8 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
       // calculate weighted average of ratio from already existing ratio&CertsAmount and incoming ratio&CertsAmount
         uint256 certsBefore = recordRatioNCerts[_positionAddress].CertsAmount;
         uint256 ratioBefore = recordRatioNCerts[_positionAddress].ratio;
-            //Q.. to make below calculation to ray cal. what to change
-        recordRatioNCerts[_positionAddress].ratio = 
+        uint256 aXDCcRatio = aXDCcAddress.ratio();
+        uint256 calculatedNewRatio = 
           add(
           wmul(
           ratioBefore,
@@ -245,12 +244,18 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             )
           ),
           wmul(
-          aXDCcAddress.ratio(),
+          aXDCcRatio,
             wdiv(certsIn, 
               add(certsBefore,certsIn) 
             )
           )
         );
+        if(calculatedNewRatio <= aXDCcRatio) {
+        recordRatioNCerts[_positionAddress].ratio = aXDCcRatio;
+        } else {
+            recordRatioNCerts[_positionAddress].ratio = calculatedNewRatio;
+        }
+
         recordRatioNCerts[_positionAddress].CertsAmount = add(recordRatioNCerts[_positionAddress].CertsAmount, certsIn);   
       }
 
@@ -263,6 +268,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     /// @param _usr The address that holding states of the position
     /// @param _amount The ibToken amount to be withdrawn from FairLaunch and return to user
     function withdraw(address _usr, uint256 _amount, bytes calldata /* _data */) external override nonReentrant whenNotPaused {
+        //I think there needs to be some protection for withdraw function
         if (live == 1) {
             _withdraw(_usr, _amount);
         }
@@ -284,29 +290,9 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             totalShare = sub(totalShare, _share);
             stake[msg.sender] = sub(stake[msg.sender], _share);
 
-            uint256 ratio = recordRatioNCerts[msg.sender].ratio;
-            uint256 ratioaXDCc = aXDCcAddress.ratio();
-            uint256 certsAmount = recordRatioNCerts[msg.sender].CertsAmount;
-
-            //if ratio on recordRatioNCerts is bigger or equal to ratioaXDCc,
-            //send all certs that the position owner has
-            if (ratio >= ratioaXDCc) {
-                SafeToken.safeTransfer(address(aXDCcAddress), _usr, certsAmount);
-            } else {
-                //otherwise calculate reward and deduct fee, then transfer the rest of certs
-                    //Q.. change to ray below
-                uint256 xdc0 = wdiv(certsAmount, ratio);
-                uint256 xdc1 = wdiv(certsAmount, ratioaXDCc);
-                // calculate reward
-                uint256 reward = sub(xdc1, xdc0);
-                // calculate fee
-                uint256 fee = wmul(reward, treasuryFee);
-                // calculate return amount
-                uint256 returnAmount = wmul(add(sub(reward,fee), xdc0), ratioaXDCc);
-
-                recordRatioNCerts[msg.sender] = RatioNCerts(0, 0);
-                SafeToken.safeTransfer(address(aXDCcAddress), _usr, returnAmount);
-            }
+            uint256 withdrawAmount = recordRatioNCerts[msg.sender].CertsAmount;
+            recordRatioNCerts[msg.sender].CertsAmount = 0;
+            SafeToken.safeTransfer(address(aXDCcAddress), _usr, withdrawAmount);
         }
             emit LogWithdraw(_amount);
     }
@@ -322,23 +308,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         uint256 _stakedAmount = stake[_source];
         stake[_source] = sub(_stakedAmount, _share);
         stake[_destination] = add(stake[_destination], _share);
-        // 2. Update source's rewardDebt due to collateral tokens have
-        // 2022 Dec 23rd Fri. Reward toen can go away
-        // moved from source to destination. Hence, rewardDebt should be updated.
-        // rewardDebtDiff is how many rewards has been paid for that share.
-        // uint256 _rewardDebt = rewardDebts[_source];
-        // uint256 _rewardDebtDiff = mul(_rewardDebt, _share) / _stakedAmount;
-        // 3. Update rewardDebts for both source and destination
-        // 2022 Dec 23 Fri
-        // Alpaca's reward system can go away
-        // Safe since rewardDebtDiff <= rewardDebts[source]
-        // rewardDebts[_source] = _rewardDebt - _rewardDebtDiff;
-        // rewardDebts[_destination] = add(rewardDebts[_destination], _rewardDebtDiff);
-        // 4. Sanity check.
-        // - stake[source] must more than or equal to collateral + lockedCollateral that source has
-        // to prevent a case where someone try to steal stake from source
-        // - stake[destination] must less than or eqal to collateral + lockedCollateral that destination has
-        // to prevent destination from claim stake > actual collateral that he has
+
         (uint256 _lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _source);
         require(
         stake[_source] >= add(bookKeeper.collateralToken(collateralPoolId, _source), _lockedCollateral),
@@ -380,22 +350,24 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         uint256 _share,
         bytes calldata _data
   ) internal onlyCollateralManager {
-        //stake might be not WAD but sth else
         uint256 certsToMoveRatio;
-        if(_share == stake[_source]){
-            certsToMoveRatio = 1*WAD;
+        if(_share >= stake[_source]){
+            uint256 CertsMove = recordRatioNCerts[_source].CertsAmount;
+            recordRatioNCerts[_source].CertsAmount = 0;
+            recordRatioNCerts[_destination].CertsAmount = CertsMove;
         } else {
             require(_share < stake[_source], "AnkrCollateralAdapter/tooMuchShare");
             certsToMoveRatio = wdiv(_share, stake[_source]);
         }
         uint256 certsMove = wmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
+
+
         recordRatioNCerts[_source].CertsAmount -= certsMove;
-        //destination should have ratio adjusted
 
         uint256 certsBefore = recordRatioNCerts[_destination].CertsAmount;
         uint256 ratioBefore = recordRatioNCerts[_destination].ratio;
 
-        recordRatioNCerts[_destination].ratio = 
+        uint256 calculatedNewRatio = 
             add(
                 wmul(
                 ratioBefore,
@@ -410,9 +382,15 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
                     )
                 )
             );
+        
+        uint256 aXDCcRatio = aXDCcAddress.ratio();
 
+        if(calculatedNewRatio <= aXDCcRatio) {
+        recordRatioNCerts[_destination].ratio = aXDCcRatio;
+        } else {
+            recordRatioNCerts[_destination].ratio = calculatedNewRatio;
+        }
         recordRatioNCerts[_destination].CertsAmount +=  certsMove;
-
   }
 
 

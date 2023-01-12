@@ -37,11 +37,11 @@ const openPositionAndDraw = async (proxyWallet, from, collateral_pool_id, stable
   ])
   console.log("here2");
   await proxyWallet.execute2(fathomStablecoinProxyActions.address, openPositionCall, { from: from, value: ethers.constants.WeiPerEther })
-  console.log("here3");
+                                                                                                        // how much XDC to collateralize
 }
 
 module.exports = async function(deployer) {
-  
+
   //making wallet
   // const proxyWalletRegistry = await ProxyWalletRegistry.at(stablecoinAddress.proxyWalletRegistry);
   const proxyWalletRegistry = await artifacts.initializeInterfaceAt("ProxyWalletRegistry", "ProxyWalletRegistry");
@@ -53,7 +53,6 @@ module.exports = async function(deployer) {
   const proxyWalletAsAlice = await artifacts.initializeInterfaceAt("ProxyWallet", proxyWalletAliceAddress);
   const proxyWalletAsAliceOwner = await proxyWalletAsAlice.owner({ from: AliceAddress });
   console.log(AliceAddress == proxyWalletAsAliceOwner);
-
-  await openPositionAndDraw(proxyWalletAsAlice, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad.mul(2));
-
+                                                                                  //how much FXD to borrow
+  await openPositionAndDraw(proxyWalletAsAlice, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad.mul(11));
 };

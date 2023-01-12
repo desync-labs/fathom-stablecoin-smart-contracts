@@ -15,9 +15,12 @@ import "../../interfaces/ISystemDebtEngine.sol";
 import "../../interfaces/IFlashLendingCallee.sol";
 import "../../interfaces/IGenericTokenAdapter.sol";
 import "../../interfaces/IManager.sol";
+import "../../interfaces/IStablecoinAdapter.sol";
+import "../../utils/SafeToken.sol";
 
 contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
     using SafeMathUpgradeable for uint256;
+    using SafeToken for address;
 
     struct LiquidationInfo {
         uint256 positionDebtShare; // [wad]
@@ -43,6 +46,7 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
     ILiquidationEngine public liquidationEngine; // Liquidation module
     ISystemDebtEngine public systemDebtEngine; // Recipient of FUSD raised in auctions
     IPriceOracle public priceOracle; // Collateral price module
+    IStablecoinAdapter public stablecoinAdapter; //StablecoinAdapter to deposit FXD to bookKeeper
 
     uint256 public flashLendingEnabled;
 
@@ -72,7 +76,7 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         _;
     }
 
-    function initialize(address _bookKeeper, address _priceOracle, address _liquidationEngine, address _systemDebtEngine) external initializer {
+    function initialize(address _bookKeeper, address _priceOracle, address _liquidationEngine, address _systemDebtEngine, address _stablecoinAdapter) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
@@ -87,6 +91,9 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
 
         ISystemDebtEngine(_systemDebtEngine).surplusBuffer(); // Sanity Check Call
         systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
+
+        stablecoinAdapter = IStablecoinAdapter(_stablecoinAdapter); //StablecoinAdapter to deposit FXD to bookKeeper
+
     }
 
     uint256 constant BLN = 10 ** 9;
@@ -185,7 +192,7 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         address _positionAddress, // Address that will receive any leftover collateral
         uint256 _debtShareToBeLiquidated, // The value of debt to be liquidated as specified by the liquidator [rad]
         uint256 _maxDebtShareToBeLiquidated, // The maximum value of debt to be liquidated as specified by the liquidator in case of full liquidation for slippage control [rad]
-        address _liquidatorAddress,
+        address _liquidatorAddress,  //<- liq. engine's address
         address _collateralRecipient,
         bytes calldata _data // Data to pass in external call; if length 0, no call is done
     ) external override nonReentrant whenNotPaused {
@@ -217,6 +224,7 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
             info.collateralAmountToBeLiquidated < 2 ** 255 && info.actualDebtShareToBeLiquidated < 2 ** 255,
             "FixedSpreadLiquidationStrategy/overflow"
         );
+
         bookKeeper.confiscatePosition(
             _collateralPoolId,
             _positionAddress,
@@ -226,15 +234,14 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
             -int256(info.actualDebtShareToBeLiquidated)
         );
         IGenericTokenAdapter _adapter = IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId));
-        _adapter.onMoveCollateral(_positionAddress, address(this), info.collateralAmountToBeLiquidated, abi.encode(0));
 
-        bookKeeper.moveCollateral(_collateralPoolId, address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees));
-        _adapter.onMoveCollateral(address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
+        _adapter.onMoveCollateral(_positionAddress, address(this), info.collateralAmountToBeLiquidated, abi.encode(0));
 
         if (info.treasuryFees > 0) {
             bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
             _adapter.onMoveCollateral(address(this), address(systemDebtEngine), info.treasuryFees, abi.encode(0));
         }
+        _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
 
         if (
             flashLendingEnabled == 1 &&
@@ -250,7 +257,12 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
             );
         }
 
-        bookKeeper.moveStablecoin(_liquidatorAddress, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
+        address _stablecoin = address(stablecoinAdapter.stablecoin());
+        _stablecoin.safeTransferFrom(_collateralRecipient, address(this), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
+        _stablecoin.safeApprove(address(stablecoinAdapter), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
+        stablecoinAdapter.deposit(_collateralRecipient, ((info.actualDebtValueToBeLiquidated / RAY) + 1), abi.encode(0));
+
+        bookKeeper.moveStablecoin(_collateralRecipient, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
 
         info.positionDebtShare = _positionDebtShare;
         info.positionCollateralAmount = _positionCollateralAmount;

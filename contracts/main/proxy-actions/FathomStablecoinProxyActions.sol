@@ -14,12 +14,14 @@ import "../interfaces/IProxyRegistry.sol";
 import "../interfaces/IProxy.sol";
 import "../utils/SafeToken.sol";
 
+import "../../utils/BytesHelper.sol";
+
 /// @notice WARNING: These functions meant to be used as a a library for a Proxy.
 /// @notice DO NOT CALL ANY FUNCTION IN THIS CONTRACT DIRECTLY.
 /// @notice Hence, it shouldn't has any state vairables. Some are unsafe if you call them directly.
 contract FathomStablecoinProxyActions {
     using SafeToken for address;
-
+    using BytesHelper for *;
     uint256 internal constant RAY = 10 ** 27;
 
     function _safeSub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
@@ -519,6 +521,10 @@ contract FathomStablecoinProxyActions {
 
         // deposits XDC to AnkrStakingPool via AnkrCollateralAdapter
         xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data);
+
+        //let's check how msg.sender is being recorded
+        //2023 Jan 11 7:32 PM
+        // revert(string((msg.value)._uintToASCIIBytes()));
 
         adjustPosition(
         _manager,
