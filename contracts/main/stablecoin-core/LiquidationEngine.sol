@@ -104,7 +104,6 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     address[] calldata _collateralRecipients,
     bytes[] calldata datas
   ) external override nonReentrant whenNotPaused onlyWhitelisted {
-
     for(uint i = 0; i < _collateralPoolIds.length; i++){
         try this.liquidate(_collateralPoolIds[i], _positionAddresses[i],_debtShareToBeLiquidateds[i], _maxDebtShareToBeLiquidateds[i], _collateralRecipients[i], datas[i],msg.sender){
         }catch{
@@ -152,6 +151,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     require(live == 1, "LiquidationEngine/not-live");
     require(_debtShareToBeLiquidated != 0, "LiquidationEngine/zero-debt-value-to-be-liquidated");
     require(_maxDebtShareToBeLiquidated != 0, "LiquidationEngine/zero-max-debt-value-to-be-liquidated");
+    require(_isPriceOk(_collateralPoolId), "LiquidationEngine/price-is-not-healthy");
 
     LocalVars memory _vars;
 
@@ -205,9 +205,6 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     _vars.wantStablecoinValueFromLiquidation = _vars.positionDebtShare.sub(_vars.newPositionDebtShare).mul(
       _collateralPoolLocalVars.debtAccumulatedRate
     ); // [rad]
-    //2024 Jan 11th
-    // in like 309 ish, there is a part where stablecoin is moved from _colRecipient to systemDebtEngine.
-    //so it's covered
     require(
       bookKeeper.stablecoin(address(systemDebtEngine)).sub(_vars.systemDebtEngineStablecoinBefore) >=
         _vars.wantStablecoinValueFromLiquidation,
@@ -261,5 +258,10 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
   /// @dev access: OWNER_ROLE, GOV_ROLE
   function unpause() external onlyOwnerOrGov {
     _unpause();
+  }
+
+  function _isPriceOk(bytes32 _collateralPoolId) internal view returns (bool) {
+    IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_collateralPoolId));
+    return _priceFeed.isPriceOk();
   }
 }
