@@ -7,31 +7,23 @@ const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
 const WeiPerRay = BigNumber.from(`1${"0".repeat(27)}`)
 const WeiPerRad = BigNumber.from(`1${"0".repeat(45)}`)
 
-const CLOSE_FACTOR_BPS = BigNumber.from(5000)   // <- 0.5
+const CLOSE_FACTOR_BPS = BigNumber.from(2500)   // <- 0.25
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)  // <- 1.05
-const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
-const LIQUIDATIONRATIO_75 = WeiPerRay.mul(133).div(100).toString();
-// LTV 75%
+const TREASURY_FEE_BPS = BigNumber.from(8000) // <- 0.8
+const STABILITY_FEE = BigNumber.from("1000000000627937192491029811")
+const LIQUIDATIONRATIO_75 = WeiPerRay.mul(133).div(100).toString(); // LTV 75%
 
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed")
-    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy")
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper")
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig")
     const priceOracle = await getProxy(proxyFactory, "PriceOracle")
-    const fathomOraclePriceFeedFactory = await getProxy(proxyFactory, "FathomOraclePriceFeedFactory");
-
-    const addresses = getAddresses(deployer.networkId())
-
-    const wxdcAdapter = await collateralTokenAdapterFactory.adapters(pools.WXDC)
-    const usdtAdapter = await collateralTokenAdapterFactory.adapters(pools.USDT_COL)
-    const fthmAdapter = await collateralTokenAdapterFactory.adapters(pools.FTHM)
-
-    const priceFeedWXDC = await fathomOraclePriceFeedFactory.feeds(addresses.WXDC)
-    const pricefeedFTHM = await fathomOraclePriceFeedFactory.feeds(addresses.FTHM)
+    const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+    const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
 
     const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);
     const debtCeilingSetUp = WeiPerRad.mul(10000000).div(2);
@@ -39,11 +31,8 @@ module.exports = async function (deployer) {
     await simplePriceFeed.setPrice(WeiPerWad.mul(1), { gasLimit: 2000000 });
 
     const promises = [
-        initPool(pools.WXDC, wxdcAdapter, priceFeedWXDC, LIQUIDATIONRATIO_75),
-        // we initiate pool with simple price feed because at this moment liquidity 
-        initPool(pools.USDT_COL, usdtAdapter, simplePriceFeed.address, LIQUIDATIONRATIO_75),
-        initPool(pools.FTHM, fthmAdapter, pricefeedFTHM, LIQUIDATIONRATIO_75),
-        initPool(pools.USDT_STABLE, usdtAdapter, simplePriceFeed.address, WeiPerRay),
+        initPool(pools.XDC, ankrCollateralAdapter.address, delayFathomOraclePriceFeed.address, LIQUIDATIONRATIO_75),
+        initPool(pools.USD_STABLE, authTokenAdapter.address, simplePriceFeed.address, WeiPerRay),
     ]
 
     await Promise.all(promises);
@@ -53,11 +42,11 @@ module.exports = async function (deployer) {
     async function initPool(poolId, adapter, priceFeed, liquidationRatio) {
         await collateralPoolConfig.initCollateralPool(
             poolId,
-            0,
+            debtCeilingSetUp,
             0,
             priceFeed,
             liquidationRatio,
-            WeiPerRay,
+            STABILITY_FEE,
             adapter,
             CLOSE_FACTOR_BPS.mul(2),
             LIQUIDATOR_INCENTIVE_BPS,
@@ -66,7 +55,6 @@ module.exports = async function (deployer) {
             { gas: 5000000 }
         );
 
-        await collateralPoolConfig.setDebtCeiling(poolId, debtCeilingSetUp, { gasLimit: 2000000 });
         await priceOracle.setPrice(poolId, { gasLimit: 2000000 });
     }
 }

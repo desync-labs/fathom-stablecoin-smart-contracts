@@ -1,15 +1,19 @@
 const fs = require('fs');
+const { BigNumber } = require('ethers');
 
 const pools = require("../../common/collateral");
 const { getAddresses } = require("../../common/addresses");
 const { getProxy } = require("../../common/proxies");
 
 const FathomStablecoinProxyActions = artifacts.require('FathomStablecoinProxyActions.sol');
-const Shield = artifacts.require('Shield.sol');
-const FathomToken = artifacts.require('FathomToken.sol');
+
+const {Deployer} = require("../../common/addresses");
+
+const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
 
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const proxyWalletFactory = await artifacts.initializeInterfaceAt("ProxyWalletFactory", "ProxyWalletFactory");
 
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
@@ -30,14 +34,9 @@ module.exports = async function (deployer) {
     const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
     const flashMintArbitrager = await getProxy(proxyFactory, "FlashMintArbitrager");
     const bookKeeperFlashMintArbitrager = await getProxy(proxyFactory, "BookKeeperFlashMintArbitrager");
-    const fathomOraclePriceFeedFactory = await getProxy(proxyFactory, "FathomOraclePriceFeedFactory");
+    const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
     const dexPriceOracle = await getProxy(proxyFactory, "DexPriceOracle");
-    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
-
-    const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", "CollateralTokenAdapter");
-    const fairLaunch = await artifacts.initializeInterfaceAt("FairLaunch", "FairLaunch");
-    const fathomOraclePriceFeed = await artifacts.initializeInterfaceAt("FathomOraclePriceFeed", "FathomOraclePriceFeed");
-    const proxyWalletFactory = await artifacts.initializeInterfaceAt("ProxyWalletFactory", "ProxyWalletFactory");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
 
     const addresses = getAddresses(deployer.networkId())
 
@@ -99,8 +98,8 @@ module.exports = async function (deployer) {
         ),
         authTokenAdapter.initialize(
             bookKeeper.address,
-            pools.USDT_STABLE,
-            addresses.USDT,
+            pools.USD_STABLE,
+            addresses.USD,
             { gasLimit: 1000000 }
         ),
         stableSwapModule.initialize(
@@ -111,9 +110,23 @@ module.exports = async function (deployer) {
         ),
         flashMintArbitrager.initialize({ gasLimit: 1000000 }),
         bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
-        fathomOraclePriceFeedFactory.initialize(fathomOraclePriceFeed.address, { gasLimit: 1000000 }),
         dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
-        collateralTokenAdapterFactory.initialize(collateralTokenAdapter.address, { gasLimit: 1000000 })
+        ankrCollateralAdapter.initialize(
+            bookKeeper.address,
+            pools.XDC,
+            addresses.xdcPool,
+            addresses.aXDCc,
+            TREASURY_FEE_BPS,
+            //TODO: use treasury wallet
+            Deployer,
+            positionManager.address
+        ),
+        delayFathomOraclePriceFeed.initialize(
+            dexPriceOracle.address,
+            addresses.USD,
+            addresses.WXDC,
+            accessControlConfig.address
+        )
     ];
 
     await Promise.all(promises);
@@ -139,15 +152,11 @@ module.exports = async function (deployer) {
         authTokenAdapter: authTokenAdapter.address,
         flashMintArbitrager: flashMintArbitrager.address,
         bookKeeperFlashMintArbitrager: bookKeeperFlashMintArbitrager.address,
-        fathomOraclePriceFeedFactory: fathomOraclePriceFeedFactory.address,
         dexPriceOracle: dexPriceOracle.address,
-        collateralTokenAdapterFactory: collateralTokenAdapterFactory.address,
-        fairLaunch: fairLaunch.address,
-        fathomOraclePriceFeed: fathomOraclePriceFeed.address,
         proxyWalletFactory: proxyWalletFactory.address,
-        fathomToken: FathomToken.address,
-        shield: Shield.address,
-        fathomStablecoinProxyActions: FathomStablecoinProxyActions.address
+        fathomStablecoinProxyActions: FathomStablecoinProxyActions.address,
+        ankrCollateralAdapter: ankrCollateralAdapter.address,
+        delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address
     }
 
     fs.writeFileSync('./addresses.json', JSON.stringify(newAddresses));

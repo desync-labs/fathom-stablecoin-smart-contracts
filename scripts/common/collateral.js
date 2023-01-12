@@ -1,8 +1,9 @@
 const { formatBytes32String } = require("ethers/lib/utils");
 
-const USDT_STABLE = formatBytes32String("USDT-STABLE")
+const USD_STABLE = formatBytes32String("USD-STABLE")
 const FTHM = formatBytes32String("FTHM")
 const WXDC = formatBytes32String("WXDC")
-const USDT_COL = formatBytes32String("USDT-COL")
+const XDC = formatBytes32String("XDC")
+const USD_COL = formatBytes32String("USD-COL")
 
-module.exports = { FTHM, WXDC, USDT_COL, USDT_STABLE }
+module.exports = { XDC, FTHM, WXDC, USD_COL, USD_STABLE }

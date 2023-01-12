@@ -8,8 +8,8 @@ contract MockaXDCc is ERC20 {
     
     uint256 public ratio;
 
-    constructor(string memory _name, string memory _symbol, uint256 _ratio) ERC20(_name, _symbol) {
-        ratio = _ratio;
+    constructor(string memory _name, string memory _symbol) ERC20(_name, _symbol) {
+        // ratio = _ratio;
     }
 
     function setRatio(uint256 _ratio) external {

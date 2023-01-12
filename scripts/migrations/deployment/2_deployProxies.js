@@ -25,9 +25,9 @@ module.exports = async function (deployer) {
         "StableSwapModule",
         "FlashMintArbitrager",
         "BookKeeperFlashMintArbitrager",
-        "FathomOraclePriceFeedFactory",
+        "DelayFathomOraclePriceFeed",
         "DexPriceOracle",
-        "CollateralTokenAdapterFactory"
+        "AnkrCollateralAdapter"
     ]
 
     const promises = contracts.map(contract => {

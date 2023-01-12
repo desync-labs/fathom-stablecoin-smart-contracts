@@ -29,7 +29,7 @@ const loadFixtureHandler = async () => {
 
     const mockedAccessControlConfig = await createMock("AccessControlConfig");
     const mockedSimplePriceFeed = await createMock("SimplePriceFeed");
-    const mockedCollateralTokenAdapter = await createMock("CollateralTokenAdapter");
+    const mockedCollateralTokenAdapter = await createMock("TokenAdapter");
 
     await mockedAccessControlConfig.mock.PRICE_ORACLE_ROLE.returns(formatBytes32String("PRICE_ORACLE_ROLE"))
     await mockedAccessControlConfig.mock.BOOK_KEEPER_ROLE.returns(formatBytes32String("BOOK_KEEPER_ROLE"))
