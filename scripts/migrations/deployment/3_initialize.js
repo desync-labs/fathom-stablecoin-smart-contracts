@@ -113,7 +113,7 @@ module.exports = async function (deployer) {
         dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
         ankrCollateralAdapter.initialize(
             bookKeeper.address,
-            pools.WXDC,
+            pools.XDC,
             addresses.xdcPool,
             addresses.aXDCc,
             TREASURY_FEE_BPS,

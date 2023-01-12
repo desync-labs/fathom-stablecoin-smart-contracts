@@ -754,9 +754,7 @@ contract FathomStablecoinProxyActions {
         ); // [wad]
         adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmount), _wipeDebtShare, _xdcAdapter, _data);
         moveCollateral(_manager, _positionId, address(this), _collateralAmount, _xdcAdapter, _data); // Moves the amount from the position to proxy's address
-        IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _collateralAmount, _data); // Withdraws WXDC amount to proxy address as a token
-        IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_collateralAmount); // Converts WXDC to XDC
-        SafeToken.safeTransferETH(msg.sender, _collateralAmount); // Sends XDC back to the user's wallet
+        IGenericTokenAdapter(_xdcAdapter).withdraw(msg.sender, _collateralAmount, _data);
         IManager(_manager).updatePrice(_collateralPoolId);
     }
 

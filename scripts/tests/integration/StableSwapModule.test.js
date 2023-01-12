@@ -1,75 +1,37 @@
 const chai = require('chai');
-const { BigNumber, ethers } = require("ethers");
+const { ethers } = require("ethers");
 const { MaxUint256 } = require("@ethersproject/constants");
 
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 
-const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
-const { DeployerAddress, AddressZero } = require("../helper/address");
-const { formatBytes32String } = require("ethers/lib/utils");
+const { WeiPerRay } = require("../helper/unit");
+const { DeployerAddress } = require("../helper/address");
 const { loadFixture } = require("../helper/fixtures");
 const { getProxy } = require("../../common/proxies");
+const pools = require("../../common/collateral");
 
 const { expect } = chai
-
-const COLLATERAL_POOL_ID = formatBytes32String("USDT-COL")
-
-const CLOSE_FACTOR_BPS = BigNumber.from(5000)
-const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(12500)
-const TREASURY_FEE_BPS = BigNumber.from(2500)
 
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
-    const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
     const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
     const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
-    const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
 
-    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID)
-    const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
-    const usdtAddr = await collateralTokenAdapter.collateralToken();
-    const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
-
-    await collateralPoolConfig.initCollateralPool(
-        COLLATERAL_POOL_ID,
-        WeiPerRad.mul(100000000000000),
-        0,
-        simplePriceFeed.address,
-        WeiPerRay,
-        WeiPerRay,
-        authTokenAdapter.address,
-        CLOSE_FACTOR_BPS,
-        LIQUIDATOR_INCENTIVE_BPS,
-        TREASURY_FEE_BPS,
-        AddressZero
-    )
-
-    await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(100000000000000), { gasLimit: 1000000 })
-    await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
-
-    // Deploy Fathom Stablecoin
-    await bookKeeper.whitelist(stablecoinAdapter.address, { gasLimit: 1000000 })
-
-    await stableSwapModule.setFeeIn(ethers.utils.parseEther("0.001"), { gasLimit: 1000000 })
-    await stableSwapModule.setFeeOut(ethers.utils.parseEther("0.001"), { gasLimit: 1000000 })
-    await authTokenAdapter.grantRole(await authTokenAdapter.WHITELISTED(), stableSwapModule.address, { gasLimit: 1000000 })
-
-    await flashMintModule.setMax(ethers.utils.parseEther("100000000"), { gasLimit: 1000000 })
-    await flashMintModule.setFeeRate(ethers.utils.parseEther("25").div(10000), { gasLimit: 1000000 })
+    const USDAddr = await authTokenAdapter.token();
+    const USD = await artifacts.initializeInterfaceAt("ERC20Mintable", USDAddr);
 
     return {
         bookKeeper,
         stablecoinAdapter,
         collateralPoolConfig,
-        USDT,
+        USD,
         stableSwapModule,
         authTokenAdapter,
         fathomStablecoin,
@@ -81,7 +43,7 @@ describe("StableSwapModule", () => {
     // Contracts
     let stablecoinAdapter
     let bookKeeper
-    let USDT
+    let USD
     let stableSwapModule
     let authTokenAdapter
     let fathomStablecoin
@@ -98,7 +60,7 @@ describe("StableSwapModule", () => {
             bookKeeper,
             stablecoinAdapter,
             collateralPoolConfig,
-            USDT,
+            USD,
             stableSwapModule,
             authTokenAdapter,
             fathomStablecoin,
@@ -110,52 +72,52 @@ describe("StableSwapModule", () => {
         context("exceed debtCeiling", async () => {
             it("should revert", async () => {
                 // Set debtCeiling of StableSwapModule to 0
-                await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, 0, { gasLimit: 1000000 })
+                await collateralPoolConfig.setDebtCeiling(pools.USD_STABLE, 0, { gasLimit: 1000000 })
 
-                // Mint 1000 USDT to deployer
-                await USDT.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
+                // Mint 1000 USD to deployer
+                await USD.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // Swap 1000 USDT to FXD
-                await USDT.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
+                // Swap 1000 USD to FXD
+                await USD.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
                 await expect(
                     stableSwapModule.swapTokenToStablecoin(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 3000000 })
                 ).to.be.revertedWith("BookKeeper/ceiling-exceeded")
             })
         })
 
-        context("swap USDT when USDT is insufficient", async () => {
+        context("swap USD when USD is insufficient", async () => {
             it("should revert", async () => {
-                // Mint 1000 USDT to deployer
-                await USDT.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
+                // Mint 1000 USD to deployer
+                await USD.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // Swap 1000 USDT to FXD
-                await USDT.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
+                // Swap 1000 USD to FXD
+                await USD.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
 
                 await expect(
                     stableSwapModule.swapTokenToStablecoin(DeployerAddress, ethers.utils.parseEther("1001"), { gasLimit: 3000000 })
                 ).to.be.revertedWith("!safeTransferFrom")
             })
         })
-        context("swap USDT to FXD", async () => {
+        context("swap USD to FXD", async () => {
             it("should success", async () => {
-                // Mint 1000 USDT to deployer
-                await USDT.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
+                // Mint 1000 USD to deployer
+                await USD.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // Swap 1000 USDT to FXD
-                await USDT.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
+                // Swap 1000 USD to FXD
+                await USD.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // 1000 * 0.001 = 1
+                // 1000 * 0.01 = 10
                 const feeFromSwap = await bookKeeper.stablecoin(systemDebtEngine.address)
-                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("1").mul(WeiPerRay))
+                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("10").mul(WeiPerRay))
 
-                // stablecoinReceived = swapAmount - fee = 1000 - 1 = 999
+                // stablecoinReceived = swapAmount - fee = 1000 - 10 = 990
                 const stablecoinReceived = await fathomStablecoin.balanceOf(DeployerAddress)
-                expect(stablecoinReceived).to.be.equal(ethers.utils.parseEther("999"))
+                expect(stablecoinReceived).to.be.equal(ethers.utils.parseEther("990"))
 
-                const USDTCollateralAmount = (await bookKeeper.positions(COLLATERAL_POOL_ID, stableSwapModule.address))
+                const USDCollateralAmount = (await bookKeeper.positions(pools.USD_STABLE, stableSwapModule.address))
                     .lockedCollateral
-                expect(USDTCollateralAmount).to.be.equal(ethers.utils.parseEther("1000"))
+                expect(USDCollateralAmount).to.be.equal(ethers.utils.parseEther("1000"))
             })
         })
     })
@@ -172,38 +134,38 @@ describe("StableSwapModule", () => {
                 )
                 await stablecoinAdapter.withdraw(DeployerAddress, ethers.utils.parseEther("1001"), "0x", { gasLimit: 1000000 })
 
-                // Swap 1000 FXD to USDT
+                // Swap 1000 FXD to USD
                 await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
                 await expect(stableSwapModule.swapStablecoinToToken(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })).to.be
                     .reverted
             })
         })
 
-        context("swap FXD to USDT", async () => {
+        context("swap FXD to USD", async () => {
             it("should success", async () => {
-                // Mint 1000 USDT to deployer
-                await USDT.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
+                // Mint 1000 USD to deployer
+                await USD.mint(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // Swap 1000 USDT to FXD
-                await USDT.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
+                // Swap 1000 USD to FXD
+                await USD.approve(authTokenAdapter.address, MaxUint256, { gasLimit: 1000000 })
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress, ethers.utils.parseEther("1000"), { gasLimit: 1000000 })
 
-                // Swap 998 FXD to USDT
+                // Swap 990 FXD to USD
                 await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
-                await stableSwapModule.swapStablecoinToToken(DeployerAddress, ethers.utils.parseEther("998"), { gasLimit: 1000000 })
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress, ethers.utils.parseEther("900"), { gasLimit: 1000000 })
 
-                // first swap = 1000 * 0.001 = 1 FXD
-                // second swap = 998 * 0.001 = 0.998 FXD
-                // total fee = 1 + 0.998 = 1.998
+                // first swap = 1000 * 0.01 = 10 FXD
+                // second swap = 900 * 0.01 = 9 FXD
+                // total fee = 10 + 9 = 19 FXD
                 const feeFromSwap = await bookKeeper.stablecoin(systemDebtEngine.address)
-                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("1.998").mul(WeiPerRay))
+                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("19").mul(WeiPerRay))
 
-                const USDTReceived = await USDT.balanceOf(DeployerAddress)
-                expect(USDTReceived).to.be.equal(ethers.utils.parseEther("998"))
+                const USDReceived = await USD.balanceOf(DeployerAddress)
+                expect(USDReceived).to.be.equal(ethers.utils.parseEther("900"))
 
-                const USDTCollateralAmount = (await bookKeeper.positions(COLLATERAL_POOL_ID, stableSwapModule.address))
+                const USDCollateralAmount = (await bookKeeper.positions(pools.USD_STABLE, stableSwapModule.address))
                     .lockedCollateral
-                expect(USDTCollateralAmount).to.be.equal(ethers.utils.parseEther("2"))
+                expect(USDCollateralAmount).to.be.equal(ethers.utils.parseEther("100"))
             })
         })
     })
