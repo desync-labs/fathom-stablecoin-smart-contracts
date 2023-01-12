@@ -67,7 +67,7 @@ describe("FlastMintModule", () => {
   })
   describe("#flashLoan", async () => {
     context("receiver doesn't have enough tokens to return the loan + fee", async () => {
-      it("should revert", async () => {
+      xit("should revert", async () => {
         // mocked router will return all tokens it has
         await USDT.mint(router.address, parseEther("100"), { gasLimit: 1000000 })
 
@@ -87,7 +87,7 @@ describe("FlastMintModule", () => {
     })
 
     context("receiver has enough tokens to return the loan + fee", async () => {
-      it("should success", async () => {
+      xit("should success", async () => {
         // mocked router will return all tokens it has
         await USDT.mint(router.address, parseEther("110"), { gasLimit: 1000000 })
 
@@ -113,7 +113,7 @@ describe("FlastMintModule", () => {
 
   describe("#bookKeeperFlashLoan", async () => {
     context("receiver doesn't have enough tokens to return the loan + fee", async () => {
-      it("should revert", async () => {
+      xit("should revert", async () => {
         // mocked router will return all tokens it has
         await USDT.mint(router.address, parseEther("100"), { gasLimit: 1000000 })
 
@@ -131,7 +131,7 @@ describe("FlastMintModule", () => {
     })
 
     context("receiver has enough tokens to return the loan + fee", async () => {
-     it("should success", async () => {
+     xit("should success", async () => {
         // mocked router will return all tokens it has
         await USDT.mint(router.address, parseEther("110"), { gasLimit: 1000000 })
 

@@ -4,12 +4,14 @@ const { BigNumber } = require('ethers');
 const pools = require("../../common/collateral");
 const { getAddresses } = require("../../common/addresses");
 const { getProxy } = require("../../common/proxies");
+const { ethers } = require("ethers");
 
 const FathomStablecoinProxyActions = artifacts.require('FathomStablecoinProxyActions.sol');
 
 const {Deployer} = require("../../common/addresses");
 
 const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
+const ERC20Stable = artifacts.require('ERC20MintableStableSwap.sol')
 
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
@@ -39,7 +41,9 @@ module.exports = async function (deployer) {
     const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
 
     const addresses = getAddresses(deployer.networkId())
+    const dailyLimit = ethers.utils.parseUnits("10000", "ether");
 
+    await deployer.deploy(ERC20Stable,"StableCoin","SFC",{gas: 3050000})
     const promises = [
         accessControlConfig.initialize({ gasLimit: 1000000 }),
         collateralPoolConfig.initialize(accessControlConfig.address, { gasLimit: 1000000 }),
@@ -84,6 +88,7 @@ module.exports = async function (deployer) {
             priceOracle.address,
             liquidationEngine.address,
             systemDebtEngine.address,
+            stablecoinAdapter.address
         ),
         stabilityFeeCollector.initialize(
             bookKeeper.address,
@@ -102,10 +107,12 @@ module.exports = async function (deployer) {
             addresses.USD,
             { gasLimit: 1000000 }
         ),
+        //@notice: IMP!! This has to be changed to real address FXD in prod, right now only for test.
         stableSwapModule.initialize(
-            authTokenAdapter.address,
-            stablecoinAdapter.address,
-            systemDebtEngine.address,
+            bookKeeper.address,
+            addresses.USD,
+            ERC20Stable.address,
+            dailyLimit,
             { gasLimit: 1000000 }
         ),
         flashMintArbitrager.initialize({ gasLimit: 1000000 }),
