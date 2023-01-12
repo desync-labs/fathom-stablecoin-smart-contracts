@@ -22,6 +22,7 @@ interface ILiquidationEngine {
     address sender
   ) external;
 
+
   function batchLiquidate(
     bytes32[] calldata _collateralPoolIds,
     address[] calldata _positionAddresses,

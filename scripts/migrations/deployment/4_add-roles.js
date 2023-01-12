@@ -17,7 +17,7 @@ module.exports =  async function(deployer) {
     const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
     const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
     const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
-    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
     
     await accessControlConfig.grantRole(await accessControlConfig.BOOK_KEEPER_ROLE(), bookKeeper.address)
   
@@ -36,15 +36,7 @@ module.exports =  async function(deployer) {
   
     await accessControlConfig.grantRole(await accessControlConfig.PRICE_ORACLE_ROLE(), priceOracle.address)
   
-    const collateralTokenAdapterWXDC = await collateralTokenAdapterFactory.adapters(pools.WXDC)
-    const collateralTokenAdapterUSDT_stbl = await collateralTokenAdapterFactory.adapters(pools.USDT_STABLE)
-    const collateralTokenAdapterUSDT_col = await collateralTokenAdapterFactory.adapters(pools.USDT_COL)
-    const collateralTokenAdapterFTHM = await collateralTokenAdapterFactory.adapters(pools.FTHM)
-  
-    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterWXDC)
-    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterUSDT_stbl)
-    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterUSDT_col)
-    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterFTHM)
+    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), ankrCollateralAdapter.address)
   
     await accessControlConfig.grantRole(await accessControlConfig.MINTABLE_ROLE(), flashMintModule.address)
   
@@ -56,4 +48,6 @@ module.exports =  async function(deployer) {
     await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), stableSwapModule.address)
 
     await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), stablecoinAdapter.address);
+
+    await bookKeeper.whitelist(stablecoinAdapter.address, { gasLimit: 1000000 })
 }

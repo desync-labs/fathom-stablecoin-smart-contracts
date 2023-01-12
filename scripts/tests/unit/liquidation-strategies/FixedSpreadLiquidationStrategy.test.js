@@ -13,7 +13,7 @@ const { getContract, createMock } = require("../../helper/contracts");
 const { loadFixture } = require("../../helper/fixtures");
 
 const loadFixtureHandler = async () => {
-    const mockedCollateralTokenAdapter = await createMock("CollateralTokenAdapter");
+    const mockedCollateralTokenAdapter = await createMock("TokenAdapter");
     const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
     const mockedBookKeeper = await createMock("BookKeeper");
     const mockedAccessControlConfig = await createMock("AccessControlConfig");

@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const MockXDCStakingPool = artifacts.require('./main/mocks/MockXDCStakingPool.sol');
+const MockXDCStakingPool = artifacts.require('./contracts/tests/mocks/MockXDCStakingPool.sol');
 
 const rawdata = fs.readFileSync('../../../../addresses.json');
 let stablecoinAddress = JSON.parse(rawdata);
@@ -13,7 +13,7 @@ module.exports =  async function(deployer) {
 
   await Promise.all(promises);
 
-  const deployed = artifacts.require('./main/mocks/MockXDCStakingPool.sol');
+  const deployed = artifacts.require('./contracts/tests/mocks/MockXDCStakingPool.sol');
   console.log("MockXDCStakingPool is "+ deployed.address);
   let addressesUpdate = { 
     mockXDCStakingPool : deployed.address,

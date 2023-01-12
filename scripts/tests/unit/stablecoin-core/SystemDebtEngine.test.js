@@ -14,7 +14,7 @@ const loadFixtureHandler = async () => {
     mockedAccessControlConfig = await createMock("AccessControlConfig");
     mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
     mockedBookKeeper = await createMock("BookKeeper");
-    mockedCollateralTokenAdapter = await createMock("CollateralTokenAdapter");
+    mockedCollateralTokenAdapter = await createMock("TokenAdapter");
 
     systemDebtEngine = getContract("SystemDebtEngine", DeployerAddress)
     systemDebtEngineAsAlice = getContract("SystemDebtEngine", AliceAddress)

@@ -29,6 +29,32 @@ const openPositionAndDraw = async (proxyWallet, from, collateral_pool_id, collat
     await proxyWallet.execute2(fathomStablecoinProxyActions.address, openPositionCall, { from: from })
 }
 
+
+const openXDCPositionAndDraw = async (proxyWallet, from, collateral_pool_id, collateral, stablecoin) => {
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const positionManager = await getProxy(proxyFactory, "PositionManager");
+    const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+    const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
+    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
+
+    const abi = [
+        "function openLockXDCAndDraw(address _manager, address _stabilityFeeCollector, address _xdcAdapter, address _stablecoinAdapter, bytes32 _collateralPoolId, uint256 _stablecoinAmount, bytes calldata _data)"
+    ];
+
+    const iFace = new ethers.utils.Interface(abi);
+    const call = iFace.encodeFunctionData("openLockXDCAndDraw", [
+        positionManager.address,
+        stabilityFeeCollector.address,
+        ankrCollateralAdapter.address,
+        stablecoinAdapter.address,
+        collateral_pool_id,
+        stablecoin,
+        ethers.utils.defaultAbiCoder.encode(["address"], [from]),
+    ])
+    await proxyWallet.execute2(fathomStablecoinProxyActions.address, call, {  value: collateral,  from: from})
+}
+
 const openPosition = async (proxyWallet, from, collateral_pool_id) => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
@@ -68,6 +94,54 @@ const wipeAndUnlockToken = async (proxyWallet, from, tokenAdapter, stablecoinAda
     await proxyWallet.execute2(fathomStablecoinProxyActions.address, wipeAndUnlockTokenCall, { from: from })
 }
 
+const wipeAndUnlockXDC = async (proxyWallet, from, positionId, collateral, stablecoin) => {
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const positionManager = await getProxy(proxyFactory, "PositionManager");
+    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+    const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
+
+    const abi = [
+        "function wipeAndUnlockXDC(address _manager, address _xdcAdapter, address _stablecoinAdapter, uint256 _positionId, uint256 _collateralAmount, uint256 _stablecoinAmount, bytes calldata _data)"
+    ];
+    const iFace = new ethers.utils.Interface(abi);
+    const call = iFace.encodeFunctionData("wipeAndUnlockXDC", [
+        positionManager.address,
+        ankrCollateralAdapter.address,
+        stablecoinAdapter.address,
+        positionId,
+        collateral,
+        stablecoin,
+        ethers.utils.defaultAbiCoder.encode(["address"], [from]),
+    ])
+
+    await proxyWallet.execute2(fathomStablecoinProxyActions.address, call, {from: from })
+}
+
+
+const wipeAllAndUnlockXDC = async (proxyWallet, from, positionId, collateral) => {
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const positionManager = await getProxy(proxyFactory, "PositionManager");
+    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+    const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
+
+    const abi = [
+        "function wipeAllAndUnlockXDC(address _manager, address _xdcAdapter, address _stablecoinAdapter, uint256 _positionId, uint256 _collateralAmount, bytes calldata _data)"
+    ];
+    const iFace = new ethers.utils.Interface(abi);
+    const call = iFace.encodeFunctionData("wipeAllAndUnlockXDC", [
+        positionManager.address,
+        ankrCollateralAdapter.address,
+        stablecoinAdapter.address,
+        positionId,
+        collateral,
+        ethers.utils.defaultAbiCoder.encode(["address"], [from]),
+    ])
+
+    await proxyWallet.execute2(fathomStablecoinProxyActions.address, call, {from: from })
+}
+
 const lockToken = async (proxyWallet, from, collateral_pool_id, positionId, amount) => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
@@ -90,14 +164,53 @@ const lockToken = async (proxyWallet, from, collateral_pool_id, positionId, amou
     await proxyWallet.execute2(fathomStablecoinProxyActions.address, lockTokenCall, { from: from })
 }
 
+const lockXDC = async (proxyWallet, from, positionId, amount) => {
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const positionManager = await getProxy(proxyFactory, "PositionManager");
+    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+
+    const lockAbi = [
+        "function lockXDC(address _manager, address _xdcAdapter, uint256 _positionId, bytes calldata _data)"
+    ];
+    const lockIFace = new ethers.utils.Interface(lockAbi);
+    const lockTokenCall = lockIFace.encodeFunctionData("lockXDC", [
+        positionManager.address,
+        ankrCollateralAdapter.address,
+        positionId,
+        ethers.utils.defaultAbiCoder.encode(["address"], [from]),
+    ])
+    await proxyWallet.execute2(fathomStablecoinProxyActions.address, lockTokenCall, {  value: amount, from: from })
+}
+
+// function safeLockXDC(address _manager, address _xdcAdapter, uint256 _positionId, address _owner, bytes calldata _data)
+const safeLockXDC = async (proxyWallet, from, positionId, amount) => {
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const positionManager = await getProxy(proxyFactory, "PositionManager");
+    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+
+    const lockAbi = [
+        "function safeLockXDC(address _manager, address _xdcAdapter, uint256 _positionId, address _owner, bytes calldata _data)"
+    ];
+    const lockIFace = new ethers.utils.Interface(lockAbi);
+    const lockTokenCall = lockIFace.encodeFunctionData("safeLockXDC", [
+        positionManager.address,
+        ankrCollateralAdapter.address,
+        positionId,
+        proxyWallet.address,
+        ethers.utils.defaultAbiCoder.encode(["address"], [from]),
+    ])
+    await proxyWallet.execute2(fathomStablecoinProxyActions.address, lockTokenCall, {  value: amount, from: proxyWallet.address })
+}
+
 const draw = async (proxyWallet, from, collateral_pool_id, positionId, amount) => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
-    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
-    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(collateral_pool_id)
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
 
     const drawTokenAbi = [
         "function draw(address _manager, address _stabilityFeeCollector, address _tokenAdapter, address _stablecoinAdapter, uint256 _positionId, uint256 _amount, bytes calldata _data)"
@@ -106,7 +219,7 @@ const draw = async (proxyWallet, from, collateral_pool_id, positionId, amount) =
     const drawTokenCall = drawTokenIFace.encodeFunctionData("draw", [
         positionManager.address,
         stabilityFeeCollector.address,
-        collateralTokenAdapterAddress,
+        ankrCollateralAdapter.address,
         stablecoinAdapter.address,
         positionId,
         amount,
@@ -194,7 +307,6 @@ const movePosition = async (proxyWallet, from, src, dst) => {
 }
 
 const tokenAdapterDeposit = async (proxyWallet, from, positionAddress, amount, collateralTokenAdapterAddress) => {
-    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const tokenAdapterDepositAbi = [
@@ -211,9 +323,27 @@ const tokenAdapterDeposit = async (proxyWallet, from, positionAddress, amount, c
     await proxyWallet.execute2(fathomStablecoinProxyActions.address, tokenAdapterDepositCall, { from: from })
 }
 
-const redeemLockedCollateral = async (proxyWallet, from, positionId, tokenAdapter) => {
+const xdcAdapterDeposit = async (proxyWallet, from, positionAddress, amount) => {
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+
+    const tokenAdapterDepositAbi = [
+        "function xdcAdapterDeposit(address _adapter, address _positionAddress, bytes calldata _data)"
+    ];
+    const interface = new ethers.utils.Interface(tokenAdapterDepositAbi);
+    const tokenAdapterDepositCall = interface.encodeFunctionData("xdcAdapterDeposit", [
+        ankrCollateralAdapter.address,
+        positionAddress,
+        ethers.utils.defaultAbiCoder.encode(["address"], [from])
+    ]);
+    await proxyWallet.execute2(fathomStablecoinProxyActions.address, tokenAdapterDepositCall, { value: amount, from: from })
+}
+
+const redeemLockedCollateral = async (proxyWallet, from, positionId) => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
+    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const abi = [
@@ -223,7 +353,7 @@ const redeemLockedCollateral = async (proxyWallet, from, positionId, tokenAdapte
     const call = interface.encodeFunctionData("redeemLockedCollateral", [
         positionManager.address,
         positionId,
-        tokenAdapter,
+        ankrCollateralAdapter.address,
         ethers.utils.defaultAbiCoder.encode(["address"], [from])
     ]);
     await proxyWallet.execute2(fathomStablecoinProxyActions.address, call, { from: from })
@@ -265,15 +395,21 @@ const importPosition = async (proxyWallet, from, source, positionId) => {
 
 module.exports = {
     openPositionAndDraw,
+    openXDCPositionAndDraw,
     openPosition,
     wipeAndUnlockToken,
+    wipeAndUnlockXDC,
+    wipeAllAndUnlockXDC,
     lockToken,
+    lockXDC,
+    safeLockXDC,
     draw,
     moveCollateral,
     adjustPosition,
     allowManagePosition,
     movePosition,
     tokenAdapterDeposit,
+    xdcAdapterDeposit,
     redeemLockedCollateral,
     exportPosition,
     importPosition
