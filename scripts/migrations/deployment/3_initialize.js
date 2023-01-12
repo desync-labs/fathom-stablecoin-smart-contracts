@@ -43,7 +43,6 @@ module.exports = async function (deployer) {
     const addresses = getAddresses(deployer.networkId())
     const dailyLimit = ethers.utils.parseUnits("10000", "ether");
 
-    await deployer.deploy(ERC20Stable,"StableCoin","SFC",{gas: 3050000})
     const promises = [
         accessControlConfig.initialize({ gasLimit: 1000000 }),
         collateralPoolConfig.initialize(accessControlConfig.address, { gasLimit: 1000000 }),

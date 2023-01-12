@@ -5,7 +5,7 @@ import "../interfaces/IAuthTokenAdapter.sol";
 import "../interfaces/IStablecoinAdapter.sol";
 
 interface IStableSwapModule {
-    function swapTokenToStablecoin(address _usr,uint256 _tokenAmoun) external;
+    function swapTokenToStablecoin(address _usr,uint256 _tokenAmount) external;
 
     function swapStablecoinToToken(address _usr,uint256 _tokenAmount) external;
    
