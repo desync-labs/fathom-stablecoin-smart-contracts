@@ -15,16 +15,12 @@ import "../../interfaces/ISystemDebtEngine.sol";
 import "../../interfaces/IFlashLendingCallee.sol";
 import "../../interfaces/IGenericTokenAdapter.sol";
 import "../../interfaces/IManager.sol";
-
 import "../../interfaces/IStablecoinAdapter.sol";
 import "../../utils/SafeToken.sol";
-import "../../../utils/BytesHelper.sol";
 
 contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
     using SafeMathUpgradeable for uint256;
     using SafeToken for address;
-    using BytesHelper for *;
-
 
     struct LiquidationInfo {
         uint256 positionDebtShare; // [wad]
@@ -228,11 +224,6 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
             info.collateralAmountToBeLiquidated < 2 ** 255 && info.actualDebtShareToBeLiquidated < 2 ** 255,
             "FixedSpreadLiquidationStrategy/overflow"
         );
-        //2023 Jan 11th, Wed
-        //deducting booKeeper.positions[positionADdress] of positionADdress that is being liquidated
-        // revert(string(bookKeeper.collateralToken(_collateralPoolId, address(this))._uintToASCIIBytes()));
-
-        //fn below increases bookKeeper.collateralToken(_collateralPoolId, address(this)) balance
 
         bookKeeper.confiscatePosition(
             _collateralPoolId,
@@ -244,55 +235,13 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         );
         IGenericTokenAdapter _adapter = IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId));
 
-
-                                //accounting on Adapter side
-                                //src                 dest
         _adapter.onMoveCollateral(_positionAddress, address(this), info.collateralAmountToBeLiquidated, abi.encode(0));
-
-
-                                                        // below should be commented out since
-                                                        // col balance in bookKeeper for FSL strategy will be
-                                                        //deducted as much as withdrawn
-                                                        //but where does FSL Strategy have collateral on bookKeeper
-                                                        //from the first place..?
-                                                        //accounting on bookKeeper
-                                                        //src               dest
-        
-
-        // revert(string(bookKeeper.collateralToken(_collateralPoolId, address(this))._uintToASCIIBytes()));
-        // amazingly, now FSLS has 1000000000000000000 as collateralToken 1WAd.. where did that happen, mystery 
-
-
-        //bookKeeper accounting #1, comment line below and keep the collateralToken inside bookKeeper to FSLS
-        // he can not move this to _collateralRecipient, but just keep it as is.
-        // bookKeeper.moveCollateral(_collateralPoolId, address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees));
-
-
-        //Adapter accounting #1, comment line below also keep the stake and certs to FSLS
-                                   //src                   dest
-        // _adapter.onMoveCollateral(address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
-
-
-        // 2023 Jan 10th Tue
-        // withdraw collateral
-        // gives aXDCc straight to liquidator's EOA
-        //              2024 Jan 11th Wed
-                        //  share of msg.sender decreases and usr(_collateralRecipient) gets aXDCc
-                        // who de heck is msg.sender here? it's 
-                        // msg.sender in normal .withdraw case.. it was proxyWallet.
-                        // then deQuestion is does FixedSpreadLiquidationStrategy has any stake[] in ankrColAdapter
-
-        // _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
-
-        // revert("revert3");
 
         if (info.treasuryFees > 0) {
             bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
             _adapter.onMoveCollateral(address(this), address(systemDebtEngine), info.treasuryFees, abi.encode(0));
         }
-        // revert("revert4");
         _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
-        //above line of code gets rid of address(this)'s collateralTokenAmount in bookKeeper
 
         if (
             flashLendingEnabled == 1 &&
@@ -307,29 +256,13 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
                 _data
             );
         }
-        // 2023 Jan 10th Tue
-        // what if I just deposit FXD to BookKeeper using  sth like    function stablecoinAdapterDeposit(
-        // like in FathomStablecoinProxyActions.sol, then moveStablecoin will be called?
-        // but the amount should be as much as 
-        // info.actualDebtValueToBeLiquidated
-        // 
+
         address _stablecoin = address(stablecoinAdapter.stablecoin());
-        //2023 Jan 10th.. hm.. safeTransferFrom from colRecipient/liq.bot to this...but...
-        //actualDebtValueToBeLiquidated is... in RAD but FXD amount will be in WAD.
-        //if I change RAD to WAD there will be some money lost.
-        //it means liquidator will pay less than what he actually has to.
-        //liquidator's address is no longer really needed but let's leave it for now
-                                                                                //RAD to WAD, then add 1
         _stablecoin.safeTransferFrom(_collateralRecipient, address(this), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
         _stablecoin.safeApprove(address(stablecoinAdapter), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
-                                                           //RAD to WAD...
         stablecoinAdapter.deposit(_collateralRecipient, ((info.actualDebtValueToBeLiquidated / RAY) + 1), abi.encode(0));
-        //from
-        // bookKeeper.moveStablecoin(_liquidatorAddress, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
-        // to
-        // revert("revertHere1");
+
         bookKeeper.moveStablecoin(_collateralRecipient, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
-        // revert("revertHere2");
 
         info.positionDebtShare = _positionDebtShare;
         info.positionCollateralAmount = _positionCollateralAmount;
