@@ -8,7 +8,6 @@ import "./PositionHandler.sol";
 import "../interfaces/IManager.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
-import "../interfaces/IShowStopper.sol";
 import "../interfaces/ISetPrice.sol";
 import "../interfaces/IPriceFeed.sol";
 
@@ -72,14 +71,11 @@ contract PositionManager is PausableUpgradeable, IManager {
         _;
     }
 
-    function initialize(address _bookKeeper, address _showStopper, address _priceOracle) external initializer {
+    function initialize(address _bookKeeper, address _priceOracle) external initializer {
         PausableUpgradeable.__Pausable_init();
 
         IBookKeeper(_bookKeeper).totalStablecoinIssued(); // Sanity Check Call
         bookKeeper = _bookKeeper;
-
-        IShowStopper(_showStopper).live(); // Sanity Check Call
-        showStopper = _showStopper;
 
         priceOracle = _priceOracle;
     }
