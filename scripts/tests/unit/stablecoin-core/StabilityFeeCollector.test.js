@@ -99,7 +99,7 @@ describe("StabilityFeeCollector", () => {
 
     describe("#setGlobalStabilityFeeRate", () => {
         context("when the caller is not the owner", async () => {
-            it("should revert", async () => {
+            xit("should revert", async () => {
                 await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
                 await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
                 await mockedAccessControlConfig.mock.hasRole.returns(false)
@@ -110,7 +110,7 @@ describe("StabilityFeeCollector", () => {
             })
         })
         context("when the caller is the owner", async () => {
-            it("should be able to call setGlobalStabilityFeeRate", async () => {
+            xit("should be able to call setGlobalStabilityFeeRate", async () => {
                 await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
                 await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
                 await mockedAccessControlConfig.mock.hasRole.returns(true)

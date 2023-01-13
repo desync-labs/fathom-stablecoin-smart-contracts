@@ -3,15 +3,16 @@ const { BigNumber, ethers } = require("ethers");
 const { MaxUint256 } = require("@ethersproject/constants");
 const TimeHelpers = require("../helper/time");
 
+
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 
 const { DeployerAddress } = require("../helper/address");
 const { loadFixture } = require("../helper/fixtures");
 const { getProxy } = require("../../common/proxies");
-
-
+const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
 const { expect } = chai
+const ERC20 = artifacts.require('ERC20Mintable.sol');
 
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
@@ -21,19 +22,20 @@ const setup = async () => {
     const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
-    const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
-
-    const stablecoin = await artifacts.initializeInterfaceAt("ERC20MintableStableSwap", "ERC20MintableStableSwap");
-    await stablecoin.mint(accounts[0], BigNumber.from("10000000000000000000000000000"), { gasLimit: 1000000 })
-    const usdtAddr = await authTokenAdapter.token();
+    
+    const usdtAddr = await stableSwapModule.token()
     const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
+
+    await fathomStablecoin.mint(DeployerAddress, ethers.utils.parseEther("10000000"), { gasLimit: 1000000 })
 
     await USDT.mint(accounts[0], ethers.utils.parseEther("1000000"), { gasLimit: 1000000 })
     await USDT.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
-    await stablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
+    await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
+    
     await stableSwapModule.depositToken(USDT.address,ethers.utils.parseEther("100000"),{ gasLimit: 1000000 })
-    await stableSwapModule.depositToken(stablecoin.address,ethers.utils.parseEther("100000"),{ gasLimit: 1000000 })
+    await stableSwapModule.depositToken(fathomStablecoin.address,ethers.utils.parseEther("100000"),{ gasLimit: 1000000 })
+    
 
     return {
         bookKeeper,
@@ -41,10 +43,8 @@ const setup = async () => {
         collateralPoolConfig,
         USDT,
         stableSwapModule,
-        authTokenAdapter,
         fathomStablecoin,
         systemDebtEngine,
-        stablecoin
     }
 }
 
@@ -54,11 +54,9 @@ describe("StableSwapModule", () => {
     let bookKeeper
     let USDT
     let stableSwapModule
-    let authTokenAdapter
     let fathomStablecoin
     let systemDebtEngine
     let collateralPoolConfig
-    let stablecoin
 
 
     before(async () => {
@@ -72,7 +70,6 @@ describe("StableSwapModule", () => {
             collateralPoolConfig,
             USDT,
             stableSwapModule,
-            authTokenAdapter,
             fathomStablecoin,
             systemDebtEngine,
             stablecoin
@@ -85,11 +82,12 @@ describe("StableSwapModule", () => {
             it("should success", async () => {
                 //accounts[5] setup
                 await USDT.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000, from : accounts[5] })
-                await stablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000, from: accounts[5] })
+                await fathomStablecoin.approve(stableSwapModule.address, WeiPerWad.mul(2500000), { gasLimit: 1000000, from: accounts[5] })
                 await USDT.mint(accounts[5], ethers.utils.parseEther("10000"), { gasLimit: 1000000 })
-                await stablecoin.mint(accounts[5], ethers.utils.parseEther("10000"), { gasLimit: 1000000 })
+                await fathomStablecoin.mint(accounts[5], ethers.utils.parseEther("10000"), { gasLimit: 1000000 })
+
                 await stableSwapModule.swapTokenToStablecoin(accounts[5],ethers.utils.parseEther("1000"), { gasLimit: 1000000, from: accounts[5] })
-                const balanceOfStablecoin = await stablecoin.balanceOf(accounts[5])
+                const balanceOfStablecoin = await fathomStablecoin.balanceOf(accounts[5])
                 const balanceOfUSDT = await USDT.balanceOf(accounts[5])
                 //10000 -> initial balance, 1000 -> from swap, -ve 1 -> from fee. Total balance = 10000+1000-1 = 10999
                 expect(balanceOfStablecoin).to.be.equal(ethers.utils.parseEther("10999"))
@@ -104,11 +102,12 @@ describe("StableSwapModule", () => {
             it("should SWAP", async () => {
                  //accounts[5] setup
                 await USDT.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000, from : accounts[5] })
-                await stablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000, from: accounts[5] })
+                await fathomStablecoin.approve(stableSwapModule.address, WeiPerWad.mul(2500000), { gasLimit: 1000000, from: accounts[5] })
                 await USDT.mint(accounts[5], ethers.utils.parseEther("10000"), { gasLimit: 1000000 })
-                await stablecoin.mint(accounts[5], ethers.utils.parseEther("10000"), { gasLimit: 1000000 })
+                await fathomStablecoin.mint(accounts[5], ethers.utils.parseEther("10000"), { gasLimit: 1000000 })
+
                 await stableSwapModule.swapStablecoinToToken(accounts[5],ethers.utils.parseEther("1000"), { gasLimit: 1000000, from: accounts[5] })
-                const balanceOfStablecoin = await stablecoin.balanceOf(accounts[5])
+                const balanceOfStablecoin = await fathomStablecoin.balanceOf(accounts[5])
                 const balanceOfUSDT = await USDT.balanceOf(accounts[5])
                 ///10000 -> initial balance, -ve 1000 -> from swap, -ve 1 -> from fee. Total balance = 10000 - 1000 - 1 = 8999
                 expect(balanceOfStablecoin).to.be.equal(ethers.utils.parseEther("8999"))
@@ -128,7 +127,7 @@ describe("StableSwapModule", () => {
                 // second swap = 998 * 0.001 = 0.998 FXD
                 // total fee = 1 + 0.998 = 1.998
                 await stableSwapModule.withdrawFees(accounts[2]);
-                const feeFromSwap = await stablecoin.balanceOf(accounts[2])
+                const feeFromSwap = await fathomStablecoin.balanceOf(accounts[2])
                 expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("1.998"))
             })
         })
@@ -157,7 +156,7 @@ describe("StableSwapModule", () => {
                 //third swap = 5000 * 0.001 = 5
                 // fee = 10 + 5 + 5 = 20
                 await stableSwapModule.withdrawFees(accounts[2]);
-                const feeFromSwap = await stablecoin.balanceOf(accounts[2])
+                const feeFromSwap = await fathomStablecoin.balanceOf(accounts[2])
                 expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("20"))
             })
         })
@@ -168,7 +167,7 @@ describe("StableSwapModule", () => {
             await expect(stableSwapModule.emergencyWithdraw(accounts[5])).to.be.reverted;
             await stableSwapModule.pause();
             await stableSwapModule.emergencyWithdraw(accounts[5]);
-            const balanceOfStablecoin = await stablecoin.balanceOf(accounts[5])
+            const balanceOfStablecoin = await fathomStablecoin.balanceOf(accounts[5])
             const balanceOfToken = await USDT.balanceOf(accounts[5])
             expect(balanceOfStablecoin).to.be.equal(ethers.utils.parseEther("100000"))
             expect(balanceOfToken).to.be.equal(ethers.utils.parseEther("100000"))

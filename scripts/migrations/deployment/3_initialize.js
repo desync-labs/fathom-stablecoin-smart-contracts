@@ -33,7 +33,6 @@ module.exports = async function (deployer) {
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
     const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
-    const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
     const flashMintArbitrager = await getProxy(proxyFactory, "FlashMintArbitrager");
     const bookKeeperFlashMintArbitrager = await getProxy(proxyFactory, "BookKeeperFlashMintArbitrager");
     const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
@@ -100,17 +99,11 @@ module.exports = async function (deployer) {
             systemDebtEngine.address,
             { gasLimit: 1000000 }
         ),
-        authTokenAdapter.initialize(
-            bookKeeper.address,
-            pools.USD_STABLE,
-            addresses.USD,
-            { gasLimit: 1000000 }
-        ),
-        //@notice: IMP!! ERC20Stable.address has to be changed to real address FXD in prod 
+        
         stableSwapModule.initialize(
             bookKeeper.address,
             addresses.USD,
-            ERC20Stable.address,
+            fathomStablecoin.address,
             dailyLimit,
             { gasLimit: 1000000 }
         ),
@@ -122,9 +115,6 @@ module.exports = async function (deployer) {
             pools.XDC,
             addresses.xdcPool,
             addresses.aXDCc,
-            TREASURY_FEE_BPS,
-            //TODO: use treasury wallet
-            Deployer,
             positionManager.address
         ),
         delayFathomOraclePriceFeed.initialize(
@@ -155,7 +145,6 @@ module.exports = async function (deployer) {
         accessControlConfig: accessControlConfig.address,
         flashMintModule: flashMintModule.address,
         stableSwapModule: stableSwapModule.address,
-        authTokenAdapter: authTokenAdapter.address,
         flashMintArbitrager: flashMintArbitrager.address,
         bookKeeperFlashMintArbitrager: bookKeeperFlashMintArbitrager.address,
         dexPriceOracle: dexPriceOracle.address,

@@ -16,7 +16,6 @@ module.exports =  async function(deployer) {
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
     const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
-    const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
     const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
     
     await accessControlConfig.grantRole(await accessControlConfig.BOOK_KEEPER_ROLE(), bookKeeper.address)
@@ -40,9 +39,7 @@ module.exports =  async function(deployer) {
   
     await accessControlConfig.grantRole(await accessControlConfig.MINTABLE_ROLE(), flashMintModule.address)
   
-    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), authTokenAdapter.address)
   
-    await authTokenAdapter.grantRole(await authTokenAdapter.WHITELISTED(), stableSwapModule.address)
   
     await accessControlConfig.grantRole(await accessControlConfig.POSITION_MANAGER_ROLE(), stableSwapModule.address)
     await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), stableSwapModule.address)

@@ -4,13 +4,5 @@ pragma solidity 0.8.17;
 import "../interfaces/IGenericTokenAdapter.sol";
 
 interface IShowStopper {
-    function redeemLockedCollateral(
-        bytes32 collateralPoolId,
-        IGenericTokenAdapter adapter,
-        address positionAddress,
-        address collateralReceiver,
-        bytes calldata data
-    ) external;
-
     function live() external view returns (uint256);
 }
