@@ -21,7 +21,6 @@ module.exports = async function (deployer) {
         "StabilityFeeCollector",
         "ProxyWalletRegistry",
         "FlashMintModule",
-        "AuthTokenAdapter",
         "StableSwapModule",
         "FlashMintArbitrager",
         "BookKeeperFlashMintArbitrager",
