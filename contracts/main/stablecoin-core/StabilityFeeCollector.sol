@@ -120,15 +120,6 @@ contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeabl
         _;
     }
 
-    /// @dev Set the global stability fee debtAccumulatedRate which will be apply to every collateral pool. Please see the explanation on the input format from the `setStabilityFeeRate` function.
-    function setGlobalStabilityFeeRate(uint256 _globalStabilityFeeRate) external onlyOwner {
-        require(_globalStabilityFeeRate == 0 || _globalStabilityFeeRate >= RAY, "StabilityFeeCollector/invalid-stability-fee-rate");
-        // Maximum stability fee rate is 50% yearly
-        require(_globalStabilityFeeRate <= 1000000012857214317438491659, "StabilityFeeCollector/stability-fee-rate-too-large");
-        globalStabilityFeeRate = _globalStabilityFeeRate;
-        emit LogSetGlobalStabilityFeeRate(msg.sender, _globalStabilityFeeRate);
-    }
-
     function setSystemDebtEngine(address _systemDebtEngine) external onlyOwner {
         require(_systemDebtEngine != address(0), "StabilityFeeCollector/bad-system-debt-engine-address");
         systemDebtEngine = _systemDebtEngine;

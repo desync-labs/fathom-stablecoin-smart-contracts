@@ -10,7 +10,6 @@ import "../../../interfaces/IFarmableTokenAdapter.sol";
 import "../../../interfaces/ICagable.sol";
 import "../../../interfaces/IManager.sol";
 import "../../../utils/SafeToken.sol";
-
 import "../../../apis/ankr/interfaces/IAnkrStakingPool.sol";
 import "../../../apis/ankr/interfaces/ICertToken.sol";
 

@@ -28,8 +28,8 @@ deploy:
 
 	coralX execute --network apothem --path scripts/deployment/6_stablecoin-adapter/initialize/initialize_stablecoin-adapter.js
 # deploy showStopper
-	coralX execute --network apothem --path scripts/deployment/8_show-stopper/deploy/show-stopper.js
-	coralX execute --network apothem --path scripts/deployment/8_show-stopper/initialize/initialize_show-stopper.js
+	# coralX execute --network apothem --path scripts/deployment/8_show-stopper/deploy/show-stopper.js
+	# coralX execute --network apothem --path scripts/deployment/8_show-stopper/initialize/initialize_show-stopper.js
 # deploy fathomToken
 	# coralX execute --network apothem --path scripts/deployment/9_fathom-token/deploy/fathom-token.js
 # deploy fairLaunch
@@ -91,17 +91,17 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/20_proxy-wallet-registry/deploy/proxy-wallet-registry.js
 	coralX execute --network apothem --path scripts/deployment/20_proxy-wallet-registry/initialize/initialize_proxy-wallet-registry.js
 # deploy authTokenAdapter
-	coralX execute --network apothem --path scripts/deployment/23_auth-token-adapter/deploy/auth-token-adapter.js
-	coralX execute --network apothem --path scripts/deployment/23_auth-token-adapter/initialize/initialize_auth-token-adapter.js
+	# coralX execute --network apothem --path scripts/deployment/23_auth-token-adapter/deploy/auth-token-adapter.js
+	# coralX execute --network apothem --path scripts/deployment/23_auth-token-adapter/initialize/initialize_auth-token-adapter.js
 # deploy stableSwapModule
-	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/deploy/stable-swap-module.js
-	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/initialize/initialize_stable-swap-module.js
+	# coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/deploy/stable-swap-module.js
+	# coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/initialize/initialize_stable-swap-module.js
 # deploy getPositions
 	# coralX execute --network apothem --path scripts/deployment/25_get-positions/deploy/get-positions.js
 
 	# coralX execute --network apothem --path scripts/deployment/25_get-positions/initialize/initialize_get-positions.js
 # whiteList StableSwapModule to authTokenAdapter
-	coralX execute --network apothem --path scripts/deployment/23_auth-token-adapter/config/auth-token-adapter-whitelist.js
+	# coralX execute --network apothem --path scripts/deployment/23_auth-token-adapter/config/auth-token-adapter-whitelist.js
 # grant ADAPTER_ROLE() to collateralTokenAdapter
 	# coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role.js
 # grant ADAPTER_ROLE() to ankrCollateralAdapter
@@ -109,7 +109,7 @@ deploy:
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-collateral-token-adapter-role-ankr.js
 
 # grant ADAPTER_ROLE() to authTokenAdapter
-	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-auth-token-adapter-role.js
+	# coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-auth-token-adapter-role.js
 # grant BOOK_KEEPER_ROLE() to bookKeeper
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-book-keeper-role.js
 # grant COLLATERAL_MANAGER_ROLE() to fixedSpreadLiquidationStrategy/positionManager/stableSwapModule
@@ -128,7 +128,7 @@ deploy:
 # grant POSITION_MANAGER_ROLE to POSITION_MANAGER_ADDR & STABLE_SWAP_MODULE_ADDR
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-position-manager-role.js
 # grant SHOW_STOPPER_ROLE() to SHOW_STOPPER_ADDR
-	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-show-stopper-role.js
+	# coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-show-stopper-role.js
 # grant STABILITY_FEE_COLLECTOR_ROLE() to stabilityFeeCollector
 	coralX execute --network apothem --path scripts/deployment/0_access-control-config/config/grant-stability-fee-collector-role.js
 # grant MINTER_ROLE() to STABLECOIN_ADAPTER_ADDR
@@ -136,9 +136,9 @@ deploy:
 # setTotalDebtCeiling for bookKeeper
 	coralX execute --network apothem --path scripts/deployment/2_book-keeper/config/set-total-debt-ceiling.js
 # set fee in for SSM
-	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/config/set-fee-in.js
+	# coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/config/set-fee-in.js
 # set fee out for SSM	
-	coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/config/set-fee-out.js
+	# coralX execute --network apothem --path scripts/deployment/24_stable-swap-module/config/set-fee-out.js
 # whiteList collateralTokenAdapter to bookKeeper
 	# coralX execute --network apothem --path scripts/deployment/2_book-keeper/config/whitelist-collateral-token-adapter.js
 
