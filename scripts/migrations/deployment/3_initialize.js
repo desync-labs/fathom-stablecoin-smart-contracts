@@ -106,7 +106,7 @@ module.exports = async function (deployer) {
             addresses.USD,
             { gasLimit: 1000000 }
         ),
-        //@notice: IMP!! This has to be changed to real address FXD in prod, right now only for test.
+        //@notice: IMP!! ERC20Stable.address has to be changed to real address FXD in prod 
         stableSwapModule.initialize(
             bookKeeper.address,
             addresses.USD,

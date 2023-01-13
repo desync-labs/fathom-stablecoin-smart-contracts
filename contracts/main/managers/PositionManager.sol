@@ -351,26 +351,6 @@ contract PositionManager is PausableUpgradeable, IManager {
         _unpause();
     }
 
-    /// @dev Redeem locked collateral from a position when emergency shutdown is activated
-    /// @param _posId The position id to be adjusted
-    /// @param _adapter The adapter to be called once the position is adjusted
-    /// @param _data The extra data for adapter
-    function redeemLockedCollateral(
-        uint256 _posId,
-        address _adapter,
-        address _collateralReceiver,
-        bytes calldata _data
-    ) external override whenNotPaused onlyOwnerAllowed(_posId) {
-        address _positionAddress = positions[_posId];
-        IShowStopper(showStopper).redeemLockedCollateral(
-            collateralPools[_posId],
-            IGenericTokenAdapter(_adapter),
-            _positionAddress,
-            _collateralReceiver,
-            _data
-        );
-    }
-
     function updatePrice(bytes32 _poolId) external override whenNotPaused {
         ISetPrice(priceOracle).setPrice(_poolId);
     }
