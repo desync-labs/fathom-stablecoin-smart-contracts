@@ -26,12 +26,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         uint256 CertsAmount;
     }
 
-    uint256 public pid;
-
-    //below state variables left for future change of fee from staking reward
-    uint256 public treasuryFeeBps;
-    address public treasuryAccount;
-
     uint256 public live;
 
     IBookKeeper public bookKeeper;
@@ -90,8 +84,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         bytes32 _collateralPoolId,
         address _xdcPoolAddress,
         address _aXDCcAddress,
-        uint256 _treasuryFeeBps,
-        address _treasuryAccount,
         address _positionManager
     ) external initializer {
         // 1. Initialized all dependencies
@@ -108,15 +100,10 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
         decimals = aXDCcAddress.decimals();
 
-        require(decimals <= 18, "CollateralTokenAdapter/decimals > 18");
+        require(decimals <= 18, "AnkrCollateralAdapter/decimals > 18");
 
         to18ConversionFactor = 10**(18 - decimals);
         toTokenConversionFactor = 10**decimals;
-
-        require(_treasuryAccount != address(0), "CollateralTokenAdapter/bad treasury account");
-        require(_treasuryFeeBps <= 5000, "CollateralTokenAdapter/bad treasury fee bps");
-        treasuryFeeBps = _treasuryFeeBps;
-        treasuryAccount = _treasuryAccount;
 
         positionManager = IManager(_positionManager);
 
@@ -167,20 +154,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         _z = mul(_x, RAY) / _y;
     }
 
-    function setTreasuryFeeBps(uint256 _treasuryFeeBps) external onlyOwner {
-        require(live == 1, "CollateralTokenAdapter/not-live");
-        require(_treasuryFeeBps <= 5000, "CollateralTokenAdapter/bad treasury fee bps");
-        treasuryFeeBps = _treasuryFeeBps;
-        emit LogSetTreasuryFeeBps(msg.sender, _treasuryFeeBps);
-    }
-
-    function setTreasuryAccount(address _treasuryAccount) external onlyOwner {
-        require(live == 1, "CollateralTokenAdapter/not-live");
-        require(_treasuryAccount != address(0), "CollateralTokenAdapter/bad treasury account");
-        treasuryAccount = _treasuryAccount;
-        emit LogSetTreasuryAccount(msg.sender, _treasuryAccount);
-    }
-
     /// @dev Ignore collateralTokens that have been directly transferred
     function netAssetValuation() public view returns (uint256) {
         return totalShare;
@@ -204,14 +177,14 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     /// @param _positionAddress The position address to be updated
     /// @param _amount The amount to be deposited
     function _deposit(address _positionAddress, uint256 _amount, bytes calldata /* _data */) private {
-    require(live == 1, "CollateralTokenAdapter/not live");
-    require(_amount == msg.value, "CollateralTokenAdapter/DepositAmountMismatch");
+    require(live == 1, "AnkrCollateralAdapter/not live");
+    require(_amount == msg.value, "AnkrCollateralAdapter/DepositAmountMismatch");
 
     if (_amount > 0) {
       uint256 _share = wdiv(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
       // Overflow check for int256(wad) cast below
       // Also enforces a non-zero wad
-      require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
+      require(int256(_share) > 0, "AnkrCollateralAdapter/share-overflow");
 
       //bookKeeping
       bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
@@ -283,8 +256,8 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             uint256 _share = wdivup(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
-            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
-            require(stake[msg.sender] >= _share, "CollateralTokenAdapter/insufficient staked amount");
+            require(int256(_share) > 0, "AnkrCollateralAdapter/share-overflow");
+            require(stake[msg.sender] >= _share, "AnkrCollateralAdapter/insufficient staked amount");
 
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
             totalShare = sub(totalShare, _share);
@@ -312,12 +285,12 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         (uint256 _lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _source);
         require(
         stake[_source] >= add(bookKeeper.collateralToken(collateralPoolId, _source), _lockedCollateral),
-        "CollateralTokenAdapter/stake[source] < collateralTokens + lockedCollateral"
+        "AnkrCollateralAdapter/stake[source] < collateralTokens + lockedCollateral"
         );
         (_lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _destination);
         require(
         stake[_destination] <= add(bookKeeper.collateralToken(collateralPoolId, _destination), _lockedCollateral),
-        "CollateralTokenAdapter/stake[destination] > collateralTokens + lockedCollateral"
+        "AnkrCollateralAdapter/stake[destination] > collateralTokens + lockedCollateral"
         );
         emit LogMoveStake(_source, _destination, _share);
     }
@@ -398,15 +371,15 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
         _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender),
-        "CollateralTokenAdapter/not-authorized"
+        "AnkrCollateralAdapter/not-authorized"
         );
-        require(live == 1, "CollateralTokenAdapter/not-live");
+        require(live == 1, "AnkrCollateralAdapter/not-live");
         live = 0;
         emit LogCage();
     }
 
     function uncage() external override onlyOwner {
-        require(live == 0, "CollateralTokenAdapter/not-caged");
+        require(live == 0, "AnkrCollateralAdapter/not-caged");
         live = 1;
         emit LogUncage();
     }
