@@ -12,6 +12,7 @@ import "../interfaces/IShowStopper.sol";
 import "../interfaces/ISetPrice.sol";
 import "../interfaces/IPriceFeed.sol";
 
+
 contract PositionManager is PausableUpgradeable, IManager {
     address public override bookKeeper;
     address public showStopper;
