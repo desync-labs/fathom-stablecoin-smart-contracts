@@ -8,6 +8,7 @@ const MockedDexRouter = artifacts.require('MockedDexRouter.sol');
 const TokenAdapter = artifacts.require('TokenAdapter.sol');
 const aXDCcMocked = artifacts.require('MockaXDCc.sol');
 const MockedXDCStakingPool = artifacts.require('MockXDCStakingPool.sol');
+const FathomToken = artifacts.require('FathomToken.sol');
 const ERC20 = artifacts.require('ERC20Mintable.sol');
 const ERC20Stable = artifacts.require('ERC20MintableStableSwap.sol')
 module.exports =  async function(deployer) {
@@ -15,6 +16,7 @@ module.exports =  async function(deployer) {
       deployer.deploy(ERC20, "US+", "US+", { gas: 3050000 }),
       deployer.deploy(MockedDexRouter, { gas: 3050000 }),
       deployer.deploy(TokenAdapter, { gas: 3050000 }),
+      deployer.deploy(FathomToken, 88, 89, { gas: 3050000 }),
       deployer.deploy(aXDCcMocked, "aXDCc", "aXDCc", { gas: 3050000 }),
       deployer.deploy(ERC20Stable,"StableCoin","SFC",{gas: 3050000})
   ];

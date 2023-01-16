@@ -9,72 +9,59 @@ const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
 const TimeHelpers = require("../helper/time");
 const AssertHelpers = require("../helper/assert");
 const { createProxyWallets } = require("../helper/proxy-wallets");
-const { DeployerAddress, AliceAddress, BobAddress, AddressZero } = require("../helper/address");
+const { DeployerAddress, AliceAddress, BobAddress } = require("../helper/address");
 const PositionHelper = require("../helper/positions");
 const { parseEther, parseUnits, defaultAbiCoder, formatBytes32String } = require("ethers/lib/utils");
 const { loadFixture } = require("../helper/fixtures");
 const { getProxy } = require("../../common/proxies");
-
+const { getContractAt } = require("../helper/contracts");
+const pools = require("../../common/collateral");
 
 const { expect } = chai
 
-const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 const CLOSE_FACTOR_BPS = BigNumber.from(5000)
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)
 const TREASURY_FEE_BPS = BigNumber.from(5000)
+const COLLATERAL_POOL_ID = formatBytes32String("XDC")
 const BPS = BigNumber.from(10000)
 
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-    const collateralTokenAdapterFactory = await getProxy(proxyFactory, "CollateralTokenAdapterFactory");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
-    const liquidationEngine = await getProxy(proxyFactory, "LiquidationEngine");
+    const liquidationEngineAsAdmin = await getProxy(proxyFactory, "LiquidationEngine");
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
     const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
     const priceOracle = await getProxy(proxyFactory, "PriceOracle");
 
-    const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
+    const liquidationEngine = getContractAt("LiquidationEngine", liquidationEngineAsAdmin.address, BobAddress)
 
-    const collateralTokenAdapterAddress = await collateralTokenAdapterFactory.adapters(COLLATERAL_POOL_ID)
-    const tokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", collateralTokenAdapterAddress);
-    const wxdcAddr = await tokenAdapter.collateralToken();
-    const WXDC = await artifacts.initializeInterfaceAt("ERC20Mintable", wxdcAddr);
+    const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
+    const aXDCc = await artifacts.initializeInterfaceAt("MockaXDCc", "MockaXDCc");
 
     ({
         proxyWallets: [aliceProxyWallet],
     } = await createProxyWallets([AliceAddress, BobAddress]));
 
-    await collateralPoolConfig.initCollateralPool(
-        COLLATERAL_POOL_ID,
-        0,
-        0,
-        simplePriceFeed.address,
-        WeiPerRay,
-        WeiPerRay,
-        collateralTokenAdapterAddress,
-        CLOSE_FACTOR_BPS,
-        LIQUIDATOR_INCENTIVE_BPS,
-        TREASURY_FEE_BPS,
-        AddressZero
-    )
-    await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10000000), { gasLimit: 1000000 })
-    await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRad.mul(10000000), { gasLimit: 1000000 })
-    await simplePriceFeed.setPrice(WeiPerWad, { gasLimit: 1000000 });
-    await liquidationEngine.whitelist(BobAddress, { gasLimit: 1000000 });
-    await priceOracle.setPrice(COLLATERAL_POOL_ID);
-    await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 })
+    await collateralPoolConfig.setStabilityFeeRate(pools.XDC, WeiPerRay, { gasLimit: 1000000 });
+    await collateralPoolConfig.setLiquidationRatio(pools.XDC, WeiPerRay, { gasLimit: 1000000 });
+    await collateralPoolConfig.setLiquidatorIncentiveBps(pools.XDC, LIQUIDATOR_INCENTIVE_BPS, { gasLimit: 1000000 });
+    await collateralPoolConfig.setCloseFactorBps(pools.XDC, CLOSE_FACTOR_BPS, { gasLimit: 1000000 });
+    await collateralPoolConfig.setTreasuryFeesBps(pools.XDC, TREASURY_FEE_BPS, { gasLimit: 1000000 });
 
+    await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 3000000 })
+    await bookKeeper.whitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 3000000 })
+    await liquidationEngineAsAdmin.whitelist(BobAddress);
+    
     return {
         bookKeeper,
         collateralPoolConfig,
         positionManager,
-        WXDC,
         simplePriceFeed,
         aliceProxyWallet,
         stabilityFeeCollector,
@@ -83,7 +70,8 @@ const setup = async () => {
         systemDebtEngine,
         fathomStablecoin,
         fixedSpreadLiquidationStrategy,
-        priceOracle
+        priceOracle,
+        aXDCc
     }
 }
 
@@ -93,7 +81,6 @@ describe("LiquidationEngine", () => {
     let aliceProxyWallet
 
     let bookKeeper
-    let WXDC
     let fathomToken
     let positionManager
     let stabilityFeeCollector
@@ -104,6 +91,7 @@ describe("LiquidationEngine", () => {
     let systemDebtEngine
     let collateralPoolConfig
     let priceOracle
+    let aXDCc
 
     before(async () => {
         await snapshot.revertToSnapshot();
@@ -114,7 +102,7 @@ describe("LiquidationEngine", () => {
             bookKeeper,
             collateralPoolConfig,
             positionManager,
-            WXDC,
+            // XDC,
             simplePriceFeed,
             aliceProxyWallet,
             stabilityFeeCollector,
@@ -123,99 +111,62 @@ describe("LiquidationEngine", () => {
             systemDebtEngine,
             fathomStablecoin,
             fixedSpreadLiquidationStrategy,
-            priceOracle
+            priceOracle,
+            aXDCc
         } = await loadFixture(setup));
     })
 
     describe("#liquidate", async () => {
         context("price drop but does not make the position underwater", async () => {
-            xit("should revert", async () => {
-                // 1. Set price for WXDC to 2 USD
+            it("should revert", async () => {
+                // 1. Set price for XDC to 2 USD
                 await simplePriceFeed.setPrice(WeiPerRay.mul(2), { gasLimit: 1000000 });
                 await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
-                await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress })
-
-                // 2. Alice open a new position with 1 WXDC and draw 1 FUSD
-                await PositionHelper.openPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad, WeiPerWad);
+                // 2. Alice open a new position with 1 XDC and draw 1 FUSD
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad, WeiPerWad);
                 const alicePositionAddress = await positionManager.positions(1)
-                const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                const alicePosition = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
 
-                expect(
-                    alicePosition.lockedCollateral,
-                    "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
-                ).to.be.equal(WeiPerWad)
-                expect(alicePosition.debtShare, "debtShare should be 1 FUSD, because Alice drew 1 FUSD").to.be.equal(WeiPerWad)
-                expect(
-                    await bookKeeper.collateralToken(COLLATERAL_POOL_ID, alicePositionAddress),
-                    "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
-                ).to.be.equal(0)
-                expect(fathomStablecoinBalance, "Alice should receive 1 FUSD from drawing 1 FUSD").to.be.equal(WeiPerWad)
-
-                // 3. WXDC price drop to 1 USD
+                // 3. XDC price drop to 1 USD
                 await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
                 await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
                 // 3.5 whitelist bob as liquidator
-                await liquidationEngine.whitelist(BobAddress);
                 // 4. Bob try to liquidate Alice's position but failed due to the price did not drop low enough
                 await expect(
-                    liquidationEngine.liquidate(COLLATERAL_POOL_ID, alicePositionAddress, 1, 1, AliceAddress, "0x", { from: BobAddress, gasLimit: 1000000 })
+                    liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](COLLATERAL_POOL_ID, alicePositionAddress, 1, 1, AliceAddress, "0x", {gasLimit: 3000000 })
                 ).to.be.revertedWith("LiquidationEngine/position-is-safe")
             })
         })
 
         context("safety buffer -0.1%, but liquidator does not have enough FUSD to liquidate", async () => {
-            xit("should success", async () => {
-                // 1. Set priceWithSafetyMargin for WXDC to 2 USD
+            it("should revert", async () => {
+                // 1. Set priceWithSafetyMargin for XDC to 2 USD
                 await simplePriceFeed.setPrice(WeiPerRay.mul(2), { gasLimit: 1000000 });
                 await priceOracle.setPrice(COLLATERAL_POOL_ID);
                 await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
-                await WXDC.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress })
 
-                // 2. Alice open a new position with 1 WXDC and draw 1 FUSD
-                await PositionHelper.openPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad, WeiPerWad);
-
+                // 2. Alice open a new position with 1 XDC and draw 1 FUSD
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad, WeiPerWad);
                 const alicePositionAddress = await positionManager.positions(1)
-                const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                const alicePosition = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
 
-                expect(
-                    alicePosition.lockedCollateral,
-                    "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
-                ).to.be.equal(WeiPerWad)
-                expect(alicePosition.debtShare, "debtShare should be 1 FUSD, because Alice drew 1 FUSD").to.be.equal(WeiPerWad)
-                expect(
-                    await bookKeeper.collateralToken(COLLATERAL_POOL_ID, alicePositionAddress),
-                    "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
-                ).to.be.equal(0)
-                expect(fathomStablecoinBalance, "Alice should receive 1 FUSD from drawing 1 FUSD").to.be.equal(WeiPerWad)
-                expect(
-                    await fathomToken.balanceOf(aliceProxyWallet.address),
-                    "Alice's proxy wallet should have 0 FATHOM, as Alice has not harvest any rewards from her position"
-                ).to.be.equal(0)
-
-                // 3. WXDC price drop to 0.99 USD
+                // 3. XDC price drop to 0.99 USD
                 await simplePriceFeed.setPrice(WeiPerRay.sub(1).div(1e9), { gasLimit: 1000000 })
                 await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
-                // 3.5 whitelist bob as liquidator
-                await liquidationEngine.whitelist(BobAddress);
-
                 // 4. Bob liquidate Alice's position up to full close factor successfully
                 const debtShareToRepay = parseEther("0.5")
-                await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 1000000 })
+                await bookKeeper.whitelist(liquidationEngine.address, { gasLimit: 1000000 })
 
                 await expect(
-                    liquidationEngine.liquidate(
+                    liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
                         COLLATERAL_POOL_ID,
                         alicePositionAddress,
                         debtShareToRepay,
                         MaxUint256,
                         BobAddress,
                         defaultAbiCoder.encode(["address", "bytes"], [BobAddress, []]),
-                        { from: BobAddress, gasLimit: 1000000 }
+                        { gasLimit: 1000000 }
                     )
                 ).to.be.reverted
             })
@@ -435,8 +386,10 @@ describe("LiquidationEngine", () => {
             ]
             for (let i = 0; i < testParams.length; i++) {
                 const testParam = testParams[i]
-                xit(testParam.label, async () => {
-                    await WXDC.mint(AliceAddress, parseEther(testParam.collateralAmount), { gasLimit: 3000000 })
+                it(testParam.label, async () => {
+                    await fathomStablecoin.approve(fixedSpreadLiquidationStrategy.address, MaxUint256, {from: BobAddress, gasLimit: 1000000})
+                    await fathomStablecoin.mint(BobAddress, parseUnits(testParam.debtShareToRepay, 46), { gasLimit: 1000000})
+
                     await collateralPoolConfig.setLiquidatorIncentiveBps(COLLATERAL_POOL_ID, testParam.liquidatorIncentiveBps)
                     await collateralPoolConfig.setCloseFactorBps(COLLATERAL_POOL_ID, testParam.closeFactorBps)
                     await simplePriceFeed.setPrice(parseUnits(testParam.startingPrice, 18), { gasLimit: 3000000 })
@@ -445,66 +398,35 @@ describe("LiquidationEngine", () => {
                     await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 3000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
 
-                    // 2. Alice open a new position with 1 WXDC and draw 1 FUSD
+                    // 2. Alice open a new position with 1 XDC and draw 1 FUSD
                     const lockedCollateralAmount = parseEther(testParam.collateralAmount)
                     const drawStablecoinAmount = parseEther(testParam.drawStablecoinAmount)
-                    await WXDC.approve(aliceProxyWallet.address, lockedCollateralAmount, { from: AliceAddress })
 
-                    await PositionHelper.openPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
+                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
                     const alicePositionAddress = await positionManager.positions(1)
-                    const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
                     const alicePosition = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
-                    expect(
-                        alicePosition.lockedCollateral,
-                        "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
-                    ).to.be.equal(lockedCollateralAmount)
-                    expect(alicePosition.debtShare, "debtShare should be 1 FUSD, because Alice drew 1 FUSD").to.be.equal(
-                        drawStablecoinAmount
-                    )
-                    expect(
-                        await bookKeeper.collateralToken(COLLATERAL_POOL_ID, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
-                    ).to.be.equal(0)
-                    expect(fathomStablecoinBalance, "Alice should receive 1 FUSD from drawing 1 FUSD").to.be.equal(
-                        drawStablecoinAmount
-                    )
-                    expect(
-                        await fathomToken.balanceOf(aliceProxyWallet.address),
-                        "Alice's proxy wallet should have 0 FATHOM, as Alice has not harvest any rewards from her position"
-                    ).to.be.equal(0)
 
-                    // 3. WXDC price drop to 0.99 USD
+                    // 3. XDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 3000000 })
                     await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
-                    // 3.5 whitelist bob as liquidator
-                    await liquidationEngine.whitelist(BobAddress);
-
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther(testParam.debtShareToRepay)
-                    await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 3000000 })
-                    await bookKeeper.whitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 3000000 })
-                    await bookKeeper.mintUnbackedStablecoin(
-                        DeployerAddress,
-                        BobAddress,
-                        parseUnits(testParam.debtShareToRepay, 46),
-                        { gasLimit: 3000000 }
-                    )
-                    const bobStablecoinBeforeLiquidation = await bookKeeper.stablecoin(BobAddress)
-                    await liquidationEngine.liquidate(
+                    const bobStablecoinBeforeLiquidation = await fathomStablecoin.balanceOf(BobAddress) //await bookKeeper.stablecoin(BobAddress)
+                    await liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
                         COLLATERAL_POOL_ID,
                         alicePositionAddress,
                         debtShareToRepay,
                         MaxUint256,
                         BobAddress,
                         "0x",
-                        { from: BobAddress, gasLimit: 3000000 }
+                        { gasLimit: 5000000 }
                     )
 
                     // 5. Settle system bad debt
                     await systemDebtEngine.settleSystemBadDebt(await bookKeeper.stablecoin(systemDebtEngine.address), { gasLimit: 1000000 })
 
-                    const bobStablecoinAfterLiquidation = await bookKeeper.stablecoin(BobAddress)
+                    const bobStablecoinAfterLiquidation = await fathomStablecoin.balanceOf(BobAddress) //await bookKeeper.stablecoin(BobAddress)
 
                     const alicePositionAfterLiquidation = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
                     const expectedSeizedCollateral = parseUnits(testParam.expectedSeizedCollateral, 18)
@@ -512,7 +434,8 @@ describe("LiquidationEngine", () => {
                         expectedSeizedCollateral.mul(BPS).div(testParam.liquidatorIncentiveBps)
                     )
                     const expectedTreasuryFee = expectedLiquidatorIncentive.mul(testParam.treasuryFeeBps).div(BPS)
-                    const expectedCollateralBobShouldReceive = expectedSeizedCollateral.sub(expectedTreasuryFee)
+                    const aXDCcRatio = await aXDCc.ratio();
+                    const expectedCollateralBobShouldReceive = (expectedSeizedCollateral.sub(expectedTreasuryFee)).mul(aXDCcRatio).div(WeiPerWad)
 
                     AssertHelpers.assertAlmostEqual(
                         alicePosition.lockedCollateral.sub(alicePositionAfterLiquidation.lockedCollateral).toString(),
@@ -526,27 +449,23 @@ describe("LiquidationEngine", () => {
                         parseUnits(testParam.expectedSystemBadDebt, 45).toString()
                     )
                     AssertHelpers.assertAlmostEqual(
-                        (await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)).toString(),
+                        (await aXDCc.balanceOf(BobAddress)).toString(),
                         expectedCollateralBobShouldReceive.toString()
                     )
                     AssertHelpers.assertAlmostEqual(
                         bobStablecoinBeforeLiquidation.sub(bobStablecoinAfterLiquidation).toString(),
-                        parseUnits(testParam.expectedDebtValueToRepay, 45).toString()
+                        parseUnits(testParam.expectedDebtValueToRepay, 18).toString()
                     )
                     AssertHelpers.assertAlmostEqual(
                         (await bookKeeper.collateralToken(COLLATERAL_POOL_ID, systemDebtEngine.address)).toString(),
                         expectedTreasuryFee.toString()
                     )
-                    expect(
-                        await fathomToken.balanceOf(aliceProxyWallet.address),
-                        "Alice's proxy wallet should have more than 0 FATHOM, because the liquidation process will distribute the pending FATHOM rewards to the position owner"
-                    ).to.not.equal(0)
                 })
             }
         })
 
         context("1st liquidation keep position unsafe, 2nd position fully liquidate the position", async () => {
-            xit("should success", async () => {
+            it("should success", async () => {
                 const testParam = {
                     label: "safety buffer -0.18%, position is liquidated up to full close factor",
                     collateralAmount: "10",
@@ -564,8 +483,7 @@ describe("LiquidationEngine", () => {
                     expectedDebtShareAfterLiquidation: "1800",
                     expectedSystemBadDebt: "0",
                 }
-                xit(testParam.label, async () => {
-                    await WXDC.mint(AliceAddress, parseEther(testParam.collateralAmount), { gasLimit: 1000000 })
+                it(testParam.label, async () => {
                     await collateralPoolConfig.setLiquidatorIncentiveBps(COLLATERAL_POOL_ID, testParam.liquidatorIncentiveBps)
                     await collateralPoolConfig.setCloseFactorBps(COLLATERAL_POOL_ID, testParam.closeFactorBps)
                     await simplePriceFeed.setPrice(parseUnits(testParam.startingPrice, 18), { gasLimit: 1000000 })
@@ -574,59 +492,30 @@ describe("LiquidationEngine", () => {
                     await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 1000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
 
-                    // 2. Alice open a new position with 1 WXDC and draw 1 FUSD
+                    // 2. Alice open a new position with 1 XDC and draw 1 FUSD
                     const lockedCollateralAmount = parseEther(testParam.collateralAmount)
                     const drawStablecoinAmount = parseEther(testParam.drawStablecoinAmount)
-                    await WXDC.approve(aliceProxyWallet.address, lockedCollateralAmount, { from: AliceAddress })
-                    await PositionHelper.openPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
+                    // await XDC.approve(aliceProxyWallet.address, lockedCollateralAmount, { from: AliceAddress })
+                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
                     const alicePositionAddress = await positionManager.positions(1)
-                    const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
+                    // const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
                     const alicePosition = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
-                    expect(
-                        alicePosition.lockedCollateral,
-                        "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
-                    ).to.be.equal(lockedCollateralAmount)
-                    expect(alicePosition.debtShare, "debtShare should be 1 FUSD, because Alice drew 1 FUSD").to.be.equal(
-                        drawStablecoinAmount
-                    )
-                    expect(
-                        await bookKeeper.collateralToken(COLLATERAL_POOL_ID, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
-                    ).to.be.equal(0)
-                    expect(fathomStablecoinBalance, "Alice should receive 1 FUSD from drawing 1 FUSD").to.be.equal(
-                        drawStablecoinAmount
-                    )
-                    expect(
-                        await fathomToken.balanceOf(aliceProxyWallet.address),
-                        "Alice's proxy wallet should have 0 FATHOM, as Alice has not harvest any rewards from her position"
-                    ).to.be.equal(0)
 
-                    // 3. WXDC price drop to 0.99 USD
+                    // 3. XDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 1000000 })
                     await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
-                    // 3.5 whitelist bob as liquidator
-                    await liquidationEngine.whitelist(BobAddress);
-
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther(testParam.debtShareToRepay)
-                    await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 1000000 })
-                    await bookKeeper.whitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 1000000 })
-                    await bookKeeper.mintUnbackedStablecoin(
-                        DeployerAddress,
-                        BobAddress,
-                        parseUnits(testParam.debtShareToRepay, 46),
-                        { gasLimit: 1000000 }
-                    )
                     const bobStablecoinBeforeLiquidation = await bookKeeper.stablecoin(BobAddress)
-                    await liquidationEngine.liquidate(
+                    await liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
                         COLLATERAL_POOL_ID,
                         alicePositionAddress,
                         debtShareToRepay,
                         MaxUint256,
                         BobAddress,
                         "0x",
-                        { from: BobAddress, gasLimit: 1000000 }
+                        {gasLimit: 1000000 }
                     )
 
                     // 5. Settle system bad debt
@@ -640,8 +529,11 @@ describe("LiquidationEngine", () => {
                         expectedSeizedCollateral.mul(BPS).div(testParam.liquidatorIncentiveBps)
                     )
                     const expectedTreasuryFee = expectedLiquidatorIncentive.mul(testParam.treasuryFeeBps).div(BPS)
-                    const expectedCollateralBobShouldReceive = expectedSeizedCollateral.sub(expectedTreasuryFee)
 
+                    AssertHelpers.assertAlmostEqual(
+                        alicePosition.lockedCollateral.sub(alicePositionAfterLiquidation.lockedCollateral).toString(),
+                        expectedSeizedCollateral.toString()
+                    )
                     AssertHelpers.assertAlmostEqual(
                         alicePosition.lockedCollateral.sub(alicePositionAfterLiquidation.lockedCollateral).toString(),
                         expectedSeizedCollateral.toString()
@@ -653,8 +545,11 @@ describe("LiquidationEngine", () => {
                         (await bookKeeper.systemBadDebt(systemDebtEngine.address)).toString(),
                         parseUnits(testParam.expectedSystemBadDebt, 45).toString()
                     )
+
+                    const aXDCcRatio = await aXDCc.ratio();
+                    const expectedCollateralBobShouldReceive = (expectedSeizedCollateral.sub(expectedTreasuryFee)).mul(aXDCcRatio).div(WeiPerWad)
                     AssertHelpers.assertAlmostEqual(
-                        (await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)).toString(),
+                        (await aXDCc.balanceOf(BobAddress)).toString(),
                         expectedCollateralBobShouldReceive.toString()
                     )
                     AssertHelpers.assertAlmostEqual(
@@ -671,14 +566,14 @@ describe("LiquidationEngine", () => {
                     ).to.not.equal(0)
 
                     // Second Liquidation
-                    await liquidationEngine.liquidate(
+                    await liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
                         COLLATERAL_POOL_ID,
                         alicePositionAddress,
                         MaxUint256,
                         MaxUint256,
                         BobAddress,
                         "0x",
-                        { from: BobAddress, gasLimit: 1000000 }
+                        { gasLimit: 1000000 }
                     )
                     const alicePositionAfterLiquidation2 = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
                     expect(alicePositionAfterLiquidation2.lockedCollateral).to.be.eq(parseEther("4.62"))
@@ -690,11 +585,12 @@ describe("LiquidationEngine", () => {
         context(
             "safety buffer -20%, position is liquidated up to full close factor with some interest and debt floor",
             async () => {
-                xit("should success", async () => {
+                it("should success", async () => {
                     // 0 whitelist bob as liquidator
-                    await liquidationEngine.whitelist(BobAddress);
+                    await fathomStablecoin.mint(BobAddress, parseUnits("3000", 45), { gasLimit: 1000000})
+                    await fathomStablecoin.approve(fixedSpreadLiquidationStrategy.address, MaxUint256, {from: BobAddress, gasLimit: 1000000})
 
-                    // 1. Set priceWithSafetyMargin for WXDC to 420 USD
+                    // 1. Set priceWithSafetyMargin for XDC to 420 USD
                     await simplePriceFeed.setPrice(parseUnits("367", 18), { gasLimit: 1000000 })
                     await priceOracle.setPrice(COLLATERAL_POOL_ID);
                     let ratio = WeiPerRay.mul(1000).div(parseUnits("0.8", 3))
@@ -702,12 +598,11 @@ describe("LiquidationEngine", () => {
                     //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, parseUnits("294", 27), { gasLimit: 1000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseEther("100").mul(WeiPerRay), { gasLimit: 1000000 })
 
-                    // 2. Alice open a new position with 10 WXDC and draw 2000 FUSD
+                    // 2. Alice open a new position with 10 XDC and draw 2000 FUSD
                     const lockedCollateralAmount = parseEther("10")
                     const drawStablecoinAmount = parseEther("2000")
 
-                    await WXDC.approve(aliceProxyWallet.address, lockedCollateralAmount, { from: AliceAddress })
-                    await PositionHelper.openPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
+                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
 
                     // Set stability fee rate to 0.5% APR
                     await collateralPoolConfig.setStabilityFeeRate(
@@ -717,29 +612,10 @@ describe("LiquidationEngine", () => {
                     )
 
                     const alicePositionAddress = await positionManager.positions(1)
-                    const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
+                    // const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
                     const alicePosition = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
 
-                    expect(
-                        alicePosition.lockedCollateral,
-                        "lockedCollateral should be 10 WXDC, because Alice locked 10 WXDC"
-                    ).to.be.equal(parseEther("10"))
-                    expect(alicePosition.debtShare, "debtShare should be 2000 FUSD, because Alice drew 2000 FUSD").to.be.equal(
-                        parseEther("2000")
-                    )
-                    expect(
-                        await bookKeeper.collateralToken(COLLATERAL_POOL_ID, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
-                    ).to.be.equal(0)
-                    expect(fathomStablecoinBalance, "Alice should receive 2000 FUSD from drawing 2000 FUSD").to.be.equal(
-                        parseEther("2000")
-                    )
-                    expect(
-                        await fathomToken.balanceOf(aliceProxyWallet.address),
-                        "Alice's proxy wallet should have 0 FATHOM, as Alice has not harvest any rewards from her position"
-                    ).to.be.equal(0)
-
-                    // 3. 1 year passed, WXDC price drop to 285 USD
+                    // 3. 1 year passed, XDC price drop to 285 USD
                     await TimeHelpers.increase(TimeHelpers.duration.seconds(ethers.BigNumber.from("31536000")))
                     await stabilityFeeCollector.collect(COLLATERAL_POOL_ID, { gasLimit: 1000000 })
                     const aliceDebtValueAfterOneYear = (
@@ -749,24 +625,20 @@ describe("LiquidationEngine", () => {
                         aliceDebtValueAfterOneYear.toString(),
                         parseEther("2010").mul(WeiPerRay).toString()
                     )
-                    //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, parseUnits("199.5", 27), { gasLimit: 1000000 })
                     await simplePriceFeed.setPrice(parseEther("249.37"), { gasLimit: 1000000 })
                     await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther("1000")
-                    await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 1000000 })
-                    await bookKeeper.whitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 1000000 })
-                    await bookKeeper.mintUnbackedStablecoin(DeployerAddress, BobAddress, parseUnits("3000", 45), { gasLimit: 1000000 })
-                    const bobStablecoinBeforeLiquidation = await bookKeeper.stablecoin(BobAddress)
-                    await liquidationEngine.liquidate(
+                    const bobStablecoinBeforeLiquidation = await fathomStablecoin.balanceOf(BobAddress)
+                    await liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
                         COLLATERAL_POOL_ID,
                         alicePositionAddress,
                         debtShareToRepay,
                         MaxUint256,
                         BobAddress,
                         defaultAbiCoder.encode(["address", "bytes"], [BobAddress, []]),
-                        { from: BobAddress, gasLimit: 2000000 }
+                        { gasLimit: 2000000 }
                     )
 
                     // // 5. Settle system bad debt
@@ -776,7 +648,7 @@ describe("LiquidationEngine", () => {
                         parseEther("10").mul(WeiPerRay).toString()
                     ) // There should be 10 FUSD left in SystemDebtEngine collected from stability fee after `settleSystemBadDebt`
 
-                    const bobStablecoinAfterLiquidation = await bookKeeper.stablecoin(BobAddress)
+                    const bobStablecoinAfterLiquidation = await fathomStablecoin.balanceOf(BobAddress)
 
                     const alicePositionAfterLiquidation = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
 
@@ -794,22 +666,20 @@ describe("LiquidationEngine", () => {
                         await bookKeeper.systemBadDebt(systemDebtEngine.address),
                         "System bad debt should be 0 FUSD"
                     ).to.be.equal(0)
+
+                    const aXDCcRatio = await aXDCc.ratio();
                     AssertHelpers.assertAlmostEqual(
-                        (await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)).toString(),
-                        parseEther("4.1309099").toString()
+                        (await aXDCc.balanceOf(BobAddress)).toString(),
+                        parseEther("4.1309099").mul(aXDCcRatio).div(WeiPerWad).toString()
                     )
                     AssertHelpers.assertAlmostEqual(
                         bobStablecoinBeforeLiquidation.sub(bobStablecoinAfterLiquidation).toString(),
-                        parseEther("1005").mul(WeiPerRay).toString()
+                        parseEther("1005").toString()
                     ) // Bob should pay 1005 FUSD for this liquidation
                     AssertHelpers.assertAlmostEqual(
                         (await bookKeeper.collateralToken(COLLATERAL_POOL_ID, systemDebtEngine.address)).toString(),
                         parseEther("0.1007539").toString()
                     )
-                    expect(
-                        await fathomToken.balanceOf(aliceProxyWallet.address),
-                        "Alice's proxy wallet should have more than 0 FATHOM, because the liquidation process will distribute the pending FATHOM rewards to the position owner"
-                    ).to.not.equal(0)
                 })
             }
         )
@@ -828,16 +698,16 @@ describe("LiquidationEngine", () => {
                     startingPrice: "420",
                     nextPrice: "285",
                     debtShareToRepay: "1000",
-                    expectedDebtValueToRepay: "1000",
+                    expectedDebtValueToRepay: "2000",
                     expectedSeizedCollateral: "3.684210526315790000",
                     expectedDebtShareAfterLiquidation: "1000",
                     expectedSystemBadDebt: "0",
                 },
             ]
                 const testParam = testParams[0];
-                xit(testParam.label, async () => {
-                    await WXDC.mint(AliceAddress, parseEther(testParam.collateralAmount), { gasLimit: 1000000 })
-                    await WXDC.mint(AliceAddress, parseEther(testParam.collateralAmount), { gasLimit: 1000000 })
+                it(testParam.label, async () => {
+                    await fathomStablecoin.mint(BobAddress, parseUnits("2000", 46), { gasLimit: 1000000})
+                    await fathomStablecoin.approve(fixedSpreadLiquidationStrategy.address, MaxUint256, {from: BobAddress, gasLimit: 1000000})
 
                     await collateralPoolConfig.setLiquidatorIncentiveBps(COLLATERAL_POOL_ID, testParam.liquidatorIncentiveBps)
                     await collateralPoolConfig.setCloseFactorBps(COLLATERAL_POOL_ID, testParam.closeFactorBps)
@@ -847,42 +717,24 @@ describe("LiquidationEngine", () => {
                     await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 1000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
 
-                    // 2. Alice open a new position with 1 WXDC and draw 1 FUSD
+                    // 2. Alice open a new position with 1 XDC and draw 1 FUSD
                     const lockedCollateralAmount = parseEther(testParam.collateralAmount)
                     const drawStablecoinAmount = parseEther(testParam.drawStablecoinAmount)
-                    await WXDC.approve(aliceProxyWallet.address, parseEther("20"), { from: AliceAddress })
-                    // await WXDC.approve(aliceProxyWallet.address, lockedCollateralAmount, { from: AliceAddress })
 
-                    await PositionHelper.openPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
-                    await PositionHelper.openPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
+                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
+                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
 
                     const alicePositionAddress1 = await positionManager.positions(1)
                     const alicePositionAddress2 = await positionManager.positions(2)
-
-                    const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
                     const alicePosition = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress1)
 
-
-                    // 3. WXDC price drop to 0.99 USD
+                    // 3. XDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 1000000 })
                     await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
-                    // 3.5 whitelist bob as liquidator
-                    await liquidationEngine.whitelist(BobAddress);
-
                     // 4. Bob liquidate Alice's position up to full close factor successfully
                     const debtShareToRepay = parseEther(testParam.debtShareToRepay)
-
-                    await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 1000000 })
-                    await bookKeeper.whitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 1000000 })
-                    await bookKeeper.mintUnbackedStablecoin(
-                        DeployerAddress,
-                        BobAddress,
-                        parseUnits("2000", 46),
-                        { gasLimit: 1000000 }
-                    )
-
-                    const bobStablecoinBeforeLiquidation = await bookKeeper.stablecoin(BobAddress)
+                    const bobStablecoinBeforeLiquidation = await fathomStablecoin.balanceOf(BobAddress)
 
                     await liquidationEngine.batchLiquidate(
                         [COLLATERAL_POOL_ID, COLLATERAL_POOL_ID],
@@ -891,13 +743,13 @@ describe("LiquidationEngine", () => {
                         [MaxUint256, MaxUint256],
                         [BobAddress, BobAddress],
                         ["0x00", "0x00"],
-                        { from: BobAddress, gasLimit: 4000000 }
+                        { gasLimit: 4000000 }
                     )
 
                     // 5. Settle system bad debt
                     await systemDebtEngine.settleSystemBadDebt(await bookKeeper.stablecoin(systemDebtEngine.address), { gasLimit: 1000000 })
 
-                    const bobStablecoinAfterLiquidation = await bookKeeper.stablecoin(BobAddress)
+                    const bobStablecoinAfterLiquidation = await fathomStablecoin.balanceOf(BobAddress)
 
                     const alicePositionAfterLiquidation = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress1)
                     const expectedSeizedCollateral = parseUnits(testParam.expectedSeizedCollateral, 18)
@@ -907,6 +759,7 @@ describe("LiquidationEngine", () => {
                     const expectedTreasuryFee = expectedLiquidatorIncentive.mul(testParam.treasuryFeeBps).div(BPS)
                     const expectedCollateralBobShouldReceive = expectedSeizedCollateral.sub(expectedTreasuryFee).mul(2)
 
+                    // TODO: check
                     AssertHelpers.assertAlmostEqual(
                         alicePosition.lockedCollateral.sub(alicePositionAfterLiquidation.lockedCollateral).toString(),
                         expectedSeizedCollateral.toString()
@@ -920,28 +773,22 @@ describe("LiquidationEngine", () => {
                         (await bookKeeper.systemBadDebt(systemDebtEngine.address)).toString(),
                         parseUnits(testParam.expectedSystemBadDebt, 45).toString()
                     )
-
+                        const b = (await aXDCc.balanceOf(BobAddress)).toString()
+                    const aXDCcRatio = await aXDCc.ratio();
                     AssertHelpers.assertAlmostEqual(
-                        (await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)).toString(),
-                        expectedCollateralBobShouldReceive.toString()
+                        (await aXDCc.balanceOf(BobAddress)).toString(),
+                        expectedCollateralBobShouldReceive.mul(aXDCcRatio).div(WeiPerWad).toString()
                     )
 
                     AssertHelpers.assertAlmostEqual(
                         bobStablecoinBeforeLiquidation.sub(bobStablecoinAfterLiquidation).toString(),
-                        // parseUnits(testParam.expectedDebtValueToRepay, 45).toString()
-                        parseUnits((Number.parseInt(testParam.expectedDebtValueToRepay) * 2).toString(), 45).toString()
-                        
+                        parseUnits(testParam.expectedDebtValueToRepay, 18).toString()
                     )
 
                     AssertHelpers.assertAlmostEqual(
                         (await bookKeeper.collateralToken(COLLATERAL_POOL_ID, systemDebtEngine.address)).toString(),
                         expectedTreasuryFee.mul(2).toString()
                     )
-
-                    expect(
-                        await fathomToken.balanceOf(aliceProxyWallet.address),
-                        "Alice's proxy wallet should have more than 0 FATHOM, because the liquidation process will distribute the pending FATHOM rewards to the position owner"
-                    ).to.not.equal(0)
                 })
         })
     })

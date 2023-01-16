@@ -260,8 +260,7 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         address _stablecoin = address(stablecoinAdapter.stablecoin());
         _stablecoin.safeTransferFrom(_collateralRecipient, address(this), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
         _stablecoin.safeApprove(address(stablecoinAdapter), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
-        stablecoinAdapter.deposit(_collateralRecipient, ((info.actualDebtValueToBeLiquidated / RAY) + 1), abi.encode(0));
-
+        stablecoinAdapter.depositRAD(_collateralRecipient, info.actualDebtValueToBeLiquidated, abi.encode(0));
         bookKeeper.moveStablecoin(_collateralRecipient, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
 
         info.positionDebtShare = _positionDebtShare;
