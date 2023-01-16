@@ -15,6 +15,12 @@ function getContract(contract, from) {
     return new ethers.Contract(instance.address, instance.getAbiFile().abi, signer);
 }
 
+function getContractAt(contract, address, from) {
+    const signer = provider.getSigner(from);
+    const instance = getInstance(contract);
+    return new ethers.Contract(address, instance.getAbiFile().abi, signer);
+}
+
 async function createMock(contract) {
     const instance = getInstance(contract);
     const signer = provider.getSigner(DeployerAddress);
@@ -26,4 +32,4 @@ async function connectToContractWithAddress(contract, address) {
     return contract.connect(newSigner);
 }
 
-module.exports = { getContract, createMock, connectToContractWithAddress }
+module.exports = { getContract, getContractAt, createMock, connectToContractWithAddress }
