@@ -18,6 +18,7 @@ contract FlashMintArbitrager is OwnableUpgradeable, IERC3156FlashBorrower {
         OwnableUpgradeable.__Ownable_init();
     }
 
+
     function onFlashLoan(address initiator, address token, uint256 amount, uint256 fee, bytes calldata data) external override returns (bytes32) {
         (address router, address stableSwapToken, address stableSwapModule) = abi.decode(data, (address, address, address));
         address[] memory path = new address[](2);
@@ -30,11 +31,10 @@ contract FlashMintArbitrager is OwnableUpgradeable, IERC3156FlashBorrower {
         IFathomSwapRouter(router).swapExactTokensForTokens(amount, 0, path, address(this), block.timestamp);
         token.safeApprove(router, 0);
         uint256 balanceAfter = stableSwapToken.myBalance();
-
         // 2. Swap BUSD to AUSD at StableSwapModule
-        stableSwapToken.safeApprove(address(IStableSwapModule(stableSwapModule).authTokenAdapter()), type(uint).max);
-        IStableSwapModule(stableSwapModule).swapTokenToStablecoin(address(this), balanceAfter.sub(balanceBefore));
-        stableSwapToken.safeApprove(address(IStableSwapModule(stableSwapModule).authTokenAdapter()), 0);
+        //stableSwapToken.safeApprove(address(IStableSwapModule(stableSwapModule).authTokenAdapter()), type(uint).max);
+        IStableSwapModule(stableSwapModule).swapTokenToStablecoin(address(this),balanceAfter.sub(balanceBefore));
+        //stableSwapToken.safeApprove(address(IStableSwapModule(stableSwapModule).authTokenAdapter()), 0);
 
         // 3. Approve AUSD for FlashMintModule
         token.safeApprove(msg.sender, amount.add(fee));

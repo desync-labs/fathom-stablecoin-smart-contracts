@@ -123,7 +123,7 @@ describe("BookKeeper", () => {
                 // bob call move collateral from alice to bob
                 await await expect(
                     bookKeeperAsBob.moveCollateral(formatBytes32String("WXDC"), AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
-                ).to.be.revertedWith("BookKeeper/not-allowed")
+                ).to.be.revertedWith("BookKeeper/moveCollateral/not-allowed")
             })
 
             context("when alice allow bob to move collateral", () => {
@@ -1165,7 +1165,7 @@ describe("BookKeeper", () => {
                             WeiPerWad.mul(1),
                             { gasLimit: 1000000 }
                         )
-                    ).to.be.revertedWith("BookKeeper/not-allowed")
+                    ).to.be.revertedWith("BookKeeper/movePosition/not-allowed")
                 })
             })
             context("when bob allow alice to manage a position", () => {
