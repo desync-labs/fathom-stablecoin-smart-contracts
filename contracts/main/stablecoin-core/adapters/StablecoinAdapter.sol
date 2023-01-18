@@ -67,7 +67,7 @@ contract StablecoinAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         stablecoin.burn(msg.sender, wad);
     }
 
-    function depositRay(address usr, uint256 ray, bytes calldata /* data */) external payable override nonReentrant whenNotPaused {
+    function depositRAD(address usr, uint256 ray, bytes calldata /* data */) external payable override nonReentrant whenNotPaused {
         bookKeeper.moveStablecoin(address(this), usr, ray);
         stablecoin.burn(msg.sender, (ray / ONE) + 1);
     }
