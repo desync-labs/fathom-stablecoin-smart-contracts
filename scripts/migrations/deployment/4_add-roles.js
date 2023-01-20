@@ -46,5 +46,10 @@ module.exports =  async function(deployer) {
 
     await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), stablecoinAdapter.address);
 
-    await bookKeeper.whitelist(stablecoinAdapter.address, { gasLimit: 1000000 })
+    await bookKeeper.whitelist(stablecoinAdapter.address, { gasLimit: 1000000 });
+
+    await ankrCollateralAdapter.whitelist(positionManager.address, { gasLimit: 1000000 });
+    await ankrCollateralAdapter.whitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
+    await ankrCollateralAdapter.whitelist(liquidationEngine.address, { gasLimit: 1000000 });
+
 }

@@ -23,7 +23,6 @@ module.exports = async function (deployer) {
     const priceOracle = await getProxy(proxyFactory, "PriceOracle")
     const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
     const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
-    const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
 
     const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);
     const debtCeilingSetUp = WeiPerRad.mul(10000000).div(2);
@@ -32,7 +31,6 @@ module.exports = async function (deployer) {
 
     const promises = [
         initPool(pools.XDC, ankrCollateralAdapter.address, delayFathomOraclePriceFeed.address, LIQUIDATIONRATIO_75),
-        initPool(pools.USD_STABLE, authTokenAdapter.address, simplePriceFeed.address, WeiPerRay),
     ]
 
     await Promise.all(promises);
