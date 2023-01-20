@@ -827,7 +827,7 @@ describe("PositionPermissions", () => {
                     ])
 
                     await expect(
-                        bobProxyWallet.execute2(fathomStablecoinProxyActions.address, lockTokenCall, { value: WeiPerWad, from: BobAddress })
+                        bobProxyWallet.execute(lockTokenCall, { value: WeiPerWad, from: BobAddress })
                     ).to.be.revertedWith("owner not allowed")
                 })
             })
@@ -957,7 +957,7 @@ describe("PositionPermissions", () => {
                         ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
                     ])
                     await expect(
-                        bobProxyWallet.execute2(fathomStablecoinProxyActions.address, drawTokenCall, { from: BobAddress })
+                        bobProxyWallet.execute(drawTokenCall, { from: BobAddress })
                     ).to.be.revertedWith("owner not allowed")
                 })
             })
@@ -1007,7 +1007,7 @@ describe("PositionPermissions", () => {
                             1,
                         ])
                         await expect(
-                            bobProxyWallet.execute2(fathomStablecoinProxyActions.address, movePositionCall, { from: BobAddress })
+                            bobProxyWallet.execute(movePositionCall, { from: BobAddress })
                         ).to.be.revertedWith("owner not allowed")
                     })
                 })

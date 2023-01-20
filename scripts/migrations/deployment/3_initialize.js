@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { BigNumber } = require('ethers');
 
 const pools = require("../../common/collateral");
 const { getAddresses } = require("../../common/addresses");
@@ -8,18 +7,13 @@ const { ethers } = require("ethers");
 
 const FathomStablecoinProxyActions = artifacts.require('FathomStablecoinProxyActions.sol');
 
-const {Deployer} = require("../../common/addresses");
-
-const TREASURY_FEE_BPS = BigNumber.from(5000) // <- 0.5
-const ERC20Stable = artifacts.require('ERC20MintableStableSwap.sol')
-
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
-    const proxyWalletFactory = await artifacts.initializeInterfaceAt("ProxyWalletFactory", "ProxyWalletFactory");
 
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
+    const proxyWalletFactory = await getProxy(proxyFactory, "ProxyWalletFactory");
     const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const showStopper = await getProxy(proxyFactory, "ShowStopper");
@@ -38,6 +32,8 @@ module.exports = async function (deployer) {
     const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
     const dexPriceOracle = await getProxy(proxyFactory, "DexPriceOracle");
     const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+    const proxyActionsStorage = await getProxy(proxyFactory, "ProxyActionsStorage");
+    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const addresses = getAddresses(deployer.networkId())
     const dailyLimit = ethers.utils.parseUnits("10000", "ether");
@@ -93,6 +89,8 @@ module.exports = async function (deployer) {
             systemDebtEngine.address,
             { gaslimit: 4050000 }
         ),
+        proxyActionsStorage.initialize(fathomStablecoinProxyActions.address, { gasLimit: 1000000 }),
+        proxyWalletFactory.initialize(proxyActionsStorage.address, { gasLimit: 1000000 }),
         proxyWalletRegistry.initialize(proxyWalletFactory.address, { gasLimit: 1000000 }),
         flashMintModule.initialize(
             stablecoinAdapter.address,
@@ -122,7 +120,7 @@ module.exports = async function (deployer) {
             addresses.USD,
             addresses.WXDC,
             accessControlConfig.address
-        )
+        ),
     ];
 
     await Promise.all(promises);

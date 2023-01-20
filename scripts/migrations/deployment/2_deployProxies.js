@@ -20,6 +20,8 @@ module.exports = async function (deployer) {
         "FixedSpreadLiquidationStrategy",
         "StabilityFeeCollector",
         "ProxyWalletRegistry",
+        "ProxyWalletFactory",
+        "ProxyActionsStorage",
         "FlashMintModule",
         "StableSwapModule",
         "FlashMintArbitrager",
