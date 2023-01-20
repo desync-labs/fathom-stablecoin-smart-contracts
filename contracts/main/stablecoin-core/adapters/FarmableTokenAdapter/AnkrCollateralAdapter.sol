@@ -9,6 +9,7 @@ import "../../../interfaces/IBookKeeper.sol";
 import "../../../interfaces/IFarmableTokenAdapter.sol";
 import "../../../interfaces/ICagable.sol";
 import "../../../interfaces/IManager.sol";
+import "../../../interfaces/IProxyRegistry.sol";
 import "../../../utils/SafeToken.sol";
 import "../../../apis/ankr/interfaces/IAnkrStakingPool.sol";
 import "../../../apis/ankr/interfaces/ICertToken.sol";
@@ -38,6 +39,8 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     IAnkrStakingPool public XDCPoolAddress;
     ICertToken public aXDCcAddress;
 
+    IProxyRegistry public proxyWalletFactory;
+
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
 
@@ -45,6 +48,8 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     mapping(address => RatioNCerts) public recordRatioNCerts;
     /// @dev Mapping of user(positionAddress) => collteralTokens that he is staking
     mapping(address => uint256) public stake;
+
+    mapping(address => bool) public whiteListed;
 
     uint256 internal to18ConversionFactor;
     uint256 internal toTokenConversionFactor;
@@ -59,6 +64,11 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
+        _;
+    }
+
+    modifier onlyProxyWalletOrWhiteListed() {
+        require(IProxyRegistry(proxyWalletFactory).isProxy(msg.sender) || whiteListed[msg.sender], "!ProxyOrWL");
         _;
     }
 
@@ -83,7 +93,8 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         bytes32 _collateralPoolId,
         address _xdcPoolAddress,
         address _aXDCcAddress,
-        address _positionManager
+        address _positionManager,
+        address _proxyWalletFactory
     ) external initializer {
         // 1. Initialized all dependencies
         PausableUpgradeable.__Pausable_init();
@@ -105,6 +116,8 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         toTokenConversionFactor = 10**decimals;
 
         positionManager = IManager(_positionManager);
+
+        proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
 
     }
 
@@ -167,7 +180,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     /// @param _positionAddress The address that holding states of the position
     /// @param _amount The XDC amount that being used as a collateral and to be staked to AnkrStakingPool
     /// @param _data The extra data that may needs to execute the deposit
-    function deposit(address _positionAddress, uint256 _amount, bytes calldata _data) external payable override nonReentrant whenNotPaused {
+    function deposit(address _positionAddress, uint256 _amount, bytes calldata _data) external payable override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
         _deposit(_positionAddress, _amount, _data);
     }
 
@@ -238,12 +251,9 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
     /// @dev Withdraw aXDCc from AnkrCollateralAdapter
     /// @param _usr The address that holding states of the position
-    /// @param _amount The ibToken amount to be withdrawn from FairLaunch and return to user
-    function withdraw(address _usr, uint256 _amount, bytes calldata /* _data */) external override nonReentrant whenNotPaused {
-        //I think there needs to be some protection for withdraw function
-        if (live == 1) {
+    /// @param _amount The XDC col amount(translated to aXDCc) to be withdrawn from AnkrCollateralAdapter and return to user
+    function withdraw(address _usr, uint256 _amount, bytes calldata /* _data */) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed{
             _withdraw(_usr, _amount);
-        }
     }
 
     /// @dev   /// withdraw collateral tokens from staking contract, and update BookKeeper and update BookKeeper
@@ -270,7 +280,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     }
 
 
-    function moveStake(address _source, address _destination, uint256 _share, bytes calldata _data) external override nonReentrant whenNotPaused {
+    function moveStake(address _source, address _destination, uint256 _share, bytes calldata _data) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed{
         _moveStake(_source, _destination, _share, _data);
     }
 
@@ -300,7 +310,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         int256 _collateralValue,
         int256 /* debtShare */,
         bytes calldata _data
-    ) external override nonReentrant whenNotPaused {
+    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed{
         uint256 _unsignedCollateralValue = _collateralValue < 0 ? uint256(-_collateralValue) : uint256(_collateralValue);
         _moveStake(_source, _destination, _unsignedCollateralValue, _data);
     }
@@ -310,7 +320,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         address _destination,
         uint256 _share,
         bytes calldata _data
-    ) external override nonReentrant whenNotPaused {
+    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed{
         _deposit(_source, 0, _data);
         _moveCerts(_source, _destination, _share, _data);
         _moveStake(_source, _destination, _share, _data);
@@ -365,6 +375,9 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         recordRatioNCerts[_destination].CertsAmount +=  certsMove;
   }
 
+  function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
+    whiteListed[toBeWhitelisted] = true;
+  }
 
     function cage() external override nonReentrant {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());

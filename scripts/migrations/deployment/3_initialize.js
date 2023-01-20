@@ -115,7 +115,8 @@ module.exports = async function (deployer) {
             pools.XDC,
             addresses.xdcPool,
             addresses.aXDCc,
-            positionManager.address
+            positionManager.address,
+            proxyWalletFactory.address
         ),
         delayFathomOraclePriceFeed.initialize(
             dexPriceOracle.address,

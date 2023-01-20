@@ -196,5 +196,4 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         remainingDailySwapAmount -= _amount;
         emit LogRemainingDailySwapAmount(remainingDailySwapAmount);
     }
-    
 }

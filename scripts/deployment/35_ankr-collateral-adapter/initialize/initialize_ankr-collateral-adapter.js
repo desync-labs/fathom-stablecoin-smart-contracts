@@ -25,10 +25,8 @@ module.exports =  async function(deployer) {
   await ankrCollateralAdapter.initialize(
     stablecoinAddress.bookKeeper,
     COLLATERAL_POOL_ID,
-    "0xd458788DD7d2fDbB5238d9eeb0a49732BffF08b7",
-    "0xe27990d8c950038C548E6f4BD0657aCE27495D48",
-    BigNumber.from(1000),                   //TREASURY_FEE_BPS 1000
-    devAddress,                 // deployer asTREASURY_ACCOUNT
+    stablecoinAddress.mockXDCStakingPool,
+    stablecoinAddress.mockaXDCc,
     stablecoinAddress.positionManager
     , { gasLimit: 5000000 }
     )

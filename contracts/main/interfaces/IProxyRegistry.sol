@@ -5,4 +5,6 @@ interface IProxyRegistry {
     function proxies(address) external view returns (address);
 
     function build(address) external returns (address);
+
+    function isProxy(address) external view returns (bool);
 }
