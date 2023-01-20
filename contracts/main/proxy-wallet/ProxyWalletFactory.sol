@@ -9,7 +9,6 @@ import "./ProxyWallet.sol";
 contract ProxyWalletFactory is OwnableUpgradeable {
     event LogCreated(address indexed _sender, address indexed _owner, address _proxy);
     mapping(address => bool) public isProxy;
-    // ProxyWalletCache public cache;
     address public proxyActionStorage;
 
     function initialize(address _proxyActionStorage) external initializer {

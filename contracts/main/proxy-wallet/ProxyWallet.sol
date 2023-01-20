@@ -8,7 +8,6 @@ import "./ProxyActionsStorage.sol";
 /// @dev Allows code execution using a persistant identity This can be very useful to execute a sequence of atomic actions. Since the owner of
 // the proxy can be changed, this allows for dynamic ownership models i.e. a multisig
 contract ProxyWallet is FathomAuth, FathomNote {
-    // ProxyWalletCache public cache; // global cache for contracts
     ProxyActionsStorage public proxyActionsStorage;
 
     constructor(address _storage) {
