@@ -189,7 +189,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     /// @param _positionAddress The position address to be updated
     /// @param _amount The amount to be deposited
     function _deposit(address _positionAddress, uint256 _amount, bytes calldata /* _data */) private {
-    require(live == 1, "AnkrCollateralAdapter/not live");
+    require(live == 1, "AnkrCollateralAdapter/not-live");
     require(_amount == msg.value, "AnkrCollateralAdapter/DepositAmountMismatch");
 
     if (_amount > 0) {

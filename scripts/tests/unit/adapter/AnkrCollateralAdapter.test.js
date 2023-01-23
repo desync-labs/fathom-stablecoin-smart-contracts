@@ -3,6 +3,11 @@ const chai = require('chai');
 const { expect } = chai
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
+const pools = require("../../../common/collateral");
+const { getProxy } = require("../../../common/proxies");
+
+
+// const { getAddresses } = require("../../../common/addresses");
 
 const { formatBytes32String } = ethers.utils
 
@@ -11,10 +16,15 @@ const { getContract, createMock } = require("../../helper/contracts");
 const { WeiPerWad } = require("../../helper/unit");
 const { loadFixture } = require("../../helper/fixtures");
 
+
+
+// const addresses = getAddresses(deployer.networkId())
+
 const loadFixtureHandler = async () => {
   const mockedAccessControlConfig = await createMock("AccessControlConfig");
   const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
   const mockedBookKeeper = await createMock("BookKeeper");
+  const mockedPositionManager = await createMock("PositionManager");
   const mockedToken = await createMock("ERC20Mintable");
 
   await mockedToken.mock.decimals.returns(18)
@@ -23,13 +33,23 @@ const loadFixtureHandler = async () => {
   await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))
   await mockedAccessControlConfig.mock.hasRole.returns(true)
 
+  const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+
   const ankrCollateralAdapter = getContract("AnkrCollateralAdapter", DeployerAddress)
   const ankrCollateralAdapterAsAlice = getContract("AnkrCollateralAdapter", AliceAddress)
+  const ProxyWalletFactory = artifacts.require('./main/proxy-wallet/ProxyWalletFactory.sol');
+
+  const xdcPool = await artifacts.initializeInterfaceAt("MockXDCStakingPool", "MockXDCStakingPool");
+  const aXDCc = await artifacts.initializeInterfaceAt("MockaXDCc", "MockaXDCc");
+
 
   await ankrCollateralAdapter.initialize(
     mockedBookKeeper.address,
-    formatBytes32String("BTCB"),
-    mockedToken.address
+    pools.XDC,
+    xdcPool.address,
+    aXDCc.address,
+    mockedPositionManager.address,
+    ProxyWalletFactory.address
   )
   return {
     ankrCollateralAdapter,
@@ -41,7 +61,7 @@ const loadFixtureHandler = async () => {
   }
 }
 
-describe("TokenAdapter", () => {
+describe("AnkrCollateralAdapter", () => {
   //Contract
   let ankrCollateralAdapter
   let mockedBookKeeper
@@ -66,79 +86,52 @@ describe("TokenAdapter", () => {
   })
 
   describe("#deposit()", () => {
-    context("when the token adapter is inactive", () => {
+    context("Directly calling AnkrCollateralAdapter", () => {
       it("should revert", async () => {
-        await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
-        await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
-        await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-        await ankrCollateralAdapter.cage()
-        await expect(ankrCollateralAdapter.deposit(AliceAddress, WeiPerWad.mul(1), "0x")).to.be.revertedWith(
-          "TokenAdapter/not-live"
+        await expect(ankrCollateralAdapter.deposit(AliceAddress, WeiPerWad.mul(1), "0x", { value: WeiPerWad.mul(1) })).to.be.revertedWith(
+          "!ProxyOrWL"
         )
-      })
-    })
-
-    context("when wad input is overflow (> MaxInt256)", () => {
-      it("should revert", async () => {
-        await expect(ankrCollateralAdapter.deposit(AliceAddress, ethers.constants.MaxUint256, "0x")).to.be.revertedWith(
-          "TokenAdapter/overflow"
-        )
-      })
-    })
-
-    context("when transfer fail", () => {
-      it("should revert", async () => {
-        await mockedBookKeeper.mock.addCollateral.returns()
-        await expect(ankrCollateralAdapter.deposit(AliceAddress, WeiPerWad.mul(1), "0x")).to.be.revertedWith("!safeTransferFrom")
-      })
-    })
-
-    context("when parameters are valid", () => {
-      it("should be able to call bookkeeper.addCollateral() correctly", async () => {
-        await mockedBookKeeper.mock.addCollateral.withArgs(
-          formatBytes32String("BTCB"),
-          AliceAddress,
-          BigNumber.from("1000000000000000000")
-        ).returns()
-        await mockedToken.mock.transferFrom.withArgs(
-          DeployerAddress,
-          ankrCollateralAdapter.address,
-          BigNumber.from("1000000000000000000")
-        ).returns(true)
-        await ankrCollateralAdapter.deposit(AliceAddress, WeiPerWad.mul(1), "0x")
       })
     })
   })
 
+
   describe("#withdraw()", () => {
-    context("when wad input is overflow (> MaxInt256)", () => {
+    context("Directly calling AnkrCollateralAdapter", () => {
       it("should revert", async () => {
-        await expect(ankrCollateralAdapter.withdraw(AliceAddress, ethers.constants.MaxUint256, "0x")).to.be.revertedWith(
-          "TokenAdapter/overflow"
+        await expect(ankrCollateralAdapter.withdraw(AliceAddress, WeiPerWad.mul(1), "0x")).to.be.revertedWith(
+          "!ProxyOrWL"
         )
       })
     })
+  })
 
-    context("when transfer fail", () => {
+  describe("#moveStake()", () => {
+    context("Directly calling AnkrCollateralAdapter", () => {
       it("should revert", async () => {
-        await mockedBookKeeper.mock.addCollateral.returns()
-        await expect(ankrCollateralAdapter.withdraw(AliceAddress, WeiPerWad.mul(1), "0x")).to.be.revertedWith("!safeTransfer")
+        await expect(ankrCollateralAdapter.moveStake(AliceAddress, AliceAddress,WeiPerWad.mul(1), "0x")).to.be.revertedWith(
+          "!ProxyOrWL"
+        )
       })
     })
+  })
 
-    context("when parameters are valid", () => {
-      it("should be able to call bookkeeper.addCollateral() correctly", async () => {
-        await mockedBookKeeper.mock.addCollateral.withArgs(
-          formatBytes32String("BTCB"),
-          DeployerAddress,
-          BigNumber.from("-1000000000000000000")
-        ).returns()
-        await mockedToken.mock.transfer.withArgs(
-          AliceAddress,
-          BigNumber.from("1000000000000000000")
-        ).returns(true)
-        await ankrCollateralAdapter.withdraw(AliceAddress, WeiPerWad.mul(1), "0x")
+  describe("#onAdjustPosition()", () => {
+    context("Directly calling AnkrCollateralAdapter", () => {
+      it("should revert", async () => {
+        await expect(ankrCollateralAdapter.onAdjustPosition(AliceAddress, AliceAddress, WeiPerWad.mul(1), WeiPerWad.mul(1), "0x")).to.be.revertedWith(
+          "!ProxyOrWL"
+        )
+      })
+    })
+  })
+
+  describe("#onMoveCollateral()", () => {
+    context("Directly calling AnkrCollateralAdapter", () => {
+      it("should revert", async () => {
+        await expect(ankrCollateralAdapter.onMoveCollateral(AliceAddress, AliceAddress, WeiPerWad.mul(1), "0x")).to.be.revertedWith(
+          "!ProxyOrWL"
+        )
       })
     })
   })
@@ -150,7 +143,7 @@ describe("TokenAdapter", () => {
         await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
         await mockedAccessControlConfig.mock.hasRole.returns(false)
 
-        await expect(ankrCollateralAdapterAsAlice.cage()).to.be.revertedWith("!(ownerRole or showStopperRole)")
+        await expect(ankrCollateralAdapterAsAlice.cage()).to.be.revertedWith("AnkrCollateralAdapter/not-authorized")
       })
     })
 
@@ -192,7 +185,7 @@ describe("TokenAdapter", () => {
         await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
         await mockedAccessControlConfig.mock.hasRole.returns(false)
 
-        await expect(ankrCollateralAdapterAsAlice.uncage()).to.be.revertedWith("!(ownerRole or showStopperRole)")
+        await expect(ankrCollateralAdapterAsAlice.uncage()).to.be.revertedWith("!ownerRole")
       })
     })
 
