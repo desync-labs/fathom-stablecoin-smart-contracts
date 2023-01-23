@@ -89,7 +89,7 @@ describe("AnkrCollateralAdapter", () => {
     context("Directly calling AnkrCollateralAdapter", () => {
       it("should revert", async () => {
         await expect(ankrCollateralAdapter.deposit(AliceAddress, WeiPerWad.mul(1), "0x", { value: WeiPerWad.mul(1) })).to.be.revertedWith(
-          "!ProxyOrWL"
+          "!ProxyOrWhiteList"
         )
       })
     })
@@ -100,7 +100,7 @@ describe("AnkrCollateralAdapter", () => {
     context("Directly calling AnkrCollateralAdapter", () => {
       it("should revert", async () => {
         await expect(ankrCollateralAdapter.withdraw(AliceAddress, WeiPerWad.mul(1), "0x")).to.be.revertedWith(
-          "!ProxyOrWL"
+          "!ProxyOrWhiteList"
         )
       })
     })
@@ -110,7 +110,7 @@ describe("AnkrCollateralAdapter", () => {
     context("Directly calling AnkrCollateralAdapter", () => {
       it("should revert", async () => {
         await expect(ankrCollateralAdapter.moveStake(AliceAddress, AliceAddress,WeiPerWad.mul(1), "0x")).to.be.revertedWith(
-          "!ProxyOrWL"
+          "!ProxyOrWhiteList"
         )
       })
     })
@@ -120,7 +120,7 @@ describe("AnkrCollateralAdapter", () => {
     context("Directly calling AnkrCollateralAdapter", () => {
       it("should revert", async () => {
         await expect(ankrCollateralAdapter.onAdjustPosition(AliceAddress, AliceAddress, WeiPerWad.mul(1), WeiPerWad.mul(1), "0x")).to.be.revertedWith(
-          "!ProxyOrWL"
+          "!ProxyOrWhiteList"
         )
       })
     })
@@ -130,7 +130,7 @@ describe("AnkrCollateralAdapter", () => {
     context("Directly calling AnkrCollateralAdapter", () => {
       it("should revert", async () => {
         await expect(ankrCollateralAdapter.onMoveCollateral(AliceAddress, AliceAddress, WeiPerWad.mul(1), "0x")).to.be.revertedWith(
-          "!ProxyOrWL"
+          "!ProxyOrWhiteList"
         )
       })
     })

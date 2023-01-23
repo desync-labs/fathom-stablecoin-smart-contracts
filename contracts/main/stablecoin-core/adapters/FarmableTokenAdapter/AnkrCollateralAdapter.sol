@@ -68,7 +68,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     }
 
     modifier onlyProxyWalletOrWhiteListed() {
-        require(IProxyRegistry(proxyWalletFactory).isProxy(msg.sender) || whiteListed[msg.sender], "!ProxyOrWL");
+        require(IProxyRegistry(proxyWalletFactory).isProxy(msg.sender) || whiteListed[msg.sender], "!ProxyOrWhiteList");
         _;
     }
 
@@ -376,6 +376,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
   }
 
   function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
+    require(toBeWhitelisted != address(0), "invalidAddress");
     whiteListed[toBeWhitelisted] = true;
   }
 
