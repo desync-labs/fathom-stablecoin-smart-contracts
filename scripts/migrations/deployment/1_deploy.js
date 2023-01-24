@@ -23,6 +23,7 @@ const FathomProxyFactory = artifacts.require('FathomProxyFactory.sol');
 const FathomProxyAdmin = artifacts.require('FathomProxyAdmin.sol');
 const DelayFathomOraclePriceFeed = artifacts.require('DelayFathomOraclePriceFeed.sol');
 const AnkrCollateralAdapter = artifacts.require('AnkrCollateralAdapter.sol');
+const ProxyActionsStorage = artifacts.require('ProxyActionsStorage.sol');
 
 module.exports =  async function(deployer) {
   let promises = [
@@ -51,6 +52,7 @@ module.exports =  async function(deployer) {
       deployer.deploy(FathomProxyAdmin, { gas: 7050000 }),
       deployer.deploy(DelayFathomOraclePriceFeed, { gas: 7050000 }),
       deployer.deploy(AnkrCollateralAdapter, { gas: 7050000 }),
+      deployer.deploy(ProxyActionsStorage, { gas: 7050000 }),
   ];
 
   await Promise.all(promises);

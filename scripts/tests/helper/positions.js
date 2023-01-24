@@ -26,7 +26,7 @@ const openPositionAndDraw = async (proxyWallet, from, collateral_pool_id, collat
         true,
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, openPositionCall, { from: from })
+    await proxyWallet.execute(openPositionCall, { from: from })
 }
 
 
@@ -52,7 +52,7 @@ const openXDCPositionAndDraw = async (proxyWallet, from, collateral_pool_id, col
         stablecoin,
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, call, {  value: collateral,  from: from})
+    await proxyWallet.execute(call, {  value: collateral,  from: from})
 }
 
 const openPosition = async (proxyWallet, from, collateral_pool_id) => {
@@ -69,7 +69,7 @@ const openPosition = async (proxyWallet, from, collateral_pool_id) => {
         proxyWallet.address,
     ]);
 
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, openPositionCall, { from: from })
+    await proxyWallet.execute(openPositionCall, { from: from })
 }
 
 const wipeAndUnlockToken = async (proxyWallet, from, tokenAdapter, stablecoinAdapter, positionId, collateral, stablecoin) => {
@@ -91,7 +91,7 @@ const wipeAndUnlockToken = async (proxyWallet, from, tokenAdapter, stablecoinAda
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
 
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, wipeAndUnlockTokenCall, { from: from })
+    await proxyWallet.execute(wipeAndUnlockTokenCall, { from: from })
 }
 
 const wipeAndUnlockXDC = async (proxyWallet, from, positionId, collateral, stablecoin) => {
@@ -115,7 +115,7 @@ const wipeAndUnlockXDC = async (proxyWallet, from, positionId, collateral, stabl
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
 
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, call, {from: from })
+    await proxyWallet.execute(call, {from: from })
 }
 
 
@@ -139,7 +139,7 @@ const wipeAllAndUnlockXDC = async (proxyWallet, from, positionId, collateral) =>
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
 
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, call, {from: from })
+    await proxyWallet.execute(call, {from: from })
 }
 
 const lockToken = async (proxyWallet, from, collateral_pool_id, positionId, amount) => {
@@ -161,7 +161,7 @@ const lockToken = async (proxyWallet, from, collateral_pool_id, positionId, amou
         true,
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, lockTokenCall, { from: from })
+    await proxyWallet.execute(lockTokenCall, { from: from })
 }
 
 const lockXDC = async (proxyWallet, from, positionId, amount) => {
@@ -180,7 +180,7 @@ const lockXDC = async (proxyWallet, from, positionId, amount) => {
         positionId,
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, lockTokenCall, {  value: amount, from: from })
+    await proxyWallet.execute(lockTokenCall, {  value: amount, from: from })
 }
 
 // function safeLockXDC(address _manager, address _xdcAdapter, uint256 _positionId, address _owner, bytes calldata _data)
@@ -201,7 +201,7 @@ const safeLockXDC = async (proxyWallet, from, positionId, amount) => {
         proxyWallet.address,
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, lockTokenCall, {  value: amount, from: proxyWallet.address })
+    await proxyWallet.execute(lockTokenCall, {  value: amount, from: proxyWallet.address })
 }
 
 const draw = async (proxyWallet, from, collateral_pool_id, positionId, amount) => {
@@ -226,7 +226,7 @@ const draw = async (proxyWallet, from, collateral_pool_id, positionId, amount) =
         ethers.utils.defaultAbiCoder.encode(["address"], [from])
     ]);
 
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, drawTokenCall, { from: from })
+    await proxyWallet.execute(drawTokenCall, { from: from })
 }
 
 const moveCollateral = async (proxyWallet, from, positionId, destination, amount, collateralTokenAdapterAddress) => {
@@ -248,7 +248,7 @@ const moveCollateral = async (proxyWallet, from, positionId, destination, amount
         ethers.utils.defaultAbiCoder.encode(["address"], [from])
     ])
 
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, moveCollateralCall, { from: from })
+    await proxyWallet.execute(moveCollateralCall, { from: from })
 }
 
 const adjustPosition = async (proxyWallet, from, positionId, collateralValue, debtShare, collateralTokenAdapterAddress) => {
@@ -268,7 +268,7 @@ const adjustPosition = async (proxyWallet, from, positionId, collateralValue, de
         collateralTokenAdapterAddress,
         ethers.utils.defaultAbiCoder.encode(["address"], [from])
     ]);
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, adjustPositionCall, { from: from })
+    await proxyWallet.execute(adjustPositionCall, { from: from })
 }
 
 const allowManagePosition = async (proxyWallet, from, positionId, user, ok) => {
@@ -286,7 +286,7 @@ const allowManagePosition = async (proxyWallet, from, positionId, user, ok) => {
         user,
         ok
     ]);
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, allowManagePositionCall, { from: from })
+    await proxyWallet.execute(allowManagePositionCall, { from: from })
 }
 
 const movePosition = async (proxyWallet, from, src, dst) => {
@@ -303,7 +303,7 @@ const movePosition = async (proxyWallet, from, src, dst) => {
         src,
         dst
     ]);
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, movePositionCall, { from: from })
+    await proxyWallet.execute(movePositionCall, { from: from })
 }
 
 const tokenAdapterDeposit = async (proxyWallet, from, positionAddress, amount, collateralTokenAdapterAddress) => {
@@ -320,7 +320,7 @@ const tokenAdapterDeposit = async (proxyWallet, from, positionAddress, amount, c
         true,
         ethers.utils.defaultAbiCoder.encode(["address"], [from])
     ]);
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, tokenAdapterDepositCall, { from: from })
+    await proxyWallet.execute(tokenAdapterDepositCall, { from: from })
 }
 
 const xdcAdapterDeposit = async (proxyWallet, from, positionAddress, amount) => {
@@ -337,7 +337,7 @@ const xdcAdapterDeposit = async (proxyWallet, from, positionAddress, amount) => 
         positionAddress,
         ethers.utils.defaultAbiCoder.encode(["address"], [from])
     ]);
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, tokenAdapterDepositCall, { value: amount, from: from })
+    await proxyWallet.execute(tokenAdapterDepositCall, { value: amount, from: from })
 }
 
 const redeemLockedCollateral = async (proxyWallet, from, positionId) => {
@@ -356,7 +356,7 @@ const redeemLockedCollateral = async (proxyWallet, from, positionId) => {
         ankrCollateralAdapter.address,
         ethers.utils.defaultAbiCoder.encode(["address"], [from])
     ]);
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, call, { from: from })
+    await proxyWallet.execute(call, { from: from })
 }
 
 const exportPosition = async (proxyWallet, from, positionId, destination) => {
@@ -373,7 +373,7 @@ const exportPosition = async (proxyWallet, from, positionId, destination) => {
         positionId,
         destination
     ]);
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, exportPositionCall, { from: from })
+    await proxyWallet.execute(exportPositionCall, { from: from })
 }
 
 const importPosition = async (proxyWallet, from, source, positionId) => {
@@ -390,7 +390,7 @@ const importPosition = async (proxyWallet, from, source, positionId) => {
         source,
         positionId
     ]);
-    await proxyWallet.execute2(fathomStablecoinProxyActions.address, importPositionCall, { from: from })
+    await proxyWallet.execute(importPositionCall, { from: from })
 }
 
 module.exports = {
