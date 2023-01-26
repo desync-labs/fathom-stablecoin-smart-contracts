@@ -44,6 +44,8 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
   uint256 public override live; // Active Flag
   mapping(address => uint256) public liquidatorsWhitelist;
 
+  event LiquidationFail(bytes32 _collateralPoolIds, address _positionAddresses, address _liquidator, string reason);
+
   modifier onlyOwnerOrShowStopper() {
     IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
     require(
@@ -106,7 +108,8 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
   ) external override nonReentrant whenNotPaused onlyWhitelisted {
     for(uint i = 0; i < _collateralPoolIds.length; i++){
         try this.liquidate(_collateralPoolIds[i], _positionAddresses[i],_debtShareToBeLiquidateds[i], _maxDebtShareToBeLiquidateds[i], _collateralRecipients[i], datas[i],msg.sender){
-        }catch{
+        } catch Error(string memory reason) {
+            emit LiquidationFail(_collateralPoolIds[i], _positionAddresses[i], msg.sender, reason);
             continue;
         }
     }
