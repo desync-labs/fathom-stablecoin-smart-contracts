@@ -56,6 +56,8 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
     event LogDeposit(uint256 _val);
     event LogWithdraw(uint256 _val);
+    event LogCertsInflow(uint256 _valCerts);
+    event LogCertsOutflow(uint256 _valCerts);
     event LogEmergencyWithdraw(address indexed _caller, address _to);
     event LogMoveStake(address indexed _src, address indexed _dst, uint256 _wad);
     event LogSetTreasuryAccount(address indexed _caller, address _treasuryAccount);
@@ -241,12 +243,12 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             recordRatioNCerts[_positionAddress].ratio = calculatedNewRatio;
         }
 
-        recordRatioNCerts[_positionAddress].CertsAmount = add(recordRatioNCerts[_positionAddress].CertsAmount, certsIn);   
+        recordRatioNCerts[_positionAddress].CertsAmount = add(recordRatioNCerts[_positionAddress].CertsAmount, certsIn);  
+        emit LogCertsInflow(certsIn); // aXDCc
       }
 
     }
-
-    emit LogDeposit(_amount);
+    emit LogDeposit(_amount); // xdc
     }
 
     /// @dev Withdraw aXDCc from AnkrCollateralAdapter
@@ -275,6 +277,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             uint256 withdrawAmount = recordRatioNCerts[msg.sender].CertsAmount;
             recordRatioNCerts[msg.sender].CertsAmount = 0;
             SafeToken.safeTransfer(address(aXDCcAddress), _usr, withdrawAmount);
+            emit LogCertsOutflow(withdrawAmount);
         }
             emit LogWithdraw(_amount);
     }
