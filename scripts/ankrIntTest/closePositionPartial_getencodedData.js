@@ -21,9 +21,9 @@ const wipeAndUnlockXDC = async (positionId, collateralAmount, stablecoinAmount) 
   ];
   const wipeAndUnlockXDCIFace = new ethers.utils.Interface(wipeAndUnlockXDCAbi);
   const closeParialPositionCall = wipeAndUnlockXDCIFace.encodeFunctionData("wipeAndUnlockXDC", [
-    "0xFBb898b3ea40E4932F9958f16257100a01B8bf9f", //Position Manager
-    "0x208EB9b89855fF06f7cd57AAa85140027304E6ef", //AnkrCollateralAdapter
-    "0x7c8367a7CAb1e4b305e60ef7D324AfA49cCf0fD5", // StablecoinAdapter
+    "0xF1760BE07B3c3162Ff1782D4a619E8Fc2028a807", //Position Manager
+    "0xd28a2B214F6b8047148e3CA323357766EC124061", //AnkrCollateralAdapter
+    "0x0C57BeB61545B7899f2C6fCD5ECbC6c5D29be6cc", // StablecoinAdapter
       positionId,
       collateralAmount, // wad
       stablecoinAmount, // wad
