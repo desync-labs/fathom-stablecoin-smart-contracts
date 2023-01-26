@@ -338,3 +338,25 @@ makeWallet:
 closePositionFull:
 	coralX execute --network development --path scripts/ankrIntTest/closePositionFull.js
 
+openCrazy:
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	coralX execute --network apothem --path scripts/ankrIntTest/apothem_positionOpening.js
+	
+
