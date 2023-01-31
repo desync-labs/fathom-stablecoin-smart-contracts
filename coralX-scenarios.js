@@ -23,4 +23,8 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/deployment'],
     ['execute', '--path', 'scripts/migrations/test/configuration'],
   ],
+  deployImplV2: [
+    ['compile'],
+    ['execute', '--path', 'scripts/ankrIntTest/apothem_deployAnkrColAptV2.js', '--network', 'apothem'],
+  ],
 }
