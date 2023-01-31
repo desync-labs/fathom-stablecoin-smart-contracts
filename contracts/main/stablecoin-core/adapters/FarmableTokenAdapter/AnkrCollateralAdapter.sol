@@ -337,15 +337,16 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
   ) internal onlyCollateralManager {
         uint256 certsToMoveRatio;
         if(_share >= stake[_source]){
-            certsToMoveRatio = WAD;
+            uint256 CertsMove = recordRatioNCerts[_source].CertsAmount;
+            recordRatioNCerts[_source].CertsAmount = 0;
+            recordRatioNCerts[_destination].CertsAmount = CertsMove;
         } else {
             require(_share < stake[_source], "AnkrCollateralAdapter/tooMuchShare");
             certsToMoveRatio = wdiv(_share, stake[_source]);
         }
-
         uint256 certsMove = wmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
 
-        //update CertsAmount in source
+
         recordRatioNCerts[_source].CertsAmount -= certsMove;
 
         uint256 certsBefore = recordRatioNCerts[_destination].CertsAmount;
@@ -369,17 +370,13 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         
         uint256 aXDCcRatio = aXDCcAddress.ratio();
 
-        //update ratio in destination
         if(calculatedNewRatio <= aXDCcRatio) {
         recordRatioNCerts[_destination].ratio = aXDCcRatio;
         } else {
             recordRatioNCerts[_destination].ratio = calculatedNewRatio;
         }
-
-        //update CertsAmount in destination
         recordRatioNCerts[_destination].CertsAmount +=  certsMove;
   }
-
 
   function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
     require(toBeWhitelisted != address(0), "invalidAddress");
