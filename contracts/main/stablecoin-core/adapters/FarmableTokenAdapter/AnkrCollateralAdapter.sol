@@ -290,6 +290,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     /// @dev Move wad amount of staked balance from source to destination. Can only be moved if underlaying assets make sense.
     function _moveStake(address _source, address _destination, uint256 _share, bytes calldata /* data */) private onlyCollateralManager {
         // 1. Update collateral tokens for source and destination
+        require(stake[_source] != 0, "AnkrCollateralAdapter/SourceNoStakeValue");
         uint256 _stakedAmount = stake[_source];
         stake[_source] = sub(_stakedAmount, _share);
         stake[_destination] = add(stake[_destination], _share);
@@ -335,18 +336,18 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         uint256 _share,
         bytes calldata _data
   ) internal onlyCollateralManager {
+        require(stake[_source] != 0, "AnkrCollateralAdapter/SourceNoStakeValue");
         uint256 certsToMoveRatio;
         if(_share >= stake[_source]){
-            uint256 CertsMove = recordRatioNCerts[_source].CertsAmount;
-            recordRatioNCerts[_source].CertsAmount = 0;
-            recordRatioNCerts[_destination].CertsAmount = CertsMove;
+            certsToMoveRatio = WAD;
         } else {
             require(_share < stake[_source], "AnkrCollateralAdapter/tooMuchShare");
             certsToMoveRatio = wdiv(_share, stake[_source]);
         }
+
         uint256 certsMove = wmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
 
-
+        //update CertsAmount in source
         recordRatioNCerts[_source].CertsAmount -= certsMove;
 
         uint256 certsBefore = recordRatioNCerts[_destination].CertsAmount;
@@ -370,11 +371,14 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         
         uint256 aXDCcRatio = aXDCcAddress.ratio();
 
+        //update ratio in destination
         if(calculatedNewRatio <= aXDCcRatio) {
         recordRatioNCerts[_destination].ratio = aXDCcRatio;
         } else {
             recordRatioNCerts[_destination].ratio = calculatedNewRatio;
         }
+
+        //update CertsAmount in destination
         recordRatioNCerts[_destination].CertsAmount +=  certsMove;
   }
 
