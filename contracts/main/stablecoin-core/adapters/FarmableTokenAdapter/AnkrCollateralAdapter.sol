@@ -290,6 +290,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     /// @dev Move wad amount of staked balance from source to destination. Can only be moved if underlaying assets make sense.
     function _moveStake(address _source, address _destination, uint256 _share, bytes calldata /* data */) private onlyCollateralManager {
         // 1. Update collateral tokens for source and destination
+        require(stake[_source] != 0, "AnkrCollateralAdapter/SourceNoStakeValue");
         uint256 _stakedAmount = stake[_source];
         stake[_source] = sub(_stakedAmount, _share);
         stake[_destination] = add(stake[_destination], _share);
@@ -335,6 +336,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         uint256 _share,
         bytes calldata _data
   ) internal onlyCollateralManager {
+        require(stake[_source] != 0, "AnkrCollateralAdapter/SourceNoStakeValue");
         uint256 certsToMoveRatio;
         if(_share >= stake[_source]){
             certsToMoveRatio = WAD;
