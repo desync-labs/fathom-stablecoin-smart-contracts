@@ -13,10 +13,10 @@ const { WeiPerWad } = require("../tests/helper/unit");
 
 
 const openPositionAndDraw = async (proxyWallet, collateral_pool_id, stablecoinAmount) => {
-  const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "0xF1760BE07B3c3162Ff1782D4a619E8Fc2028a807");
-  const stablecoinAdapter = await artifacts.initializeInterfaceAt("StablecoinAdapter", "0x0C57BeB61545B7899f2C6fCD5ECbC6c5D29be6cc");
-  const stabilityFeeCollector = await artifacts.initializeInterfaceAt("StabilityFeeCollector", "0x37e52CF56C9a20330A544434210A39338958223D");
-  const xdcAdapter = await artifacts.initializeInterfaceAt("AnkrCollateralAdapter", "0xd28a2B214F6b8047148e3CA323357766EC124061");
+  const positionManager = await artifacts.initializeInterfaceAt("PositionManager", "0xe485eDc3D5aba4dbEcD76a78e6c71c8F5E114F3b");
+  const stablecoinAdapter = await artifacts.initializeInterfaceAt("StablecoinAdapter", "0x07a2C89774a3F3c57980AD7A528Aea6F262d8939");
+  const stabilityFeeCollector = await artifacts.initializeInterfaceAt("StabilityFeeCollector", "0x62889248B6C81D31D7acc450cc0334D0AA58A14A");
+  const xdcAdapter = await artifacts.initializeInterfaceAt("AnkrCollateralAdapter", "0xc3c7f26ffD1cd5ec682E23C076471194DE8ce4f1");
 
   console.log("here1");
 
@@ -48,10 +48,10 @@ module.exports = async function(deployer) {
   //uncomment below to make wallet
   // await proxyWalletRegistry.build(apothemDeployerTest, { from: apothemDeployerTest, gasLimit: 2000000 })
   // const proxyWalletapothemDeployerTest = await proxyWalletRegistry.proxies("0xB4A0403376CA4f0a99b863840EfFf78bc061d71F")
-  let proxyWalletapothemDeployerTest = "0xaB9E9e40841F97a260E9E9ccc1A809A4663b7733";
+  let proxyWalletapothemDeployerTest = "0x3a82aAdEeb6E1b3114A05bF9127D12748E800E93";
   const proxyWalletAsAlice = await artifacts.initializeInterfaceAt("ProxyWallet", proxyWalletapothemDeployerTest);
   // const proxyWalletAsAliceOwner = await proxyWalletAsAlice.owner();
   // console.log(apothemDeployerTest == proxyWalletAsAliceOwner);
                                                                                   //how much FXD to borrow
-  await openPositionAndDraw(proxyWalletAsAlice, COLLATERAL_POOL_ID, WeiPerWad.mul(7));
+  await openPositionAndDraw(proxyWalletAsAlice, COLLATERAL_POOL_ID, WeiPerWad.mul(20));
 };
