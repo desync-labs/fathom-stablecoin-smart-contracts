@@ -25,7 +25,9 @@ module.exports = {
       gasPrice: '0x3b9aca00',
     },
     apothem: {
-      host: "https://rpc.apothem.network",
+      // host: "https://rpc.apothem.network",
+      host: "https://erpc.apothem.network/",
+      // host: "https://apothem.xdcrpc.com/",
       // private_key: fs.readFileSync("./privateKey").toString(),
       private_key: process.env.GORLI_DEPLOYER,
       gasPrice: '0x3b9aca00',

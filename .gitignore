@@ -20,3 +20,4 @@ fathomapp-subgraph/build
 fathomapp-subgraph/generated
 fathomapp-subgraph/node_modules
 
+*.zip
