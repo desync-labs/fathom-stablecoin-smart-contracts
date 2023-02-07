@@ -108,17 +108,26 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
         _peekPrice();
     }
 
+    function setPrice() external onlyOwner {
+        _setPrice();
+    }
+
     function _peekPrice() internal returns (bytes32, bool) {
-        if (block.timestamp < lastUpdateTS + timeDelay) {
-            return (bytes32(delayedPrice), _isPriceOk());
+        if (block.timestamp >= lastUpdateTS + timeDelay) {
+          _setPrice();
         }
-        else {
-            (uint256 _price, uint256 _lastUpdate) = fathomOracle.getPrice(token0, token1);
-            delayedPrice = lastUpdateTS == 0 ? _price : latestPrice;
-            latestPrice = _price;
-            lastUpdateTS = _lastUpdate;
-            return (bytes32(delayedPrice), _isPriceOk());
-        }
+        return (bytes32(delayedPrice), _isPriceOk());
+    }
+
+    function _setPrice() internal {
+        (uint256 _price, uint256 _lastUpdate) = fathomOracle.getPrice(token0, token1);
+        
+        require(_price > 0, "FathomOraclePriceFeed/wrong-price");
+        require(_lastUpdate <= block.timestamp, "FathomOraclePriceFeed/wrong-lastUpdate");
+
+        delayedPrice = delayedPrice == 0 ? _price : latestPrice;
+        latestPrice = _price;
+        lastUpdateTS = _lastUpdate;
     }
 
     function _isPriceFresh() internal view returns (bool) {
