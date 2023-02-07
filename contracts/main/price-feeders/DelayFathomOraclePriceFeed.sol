@@ -68,7 +68,7 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
     }
 
     function setPriceLife(uint256 _second) external onlyOwner {
-        require(_second >= 5 minutes && _second <= 1 days, "FathomOraclePriceFeed/bad-price-life");
+        require(_second >= timeDelay && _second >= 5 minutes && _second <= 1 days, "FathomOraclePriceFeed/bad-price-life");
         priceLife = _second;
         emit LogSetPriceLife(msg.sender, _second);
     }
