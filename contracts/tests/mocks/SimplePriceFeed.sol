@@ -4,8 +4,8 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-import "../interfaces/IPriceFeed.sol";
-import "../interfaces/IAccessControlConfig.sol";
+import "../../main/interfaces/IPriceFeed.sol";
+import "../../main/interfaces/IAccessControlConfig.sol";
 
 contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPriceFeed {
     IAccessControlConfig public accessControlConfig;

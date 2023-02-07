@@ -10,7 +10,6 @@ const ProxyWalletFactory = artifacts.require('ProxyWalletFactory.sol');
 const StabilityFeeCollector = artifacts.require('StabilityFeeCollector.sol');
 const FathomStablecoinProxyActions = artifacts.require('FathomStablecoinProxyActions.sol');
 const FixedSpreadLiquidationStrategy = artifacts.require('FixedSpreadLiquidationStrategy.sol');
-const SimplePriceFeed = artifacts.require('SimplePriceFeed.sol');
 const PositionManager = artifacts.require('PositionManager.sol');
 const ShowStopper = artifacts.require('ShowStopper.sol');
 const PriceOracle = artifacts.require('PriceOracle.sol');
@@ -37,7 +36,6 @@ module.exports =  async function(deployer) {
       deployer.deploy(PriceOracle, { gas: 7050000 }),
       deployer.deploy(ShowStopper, { gas: 7050000 }),
       deployer.deploy(PositionManager, { gas: 7050000 }),
-      deployer.deploy(SimplePriceFeed, { gas: 7050000 }),
       deployer.deploy(FixedSpreadLiquidationStrategy, { gas: 7050000 }),
       deployer.deploy(FathomStablecoinProxyActions, { gas: 7050000 }),
       deployer.deploy(StabilityFeeCollector, { gas: 7050000 }),

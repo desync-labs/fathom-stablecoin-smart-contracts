@@ -16,7 +16,6 @@ module.exports = async function (deployer) {
         "PriceOracle",
         "ShowStopper",
         "PositionManager",
-        "SimplePriceFeed",
         "FixedSpreadLiquidationStrategy",
         "StabilityFeeCollector",
         "ProxyWalletRegistry",

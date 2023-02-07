@@ -34,7 +34,6 @@ const setup = async () => {
     const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
     const liquidationEngineAsAdmin = await getProxy(proxyFactory, "LiquidationEngine");
-    const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
     const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
     const priceOracle = await getProxy(proxyFactory, "PriceOracle");
@@ -43,6 +42,7 @@ const setup = async () => {
 
     const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
     const aXDCc = await artifacts.initializeInterfaceAt("MockaXDCc", "MockaXDCc");
+    const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
 
     ({
         proxyWallets: [aliceProxyWallet],

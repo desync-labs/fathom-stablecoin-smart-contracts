@@ -15,15 +15,14 @@ const pools = require("../../common/collateral");
 
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
 
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
-    const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
     const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
-    const priceOracle = await getProxy(proxyFactory, "PriceOracle");
 
     ({
         proxyWallets: [aliceProxyWallet],
@@ -31,15 +30,12 @@ const setup = async () => {
 
     await stabilityFeeCollector.setSystemDebtEngine(DevAddress)
 
-    // await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
     await fathomStablecoin.approve(aliceProxyWallet.address, WeiPerWad.mul(10000), { from: AliceAddress })
-    // await priceOracle.setPrice(pools.XDC, { gasLimit: 2000000 })
 
     return {
         bookKeeper,
         stablecoinAdapter,
         positionManager,
-        // tokenAdapter,
         stabilityFeeCollector,
         simplePriceFeed,
         collateralPoolConfig,

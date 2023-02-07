@@ -16,14 +16,14 @@ const { expect } = chai
 
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
+    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
-    const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
     const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
-    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
     const priceOracle = await getProxy(proxyFactory, "PriceOracle");
     const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");

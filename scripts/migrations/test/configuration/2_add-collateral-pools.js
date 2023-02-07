@@ -13,13 +13,16 @@ const STABILITY_FEE = BigNumber.from("1000000000627937192491029811")
 
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
 
-    const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed")
+    const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy")
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper")
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig")
     const priceOracle = await getProxy(proxyFactory, "PriceOracle")
     const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+
+    await simplePriceFeed.initialize(accessControlConfig.address, { gasLimit: 5000000 });
 
     const debtCeilingSetUpTotal = WeiPerRad.mul(100000000000000);
     const debtCeilingSetUp = WeiPerRad.mul(100000000000000);
