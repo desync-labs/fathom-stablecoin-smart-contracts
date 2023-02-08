@@ -383,8 +383,11 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
   }
 
   function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
-    require(toBeWhitelisted != address(0), "invalidAddress");
+    require(toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
     whiteListed[toBeWhitelisted] = true;
+  }
+  function blacklist(address toBeRemoved) external onlyOwnerOrGov {
+    whiteListed[toBeRemoved] = false;
   }
 
     function cage() external override nonReentrant {

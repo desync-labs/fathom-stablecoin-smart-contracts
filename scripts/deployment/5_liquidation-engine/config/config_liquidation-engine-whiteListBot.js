@@ -7,7 +7,7 @@ const LiquidationEngine = artifacts.require('./main/stablecoin-core/LiquidationE
 module.exports =  async function(deployer) {
   console.log(">> Initializing LiquidationEngine")
 
-  const botAdd = "0xe7B11F39E08089B1d76A79D6272AC7Ad11E8eFe9";
+  const botAdd = "0xd2158e94c1ec20A0ebBD1C3786Bad2C99b6bF534";
   const liquidationEngine = await LiquidationEngine.at(stablecoinAddress.liquidationEngine);
 
   await liquidationEngine.whitelist(
