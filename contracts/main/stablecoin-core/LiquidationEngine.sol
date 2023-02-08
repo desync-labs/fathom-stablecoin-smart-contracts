@@ -91,6 +91,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
   uint256 constant WAD = 10**18;
 
   function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
+    require(toBeWhitelisted != address(0), "LiquidationEngine/whitelist-invalidAddress");
     liquidatorsWhitelist[toBeWhitelisted] = 1;
   }
 
