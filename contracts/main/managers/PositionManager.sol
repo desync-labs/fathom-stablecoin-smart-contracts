@@ -19,6 +19,8 @@ contract PositionManager is PausableUpgradeable, IManager {
     address public priceOracle;
 
     uint256 public lastPositionId;
+    /// @dev minimum borrowing requirement
+    uint256 public minDebt;
     /// @dev Mapping of positionId => positionHandler
     mapping(uint256 => address) public override positions;
     /// @dev Mapping of positionId => prev & next positionId; Double linked list
@@ -344,6 +346,10 @@ contract PositionManager is PausableUpgradeable, IManager {
         priceOracle = _priceOracle;
     }
 
+    function setMinDebt(uint256 _minDebt) external onlyOwnerOrGov {
+        minDebt = _minDebt;
+    }
+
     function pause() external onlyOwnerOrGov {
         _pause();
     }
@@ -356,8 +362,13 @@ contract PositionManager is PausableUpgradeable, IManager {
         ISetPrice(priceOracle).setPrice(_poolId);
     }
 
+    function minimumDebtCheck(uint256 _stablecoinAmount) external view returns(bool) {
+        return _stablecoinAmount >= minDebt ? true : false;
+    }
+
     function _isPriceHealthy(bytes32 _poolId) internal view returns(bool) {
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_poolId));
         return _priceFeed.isPriceOk();
     }
+
 }

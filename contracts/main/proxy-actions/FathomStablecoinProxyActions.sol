@@ -137,7 +137,7 @@ contract FathomStablecoinProxyActions {
         IBookKeeper(_bookKeeper).blacklist(_usr);
     }
 
-    function open(address _manager, bytes32 _collateralPoolId, address _usr) public returns (uint256 _positionId) {
+    function open(address _manager, bytes32 _collateralPoolId, address _usr) internal returns (uint256 _positionId) {
         _positionId = IManager(_manager).open(_collateralPoolId, _usr);
     }
 
@@ -349,6 +349,9 @@ contract FathomStablecoinProxyActions {
         uint256 _stablecoinAmount, // [wad]
         bytes calldata _data
     ) public payable {
+        //Minimum borrowing requirement
+        require(IManager(_manager).minimumDebtCheck(_stablecoinAmount), "ProxyActions/lockXDCAndDraw-debtTooLow");
+
         address _positionAddress = IManager(_manager).positions(_positionId);
         address _bookKeeper = IManager(_manager).bookKeeper();
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);

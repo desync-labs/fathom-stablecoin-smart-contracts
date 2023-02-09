@@ -35,4 +35,10 @@ interface IManager {
     function movePosition(uint256, uint256) external;
 
     function updatePrice(bytes32 _poolId) external;
+
+    function setPriceOracle(address _priceOracle) external;
+
+    function setMinDebt(uint256 _minDebt) external;
+
+    function minimumDebtCheck(uint256 _stablecoinAmount) external view returns(bool) ;
 }
