@@ -17,11 +17,16 @@ const loadFixtureHandler = async () => {
     const mockedShowStopper = await createMock("ShowStopper");
     const mockedPriceOracle = await createMock("PriceOracle");
     const mockedPriceFeed = await createMock("SimplePriceFeed");
+    const mockedAccessControlConfig = await createMock("AccessControlConfig");
 
+    await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"));
+    await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"));
+    await mockedAccessControlConfig.mock.hasRole.returns(true);
     await mockedShowStopper.mock.live.returns(1);
     await mockedBookKeeper.mock.totalStablecoinIssued.returns(0);
     await mockedBookKeeper.mock.whitelist.returns();
-    await mockedPriceOracle.mock.setPrice.returns()
+    await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address);
+    await mockedPriceOracle.mock.setPrice.returns();
     await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
     await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(WeiPerRay)
     await mockedCollateralPoolConfig.mock.getAdapter.returns(mockedTokenAdapter.address)
@@ -745,6 +750,27 @@ describe("PositionManager", () => {
                     "0x"
                 ).returns()
                 await positionManagerAsAlice.redeemLockedCollateral(1, mockedTokenAdapter.address, AliceAddress, "0x")
+            })
+        })
+    })
+
+    describe("#minimumDebtAmount()", () => {
+        context("when caller opens a position with stablecoin amount smaller than minimum debt", () => {
+            it("should return false", async () => {
+                await positionManager.setMinDebt(WeiPerWad.mul(10));
+                const result = await positionManager.minDebt() 
+                expect(result).to.be.equal(WeiPerWad.mul(10));
+                const minDebtCheck = await positionManager.minimumDebtCheck(WeiPerWad.mul(5))
+                expect(minDebtCheck).to.be.false;
+            })
+        })
+        context("when caller opens a position with stablecoin amount bigger than minimum debt", () => {
+            it("should return true", async () => {
+                    await positionManager.setMinDebt(WeiPerWad.mul(15));
+                    const result = await positionManager.minDebt() 
+                    expect(result).to.be.equal(WeiPerWad.mul(15));
+                    const minDebtCheck = await positionManager.minimumDebtCheck(WeiPerWad.mul(20))
+                    expect(minDebtCheck).to.be.true;
             })
         })
     })

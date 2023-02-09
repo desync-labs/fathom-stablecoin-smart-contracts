@@ -363,7 +363,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     }
 
     function minimumDebtCheck(uint256 _stablecoinAmount) external view returns(bool) {
-        return _stablecoinAmount >= minDebt ? true : false;
+        return _stablecoinAmount >= minDebt;
     }
 
     function _isPriceHealthy(bytes32 _poolId) internal view returns(bool) {
