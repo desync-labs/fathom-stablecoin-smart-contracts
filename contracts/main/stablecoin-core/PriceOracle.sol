@@ -98,9 +98,10 @@ contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceO
     }
 
     function cage() external override onlyOwnerOrShowStopper {
-        require(live == 1, "PriceOracle/not-live");
-        live = 0;
-        emit LogCage();
+        if(live == 1) {
+            live = 0;
+            emit LogCage();
+        }
     }
 
     function uncage() external override onlyOwnerOrShowStopper {

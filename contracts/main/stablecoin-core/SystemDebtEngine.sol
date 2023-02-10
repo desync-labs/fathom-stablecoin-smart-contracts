@@ -99,10 +99,11 @@ contract SystemDebtEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     }
 
     function cage() external override onlyOwnerOrShowStopper {
-        require(live == 1, "SystemDebtEngine/not-live");
-        live = 0;
-        bookKeeper.settleSystemBadDebt(min(bookKeeper.stablecoin(address(this)), bookKeeper.systemBadDebt(address(this))));
-        emit LogCage();
+        if(live == 1) {
+            live = 0;
+            bookKeeper.settleSystemBadDebt(min(bookKeeper.stablecoin(address(this)), bookKeeper.systemBadDebt(address(this))));
+            emit LogCage();
+        }
     }
 
     function uncage() external override onlyOwnerOrShowStopper {

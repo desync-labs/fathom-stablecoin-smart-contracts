@@ -18,10 +18,10 @@ import "../../../apis/ankr/interfaces/ICertToken.sol";
 contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
 
-    uint256 internal constant WAD = 10 ** 18;
-    uint256 internal constant RAY = 10 ** 27;
+    uint256 internal constant WAD = 10**18;
+    uint256 internal constant RAY = 10**27;
 
-    struct RatioNCerts{
+    struct RatioNCerts {
         uint256 ratio;
         uint256 CertsAmount;
     }
@@ -65,7 +65,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
-        require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
+        require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "AnkrCollateralAdapter/not-authorized");
         _;
     }
 
@@ -120,7 +120,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         positionManager = IManager(_positionManager);
 
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
-
     }
 
     function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
@@ -182,7 +181,11 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     /// @param _positionAddress The address that holding states of the position
     /// @param _amount The XDC amount that being used as a collateral and to be staked to AnkrStakingPool
     /// @param _data The extra data that may needs to execute the deposit
-    function deposit(address _positionAddress, uint256 _amount, bytes calldata _data) external payable override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
+    function deposit(
+        address _positionAddress,
+        uint256 _amount,
+        bytes calldata _data
+    ) external payable override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
         _deposit(_positionAddress, _amount, _data);
     }
 
@@ -190,79 +193,74 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     /// deposit collateral tokens to staking contract, and update BookKeeper
     /// @param _positionAddress The position address to be updated
     /// @param _amount The amount to be deposited
-    function _deposit(address _positionAddress, uint256 _amount, bytes calldata /* _data */) private {
-    require(live == 1, "AnkrCollateralAdapter/not-live");
-    require(_amount == msg.value, "AnkrCollateralAdapter/DepositAmountMismatch");
+    function _deposit(
+        address _positionAddress,
+        uint256 _amount,
+        bytes calldata /* _data */
+    ) private {
+        require(live == 1, "AnkrCollateralAdapter/not-live");
+        require(_amount == msg.value, "AnkrCollateralAdapter/DepositAmountMismatch");
 
-    if (_amount > 0) {
-      uint256 _share = wdiv(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
-      // Overflow check for int256(wad) cast below
-      // Also enforces a non-zero wad
-      require(int256(_share) > 0, "AnkrCollateralAdapter/share-overflow");
+        if (_amount > 0) {
+            uint256 _share = wdiv(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
+            // Overflow check for int256(wad) cast below
+            // Also enforces a non-zero wad
+            require(int256(_share) > 0, "AnkrCollateralAdapter/share-overflow");
 
-      //bookKeeping
-      bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
-      totalShare = add(totalShare, _share);
-      stake[_positionAddress] = add(stake[_positionAddress], _share);
+            //bookKeeping
+            bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
+            totalShare = add(totalShare, _share);
+            stake[_positionAddress] = add(stake[_positionAddress], _share);
 
-      //record aXDCc amount before stakeCerts
-      uint256 aXDCcBefore = aXDCcAddress.balanceOf(address(this));
-      XDCPoolAddress.stakeCerts{value : msg.value}();
-      uint256 aXDCcAfter = aXDCcAddress.balanceOf(address(this));
+            //record aXDCc amount before stakeCerts
+            uint256 aXDCcBefore = aXDCcAddress.balanceOf(address(this));
+            XDCPoolAddress.stakeCerts{ value: msg.value }();
+            uint256 aXDCcAfter = aXDCcAddress.balanceOf(address(this));
 
-      uint256 certsIn = (aXDCcAfter - aXDCcBefore);
-      RatioNCerts memory ratioNCerts = RatioNCerts(aXDCcAddress.ratio(), certsIn);
+            uint256 certsIn = (aXDCcAfter - aXDCcBefore);
+            RatioNCerts memory ratioNCerts = RatioNCerts(aXDCcAddress.ratio(), certsIn);
 
-      // if it is first record of staking
-      if (recordRatioNCerts[_positionAddress].ratio == 0 && recordRatioNCerts[_positionAddress].CertsAmount == 0) {
-        recordRatioNCerts[_positionAddress] = ratioNCerts;
-      } else {
-      // if it is not the first record of staking
-      // calculate weighted average of ratio from already existing ratio&CertsAmount and incoming ratio&CertsAmount
-        uint256 certsBefore = recordRatioNCerts[_positionAddress].CertsAmount;
-        uint256 ratioBefore = recordRatioNCerts[_positionAddress].ratio;
-        uint256 aXDCcRatio = aXDCcAddress.ratio();
-        uint256 calculatedNewRatio = 
-          add(
-          wmul(
-          ratioBefore,
-            wdiv(certsBefore, 
-              add(certsBefore,certsIn) 
-            )
-          ),
-          wmul(
-          aXDCcRatio,
-            wdiv(certsIn, 
-              add(certsBefore,certsIn) 
-            )
-          )
-        );
-        if(calculatedNewRatio <= aXDCcRatio) {
-        recordRatioNCerts[_positionAddress].ratio = aXDCcRatio;
-        } else {
-            recordRatioNCerts[_positionAddress].ratio = calculatedNewRatio;
+            // if it is first record of staking
+            if (recordRatioNCerts[_positionAddress].ratio == 0 && recordRatioNCerts[_positionAddress].CertsAmount == 0) {
+                recordRatioNCerts[_positionAddress] = ratioNCerts;
+            } else {
+                // if it is not the first record of staking
+                // calculate weighted average of ratio from already existing ratio&CertsAmount and incoming ratio&CertsAmount
+                uint256 certsBefore = recordRatioNCerts[_positionAddress].CertsAmount;
+                uint256 ratioBefore = recordRatioNCerts[_positionAddress].ratio;
+                uint256 aXDCcRatio = aXDCcAddress.ratio();
+                uint256 calculatedNewRatio = add(
+                    wmul(ratioBefore, wdiv(certsBefore, add(certsBefore, certsIn))),
+                    wmul(aXDCcRatio, wdiv(certsIn, add(certsBefore, certsIn)))
+                );
+                if (calculatedNewRatio <= aXDCcRatio) {
+                    recordRatioNCerts[_positionAddress].ratio = aXDCcRatio;
+                } else {
+                    recordRatioNCerts[_positionAddress].ratio = calculatedNewRatio;
+                }
+
+                recordRatioNCerts[_positionAddress].CertsAmount = add(recordRatioNCerts[_positionAddress].CertsAmount, certsIn);
+                emit LogCertsInflow(certsIn); // aXDCc
+            }
         }
-
-        recordRatioNCerts[_positionAddress].CertsAmount = add(recordRatioNCerts[_positionAddress].CertsAmount, certsIn);  
-        emit LogCertsInflow(certsIn); // aXDCc
-      }
-
-    }
-    emit LogDeposit(_amount); // xdc
+        emit LogDeposit(_amount); // xdc
     }
 
     /// @dev Withdraw aXDCc from AnkrCollateralAdapter
     /// @param _usr The address that holding states of the position
     /// @param _amount The XDC col amount(translated to aXDCc) to be withdrawn from AnkrCollateralAdapter and return to user
-    function withdraw(address _usr, uint256 _amount, bytes calldata /* _data */) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed{
-            _withdraw(_usr, _amount);
+    function withdraw(
+        address _usr,
+        uint256 _amount,
+        bytes calldata /* _data */
+    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
+        _withdraw(_usr, _amount);
     }
 
     /// @dev   /// withdraw collateral tokens from staking contract, and update BookKeeper and update BookKeeper
     /// @param _usr The position address to be updated
     /// @param _amount The amount to be deposited
     function _withdraw(address _usr, uint256 _amount) private {
-
         if (_amount > 0) {
             uint256 _share = wdivup(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
@@ -279,16 +277,25 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
             SafeToken.safeTransfer(address(aXDCcAddress), _usr, withdrawAmount);
             emit LogCertsOutflow(withdrawAmount);
         }
-            emit LogWithdraw(_amount);
+        emit LogWithdraw(_amount);
     }
 
-
-    function moveStake(address _source, address _destination, uint256 _share, bytes calldata _data) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed{
+    function moveStake(
+        address _source,
+        address _destination,
+        uint256 _share,
+        bytes calldata _data
+    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
         _moveStake(_source, _destination, _share, _data);
     }
 
     /// @dev Move wad amount of staked balance from source to destination. Can only be moved if underlaying assets make sense.
-    function _moveStake(address _source, address _destination, uint256 _share, bytes calldata /* data */) private onlyCollateralManager {
+    function _moveStake(
+        address _source,
+        address _destination,
+        uint256 _share,
+        bytes calldata /* data */
+    ) private onlyCollateralManager {
         // 1. Update collateral tokens for source and destination
         require(stake[_source] != 0, "AnkrCollateralAdapter/SourceNoStakeValue");
         uint256 _stakedAmount = stake[_source];
@@ -297,13 +304,13 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
         (uint256 _lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _source);
         require(
-        stake[_source] >= add(bookKeeper.collateralToken(collateralPoolId, _source), _lockedCollateral),
-        "AnkrCollateralAdapter/stake[source] < collateralTokens + lockedCollateral"
+            stake[_source] >= add(bookKeeper.collateralToken(collateralPoolId, _source), _lockedCollateral),
+            "AnkrCollateralAdapter/stake[source] < collateralTokens + lockedCollateral"
         );
         (_lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _destination);
         require(
-        stake[_destination] <= add(bookKeeper.collateralToken(collateralPoolId, _destination), _lockedCollateral),
-        "AnkrCollateralAdapter/stake[destination] > collateralTokens + lockedCollateral"
+            stake[_destination] <= add(bookKeeper.collateralToken(collateralPoolId, _destination), _lockedCollateral),
+            "AnkrCollateralAdapter/stake[destination] > collateralTokens + lockedCollateral"
         );
         emit LogMoveStake(_source, _destination, _share);
     }
@@ -312,9 +319,9 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         address _source,
         address _destination,
         int256 _collateralValue,
-        int256 /* debtShare */,
+        int256, /* debtShare */
         bytes calldata _data
-    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed{
+    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
         uint256 _unsignedCollateralValue = _collateralValue < 0 ? uint256(-_collateralValue) : uint256(_collateralValue);
         _moveStake(_source, _destination, _unsignedCollateralValue, _data);
     }
@@ -324,7 +331,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         address _destination,
         uint256 _share,
         bytes calldata _data
-    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed{
+    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
         _deposit(_source, 0, _data);
         _moveCerts(_source, _destination, _share, _data);
         _moveStake(_source, _destination, _share, _data);
@@ -335,10 +342,10 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         address _destination,
         uint256 _share,
         bytes calldata _data
-  ) internal onlyCollateralManager {
+    ) internal onlyCollateralManager {
         require(stake[_source] != 0, "AnkrCollateralAdapter/SourceNoStakeValue");
         uint256 certsToMoveRatio;
-        if(_share >= stake[_source]){
+        if (_share >= stake[_source]) {
             certsToMoveRatio = WAD;
         } else {
             require(_share < stake[_source], "AnkrCollateralAdapter/tooMuchShare");
@@ -353,52 +360,38 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         uint256 certsBefore = recordRatioNCerts[_destination].CertsAmount;
         uint256 ratioBefore = recordRatioNCerts[_destination].ratio;
 
-        uint256 calculatedNewRatio = 
-            add(
-                wmul(
-                ratioBefore,
-                    wdiv(certsBefore, 
-                        add(certsBefore,certsMove) 
-                    )
-                ),
-                wmul(
-                recordRatioNCerts[_source].ratio,
-                    wdiv(certsMove, 
-                        add(certsBefore,certsMove) 
-                    )
-                )
-            );
-        
+        uint256 calculatedNewRatio = add(
+            wmul(ratioBefore, wdiv(certsBefore, add(certsBefore, certsMove))),
+            wmul(recordRatioNCerts[_source].ratio, wdiv(certsMove, add(certsBefore, certsMove)))
+        );
+
         uint256 aXDCcRatio = aXDCcAddress.ratio();
 
         //update ratio in destination
-        if(calculatedNewRatio <= aXDCcRatio) {
-        recordRatioNCerts[_destination].ratio = aXDCcRatio;
+        if (calculatedNewRatio <= aXDCcRatio) {
+            recordRatioNCerts[_destination].ratio = aXDCcRatio;
         } else {
             recordRatioNCerts[_destination].ratio = calculatedNewRatio;
         }
 
         //update CertsAmount in destination
-        recordRatioNCerts[_destination].CertsAmount +=  certsMove;
-  }
+        recordRatioNCerts[_destination].CertsAmount += certsMove;
+    }
 
-  function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
-    require(toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
-    whiteListed[toBeWhitelisted] = true;
-  }
-  function blacklist(address toBeRemoved) external onlyOwnerOrGov {
-    whiteListed[toBeWhitelisted] = false;
-  }
+    function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
+        require(toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
+        whiteListed[toBeWhitelisted] = true;
+    }
 
-    function cage() external override nonReentrant {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
-        require(
-        _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender),
-        "AnkrCollateralAdapter/not-authorized"
-        );
-        require(live == 1, "AnkrCollateralAdapter/not-live");
-        live = 0;
-        emit LogCage();
+    function blacklist(address toBeRemoved) external onlyOwnerOrGov {
+        whiteListed[toBeRemoved] = false;
+    }
+
+    function cage() external override nonReentrant onlyOwner {
+        if (live == 1) {
+            live = 0;
+            emit LogCage();
+        }
     }
 
     function uncage() external override onlyOwner {

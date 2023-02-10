@@ -24,8 +24,8 @@ contract DexPriceOracle is Initializable, IFathomDEXOracle {
         require(token0 != token1, "DexPriceOracle/same-tokens");
         (uint256 r0, uint256 r1) = FathomSwapLibrary.getReserves(dexFactory, token0, token1);
 
-        uint8 decimals0 = ERC20(_token).decimals();
-        uint8 decimals1 = ERC20(_token).decimals();
+        uint8 decimals0 = ERC20(token0).decimals();
+        uint8 decimals1 = ERC20(token1).decimals();
 
         (uint256 normalized0, uint256 normalized1) = decimals0 >= decimals1
             ? (r0, r1 * (10**(decimals0 - decimals1)))
