@@ -59,9 +59,10 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
     }
 
     function cage() external override onlyOwnerOrShowStopper {
-        require(live == 1, "TokenAdapter/not-live");
-        live = 0;
-        emit LogCage();
+        if(live == 1) {
+            live = 0;
+            emit LogCage();
+        }
     }
 
     function uncage() external override onlyOwnerOrShowStopper {
