@@ -217,6 +217,22 @@ describe("LiquidationEngine", () => {
         })
       })
 
+      context("when was already caged", () => {
+        it("should not fail", async () => {
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+          expect(await liquidationEngineAsAlice.live()).to.be.equal(1)
+
+          await expect(liquidationEngineAsAlice.cage()).to.emit(liquidationEngineAsAlice, "LogCage").withArgs()
+
+          expect(await liquidationEngineAsAlice.live()).to.be.equal(0)
+
+          await liquidationEngineAsAlice.cage()
+
+          expect(await liquidationEngineAsAlice.live()).to.be.equal(0)
+        })
+      })
+
       context("caller is showStopper role", () => {
         it("should be set live to 0", async () => {
           await mockedAccessControlConfig.mock.hasRole.withArgs(formatBytes32String("SHOW_STOPPER_ROLE"), AliceAddress).returns(true)
