@@ -113,6 +113,23 @@ describe("SystemDebtEngine", () => {
         })
       })
 
+      context("when was already caged", () => {
+        it("should not fail", async () => {
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+          await mockedBookKeeper.mock.settleSystemBadDebt.returns()
+
+          expect(await systemDebtEngineAsAlice.live()).to.be.equal(1)
+
+          await expect(systemDebtEngineAsAlice.cage()).to.emit(systemDebtEngineAsAlice, "LogCage").withArgs()
+
+          expect(await systemDebtEngineAsAlice.live()).to.be.equal(0)
+
+          await systemDebtEngineAsAlice.cage()
+
+          expect(await systemDebtEngineAsAlice.live()).to.be.equal(0)
+        })
+      })
+
       context("caller is showStopper role", () => {
         it("should be set live to 0", async () => {
           await mockedAccessControlConfig.mock.hasRole.returns(true)

@@ -10,17 +10,12 @@ chai.use(solidity);
 const { DeployerAddress } = require("../helper/address");
 const { loadFixture } = require("../helper/fixtures");
 const { getProxy } = require("../../common/proxies");
-const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
+const { WeiPerWad } = require("../helper/unit");
 const { expect } = chai
-const ERC20 = artifacts.require('ERC20Mintable.sol');
 
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-    const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
-    const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
-    const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
-    const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
     
@@ -35,29 +30,19 @@ const setup = async () => {
     
     await stableSwapModule.depositToken(USDT.address,ethers.utils.parseEther("100000"),{ gasLimit: 1000000 })
     await stableSwapModule.depositToken(fathomStablecoin.address,ethers.utils.parseEther("100000"),{ gasLimit: 1000000 })
-    
 
     return {
-        bookKeeper,
-        stablecoinAdapter,
-        collateralPoolConfig,
         USDT,
         stableSwapModule,
         fathomStablecoin,
-        systemDebtEngine,
     }
 }
 
 describe("StableSwapModule", () => {
     // Contracts
-    let stablecoinAdapter
-    let bookKeeper
     let USDT
     let stableSwapModule
     let fathomStablecoin
-    let systemDebtEngine
-    let collateralPoolConfig
-
 
     before(async () => {
         await snapshot.revertToSnapshot();
@@ -65,19 +50,13 @@ describe("StableSwapModule", () => {
 
     beforeEach(async () => {
         ({
-            bookKeeper,
-            stablecoinAdapter,
-            collateralPoolConfig,
             USDT,
             stableSwapModule,
             fathomStablecoin,
-            systemDebtEngine,
-            stablecoin
         } = await loadFixture(setup));
     })
 
     describe("#swapTokenToStablecoin", async () => {
-        
         context("swap USDT to FXD", async () => {
             it("should success", async () => {
                 //accounts[5] setup
@@ -109,10 +88,10 @@ describe("StableSwapModule", () => {
                 await stableSwapModule.swapStablecoinToToken(accounts[5],ethers.utils.parseEther("1000"), { gasLimit: 1000000, from: accounts[5] })
                 const balanceOfStablecoin = await fathomStablecoin.balanceOf(accounts[5])
                 const balanceOfUSDT = await USDT.balanceOf(accounts[5])
-                ///10000 -> initial balance, -ve 1000 -> from swap, -ve 1 -> from fee. Total balance = 10000 - 1000 - 1 = 8999
-                expect(balanceOfStablecoin).to.be.equal(ethers.utils.parseEther("8999"))
-                ///10000 -> initial balance, 1000 -> from swap Total balance = 10000+1000 = 11000
-                expect(balanceOfUSDT).to.be.equal(ethers.utils.parseEther("11000"))
+                ///10000 -> initial balance, -ve 1000 -> from swap Total balance = 10000-1000 = 9000
+                expect(balanceOfStablecoin).to.be.equal(ethers.utils.parseEther("9000"))
+                ///10000 -> initial balance, 1000 -> from swap, -ve 1 -> from fee. Total balance = 10000+1000-1 = 10999
+                expect(balanceOfUSDT).to.be.equal(ethers.utils.parseEther("10999"))
             })
         })
 
@@ -123,12 +102,13 @@ describe("StableSwapModule", () => {
                 // Swap 998 FXD to USDT
                 await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress,ethers.utils.parseEther("998"), { gasLimit: 1000000 })
-                // first swap = 1000 * 0.001 = 1 FXD
-                // second swap = 998 * 0.001 = 0.998 FXD
-                // total fee = 1 + 0.998 = 1.998
+                // first swap FXDFee = 1000 * 0.001 = 1 FXD
+                // second swap TokenFee = 998 * 0.001 = 0.998 Token
                 await stableSwapModule.withdrawFees(accounts[2]);
                 const feeFromSwap = await fathomStablecoin.balanceOf(accounts[2])
-                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("1.998"))
+                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("1"))
+                const USDTfeeFromSwap = await USDT.balanceOf(accounts[2])
+                expect(USDTfeeFromSwap).to.be.equal(ethers.utils.parseEther("0.998"))
             })
         })
     })
@@ -151,13 +131,16 @@ describe("StableSwapModule", () => {
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress,ethers.utils.parseEther("5000"), { gasLimit: 1000000 })
                 await expect(stableSwapModule.swapTokenToStablecoin(DeployerAddress,ethers.utils.parseEther("1"), { gasLimit: 1000000 })
                 ).to.be.revertedWith("_udpateAndCheckDailyLimit/daily-limit-exceeded")
-                //first swap = 10000 * 0.001 = 10
-                //second swap = 5000 * 0.001 = 5
-                //third swap = 5000 * 0.001 = 5
-                // fee = 10 + 5 + 5 = 20
+                //first swap FXDFee = 10000 * 0.001 = 10
+                //second swap tokenFee = 5000 * 0.001 = 5
+                //third swap tokenFee= 5000 * 0.001 = 5
+                // FXDfee = 10
+                // TokenFee = 5 + 5 = 10
                 await stableSwapModule.withdrawFees(accounts[2]);
-                const feeFromSwap = await fathomStablecoin.balanceOf(accounts[2])
-                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("20"))
+                const FXDfeeFromSwap = await fathomStablecoin.balanceOf(accounts[2])
+                expect(FXDfeeFromSwap).to.be.equal(ethers.utils.parseEther("10"))
+                const USDTfeeFromSwap = await USDT.balanceOf(accounts[2])
+                expect(USDTfeeFromSwap).to.be.equal(ethers.utils.parseEther("10"))
             })
         })
     })

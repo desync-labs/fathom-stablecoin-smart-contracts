@@ -378,16 +378,12 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         recordRatioNCerts[_destination].CertsAmount += certsMove;
     }
 
-  function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
+    function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
     require(toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
     whiteListed[toBeWhitelisted] = true;
-  }
-  function blacklist(address toBeRemoved) external onlyOwnerOrGov {
-    whiteListed[toBeRemoved] = false;
-  }
-
+    }
     function blacklist(address toBeRemoved) external onlyOwnerOrGov {
-        whiteListed[toBeRemoved] = false;
+    whiteListed[toBeRemoved] = false;
     }
 
     function cage() external override nonReentrant onlyOwner {

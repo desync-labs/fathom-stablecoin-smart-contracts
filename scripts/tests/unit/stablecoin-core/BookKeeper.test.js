@@ -1847,6 +1847,22 @@ describe("BookKeeper", () => {
                 expect(await bookKeeperAsAlice.live()).to.be.equal(0)
             })
         })
+
+        context("when was already caged", () => {
+            it("should not fail", async () => {
+              await mockedAccessControlConfig.mock.hasRole.returns(true)
+    
+              expect(await bookKeeperAsAlice.live()).to.be.equal(1)
+
+              await expect(bookKeeperAsAlice.cage()).to.emit(bookKeeperAsAlice, "LogCage").withArgs()
+
+              expect(await bookKeeperAsAlice.live()).to.be.equal(0)
+    
+              await bookKeeperAsAlice.cage()
+    
+              expect(await bookKeeperAsAlice.live()).to.be.equal(0)
+            })
+          })
     })
 
     describe("#uncage", () => {
