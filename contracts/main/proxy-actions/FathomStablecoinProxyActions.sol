@@ -410,6 +410,7 @@ contract FathomStablecoinProxyActions {
         adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmount), _wipeDebtShare, _xdcAdapter, _data);
         moveCollateral(_manager, _positionId, address(this), _collateralAmount, _xdcAdapter, _data); // Moves the amount from the position to proxy's address
         IGenericTokenAdapter(_xdcAdapter).withdraw(msg.sender, _collateralAmount, _data);
+        IStabilityFeeCollector(_stabilityFeeCollector).collect(_collateralPoolId); // Updates debtAccumulated Rate
         IManager(_manager).updatePrice(_collateralPoolId);
     }
 
@@ -437,7 +438,7 @@ contract FathomStablecoinProxyActions {
         adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmount), -int256(_debtShare), _xdcAdapter, _data); // Paybacks debt to the CDP and unlocks WXDC amount from it
         moveCollateral(_manager, _positionId, address(this), _collateralAmount, _xdcAdapter, _data); // Moves the amount from the CDP positionAddress to proxy's address
         IGenericTokenAdapter(_xdcAdapter).withdraw(msg.sender, _collateralAmount, _data); // Withdraw aXDCc from AnkrCollateralAdapter, fee deducted amount
-
+        IStabilityFeeCollector(_stabilityFeeCollector).collect(_collateralPoolId); // Updates debtAccumulated Rate
         IManager(_manager).updatePrice(_collateralPoolId);
     }
 
