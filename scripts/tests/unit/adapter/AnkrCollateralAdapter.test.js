@@ -185,7 +185,7 @@ describe("AnkrCollateralAdapter", () => {
         await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
         await mockedAccessControlConfig.mock.hasRole.returns(false)
 
-        await expect(ankrCollateralAdapterAsAlice.uncage()).to.be.revertedWith("!ownerRole")
+        await expect(ankrCollateralAdapterAsAlice.uncage()).to.be.revertedWith("AnkrCollateralAdapter/not-authorized")
       })
     })
 
