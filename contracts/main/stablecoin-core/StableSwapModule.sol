@@ -5,8 +5,8 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
+import "../interfaces/IToken.sol";
 import "../interfaces/IStablecoinAdapter.sol";
 import "../interfaces/IStablecoin.sol";
 import "../interfaces/IBookKeeper.sol";
@@ -101,7 +101,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     function swapTokenToStablecoin(address _usr, uint256 _amount) external override nonReentrant whenNotPaused {
         require(_amount != 0, "StableSwapModule/amount-zero");
 
-        uint256 tokenAmount18 = _convertDecimals(_amount, ERC20(token).decimals(), 18);
+        uint256 tokenAmount18 = _convertDecimals(_amount, IToken(token).decimals(), 18);
         uint256 fee = (tokenAmount18 * feeIn) / WAD;
         uint256 stablecoinAmount = tokenAmount18 - fee;
         require(tokenBalance[stablecoin] >= stablecoinAmount, "swapTokenToStablecoin/not-enough-stablecoin-balance");
@@ -121,7 +121,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_amount != 0, "StableSwapModule/amount-zero");
         
         uint256 fee = (_amount * feeOut) / WAD;
-        uint256 tokenAmount = _convertDecimals(_amount - fee, 18, ERC20(token).decimals());
+        uint256 tokenAmount = _convertDecimals(_amount - fee, 18, IToken(token).decimals());
 
         require(tokenBalance[token] >= tokenAmount, "swapStablecoinToToken/not-enough-token-balance");
 
