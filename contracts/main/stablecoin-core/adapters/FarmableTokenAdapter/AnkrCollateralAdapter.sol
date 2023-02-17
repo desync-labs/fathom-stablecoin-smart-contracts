@@ -104,10 +104,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         bookKeeper = IBookKeeper(_bookKeeper);
         collateralPoolId = _collateralPoolId;
 
-        // decimals = aXDCcAddress.decimals();
-
-        require(decimals <= 18, "AnkrCollateralAdapter/decimals > 18");
-
         positionManager = IManager(_positionManager);
 
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
