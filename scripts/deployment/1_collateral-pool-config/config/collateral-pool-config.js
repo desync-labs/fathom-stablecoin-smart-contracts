@@ -27,7 +27,7 @@ module.exports = async function(deployer) {
 
   const bookKeeper = await BookKeeper.at(stablecoinAddress.bookKeeper);
 
-  const simplePriceFeed = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeed);
+  // const simplePriceFeed = await SimplePriceFeed.at(stablecoinAddress.simplePriceFeed);
 
   const priceOracle = await PriceOracle.at(stablecoinAddress.priceOracle);
 
