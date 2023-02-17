@@ -31,9 +31,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     IBookKeeper public bookKeeper;
     bytes32 public override collateralPoolId;
 
-    address public override collateralToken;
-    uint256 public override decimals;
-
     IManager public positionManager;
 
     IAnkrStakingPool public XDCPoolAddress;
@@ -50,9 +47,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     mapping(address => uint256) public stake;
 
     mapping(address => bool) public whiteListed;
-
-    uint256 internal to18ConversionFactor;
-    uint256 internal toTokenConversionFactor;
 
     event LogDeposit(uint256 _val);
     event LogWithdraw(uint256 _val);
@@ -109,13 +103,6 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
 
         bookKeeper = IBookKeeper(_bookKeeper);
         collateralPoolId = _collateralPoolId;
-
-        decimals = aXDCcAddress.decimals();
-
-        require(decimals <= 18, "AnkrCollateralAdapter/decimals > 18");
-
-        to18ConversionFactor = 10**(18 - decimals);
-        toTokenConversionFactor = 10**decimals;
 
         positionManager = IManager(_positionManager);
 
@@ -202,7 +189,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
         require(_amount == msg.value, "AnkrCollateralAdapter/DepositAmountMismatch");
 
         if (_amount > 0) {
-            uint256 _share = wdiv(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
+            uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
             require(int256(_share) > 0, "AnkrCollateralAdapter/share-overflow");
@@ -262,7 +249,7 @@ contract AnkrCollateralAdapter is IFarmableTokenAdapter, PausableUpgradeable, Re
     /// @param _amount The amount to be deposited
     function _withdraw(address _usr, uint256 _amount) private {
         if (_amount > 0) {
-            uint256 _share = wdivup(mul(_amount, to18ConversionFactor), netAssetPerShare()); // [wad]
+            uint256 _share = wdivup(_amount, netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
             require(int256(_share) > 0, "AnkrCollateralAdapter/share-overflow");
