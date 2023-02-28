@@ -31,7 +31,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
     uint256 public remainingDailySwapAmount; // [wad]
     uint256 public dailySwapLimit; // [wad]
-    uint256 public totalFeeBalance; // [wad]
+    uint256 public totalTokenFeeBalance; // [wad]
+    uint256 public totalFXDFeeBalance; // [wad]
 
     uint256 public constant ONE_DAY = 86400;
     uint256 public constant MINIMUM_DAILY_SWAP_LIMIT = 1000 * 1e18;
@@ -42,7 +43,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     event LogSwapStablecoinToToken(address indexed _owner, uint256 _value, uint256 _fee);
     event LogDailySwapLimitUpdate(uint256 _newDailySwapLimit, uint256 _oldDailySwapLimit);
     event LogDepositToken(address indexed _owner, address indexed _token, uint256 _value);
-    event LogWithdrawFees(address indexed _account, uint256 _fees);
+    event LogWithdrawFees(address indexed _destination, uint256 _stablecoinFee, uint256 _tokenFee);
     event LogRemainingDailySwapAmount(uint256 _remainingDailySwapAmount);
     event LogStableSwapPauseState(bool _pauseState);
     event LogEmergencyWithdraw(address indexed _account);
@@ -110,7 +111,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         tokenBalance[stablecoin] -= stablecoinAmount;
         tokenBalance[token] += _amount;
-        totalFeeBalance += fee;
+        totalFXDFeeBalance += fee;
 
         token.safeTransferFrom(msg.sender, address(this), _amount);
         stablecoin.safeTransfer(_usr, stablecoinAmount);
@@ -129,7 +130,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         tokenBalance[token] -= tokenAmount;
         tokenBalance[stablecoin] += _amount;
-        totalFeeBalance += fee;
+        totalTokenFeeBalance += fee;
 
         stablecoin.safeTransferFrom(msg.sender, address(this), _amount);
         token.safeTransfer(_usr, tokenAmount);
@@ -145,13 +146,21 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogDepositToken(msg.sender, _token, _amount);
     }
 
-    function withdrawFees(address _account) external override nonReentrant onlyOwnerOrGov {
-        require(_account != address(0), "withdrawFees/empty-account");
-        require(totalFeeBalance != 0, "withdrawFees/no-fee-balance");
-        uint256 pendingFeeBalance = totalFeeBalance;
-        totalFeeBalance = 0;
-        stablecoin.safeTransfer(_account, pendingFeeBalance);
-        emit LogWithdrawFees(_account, pendingFeeBalance);
+    function withdrawFees(address _destination) external override nonReentrant onlyOwnerOrGov {
+        require(_destination != address(0), "withdrawFees/wrong-destination");
+        require(totalFXDFeeBalance != 0 || totalTokenFeeBalance != 0, "withdrawFees/no-fee-balance");
+        uint256 pendingFXDBalance = totalFXDFeeBalance;
+        if(pendingFXDBalance !=0) {
+            totalFXDFeeBalance = 0;
+            stablecoin.safeTransfer(_destination, pendingFXDBalance);
+        }
+        uint256 pendingTokenBalance = totalTokenFeeBalance;
+        if(pendingTokenBalance !=0) {
+            totalTokenFeeBalance = 0;
+            token.safeTransfer(_destination, pendingTokenBalance);
+        }
+
+        emit LogWithdrawFees(_destination, pendingFXDBalance, pendingTokenBalance);
     }
 
     function pause() external onlyOwnerOrGov {

@@ -353,7 +353,7 @@ describe("StableSwapModule", () => {
       it("should revert", async () => {
         await expect(
           stableSwapModule.withdrawFees(AddressZero)
-        ).to.be.revertedWith("withdrawFees/empty-account")
+        ).to.be.revertedWith("withdrawFees/wrong-destination")
       })
     })
     context("withdraw fees", () => {
@@ -369,7 +369,7 @@ describe("StableSwapModule", () => {
         await expect(
           stableSwapModule.withdrawFees(DeployerAddress)
         ).to.be.emit(stableSwapModule, "LogWithdrawFees")
-          .withArgs(DeployerAddress, WeiPerWad.div(10))
+          .withArgs(DeployerAddress, 0, WeiPerWad.div(10))
       })
     })
   })
