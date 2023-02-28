@@ -102,12 +102,13 @@ describe("StableSwapModule", () => {
                 // Swap 998 FXD to USDT
                 await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress,ethers.utils.parseEther("998"), { gasLimit: 1000000 })
-                // first swap = 1000 * 0.001 = 1 FXD
-                // second swap = 998 * 0.001 = 0.998 FXD
-                // total fee = 1 + 0.998 = 1.998
+                // first swap FXDFee = 1000 * 0.001 = 1 FXD
+                // second swap TokenFee = 998 * 0.001 = 0.998 Token
                 await stableSwapModule.withdrawFees(accounts[2]);
                 const feeFromSwap = await fathomStablecoin.balanceOf(accounts[2])
-                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("1.998"))
+                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("1"))
+                const USDTfeeFromSwap = await USDT.balanceOf(accounts[2])
+                expect(USDTfeeFromSwap).to.be.equal(ethers.utils.parseEther("0.998"))
             })
         })
     })
@@ -130,13 +131,16 @@ describe("StableSwapModule", () => {
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress,ethers.utils.parseEther("5000"), { gasLimit: 1000000 })
                 await expect(stableSwapModule.swapTokenToStablecoin(DeployerAddress,ethers.utils.parseEther("1"), { gasLimit: 1000000 })
                 ).to.be.revertedWith("_udpateAndCheckDailyLimit/daily-limit-exceeded")
-                //first swap = 10000 * 0.001 = 10
-                //second swap = 5000 * 0.001 = 5
-                //third swap = 5000 * 0.001 = 5
-                // fee = 10 + 5 + 5 = 20
+                //first swap FXDFee = 10000 * 0.001 = 10
+                //second swap tokenFee = 5000 * 0.001 = 5
+                //third swap tokenFee= 5000 * 0.001 = 5
+                // FXDfee = 10
+                // TokenFee = 5 + 5 = 10
                 await stableSwapModule.withdrawFees(accounts[2]);
-                const feeFromSwap = await fathomStablecoin.balanceOf(accounts[2])
-                expect(feeFromSwap).to.be.equal(ethers.utils.parseEther("20"))
+                const FXDfeeFromSwap = await fathomStablecoin.balanceOf(accounts[2])
+                expect(FXDfeeFromSwap).to.be.equal(ethers.utils.parseEther("10"))
+                const USDTfeeFromSwap = await USDT.balanceOf(accounts[2])
+                expect(USDTfeeFromSwap).to.be.equal(ethers.utils.parseEther("10"))
             })
         })
     })
