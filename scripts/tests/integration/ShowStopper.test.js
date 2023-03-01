@@ -101,6 +101,18 @@ describe("ShowStopper", () => {
                 expect(await priceOracle.live()).to.be.equal(0)
             })
         })
+        context("when some contract was already caged", () => {
+            it("should be able to cage", async () => {
+                await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
+                await systemDebtEngine.cage({ gasLimit: 1000000 })
+                await showStopper.cage({ gasLimit: 1000000 });
+
+                expect(await bookKeeper.live()).to.be.equal(0)
+                expect(await liquidationEngine.live()).to.be.equal(0)
+                expect(await systemDebtEngine.live()).to.be.equal(0)
+                expect(await priceOracle.live()).to.be.equal(0)
+            })
+        })
     })
     describe("#cage(collateralPoolId)", () => {
         context("deployer cage WXDC pool", () => {
@@ -109,9 +121,21 @@ describe("ShowStopper", () => {
                 //  a. open a new position
                 //  b. lock WXDC
                 //  c. mint FXD
+
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
                 await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
 
+                await showStopper.cage()
+                await showStopper.cagePool(pools.XDC)
+
+                expect(await showStopper.cagePrice(pools.XDC)).to.be.equal(WeiPerRay)
+                expect(await showStopper.totalDebtShare(pools.XDC)).to.be.equal(WeiPerWad.mul(5))
+            })
+            it("test", async () => {
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
+                await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
+
+                await bookKeeper.cage()
                 await showStopper.cage()
                 await showStopper.cagePool(pools.XDC)
 
