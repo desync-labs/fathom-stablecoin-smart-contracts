@@ -107,10 +107,25 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     address[] calldata _collateralRecipients,
     bytes[] calldata datas
   ) external override nonReentrant whenNotPaused onlyWhitelisted {
+
+    require(_collateralPoolIds.length == _positionAddresses.length &&
+            _collateralPoolIds.length == _debtShareToBeLiquidateds.length && 
+            _collateralPoolIds.length == _maxDebtShareToBeLiquidateds.length && 
+            _collateralPoolIds.length == _collateralRecipients.length && 
+            _collateralPoolIds.length == datas.length 
+             ,"LiquidationEngine/batchLiquidate-invalid-arguments");
+
     for(uint i = 0; i < _collateralPoolIds.length; i++){
         try this.liquidate(_collateralPoolIds[i], _positionAddresses[i],_debtShareToBeLiquidateds[i], _maxDebtShareToBeLiquidateds[i], _collateralRecipients[i], datas[i],msg.sender){
         } catch Error(string memory reason) {
             emit LiquidationFail(_collateralPoolIds[i], _positionAddresses[i], msg.sender, reason);
+            continue;
+        } catch Panic(uint errorCode) {
+          emit LiquidationFail(_collateralPoolIds[i], _positionAddresses[i], msg.sender, "panic error");
+            continue;
+        } catch (bytes memory lowLevelData) {
+          string memory errorData = string(lowLevelData);
+          emit LiquidationFail(_collateralPoolIds[i], _positionAddresses[i], msg.sender, errorData);
             continue;
         }
     }
