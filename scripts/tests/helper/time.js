@@ -5,6 +5,11 @@ async function latest() {
   return ethers.BigNumber.from(block.timestamp)
 }
 
+async function getBlockTS(blockNumber) {
+  const block = await web3.eth.getBlock(blockNumber)
+  return ethers.BigNumber.from(block.timestamp)
+}
+
 async function latestBlockNumber() {
   const block = await web3.eth.getBlock('latest')
   return ethers.BigNumber.from(block.number)
@@ -70,4 +75,4 @@ async function advanceBlockTo(block) {
   }
 }
 
-module.exports = {advanceBlockTo, duration, increase, advanceBlock, latestBlockNumber, latest}
+module.exports = {advanceBlockTo, duration, increase, advanceBlock, latestBlockNumber, latest, getBlockTS}
