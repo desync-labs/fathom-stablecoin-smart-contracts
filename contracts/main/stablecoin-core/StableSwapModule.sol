@@ -130,7 +130,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         tokenBalance[token] -= tokenAmount;
         tokenBalance[stablecoin] += _amount;
-        totalTokenFeeBalance += fee;
+        totalTokenFeeBalance += _convertDecimals(fee, 18, IToken(token).decimals());
 
         stablecoin.safeTransferFrom(msg.sender, address(this), _amount);
         token.safeTransfer(_usr, tokenAmount);
