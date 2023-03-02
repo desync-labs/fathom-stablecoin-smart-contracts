@@ -29,7 +29,7 @@ module.exports = async function (deployer) {
     const flashMintArbitrager = await getProxy(proxyFactory, "FlashMintArbitrager");
     const bookKeeperFlashMintArbitrager = await getProxy(proxyFactory, "BookKeeperFlashMintArbitrager");
     const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
-    const slidingWindowDexOracle = await getProxy(proxyFactory, "SlidingWindowDexOracle");
+    const dexPriceOracle = await getProxy(proxyFactory, "DexPriceOracle");
     const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
     const proxyActionsStorage = await getProxy(proxyFactory, "ProxyActionsStorage");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
@@ -102,8 +102,7 @@ module.exports = async function (deployer) {
         ),
         flashMintArbitrager.initialize({ gasLimit: 1000000 }),
         bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
-        //TODO: numbers should be adjusted, need response from Max
-        slidingWindowDexOracle.initialize(addresses.DEXFactory, 900, 3, { gasLimit: 1000000 }),
+        dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
         ankrCollateralAdapter.initialize(
             bookKeeper.address,
             pools.XDC,
@@ -113,7 +112,7 @@ module.exports = async function (deployer) {
             proxyWalletFactory.address
         ),
         delayFathomOraclePriceFeed.initialize(
-            slidingWindowDexOracle.address,
+            dexPriceOracle.address,
             addresses.USD,
             addresses.WXDC,
             accessControlConfig.address
@@ -141,7 +140,7 @@ module.exports = async function (deployer) {
         stableSwapModule: stableSwapModule.address,
         flashMintArbitrager: flashMintArbitrager.address,
         bookKeeperFlashMintArbitrager: bookKeeperFlashMintArbitrager.address,
-        slidingWindowDexOracle: slidingWindowDexOracle.address,
+        dexPriceOracle: dexPriceOracle.address,
         proxyWalletFactory: proxyWalletFactory.address,
         fathomStablecoinProxyActions: FathomStablecoinProxyActions.address,
         ankrCollateralAdapter: ankrCollateralAdapter.address,
