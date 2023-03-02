@@ -63,7 +63,7 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
-        IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender); // Sanity Check Call
+        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "FathomOraclePriceFeed/msgsender-not-owner")
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
     }
 
