@@ -5,6 +5,7 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "./lib/FathomSwapLibrary.sol";
+import "./lib/IFathomSwapPair.sol";
 import "../interfaces/IFathomDEXOracle.sol";
 
 contract DexPriceOracle is Initializable, IFathomDEXOracle {
@@ -22,7 +23,9 @@ contract DexPriceOracle is Initializable, IFathomDEXOracle {
         returns (uint256, uint256)
     {
         require(token0 != token1, "DexPriceOracle/same-tokens");
-        (uint256 r0, uint256 r1) = FathomSwapLibrary.getReserves(dexFactory, token0, token1);
+        
+        address pair = FathomSwapLibrary.pairFor(dexFactory, token0, token1);
+        (uint256 r0, uint256 r1,) = IFathomSwapPair(pair).getReserves();
 
         uint8 decimals0 = ERC20(token0).decimals();
         uint8 decimals1 = ERC20(token1).decimals();
