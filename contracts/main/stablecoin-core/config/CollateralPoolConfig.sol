@@ -83,7 +83,6 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         require(_stabilityFeeRate <= 1000000012857214317438491659, "CollateralPoolConfig/stability-fee-rate-too-large");
         _collateralPools[_collateralPoolId].stabilityFeeRate = _stabilityFeeRate;
         _collateralPools[_collateralPoolId].lastAccumulationTime = block.timestamp;
-        IGenericTokenAdapter(_adapter).decimals(); // Sanity Check Call
         _collateralPools[_collateralPoolId].adapter = _adapter;
         require(_closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
         require(_liquidatorIncentiveBps >= 10000 && _liquidatorIncentiveBps <= 19000, "CollateralPoolConfig/invalid-liquidator-incentive-bps");
