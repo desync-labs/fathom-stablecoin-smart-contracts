@@ -28,7 +28,8 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
         fathomOracle = IFathomOracle(_fathomOracle);
         require(_token0 != _token1, "FathomOraclePriceFeed/same-token0-token1");
         require(_token0 != address(0) && _token1 != address(0), "FathomOraclePriceFeed: ZERO_ADDRESS");
-        (token0, token1) = _token0 < _token1 ? (_token0, _token1) : (_token1, _token0);
+        token0 = _token0;
+        token1 = _token1;
         priceLife = 30 minutes;
         timeDelay = 15 minutes;
     }
@@ -63,7 +64,7 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
-        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "FathomOraclePriceFeed/msgsender-not-owner")
+        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "FathomOraclePriceFeed/msgsender-not-owner");
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
     }
 

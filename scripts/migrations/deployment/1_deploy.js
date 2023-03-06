@@ -5,6 +5,7 @@ const FathomStablecoin = artifacts.require('FathomStablecoin.sol');
 const SystemDebtEngine = artifacts.require('SystemDebtEngine.sol');
 const StableSwapModule = artifacts.require('StableSwapModule.sol');
 const DexPriceOracle = artifacts.require('DexPriceOracle.sol');
+const SlidingWindowDexOracle = artifacts.require('SlidingWindowDexOracle.sol');
 const ProxyWalletRegistry = artifacts.require('ProxyWalletRegistry.sol');
 const ProxyWalletFactory = artifacts.require('ProxyWalletFactory.sol');
 const StabilityFeeCollector = artifacts.require('StabilityFeeCollector.sol');
@@ -51,6 +52,7 @@ module.exports =  async function(deployer) {
       deployer.deploy(DelayFathomOraclePriceFeed, { gas: 7050000 }),
       deployer.deploy(AnkrCollateralAdapter, { gas: 7050000 }),
       deployer.deploy(ProxyActionsStorage, { gas: 7050000 }),
+      deployer.deploy(SlidingWindowDexOracle, { gas: 7050000 }),
   ];
 
   await Promise.all(promises);
