@@ -35,8 +35,8 @@ contract DexPriceOracle is Initializable, IFathomDEXOracle {
             (r1, r0,) = IFathomSwapPair(pair).getReserves();
         }
 
-        uint8 decimals0 = IToken(token0).decimals();
-        uint8 decimals1 = IToken(token1).decimals();
+        uint256 decimals0 = IToken(token0).decimals();
+        uint256 decimals1 = IToken(token1).decimals();
 
         (uint256 normalized0, uint256 normalized1) = decimals0 >= decimals1
             ? (r0, r1 * (10**(decimals0 - decimals1)))
