@@ -9,7 +9,6 @@ const { getContract, createMock } = require("../../helper/contracts");
 const { WeiPerRad, WeiPerWad } = require("../../helper/unit")
 const { increase, latest, getBlockTS } = require('../../helper/time');
 const { BigNumber } = require('ethers');
-const { assertAlmostEqual } = require('../../helper/assert');
 const Resolution = BigNumber.from("5192296858534827628530496329220096")
 
 const setup = async () => {
@@ -41,7 +40,7 @@ describe("SlidingWindowDexOracle", () => {
 
     describe("#update()", async () => {
         context("same tokens", async () => {
-            xit("should revert", async () => {
+            it("should revert", async () => {
                 await expect(slidingWindowDexOracle.update(mockedStablecoin.address, mockedStablecoin.address)).to.be.revertedWith("SlidingWindowDexOracle/same-tokens");
             })
         })

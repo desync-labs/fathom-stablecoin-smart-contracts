@@ -2,11 +2,11 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 import "./lib/FathomSwapLibrary.sol";
 import "./lib/IFathomSwapPair.sol";
 import "../interfaces/IFathomDEXOracle.sol";
+import "../interfaces/IToken.sol";
 
 contract DexPriceOracle is Initializable, IFathomDEXOracle {
     address public dexFactory;
@@ -27,13 +27,17 @@ contract DexPriceOracle is Initializable, IFathomDEXOracle {
         address pair = FathomSwapLibrary.pairFor(dexFactory, token0, token1);
         (uint256 r0, uint256 r1,) = IFathomSwapPair(pair).getReserves();
 
-        uint8 decimals0 = ERC20(token0).decimals();
-        uint8 decimals1 = ERC20(token1).decimals();
+        uint8 decimals0 = IToken(token0).decimals();
+        uint8 decimals1 = IToken(token1).decimals();
 
         (uint256 normalized0, uint256 normalized1) = decimals0 >= decimals1
             ? (r0, r1 * (10**(decimals0 - decimals1)))
             : (r0 * (10**(decimals1 - decimals0)), r1);
-        uint price = (normalized0 * 1e18) / normalized1;
+            
+        (address tokenA,) = FathomSwapLibrary.sortTokens(token0, token1);
+        uint price = token0 == tokenA 
+            ? (normalized0 * 1e18) / normalized1
+            : (normalized1 * 1e18) / normalized0;
 
         return (price, uint64(block.timestamp));
     }
