@@ -146,7 +146,7 @@ describe("ShowStopper", () => {
     })
     describe("#accumulateBadDebt, #redeemLockedCollateral", () => {
         context("when the caller is not the position owner", () => {
-            xit("should be able to redeemLockedCollateral", async () => {
+            it("should be able to redeemLockedCollateral", async () => {
                 // alice's position #1
                 //  a. open a new position
                 //  b. lock WXDC
@@ -172,7 +172,7 @@ describe("ShowStopper", () => {
             })
         })
         context("when the caller is the position owner", () => {
-            xit("should be able to redeemLockedCollateral", async () => {
+            it("should be able to redeemLockedCollateral", async () => {
                 // alice's position #1
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
                 await advanceBlock()
