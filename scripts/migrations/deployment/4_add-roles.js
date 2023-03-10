@@ -49,5 +49,5 @@ module.exports =  async function(deployer) {
     await ankrCollateralAdapter.whitelist(positionManager.address, { gasLimit: 1000000 });
     await ankrCollateralAdapter.whitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
     await ankrCollateralAdapter.whitelist(liquidationEngine.address, { gasLimit: 1000000 });
-
+    await ankrCollateralAdapter.whitelist(showStopper.address, { gasLimit: 1000000 });
 }

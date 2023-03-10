@@ -440,4 +440,7 @@ contract FathomStablecoinProxyActions {
         IManager(_manager).updatePrice(_collateralPoolId);
     }
 
+    function redeemLockedCollateral(address _manager, uint256 _positionId, address _tokenAdapter, bytes calldata _data) external {
+        IManager(_manager).redeemLockedCollateral(_positionId, _tokenAdapter, address(this), _data);
+    }
 }
