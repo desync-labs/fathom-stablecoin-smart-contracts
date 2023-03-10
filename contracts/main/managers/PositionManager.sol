@@ -339,6 +339,27 @@ contract PositionManager is PausableUpgradeable, IManager {
         emit LogMovePosition(_sourceId, _destinationId, _lockedCollateral, _debtShare);
     }
 
+    /// @dev Redeem locked collateral from a position when emergency shutdown is activated
+    /// @param _posId The position id to be adjusted
+    /// @param _adapter The adapter to be called once the position is adjusted
+    /// @param _data The extra data for adapter
+    function redeemLockedCollateral(
+        uint256 _posId,
+        address _adapter,
+        address _collateralReceiver,
+        bytes calldata _data
+    ) external override whenNotPaused onlyOwnerAllowed(_posId) {
+        address _positionAddress = positions[_posId];
+        IShowStopper(showStopper).redeemLockedCollateral(
+            collateralPools[_posId],
+            IGenericTokenAdapter(_adapter),
+            _positionAddress,
+            _collateralReceiver,
+            _data
+        );
+    }
+
+
     function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
         require(_priceOracle != address(0), "_priceOracle cannot be zero address");
         priceOracle = _priceOracle;
