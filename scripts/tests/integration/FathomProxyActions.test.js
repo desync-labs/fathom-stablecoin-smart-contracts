@@ -2,6 +2,7 @@ const { BigNumber } = require("ethers");
 const chai = require('chai');
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
+const { expect } = chai
 
 
 const { WeiPerRay, WeiPerWad } = require("../helper/unit");
@@ -82,7 +83,7 @@ describe("Position Closure without collateral withdrawl", () => {
                 // position 1
                 //  a. open a new position
                 //  b. lock WXDC
-                //  c. mint FUSD
+                //  c. mint FXD
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
@@ -103,11 +104,53 @@ describe("Position Closure without collateral withdrawl", () => {
                     pools.XDC,
                     positionAddress
                 )
-                    console.log(lockedCollateral);
-                // expect(lockedCollateral).to.be.equal(BigNumber.from("10000000000000000000"));
-                expect(lockedCollateral).to.be.equal(WeiPerWad.mul(10));
 
-                // expect(debtShare).to.be.equal(WeiPerWad.mul(2));
+                expect(lockedCollateral).to.be.equal(WeiPerWad.mul(10));
+                AssertHelpers.assertAlmostEqual(
+                    debtShare,
+                    WeiPerWad.mul(3)
+                )
+            })
+        })
+    })
+
+    describe("#wipeAllAndUnlockXDC", () => {
+        context("open position and pay back debt without collateral withdrawl", () => {
+            it("should be success", async () => {
+                await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
+
+                // position 1
+                //  a. open a new position
+                //  b. lock WXDC
+                //  c. mint FXD
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
+                const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
+                const positionAddress = await positionManager.positions(positionId)
+
+                // position 2
+                //  a. open a new position
+                //  b. lock WXDC
+                //  c. mint FXD
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
+
+                //  a. repay debt fully for position1
+                //  b. alice doesn't unlock any XDC
+                //  c. check if the position has the same amount of lockedCollateral
+                //  d. check if the position has now debtShare of 0 WAD
+                await PositionHelper.wipeAllAndUnlockXDC(
+                    aliceProxyWallet,
+                    AliceAddress,
+                    positionId,
+                    0
+                )
+
+                const [lockedCollateral, debtShare] = await bookKeeper.positions(
+                    pools.XDC,
+                    positionAddress
+                )
+
+                expect(lockedCollateral).to.be.equal(WeiPerWad.mul(10));
+                expect(debtShare).to.be.equal(0);
             })
         })
     })
