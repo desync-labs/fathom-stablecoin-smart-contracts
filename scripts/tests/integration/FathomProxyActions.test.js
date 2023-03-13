@@ -1,4 +1,3 @@
-const { BigNumber } = require("ethers");
 const chai = require('chai');
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
@@ -6,7 +5,6 @@ const { expect } = chai
 
 
 const { WeiPerRay, WeiPerWad } = require("../helper/unit");
-const TimeHelpers = require("../helper/time");
 const AssertHelpers = require("../helper/assert");
 const { createProxyWallets } = require("../helper/proxy-wallets");
 const { AliceAddress, DevAddress } = require("../helper/address");
@@ -52,10 +50,6 @@ describe("Position Closure without collateral withdrawl", () => {
     // Contract
     let positionManager
     let bookKeeper
-    // let tokenAdapter
-    let stablecoinAdapter
-    let stabilityFeeCollector
-    let collateralPoolConfig
     let simplePriceFeed
 
     before(async () => {
