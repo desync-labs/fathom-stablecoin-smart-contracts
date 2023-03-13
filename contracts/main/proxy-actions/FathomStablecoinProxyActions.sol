@@ -254,92 +254,6 @@ contract FathomStablecoinProxyActions {
         IManager(_manager).updatePrice(_collateralPoolId);
     }
 
-    function wipe(
-        address _manager,
-        address _tokenAdapter,
-        address _stablecoinAdapter,
-        uint256 _positionId,
-        uint256 _amount, // [wad]
-        bytes calldata _data
-    ) public {
-        address _bookKeeper = IManager(_manager).bookKeeper();
-        address _positionAddress = IManager(_manager).positions(_positionId);
-        bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
-
-        address owner = IManager(_manager).owners(_positionId);
-        if (owner == address(this) || IManager(_manager).ownerWhitelist(owner, _positionId, address(this)) == 1) {
-            stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _amount, _data); // Deposits Fathom Stablecoin amount into the bookKeeper
-            // Paybacks debt to the CDP
-            adjustPosition(
-                _manager,
-                _positionId,
-                0,
-                _getWipeDebtShare(_bookKeeper, IBookKeeper(_bookKeeper).stablecoin(_positionAddress), _positionAddress, _collateralPoolId),
-                _tokenAdapter,
-                _data
-            );
-        } else {
-            stablecoinAdapterDeposit(_stablecoinAdapter, address(this), _amount, _data); // Deposits Fathom Stablecoin amount into the bookKeeper
-            int256 _wipeDebtShare = _getWipeDebtShare(_bookKeeper, _amount * RAY, _positionAddress, _collateralPoolId); // Paybacks debt to the position
-            IBookKeeper(_bookKeeper).adjustPosition(_collateralPoolId, _positionAddress, address(this), address(this), 0, _wipeDebtShare);
-        }
-        IManager(_manager).updatePrice(_collateralPoolId);
-    }
-
-    function safeWipe(
-        address _manager,
-        address _tokenAdapter,
-        address _stablecoinAdapter,
-        uint256 _positionId,
-        uint256 _amount, // [wad]
-        address _owner,
-        bytes calldata _data
-    ) external {
-        require(IManager(_manager).owners(_positionId) == _owner, "!owner");
-        wipe(_manager, _tokenAdapter, _stablecoinAdapter, _positionId, _amount, _data);
-    }
-
-    function wipeAll(address _manager, address _tokenAdapter, address _stablecoinAdapter, uint256 _positionId, bytes calldata _data) public {
-        address _bookKeeper = IManager(_manager).bookKeeper();
-        address _positionAddress = IManager(_manager).positions(_positionId);
-        bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
-        (, uint256 _debtShare) = IBookKeeper(_bookKeeper).positions(_collateralPoolId, _positionAddress); // [wad]
-
-        address _owner = IManager(_manager).owners(_positionId);
-        if (_owner == address(this) || IManager(_manager).ownerWhitelist(_owner, _positionId, address(this)) == 1) {
-            // Deposits Fathom Stablecoin amount into the bookKeeper
-            stablecoinAdapterDeposit(
-                _stablecoinAdapter,
-                _positionAddress,
-                _getWipeAllStablecoinAmount(_bookKeeper, _positionAddress, _positionAddress, _collateralPoolId),
-                _data
-            );
-            adjustPosition(_manager, _positionId, 0, -int256(_debtShare), _tokenAdapter, _data); // Paybacks debt to the CDP
-        } else {
-            // Deposits Fathom Stablecoin amount into the bookKeeper
-            stablecoinAdapterDeposit(
-                _stablecoinAdapter,
-                address(this),
-                _getWipeAllStablecoinAmount(_bookKeeper, address(this), _positionAddress, _collateralPoolId),
-                _data
-            );
-            IBookKeeper(_bookKeeper).adjustPosition(_collateralPoolId, _positionAddress, address(this), address(this), 0, -int256(_debtShare)); // Paybacks debt to the position
-        }
-        IManager(_manager).updatePrice(_collateralPoolId);
-    }
-
-    function safeWipeAll(
-        address _manager,
-        address _tokenAdapter,
-        address _stablecoinAdapter,
-        uint256 _positionId,
-        address _owner,
-        bytes calldata _data
-    ) external {
-        require(IManager(_manager).owners(_positionId) == _owner, "!owner");
-        wipeAll(_manager, _tokenAdapter, _stablecoinAdapter, _positionId, _data);
-    }
-
     function lockXDCAndDraw(
         address _manager,
         address _stabilityFeeCollector,
@@ -408,8 +322,10 @@ contract FathomStablecoinProxyActions {
             _collateralPoolId
         ); // [wad]
         adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmount), _wipeDebtShare, _xdcAdapter, _data);
-        moveCollateral(_manager, _positionId, address(this), _collateralAmount, _xdcAdapter, _data); // Moves the amount from the position to proxy's address
-        IGenericTokenAdapter(_xdcAdapter).withdraw(msg.sender, _collateralAmount, _data);
+        if(_collateralAmount > 0) {
+            moveCollateral(_manager, _positionId, address(this), _collateralAmount, _xdcAdapter, _data); // Moves the amount from the position to proxy's address
+            IGenericTokenAdapter(_xdcAdapter).withdraw(msg.sender, _collateralAmount, _data);
+        }
         IManager(_manager).updatePrice(_collateralPoolId);
     }
 
@@ -433,10 +349,11 @@ contract FathomStablecoinProxyActions {
             _getWipeAllStablecoinAmount(_bookKeeper, _positionAddress, _positionAddress, _collateralPoolId),
             _data
         );
-
         adjustPosition(_manager, _positionId, -_safeToInt(_collateralAmount), -int256(_debtShare), _xdcAdapter, _data); // Paybacks debt to the CDP and unlocks WXDC amount from it
-        moveCollateral(_manager, _positionId, address(this), _collateralAmount, _xdcAdapter, _data); // Moves the amount from the CDP positionAddress to proxy's address
-        IGenericTokenAdapter(_xdcAdapter).withdraw(msg.sender, _collateralAmount, _data); // Withdraw aXDCc from AnkrCollateralAdapter, fee deducted amount
+        if(_collateralAmount > 0) {
+            moveCollateral(_manager, _positionId, address(this), _collateralAmount, _xdcAdapter, _data); // Moves the amount from the CDP positionAddress to proxy's address
+            IGenericTokenAdapter(_xdcAdapter).withdraw(msg.sender, _collateralAmount, _data); // Withdraw aXDCc from AnkrCollateralAdapter, fee deducted amount
+        }
         IManager(_manager).updatePrice(_collateralPoolId);
     }
 
