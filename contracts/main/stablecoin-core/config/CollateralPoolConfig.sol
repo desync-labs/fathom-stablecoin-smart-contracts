@@ -112,6 +112,12 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function setPriceFeed(bytes32 _poolId, address _priceFeed) external onlyOwner {
+        require(_priceFeed != address(0), "CollateralPoolConfig/zero-price-feed");
+        require(IPriceFeed(_priceFeed).poolId() == _poolId, "CollateralPoolConfig/wrong-price-feed-pool");
+        require(IPriceFeed(_priceFeed).isPriceOk(), "CollateralPoolConfig/unhealthy-price-feed");
+
+        IPriceFeed(_priceFeed).peekPrice();
+
         _collateralPools[_poolId].priceFeed = _priceFeed;
         emit LogSetPriceFeed(msg.sender, _poolId, _priceFeed);
     }

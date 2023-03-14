@@ -3,14 +3,15 @@ const { expect } = chai
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 
-const { BigNumber, ethers } = require("ethers");
+const { ethers } = require("ethers");
 
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../../helper/unit");
 const { DeployerAddress } = require("../../helper/address");
 const { getContract, createMock } = require("../../helper/contracts");
 const { increase, latest } = require('../../helper/time');
-
 const { formatBytes32String } = ethers.utils
+
+const COLLATERAL_POOL_ID = formatBytes32String("XDC")
 
 describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () => {
   let mockedBookKeeper //  <- bookKeeper.collateralPoolConfig() should return the address of mockCollateralPoolConfig
@@ -38,7 +39,7 @@ describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () =
     await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address);
     await mockedCollateralPoolConfig.mock.getLiquidationRatio.returns(WeiPerRay);
 
-    await delayFathomOraclePriceFeed.initialize(mockedDexPriceOracle.address, mockToken0, mockToken1, mockedAccessControlConfig.address);
+    await delayFathomOraclePriceFeed.initialize(mockedDexPriceOracle.address, mockToken0, mockToken1, mockedAccessControlConfig.address, COLLATERAL_POOL_ID);
   })
 
   describe("DelayFathomOraclePriceFeed Contract Tests", () => {

@@ -244,8 +244,38 @@ describe("CollateralPoolConfig", () => {
         ).to.be.revertedWith("!ownerRole")
       })
     })
+    context("when price feed is zero", () => {
+      it("should revert", async () => {
+        await expect(
+          collateralPoolConfigAsAlice.setPriceFeed(COLLATERAL_POOL_ID, AddressZero)
+        ).to.be.revertedWith("CollateralPoolConfig/zero-price-feed")
+      })
+    })
+    context("price feed for another pool", () => {
+      it("should revert", async () => {
+        const poolId = formatBytes32String("GOLD")
+
+        await mockedSimplePriceFeed.mock.poolId.returns(poolId)
+        await expect(
+          collateralPoolConfigAsAlice.setPriceFeed(COLLATERAL_POOL_ID, mockedSimplePriceFeed.address)
+        ).to.be.revertedWith("CollateralPoolConfig/wrong-price-feed-pool")
+      })
+    })
+    context("price feed is not healthy", () => {
+      it("should revert", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(false)
+
+        await expect(
+          collateralPoolConfigAsAlice.setPriceFeed(COLLATERAL_POOL_ID, mockedSimplePriceFeed.address)
+        ).to.be.revertedWith("CollateralPoolConfig/unhealthy-price-feed")
+      })
+    })
     context("when parameters are valid", () => {
       it("should success", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
+
         await expect(collateralPoolConfig.setPriceFeed(COLLATERAL_POOL_ID, mockedSimplePriceFeed.address))
           .to.be.emit(collateralPoolConfig, "LogSetPriceFeed")
           .withArgs(DeployerAddress, COLLATERAL_POOL_ID, mockedSimplePriceFeed.address)
@@ -531,6 +561,8 @@ describe("CollateralPoolConfig", () => {
   describe("#getPriceFeed", () => {
     context("when parameters are valid", () => {
       it("should success", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
         await collateralPoolConfig.setPriceFeed(COLLATERAL_POOL_ID, mockedSimplePriceFeed.address)
 
         expect(await collateralPoolConfig.getPriceFeed(COLLATERAL_POOL_ID)).to.be.equal(mockedSimplePriceFeed.address)
