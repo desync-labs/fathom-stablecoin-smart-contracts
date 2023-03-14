@@ -117,7 +117,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
      
     function setLiquidationRatio(bytes32 _poolId, uint256 _liquidationRatio) external onlyOwner {
-        require(_liquidationRatio >= RAY && _liquidationRatio < RAY * 100, "CollateralPoolConfig/invalid-liquidation-ratio");
+        require(_liquidationRatio >= RAY && _liquidationRatio <= RAY * 100, "CollateralPoolConfig/invalid-liquidation-ratio");
         _collateralPools[_poolId].liquidationRatio = _liquidationRatio;
         emit LogSetLiquidationRatio(msg.sender, _poolId, _liquidationRatio);
     }
