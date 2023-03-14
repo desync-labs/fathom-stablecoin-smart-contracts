@@ -43,6 +43,8 @@ contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceO
     }
 
     uint256 constant ONE = 10 ** 27;
+    uint256 constant MinReferencePrice = 10 ** 24;
+    uint256 constant MaxReferencePrice = 2 * (10 ** 27);
 
     function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         require(_y == 0 || (_z = _x * _y) / _y == _x);
@@ -80,10 +82,12 @@ contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceO
         _;
     }
 
-    function setStableCoinReferencePrice(uint256 _data) external onlyOwner {
+    function setStableCoinReferencePrice(uint256 _referencePrice) external onlyOwner {
         require(live == 1, "PriceOracle/not-live");
-        stableCoinReferencePrice = _data;
-        emit LogSetStableCoinReferencePrice(msg.sender, _data);
+        require(_referencePrice > 0, "PriceOracle/zero-reference-price");
+        require(_referencePrice > MinReferencePrice && _referencePrice < MaxReferencePrice , "PriceOracle/invalid-reference-price");
+        stableCoinReferencePrice = _referencePrice;
+        emit LogSetStableCoinReferencePrice(msg.sender, _referencePrice);
     }
 
     function setPrice(bytes32 _collateralPoolId) external whenNotPaused {
