@@ -101,6 +101,10 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
         require(_oracle != address(0), "FathomOraclePriceFeed: ZERO_ADDRESS");
         fathomOracle = IFathomOracle(_oracle);
     }
+    
+    function setPoolId(bytes32 _poolId) external onlyOwner {
+       poolId = _poolId;
+    }
 
     function pause() external onlyOwnerOrGov {
         _pause();
