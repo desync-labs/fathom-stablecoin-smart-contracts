@@ -115,10 +115,11 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _collateralPools[_poolId].priceFeed = _priceFeed;
         emit LogSetPriceFeed(msg.sender, _poolId, _priceFeed);
     }
-
-    function setLiquidationRatio(bytes32 _poolId, uint256 _data) external onlyOwner {
-        _collateralPools[_poolId].liquidationRatio = _data;
-        emit LogSetLiquidationRatio(msg.sender, _poolId, _data);
+     
+    function setLiquidationRatio(bytes32 _poolId, uint256 _liquidationRatio) external onlyOwner {
+        require(_liquidationRatio >= RAY && _liquidationRatio < RAY * 100, "CollateralPoolConfig/invalid-liquidation-ratio");
+        _collateralPools[_poolId].liquidationRatio = _liquidationRatio;
+        emit LogSetLiquidationRatio(msg.sender, _poolId, _liquidationRatio);
     }
 
     /** @dev Set the stability fee rate of the collateral pool.
