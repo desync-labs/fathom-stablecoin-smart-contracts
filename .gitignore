@@ -10,7 +10,8 @@ coverage.json
 typechain
 typechain-types
 /build
-
+privateKey
+privateKey_gorli
 
 #Hardhat files
 cache

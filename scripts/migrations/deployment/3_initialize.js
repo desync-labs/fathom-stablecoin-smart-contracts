@@ -35,7 +35,7 @@ module.exports = async function (deployer) {
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const addresses = getAddresses(deployer.networkId())
-    const dailyLimit = ethers.utils.parseUnits("10000", "ether");
+    const dailyLimitNumerator = 20
 
     const promises = [
         accessControlConfig.initialize({ gasLimit: 1000000 }),
@@ -97,7 +97,8 @@ module.exports = async function (deployer) {
             bookKeeper.address,
             addresses.USD,
             fathomStablecoin.address,
-            dailyLimit,
+            dailyLimitNumerator,
+            [],
             { gasLimit: 1000000 }
         ),
         flashMintArbitrager.initialize({ gasLimit: 1000000 }),
