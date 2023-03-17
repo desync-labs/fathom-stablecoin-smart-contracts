@@ -7,4 +7,6 @@ interface IPriceFeed {
     function peekPrice() external returns (bytes32, bool); // [wad]
 
     function isPriceOk() external view returns (bool);
+
+    function poolId() external view returns (bytes32);
 }

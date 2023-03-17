@@ -12,6 +12,7 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
 
     uint256 public price;
     uint256 public lastUpdate;
+    bytes32 public poolId;
 
     uint256 public priceLife;
 
@@ -52,6 +53,10 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
         require(_second >= 1 hours && _second <= 365 days, "SimplePriceFeed/bad-price-life");
         priceLife = _second;
         emit LogSetPriceLife(msg.sender, _second);
+    }
+
+    function setPoolId(bytes32 _poolId) external {
+        poolId = _poolId;
     }
 
     function pause() external onlyOwnerOrGov {
