@@ -196,7 +196,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         uint256 _amount,
         uint8 _fromDecimals,
         uint8 _toDecimals
-    ) internal returns (uint256 result) {
+    ) internal pure returns (uint256 result) {
         result = _toDecimals >= _fromDecimals ? _amount * (10**(_toDecimals - _fromDecimals)) : _amount / (10**(_fromDecimals - _toDecimals));
     }
 }
