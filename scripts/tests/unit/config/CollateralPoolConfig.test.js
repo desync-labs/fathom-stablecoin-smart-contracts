@@ -347,6 +347,20 @@ describe("CollateralPoolConfig", () => {
         )
       })
     })
+    context("ratio less than ray", () => {
+      it("should revert", async () => {
+        await expect(collateralPoolConfigAsAlice.setLiquidationRatio(COLLATERAL_POOL_ID, WeiPerRay.sub(1))).to.be.revertedWith(
+          "CollateralPoolConfig/invalid-liquidation-ratio"
+        )
+      })
+    })
+    context("ratio higher than max", () => {
+      it("should revert", async () => {
+        await expect(collateralPoolConfigAsAlice.setLiquidationRatio(COLLATERAL_POOL_ID, WeiPerRay.mul(101))).to.be.revertedWith(
+          "CollateralPoolConfig/invalid-liquidation-ratio"
+        )
+      })
+    })
     context("when parameters are valid", () => {
       it("should success", async () => {
         await expect(collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, WeiPerRay))
