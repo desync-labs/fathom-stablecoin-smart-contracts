@@ -73,6 +73,8 @@ describe("CollateralPoolConfig", () => {
     context("when the caller is not the owner", () => {
       it("should be revert", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(false)
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
 
         await expect(
           collateralPoolConfigAsAlice.initCollateralPool(
@@ -93,6 +95,9 @@ describe("CollateralPoolConfig", () => {
     })
     context("when collateral pool already init", () => {
       it("should be revert", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
+
         await collateralPoolConfig.initCollateralPool(
           COLLATERAL_POOL_ID,
           WeiPerRad.mul(10000000),
@@ -125,6 +130,9 @@ describe("CollateralPoolConfig", () => {
     })
     context("when stability fee rate invalid", () => {
       it("should be revert", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
+
         await expect(
           collateralPoolConfig.initCollateralPool(
             COLLATERAL_POOL_ID,
@@ -142,8 +150,55 @@ describe("CollateralPoolConfig", () => {
         ).to.be.revertedWith("CollateralPoolConfig/invalid-stability-fee-rate")
       })
     })
+    context("price feed is not healthy", () => {
+      it("should revert", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(false)
+
+        await expect(
+          collateralPoolConfig.initCollateralPool(
+            COLLATERAL_POOL_ID,
+            WeiPerRad.mul(10000000),
+            0,
+            mockedSimplePriceFeed.address,
+            WeiPerRay,
+            WeiPerWad,
+            mockedCollateralTokenAdapter.address,
+            CLOSE_FACTOR_BPS,
+            LIQUIDATOR_INCENTIVE_BPS,
+            TREASURY_FEE_BPS,
+            AddressZero
+          )
+        ).to.be.revertedWith("CollateralPoolConfig/unhealthy-price-feed")
+      })
+    })
+    context("wrong price feed pool", () => {
+      it("should revert", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(formatBytes32String("GOLD"))
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
+
+        await expect(
+          collateralPoolConfig.initCollateralPool(
+            COLLATERAL_POOL_ID,
+            WeiPerRad.mul(10000000),
+            0,
+            mockedSimplePriceFeed.address,
+            WeiPerRay,
+            WeiPerWad,
+            mockedCollateralTokenAdapter.address,
+            CLOSE_FACTOR_BPS,
+            LIQUIDATOR_INCENTIVE_BPS,
+            TREASURY_FEE_BPS,
+            AddressZero
+          )
+        ).to.be.revertedWith("CollateralPoolConfig/wrong-price-feed-pool")
+      })
+    })
     context("when parameters are valid", () => {
       it("should success", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
+        
         await collateralPoolConfig.initCollateralPool(
           COLLATERAL_POOL_ID,
           WeiPerRad.mul(10000000),
@@ -244,8 +299,38 @@ describe("CollateralPoolConfig", () => {
         ).to.be.revertedWith("!ownerRole")
       })
     })
+    context("when price feed is zero", () => {
+      it("should revert", async () => {
+        await expect(
+          collateralPoolConfigAsAlice.setPriceFeed(COLLATERAL_POOL_ID, AddressZero)
+        ).to.be.revertedWith("CollateralPoolConfig/zero-price-feed")
+      })
+    })
+    context("price feed for another pool", () => {
+      it("should revert", async () => {
+        const poolId = formatBytes32String("GOLD")
+
+        await mockedSimplePriceFeed.mock.poolId.returns(poolId)
+        await expect(
+          collateralPoolConfigAsAlice.setPriceFeed(COLLATERAL_POOL_ID, mockedSimplePriceFeed.address)
+        ).to.be.revertedWith("CollateralPoolConfig/wrong-price-feed-pool")
+      })
+    })
+    context("price feed is not healthy", () => {
+      it("should revert", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(false)
+
+        await expect(
+          collateralPoolConfigAsAlice.setPriceFeed(COLLATERAL_POOL_ID, mockedSimplePriceFeed.address)
+        ).to.be.revertedWith("CollateralPoolConfig/unhealthy-price-feed")
+      })
+    })
     context("when parameters are valid", () => {
       it("should success", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
+
         await expect(collateralPoolConfig.setPriceFeed(COLLATERAL_POOL_ID, mockedSimplePriceFeed.address))
           .to.be.emit(collateralPoolConfig, "LogSetPriceFeed")
           .withArgs(DeployerAddress, COLLATERAL_POOL_ID, mockedSimplePriceFeed.address)
@@ -531,6 +616,8 @@ describe("CollateralPoolConfig", () => {
   describe("#getPriceFeed", () => {
     context("when parameters are valid", () => {
       it("should success", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
         await collateralPoolConfig.setPriceFeed(COLLATERAL_POOL_ID, mockedSimplePriceFeed.address)
 
         expect(await collateralPoolConfig.getPriceFeed(COLLATERAL_POOL_ID)).to.be.equal(mockedSimplePriceFeed.address)

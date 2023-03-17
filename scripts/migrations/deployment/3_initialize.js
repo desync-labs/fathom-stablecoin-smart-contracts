@@ -113,9 +113,10 @@ module.exports = async function (deployer) {
         ),
         delayFathomOraclePriceFeed.initialize(
             dexPriceOracle.address,
-            addresses.USD,
             addresses.WXDC,
-            accessControlConfig.address
+            addresses.USD,
+            accessControlConfig.address,
+            pools.XDC
         ),
     ];
 

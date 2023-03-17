@@ -74,7 +74,11 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _collateralPools[_collateralPoolId].debtAccumulatedRate = RAY;
         _collateralPools[_collateralPoolId].debtCeiling = _debtCeiling;
         _collateralPools[_collateralPoolId].debtFloor = _debtFloor;
+        
+        require(IPriceFeed(_priceFeed).poolId() == _collateralPoolId, "CollateralPoolConfig/wrong-price-feed-pool");
+        require(IPriceFeed(_priceFeed).isPriceOk(), "CollateralPoolConfig/unhealthy-price-feed");
         IPriceFeed(_priceFeed).peekPrice(); // Sanity Check Call
+
         _collateralPools[_collateralPoolId].priceFeed = _priceFeed;
         require(_liquidationRatio >= RAY, "CollateralPoolConfig/invalid-liquidation-ratio");
         _collateralPools[_collateralPoolId].liquidationRatio = _liquidationRatio;
@@ -112,6 +116,12 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function setPriceFeed(bytes32 _poolId, address _priceFeed) external onlyOwner {
+        require(_priceFeed != address(0), "CollateralPoolConfig/zero-price-feed");
+        require(IPriceFeed(_priceFeed).poolId() == _poolId, "CollateralPoolConfig/wrong-price-feed-pool");
+        require(IPriceFeed(_priceFeed).isPriceOk(), "CollateralPoolConfig/unhealthy-price-feed");
+
+        IPriceFeed(_priceFeed).peekPrice();
+
         _collateralPools[_poolId].priceFeed = _priceFeed;
         emit LogSetPriceFeed(msg.sender, _poolId, _priceFeed);
     }
