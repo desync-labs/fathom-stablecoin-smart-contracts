@@ -13,36 +13,29 @@ import "../../../interfaces/IProxyRegistry.sol";
 import "../../../utils/SafeToken.sol";
 import "../../../apis/ankr/interfaces/IAnkrStakingPool.sol";
 import "../../../apis/ankr/interfaces/ICertToken.sol";
+import "../../../interfaces/IVault.sol";
 
-/// @dev receives XDC from users and deposit in Ankr's staking. Hence, users will still earn reward from changing aXDCc ratio
-contract AnkrCollateralAdapter is IAnkrColAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+
+/// @dev receives WXDC from users and deposit in Vault.
+contract CollateralTokenAdapter is IAnkrColAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
 
     uint256 internal constant WAD = 10**18;
     uint256 internal constant RAY = 10**27;
-
-    struct RatioNCerts {
-        uint256 ratio;
-        uint256 CertsAmount;
-    }
-
     uint256 public live;
+    bool flagVault;
 
+    address public collateralToken;
     IBookKeeper public bookKeeper;
     bytes32 public override collateralPoolId;
 
+    IVault public vault;
     IManager public positionManager;
-
-    IAnkrStakingPool public XDCPoolAddress;
-    ICertToken public aXDCcAddress;
-
     IProxyRegistry public proxyWalletFactory;
 
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
 
-    /// @dev Mapping of user(positionAddress) => recordRatioNCerts that he has ownership over.
-    mapping(address => RatioNCerts) public recordRatioNCerts;
     /// @dev Mapping of user(positionAddress) => collteralTokens that he is staking
     mapping(address => uint256) public stake;
 
@@ -50,16 +43,12 @@ contract AnkrCollateralAdapter is IAnkrColAdapter, PausableUpgradeable, Reentran
 
     event LogDeposit(uint256 _val);
     event LogWithdraw(uint256 _val);
-    event LogCertsInflow(uint256 _valCerts);
-    event LogCertsOutflow(uint256 _valCerts);
     event LogEmergencyWithdraw(address indexed _caller, address _to);
     event LogMoveStake(address indexed _src, address indexed _dst, uint256 _wad);
-    event LogSetTreasuryAccount(address indexed _caller, address _treasuryAccount);
-    event LogSetTreasuryFeeBps(address indexed _caller, uint256 _treasuryFeeBps);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
-        require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "AnkrCollateralAdapter/not-authorized");
+        require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "CollateralTokenAdapter/not-authorized");
         _;
     }
 
@@ -87,17 +76,14 @@ contract AnkrCollateralAdapter is IAnkrColAdapter, PausableUpgradeable, Reentran
     function initialize(
         address _bookKeeper,
         bytes32 _collateralPoolId,
-        address _xdcPoolAddress,
-        address _aXDCcAddress,
+        address _collateralToken,
         address _positionManager,
         address _proxyWalletFactory
     ) external initializer {
         // 1. Initialized all dependencies
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
-
-        XDCPoolAddress = IAnkrStakingPool(_xdcPoolAddress);
-        aXDCcAddress = ICertToken(_aXDCcAddress);
+        collateralToken = _collateralToken;
 
         live = 1;
 
@@ -165,6 +151,12 @@ contract AnkrCollateralAdapter is IAnkrColAdapter, PausableUpgradeable, Reentran
         else return wdiv(netAssetValuation(), totalShare);
     }
 
+    function setVault(address _vault) external onlyOwner{
+        require(true != flagVault, "CollateralTokenAdapter/Vault-set-already");
+        flagVault = true;
+        vault = IVault(_vault);
+    }
+
     /// @param _positionAddress The address that holding states of the position
     /// @param _amount The XDC amount that being used as a collateral and to be staked to AnkrStakingPool
     /// @param _data The extra data that may needs to execute the deposit
@@ -176,7 +168,7 @@ contract AnkrCollateralAdapter is IAnkrColAdapter, PausableUpgradeable, Reentran
         _deposit(_positionAddress, _amount, _data);
     }
 
-    /// @dev Stake XDC to AnkrStakingPool, receive aXDCc and record
+    /// @dev Lock XDC in the vault
     /// deposit collateral tokens to staking contract, and update BookKeeper
     /// @param _positionAddress The position address to be updated
     /// @param _amount The amount to be deposited
@@ -185,57 +177,31 @@ contract AnkrCollateralAdapter is IAnkrColAdapter, PausableUpgradeable, Reentran
         uint256 _amount,
         bytes calldata /* _data */
     ) private {
-        require(live == 1, "AnkrCollateralAdapter/not-live");
-        require(_amount == msg.value, "AnkrCollateralAdapter/DepositAmountMismatch");
+        require(live == 1, "CollateralTokenAdapter/not-live");
 
         if (_amount > 0) {
             uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
-            require(int256(_share) > 0, "AnkrCollateralAdapter/share-overflow");
-
+            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
+            //transfer WXDC from proxyWallet to adapter
+            address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
             //bookKeeping
             bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
             totalShare = add(totalShare, _share);
             stake[_positionAddress] = add(stake[_positionAddress], _share);
-
-            //record aXDCc amount before stakeCerts
-            uint256 aXDCcBefore = aXDCcAddress.balanceOf(address(this));
-            XDCPoolAddress.stakeCerts{ value: msg.value }();
-            uint256 aXDCcAfter = aXDCcAddress.balanceOf(address(this));
-
-            uint256 certsIn = (aXDCcAfter - aXDCcBefore);
-            RatioNCerts memory ratioNCerts = RatioNCerts(aXDCcAddress.ratio(), certsIn);
-
-            // if it is first record of staking
-            if (recordRatioNCerts[_positionAddress].ratio == 0 && recordRatioNCerts[_positionAddress].CertsAmount == 0) {
-                recordRatioNCerts[_positionAddress] = ratioNCerts;
-            } else {
-                // if it is not the first record of staking
-                // calculate weighted average of ratio from already existing ratio&CertsAmount and incoming ratio&CertsAmount
-                uint256 certsBefore = recordRatioNCerts[_positionAddress].CertsAmount;
-                uint256 ratioBefore = recordRatioNCerts[_positionAddress].ratio;
-                uint256 aXDCcRatio = aXDCcAddress.ratio();
-                uint256 calculatedNewRatio = add(
-                    wmul(ratioBefore, wdiv(certsBefore, add(certsBefore, certsIn))),
-                    wmul(aXDCcRatio, wdiv(certsIn, add(certsBefore, certsIn)))
-                );
-                if (calculatedNewRatio <= aXDCcRatio) {
-                    recordRatioNCerts[_positionAddress].ratio = aXDCcRatio;
-                } else {
-                    recordRatioNCerts[_positionAddress].ratio = calculatedNewRatio;
-                }
-
-                recordRatioNCerts[_positionAddress].CertsAmount = add(recordRatioNCerts[_positionAddress].CertsAmount, certsIn);
-                emit LogCertsInflow(certsIn); // aXDCc
-            }
+            
+            // safeApprove to Vault
+            address(collateralToken).safeApprove(address(vault), _amount);
+            //deposit WXDC to Vault
+            vault.deposit(_amount);
         }
-        emit LogDeposit(_amount); // xdc
+        emit LogDeposit(_amount); // wxdc
     }
 
-    /// @dev Withdraw aXDCc from AnkrCollateralAdapter
+    /// @dev Withdraw WXDC from Vault
     /// @param _usr The address that holding states of the position
-    /// @param _amount The XDC col amount(translated to aXDCc) to be withdrawn from AnkrCollateralAdapter and return to user
+    /// @param _amount The WXDC col amount in Vault to be returned to proxyWallet and then to user
     function withdraw(
         address _usr,
         uint256 _amount,
@@ -252,17 +218,17 @@ contract AnkrCollateralAdapter is IAnkrColAdapter, PausableUpgradeable, Reentran
             uint256 _share = wdivup(_amount, netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
-            require(int256(_share) > 0, "AnkrCollateralAdapter/share-overflow");
-            require(stake[msg.sender] >= _share, "AnkrCollateralAdapter/insufficient staked amount");
+            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
+            require(stake[msg.sender] >= _share, "CollateralTokenAdapter/insufficient staked amount");
 
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
             totalShare = sub(totalShare, _share);
             stake[msg.sender] = sub(stake[msg.sender], _share);
 
-            uint256 withdrawAmount = recordRatioNCerts[msg.sender].CertsAmount;
-            recordRatioNCerts[msg.sender].CertsAmount = 0;
-            SafeToken.safeTransfer(address(aXDCcAddress), _usr, withdrawAmount);
-            emit LogCertsOutflow(withdrawAmount);
+            //withdraw WXDC from Vault
+            vault.withdraw(_amount);
+            //Transfer WXDC to proxyWallet
+            address(collateralToken).safeTransfer(_usr, _amount);
         }
         emit LogWithdraw(_amount);
     }
@@ -284,7 +250,7 @@ contract AnkrCollateralAdapter is IAnkrColAdapter, PausableUpgradeable, Reentran
         bytes calldata /* data */
     ) private onlyCollateralManager {
         // 1. Update collateral tokens for source and destination
-        require(stake[_source] != 0, "AnkrCollateralAdapter/SourceNoStakeValue");
+        require(stake[_source] != 0, "CollateralTokenAdapter/SourceNoStakeValue");
         uint256 _stakedAmount = stake[_source];
         stake[_source] = sub(_stakedAmount, _share);
         stake[_destination] = add(stake[_destination], _share);
@@ -292,12 +258,12 @@ contract AnkrCollateralAdapter is IAnkrColAdapter, PausableUpgradeable, Reentran
         (uint256 _lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _source);
         require(
             stake[_source] >= add(bookKeeper.collateralToken(collateralPoolId, _source), _lockedCollateral),
-            "AnkrCollateralAdapter/stake[source] < collateralTokens + lockedCollateral"
+            "CollateralTokenAdapter/stake[source] < collateralTokens + lockedCollateral"
         );
         (_lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _destination);
         require(
             stake[_destination] <= add(bookKeeper.collateralToken(collateralPoolId, _destination), _lockedCollateral),
-            "AnkrCollateralAdapter/stake[destination] > collateralTokens + lockedCollateral"
+            "CollateralTokenAdapter/stake[destination] > collateralTokens + lockedCollateral"
         );
         emit LogMoveStake(_source, _destination, _share);
     }
@@ -320,49 +286,7 @@ contract AnkrCollateralAdapter is IAnkrColAdapter, PausableUpgradeable, Reentran
         bytes calldata _data
     ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
         _deposit(_source, 0, _data);
-        _moveCerts(_source, _destination, _share, _data);
         _moveStake(_source, _destination, _share, _data);
-    }
-
-    function _moveCerts(
-        address _source,
-        address _destination,
-        uint256 _share,
-        bytes calldata _data
-    ) internal onlyCollateralManager {
-        require(stake[_source] != 0, "AnkrCollateralAdapter/SourceNoStakeValue");
-        uint256 certsToMoveRatio;
-        if (_share >= stake[_source]) {
-            certsToMoveRatio = WAD;
-        } else {
-            require(_share < stake[_source], "AnkrCollateralAdapter/tooMuchShare");
-            certsToMoveRatio = wdiv(_share, stake[_source]);
-        }
-
-        uint256 certsMove = wmul(certsToMoveRatio, recordRatioNCerts[_source].CertsAmount);
-
-        //update CertsAmount in source
-        recordRatioNCerts[_source].CertsAmount -= certsMove;
-
-        uint256 certsBefore = recordRatioNCerts[_destination].CertsAmount;
-        uint256 ratioBefore = recordRatioNCerts[_destination].ratio;
-
-        uint256 calculatedNewRatio = add(
-            wmul(ratioBefore, wdiv(certsBefore, add(certsBefore, certsMove))),
-            wmul(recordRatioNCerts[_source].ratio, wdiv(certsMove, add(certsBefore, certsMove)))
-        );
-
-        uint256 aXDCcRatio = aXDCcAddress.ratio();
-
-        //update ratio in destination
-        if (calculatedNewRatio <= aXDCcRatio) {
-            recordRatioNCerts[_destination].ratio = aXDCcRatio;
-        } else {
-            recordRatioNCerts[_destination].ratio = calculatedNewRatio;
-        }
-
-        //update CertsAmount in destination
-        recordRatioNCerts[_destination].CertsAmount += certsMove;
     }
 
     function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
@@ -382,7 +306,7 @@ contract AnkrCollateralAdapter is IAnkrColAdapter, PausableUpgradeable, Reentran
     }
 
     function uncage() external override onlyOwner {
-        require(live == 0, "AnkrCollateralAdapter/not-caged");
+        require(live == 0, "CollateralTokenAdapter/not-caged");
         live = 1;
         emit LogUncage();
     }

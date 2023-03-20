@@ -8,7 +8,10 @@ module.exports =  async function(deployer) {
 
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
-  
+    const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
+    const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
+
+
     await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), DeployerWallet);
 
     await accessControlConfig.grantRole(await accessControlConfig.PRICE_ORACLE_ROLE(), DeployerWallet)

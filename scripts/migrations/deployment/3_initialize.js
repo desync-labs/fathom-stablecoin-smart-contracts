@@ -30,7 +30,7 @@ module.exports = async function (deployer) {
     const bookKeeperFlashMintArbitrager = await getProxy(proxyFactory, "BookKeeperFlashMintArbitrager");
     const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
     const dexPriceOracle = await getProxy(proxyFactory, "DexPriceOracle");
-    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+    const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const proxyActionsStorage = await getProxy(proxyFactory, "ProxyActionsStorage");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
@@ -102,19 +102,21 @@ module.exports = async function (deployer) {
         ),
         flashMintArbitrager.initialize({ gasLimit: 1000000 }),
         bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
+
         dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
-        ankrCollateralAdapter.initialize(
+
+        collateralTokenAdapter.initialize(
             bookKeeper.address,
             pools.XDC,
-            addresses.xdcPool,
-            addresses.aXDCc,
+            addresses.WXDC,
             positionManager.address,
             proxyWalletFactory.address
         ),
+
         delayFathomOraclePriceFeed.initialize(
             dexPriceOracle.address,
-            addresses.WXDC,
             addresses.USD,
+            addresses.WXDC,
             accessControlConfig.address,
             pools.XDC
         ),
@@ -144,8 +146,8 @@ module.exports = async function (deployer) {
         dexPriceOracle: dexPriceOracle.address,
         proxyWalletFactory: proxyWalletFactory.address,
         fathomStablecoinProxyActions: FathomStablecoinProxyActions.address,
-        ankrCollateralAdapter: ankrCollateralAdapter.address,
-        delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address
+        collateralTokenAdapter: collateralTokenAdapter.address,
+        delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address,
     }
 
     fs.writeFileSync('./addresses.json', JSON.stringify(newAddresses));

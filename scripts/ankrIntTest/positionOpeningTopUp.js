@@ -2,7 +2,6 @@
 // const rawdata = fs.readFileSync('../../addresses.json');
 // let stablecoinAddress = JSON.parse(rawdata);
 const { ethers } = require("ethers");
-// const MaxUint256 = require("@ethersproject/constants");
 
 const { getProxy } = require("../common/proxies");
 
@@ -15,33 +14,32 @@ const { AliceAddress } = require("../tests/helper/address");
 const { WeiPerWad } = require("../tests/helper/unit");
 
 
-const wipeAllAndUnlockXDC = async (positionId, collateralAmount) => {
+const lockXDCAndDraw = async (positionId, stablecoinAmount) => {
+
   const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
   const positionManager = await getProxy(proxyFactory, "PositionManager");
   const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
   const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
-  const wipeAllAndUnlockXDCAbi = [
-      "function wipeAllAndUnlockXDC(address _manager, address _xdcAdapter, address _stablecoinAdapter, uint256 _positionId, uint256 _collateralAmount, bytes calldata _data)"
+  const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
+  const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
+
+  const lockXDCAndDrawAbi = [
+      "function lockXDCAndDraw(address _manager, address _stabilityFeeCollector, address _xdcAdapter, address _stablecoinAdapter, uint256 _positionId, uint256 _stablecoinAmount, bytes calldata _data)"
   ];
-  const wipeAllAndUnlockXDCIFace = new ethers.utils.Interface(wipeAllAndUnlockXDCAbi);
-  const closePositionCall = wipeAllAndUnlockXDCIFace.encodeFunctionData("wipeAllAndUnlockXDC", [
-    positionManager.address,
-    collateralTokenAdapter.address,
-    stablecoinAdapter.address,
-    positionId,
-      collateralAmount, // wad
+  const lockXDCAndDrawIFace = new ethers.utils.Interface(lockXDCAndDrawAbi);
+  const topUpCall = lockXDCAndDrawIFace.encodeFunctionData("lockXDCAndDraw", [
+      positionManager.address,
+      stabilityFeeCollector.address,
+      collateralTokenAdapter.address,
+      stablecoinAdapter.address,
+      positionId,
+      stablecoinAmount, // wad
       "0x00",
   ])
 
-  console.log("below is the fullClosure script");
-  console.log(closePositionCall);
-
+  console.log(topUpCall);
 }
 
 module.exports = async function(deployer) {
-
-  await wipeAllAndUnlockXDC(1, WeiPerWad.mul(5));
-  console.log("below is poolId")
-  console.log(COLLATERAL_POOL_ID);
-  
+  await lockXDCAndDraw(1, WeiPerWad.mul(0));
 };

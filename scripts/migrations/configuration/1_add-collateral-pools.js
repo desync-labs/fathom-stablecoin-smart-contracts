@@ -16,26 +16,24 @@ const LIQUIDATIONRATIO_75 = WeiPerRay.mul(133).div(100).toString(); // LTV 75%
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-    const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed")
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy")
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper")
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig")
     const priceOracle = await getProxy(proxyFactory, "PriceOracle")
     const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
-    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+    const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
 
     const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);
     const debtCeilingSetUp = WeiPerRad.mul(10000000).div(2);
 
-    await simplePriceFeed.setPrice(WeiPerWad.mul(1), { gasLimit: 2000000 });
-
     const promises = [
-        initPool(pools.XDC, ankrCollateralAdapter.address, delayFathomOraclePriceFeed.address, LIQUIDATIONRATIO_75),
+        initPool(pools.XDC, collateralTokenAdapter.address, delayFathomOraclePriceFeed.address, LIQUIDATIONRATIO_75),
     ]
 
     await Promise.all(promises);
 
     await bookKeeper.setTotalDebtCeiling(debtCeilingSetUpTotal, { gasLimit: 2000000 });
+    await delayFathomOraclePriceFeed.peekPrice({ gasLimit: 2000000 });
 
     async function initPool(poolId, adapter, priceFeed, liquidationRatio) {
         await collateralPoolConfig.initCollateralPool(

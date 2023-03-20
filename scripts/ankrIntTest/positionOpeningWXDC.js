@@ -14,7 +14,7 @@ const { AliceAddress } = require("../tests/helper/address");
 const { WeiPerWad } = require("../tests/helper/unit");
 
 
-const openPositionAndDraw = async (collateral_pool_id, stablecoinAmount) => {
+const openLockTokenAndDraw = async (collateral_pool_id, collateralAmount, stablecoinAmount) => {
   const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
   const positionManager = await getProxy(proxyFactory, "PositionManager");
   const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
@@ -22,17 +22,19 @@ const openPositionAndDraw = async (collateral_pool_id, stablecoinAmount) => {
   const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
   console.log("here1");
 
-  const openLockXDCAndDrawAbi = [
-      "function openLockXDCAndDraw(address _manager, address _stabilityFeeCollector, address _xdcAdapter, address _stablecoinAdapter, bytes32 _collateralPoolId, uint256 _stablecoinAmount, bytes calldata _data)"
+  const openLockTokenAndDrawAbi = [
+      "function openLockTokenAndDraw(address _manager, address _stabilityFeeCollector, address _tokenAdapter, address _stablecoinAdapter, bytes32 _collateralPoolId, uint256 _collateralAmount, uint256 _stablecoinAmount, bool _transferFrom, bytes calldata _data)"
   ];
-  const openLockTokenAndDrawIFace = new ethers.utils.Interface(openLockXDCAndDrawAbi);
-  const openPositionCall = openLockTokenAndDrawIFace.encodeFunctionData("openLockXDCAndDraw", [
+  const openLockTokenAndDrawIFace = new ethers.utils.Interface(openLockTokenAndDrawAbi);
+  const openPositionCall = openLockTokenAndDrawIFace.encodeFunctionData("openLockTokenAndDraw", [
       positionManager.address,
       stabilityFeeCollector.address,
       collateralTokenAdapter.address,
       stablecoinAdapter.address,
       collateral_pool_id,
+      collateralAmount,
       stablecoinAmount, // wad
+      1,
       "0x00",
   ])
   console.log("below is the encoded data");
@@ -44,5 +46,5 @@ const openPositionAndDraw = async (collateral_pool_id, stablecoinAmount) => {
 }
 
 module.exports = async function(deployer) {
-  await openPositionAndDraw(COLLATERAL_POOL_ID, WeiPerWad.mul(105600));
+  await openLockTokenAndDraw(COLLATERAL_POOL_ID, WeiPerWad.mul(10), WeiPerWad.mul(10));
 };

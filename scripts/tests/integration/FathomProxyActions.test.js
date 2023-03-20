@@ -79,6 +79,7 @@ describe("Position Closure without collateral withdrawl", () => {
                 //  b. lock WXDC
                 //  c. mint FXD
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
+
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
 
@@ -86,6 +87,7 @@ describe("Position Closure without collateral withdrawl", () => {
                 //  b. alice doesn't unlock any XDC
                 //  c. check if the position has the same amount of lockedCollateral
                 //  d. check if the position has now debtShare of 3 WAD (5-2)
+
                 await PositionHelper.wipeAndUnlockXDC(
                     aliceProxyWallet,
                     AliceAddress,
