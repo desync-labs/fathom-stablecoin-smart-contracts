@@ -74,7 +74,11 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _collateralPools[_collateralPoolId].debtAccumulatedRate = RAY;
         _collateralPools[_collateralPoolId].debtCeiling = _debtCeiling;
         _collateralPools[_collateralPoolId].debtFloor = _debtFloor;
+        
+        require(IPriceFeed(_priceFeed).poolId() == _collateralPoolId, "CollateralPoolConfig/wrong-price-feed-pool");
+        require(IPriceFeed(_priceFeed).isPriceOk(), "CollateralPoolConfig/unhealthy-price-feed");
         IPriceFeed(_priceFeed).peekPrice(); // Sanity Check Call
+
         _collateralPools[_collateralPoolId].priceFeed = _priceFeed;
         require(_liquidationRatio >= RAY, "CollateralPoolConfig/invalid-liquidation-ratio");
         _collateralPools[_collateralPoolId].liquidationRatio = _liquidationRatio;
@@ -83,7 +87,6 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         require(_stabilityFeeRate <= 1000000012857214317438491659, "CollateralPoolConfig/stability-fee-rate-too-large");
         _collateralPools[_collateralPoolId].stabilityFeeRate = _stabilityFeeRate;
         _collateralPools[_collateralPoolId].lastAccumulationTime = block.timestamp;
-        IGenericTokenAdapter(_adapter).decimals(); // Sanity Check Call
         _collateralPools[_collateralPoolId].adapter = _adapter;
         require(_closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
         require(_liquidatorIncentiveBps >= 10000 && _liquidatorIncentiveBps <= 19000, "CollateralPoolConfig/invalid-liquidator-incentive-bps");
@@ -113,13 +116,20 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function setPriceFeed(bytes32 _poolId, address _priceFeed) external onlyOwner {
+        require(_priceFeed != address(0), "CollateralPoolConfig/zero-price-feed");
+        require(IPriceFeed(_priceFeed).poolId() == _poolId, "CollateralPoolConfig/wrong-price-feed-pool");
+        require(IPriceFeed(_priceFeed).isPriceOk(), "CollateralPoolConfig/unhealthy-price-feed");
+
+        IPriceFeed(_priceFeed).peekPrice();
+
         _collateralPools[_poolId].priceFeed = _priceFeed;
         emit LogSetPriceFeed(msg.sender, _poolId, _priceFeed);
     }
-
-    function setLiquidationRatio(bytes32 _poolId, uint256 _data) external onlyOwner {
-        _collateralPools[_poolId].liquidationRatio = _data;
-        emit LogSetLiquidationRatio(msg.sender, _poolId, _data);
+     
+    function setLiquidationRatio(bytes32 _poolId, uint256 _liquidationRatio) external onlyOwner {
+        require(_liquidationRatio >= RAY && _liquidationRatio <= RAY * 100, "CollateralPoolConfig/invalid-liquidation-ratio");
+        _collateralPools[_poolId].liquidationRatio = _liquidationRatio;
+        emit LogSetLiquidationRatio(msg.sender, _poolId, _liquidationRatio);
     }
 
     /** @dev Set the stability fee rate of the collateral pool.

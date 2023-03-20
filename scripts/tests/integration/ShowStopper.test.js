@@ -33,6 +33,7 @@ const setup = async () => {
     } = await createProxyWallets([AliceAddress, BobAddress]));
 
     await collateralPoolConfig.setStabilityFeeRate(pools.XDC, WeiPerRay, { gasLimit: 1000000 });
+    await collateralPoolConfig.setStabilityFeeRate(pools.WXDC, WeiPerRay, { gasLimit: 1000000 });
 
     await fathomStablecoin.approve(stablecoinAdapter.address, WeiPerWad.mul(10000), { from: AliceAddress })
 
@@ -87,12 +88,12 @@ describe("ShowStopper", () => {
     describe("#cage", () => {
         context("when doesn't grant showStopperRole for showStopper", () => {
             it("should be revert", async () => {
+                await accessControlConfig.revokeRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
                 await expect(showStopper.cage(), { gasLimit: 1000000 }).to.be.revertedWith("!(ownerRole or showStopperRole)")
             })
         })
         context("when grant showStopperRole for all contract", () => {
             it("should be able to cage", async () => {
-                await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
                 await showStopper.cage({ gasLimit: 1000000 });
 
                 expect(await bookKeeper.live()).to.be.equal(0)
@@ -103,7 +104,6 @@ describe("ShowStopper", () => {
         })
         context("when some contract was already caged", () => {
             it("should be able to cage", async () => {
-                await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
                 await systemDebtEngine.cage({ gasLimit: 1000000 })
                 await showStopper.cage({ gasLimit: 1000000 });
 
@@ -123,7 +123,6 @@ describe("ShowStopper", () => {
                 //  c. mint FXD
 
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
-                await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
 
                 await showStopper.cage()
                 await showStopper.cagePool(pools.XDC)
@@ -131,9 +130,10 @@ describe("ShowStopper", () => {
                 expect(await showStopper.cagePrice(pools.XDC)).to.be.equal(WeiPerRay)
                 expect(await showStopper.totalDebtShare(pools.XDC)).to.be.equal(WeiPerWad.mul(5))
             })
-            it("test", async () => {
+        })
+        context("bookKeeper was already caged", () => {
+            it("should be able to cage", async () => {
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
-                await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
 
                 await bookKeeper.cage()
                 await showStopper.cage()
@@ -146,7 +146,7 @@ describe("ShowStopper", () => {
     })
     describe("#accumulateBadDebt, #redeemLockedCollateral", () => {
         context("when the caller is not the position owner", () => {
-            xit("should be able to redeemLockedCollateral", async () => {
+            it("should be able to redeemLockedCollateral", async () => {
                 // alice's position #1
                 //  a. open a new position
                 //  b. lock WXDC
@@ -155,8 +155,6 @@ describe("ShowStopper", () => {
                 await advanceBlock()
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
-
-                await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
 
                 await showStopper.cage()
 
@@ -172,7 +170,7 @@ describe("ShowStopper", () => {
             })
         })
         context("when the caller is the position owner", () => {
-            xit("should be able to redeemLockedCollateral", async () => {
+            it("should be able to redeemLockedCollateral", async () => {
                 // alice's position #1
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
                 await advanceBlock()
@@ -184,8 +182,6 @@ describe("ShowStopper", () => {
                 await advanceBlock()
                 const positionId2 = await positionManager.ownerLastPositionId(bobProxyWallet.address)
                 const positionAddress2 = await positionManager.positions(positionId2)
-
-                await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
 
                 await showStopper.cage()
 
@@ -238,7 +234,7 @@ describe("ShowStopper", () => {
             it("should be able to call", async () => {
                 // alice's position #1
                 //  a. open a new position
-                //  b. lock WXDC
+                //  b. lock XDC
                 //  c. mint FXD
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
                 await advanceBlock()
@@ -247,14 +243,12 @@ describe("ShowStopper", () => {
 
                 // bob's position #2
                 //  a. open a new position
-                //  b. lock WXDC
+                //  b. lock XDC
                 //  c. mint FXD
                 await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
                 await advanceBlock()
                 const positionId2 = await positionManager.ownerLastPositionId(bobProxyWallet.address)
                 const positionAddress2 = await positionManager.positions(positionId2)
-
-                await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
 
                 await showStopper.cage()
 
@@ -312,8 +306,6 @@ describe("ShowStopper", () => {
                 await advanceBlock()
                 const positionId2 = await positionManager.ownerLastPositionId(bobProxyWallet.address)
                 const positionAddress2 = await positionManager.positions(positionId2)
-
-                await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
 
                 await showStopper.cage()
 

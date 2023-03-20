@@ -204,11 +204,12 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
         require(debt != 0, "ShowStopper/debt-zero");
         require(finalCashPrice[_collateralPoolId] == 0, "ShowStopper/final-cash-price-collateral-pool-id-already-defined");
 
+        uint256 poolStablecoinIssued = IBookKeeper(bookKeeper).poolStablecoinIssued(_collateralPoolId);
         uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getDebtAccumulatedRate(
             _collateralPoolId
         ); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
-        finalCashPrice[_collateralPoolId] = mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) / (debt / RAY);
+        finalCashPrice[_collateralPoolId] = mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) / (poolStablecoinIssued / RAY);
         emit LogFinalizeCashPrice(_collateralPoolId);
     }
 
@@ -232,5 +233,34 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
             "ShowStopper/insufficient-stablecoin-accumulator-balance"
         );
         emit LogRedeemStablecoin(_collateralPoolId, msg.sender, _amount);
+    }
+
+    /** @dev Redeem locked collateral from the position which has been safely settled by the emergency shutdown and give the collateral back to the position owner.
+      The position to be freed must has no debt at all. That means it must have gone through the process of `accumulateBadDebt` or `smip` already.
+      The position will be limited to the caller address. If the position address is not an EOA address but is managed by a position manager contract,
+      the owner of the position will have to move the collateral inside the position to the owner address first before calling `redeemLockedCollateral`.
+    */
+    function redeemLockedCollateral(
+        bytes32 _collateralPoolId,
+        IGenericTokenAdapter _adapter,
+        address _positionAddress,
+        address _collateralReceiver,
+        bytes calldata _data
+    ) external override {
+        require(live == 0, "ShowStopper/still-live");
+        require(_positionAddress == msg.sender || bookKeeper.positionWhitelist(_positionAddress, msg.sender) == 1, "ShowStopper/not-allowed");
+        (uint256 _lockedCollateralAmount, uint256 _debtShare) = bookKeeper.positions(_collateralPoolId, _positionAddress);
+        require(_debtShare == 0, "ShowStopper/debtShare-not-zero");
+        require(_lockedCollateralAmount < 2 ** 255, "ShowStopper/overflow");
+        bookKeeper.confiscatePosition(
+            _collateralPoolId,
+            _positionAddress,
+            _collateralReceiver,
+            address(systemDebtEngine),
+            -int256(_lockedCollateralAmount),
+            0
+        );
+        _adapter.onMoveCollateral(_positionAddress, _collateralReceiver, _lockedCollateralAmount, _data);
+        emit LogRedeemLockedCollateral(_collateralPoolId, _collateralReceiver, _lockedCollateralAmount);
     }
 }

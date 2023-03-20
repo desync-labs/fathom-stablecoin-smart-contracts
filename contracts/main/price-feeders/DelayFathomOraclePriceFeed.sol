@@ -13,13 +13,14 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
     uint256 public lastUpdateTS;
     uint256 public timeDelay;
     uint256 public priceLife;
+    bytes32 public poolId;
 
     IFathomOracle public fathomOracle;
     IAccessControlConfig public accessControlConfig;
     address public token0;
     address public token1;
 
-    function initialize(address _fathomOracle, address _token0, address _token1, address _accessControlConfig) external initializer {
+    function initialize(address _fathomOracle, address _token0, address _token1, address _accessControlConfig, bytes32 _poolId) external initializer {
         PausableUpgradeable.__Pausable_init();
 
         require(_accessControlConfig != address(0), "FathomOraclePriceFeed: ZERO_ADDRESS");
@@ -28,9 +29,11 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
         fathomOracle = IFathomOracle(_fathomOracle);
         require(_token0 != _token1, "FathomOraclePriceFeed/same-token0-token1");
         require(_token0 != address(0) && _token1 != address(0), "FathomOraclePriceFeed: ZERO_ADDRESS");
-        (token0, token1) = _token0 < _token1 ? (_token0, _token1) : (_token1, _token0);
+        token0 = _token0;
+        token1 = _token1;
         priceLife = 30 minutes;
         timeDelay = 15 minutes;
+        poolId = _poolId;
     }
 
     modifier onlyOwner() {
@@ -97,6 +100,10 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
     function setOracle(address _oracle) external onlyOwner {
         require(_oracle != address(0), "FathomOraclePriceFeed: ZERO_ADDRESS");
         fathomOracle = IFathomOracle(_oracle);
+    }
+    
+    function setPoolId(bytes32 _poolId) external onlyOwner {
+       poolId = _poolId;
     }
 
     function pause() external onlyOwnerOrGov {

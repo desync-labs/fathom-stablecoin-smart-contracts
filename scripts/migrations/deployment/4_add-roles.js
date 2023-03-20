@@ -32,6 +32,7 @@ module.exports =  async function(deployer) {
   
     await accessControlConfig.grantRole(await accessControlConfig.LIQUIDATION_ENGINE_ROLE(), showStopper.address)
     await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), showStopper.address)
+    await accessControlConfig.grantRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
   
     await accessControlConfig.grantRole(await accessControlConfig.PRICE_ORACLE_ROLE(), priceOracle.address)
   
@@ -49,5 +50,5 @@ module.exports =  async function(deployer) {
     await ankrCollateralAdapter.whitelist(positionManager.address, { gasLimit: 1000000 });
     await ankrCollateralAdapter.whitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
     await ankrCollateralAdapter.whitelist(liquidationEngine.address, { gasLimit: 1000000 });
-
+    await ankrCollateralAdapter.whitelist(showStopper.address, { gasLimit: 1000000 });
 }
