@@ -88,7 +88,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _collateralPools[_collateralPoolId].stabilityFeeRate = _stabilityFeeRate;
         _collateralPools[_collateralPoolId].lastAccumulationTime = block.timestamp;
         _collateralPools[_collateralPoolId].adapter = _adapter;
-        require(_closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
+        require(_closeFactorBps > 0 && _closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
         require(_liquidatorIncentiveBps >= 10000 && _liquidatorIncentiveBps <= 19000, "CollateralPoolConfig/invalid-liquidator-incentive-bps");
         require(_treasuryFeesBps <= 9000, "CollateralPoolConfig/invalid-treasury-fees-bps");
         _collateralPools[_collateralPoolId].closeFactorBps = _closeFactorBps;
@@ -161,7 +161,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function setCloseFactorBps(bytes32 _collateralPoolId, uint256 _closeFactorBps) external onlyOwner {
-        require(_closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
+        require(_closeFactorBps > 0 && _closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
         _collateralPools[_collateralPoolId].closeFactorBps = _closeFactorBps;
         emit LogSetCloseFactorBps(msg.sender, _collateralPoolId, _closeFactorBps);
     }
