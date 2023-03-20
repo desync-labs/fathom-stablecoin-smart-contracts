@@ -12,7 +12,7 @@ interface ILiquidationEngine {
     bytes calldata data
   ) external;
 
-  function liquidate(
+  function liquidateForBatch(
     bytes32 _collateralPoolId,
     address _positionAddress,
     uint256 _debtShareToBeLiquidated, // [rad]

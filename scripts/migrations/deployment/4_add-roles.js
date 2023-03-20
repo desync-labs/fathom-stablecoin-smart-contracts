@@ -16,7 +16,7 @@ module.exports =  async function(deployer) {
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
     const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
-    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+    const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     
     await accessControlConfig.grantRole(await accessControlConfig.BOOK_KEEPER_ROLE(), bookKeeper.address)
   
@@ -36,7 +36,7 @@ module.exports =  async function(deployer) {
   
     await accessControlConfig.grantRole(await accessControlConfig.PRICE_ORACLE_ROLE(), priceOracle.address)
   
-    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), ankrCollateralAdapter.address)
+    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapter.address)
   
     await accessControlConfig.grantRole(await accessControlConfig.MINTABLE_ROLE(), flashMintModule.address)
   
@@ -47,8 +47,8 @@ module.exports =  async function(deployer) {
 
     await bookKeeper.whitelist(stablecoinAdapter.address, { gasLimit: 1000000 });
 
-    await ankrCollateralAdapter.whitelist(positionManager.address, { gasLimit: 1000000 });
-    await ankrCollateralAdapter.whitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
-    await ankrCollateralAdapter.whitelist(liquidationEngine.address, { gasLimit: 1000000 });
-    await ankrCollateralAdapter.whitelist(showStopper.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.whitelist(positionManager.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.whitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.whitelist(liquidationEngine.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.whitelist(showStopper.address, { gasLimit: 1000000 });
 }

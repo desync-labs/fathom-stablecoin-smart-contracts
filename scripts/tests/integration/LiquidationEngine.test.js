@@ -4,6 +4,7 @@ const { MaxUint256 } = require("@ethersproject/constants");
 
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
+const provider = ethers.getDefaultProvider("http://127.0.0.1:8545");
 
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
 const TimeHelpers = require("../helper/time");
@@ -27,6 +28,7 @@ const BPS = BigNumber.from(10000)
 
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
 
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
@@ -41,7 +43,6 @@ const setup = async () => {
     const liquidationEngine = getContractAt("LiquidationEngine", liquidationEngineAsAdmin.address, BobAddress)
 
     const fathomToken = await artifacts.initializeInterfaceAt("FathomToken", "FathomToken");
-    const aXDCc = await artifacts.initializeInterfaceAt("MockaXDCc", "MockaXDCc");
     const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
 
     ({
@@ -71,7 +72,7 @@ const setup = async () => {
         fathomStablecoin,
         fixedSpreadLiquidationStrategy,
         priceOracle,
-        aXDCc
+        WXDC
     }
 }
 
@@ -79,7 +80,7 @@ const setup = async () => {
 describe("LiquidationEngine", () => {
     // Contracts
     let aliceProxyWallet
-
+    let WXDC
     let bookKeeper
     let fathomToken
     let positionManager
@@ -91,7 +92,6 @@ describe("LiquidationEngine", () => {
     let systemDebtEngine
     let collateralPoolConfig
     let priceOracle
-    let aXDCc
 
     before(async () => {
         await snapshot.revertToSnapshot();
@@ -102,7 +102,7 @@ describe("LiquidationEngine", () => {
             bookKeeper,
             collateralPoolConfig,
             positionManager,
-            // XDC,
+            WXDC,
             simplePriceFeed,
             aliceProxyWallet,
             stabilityFeeCollector,
@@ -112,7 +112,6 @@ describe("LiquidationEngine", () => {
             fathomStablecoin,
             fixedSpreadLiquidationStrategy,
             priceOracle,
-            aXDCc
         } = await loadFixture(setup));
     })
 
@@ -406,6 +405,7 @@ describe("LiquidationEngine", () => {
                     const alicePositionAddress = await positionManager.positions(1)
                     const alicePosition = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
 
+
                     // 3. XDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 3000000 })
                     await priceOracle.setPrice(COLLATERAL_POOL_ID);
@@ -422,7 +422,7 @@ describe("LiquidationEngine", () => {
                         "0x",
                         { gasLimit: 5000000 }
                     )
-
+                    const bobWETHAfterLiq = await WXDC.balanceOf(BobAddress);
                     // 5. Settle system bad debt
                     await systemDebtEngine.settleSystemBadDebt(await bookKeeper.stablecoin(systemDebtEngine.address), { gasLimit: 1000000 })
 
@@ -434,8 +434,7 @@ describe("LiquidationEngine", () => {
                         expectedSeizedCollateral.mul(BPS).div(testParam.liquidatorIncentiveBps)
                     )
                     const expectedTreasuryFee = expectedLiquidatorIncentive.mul(testParam.treasuryFeeBps).div(BPS)
-                    const aXDCcRatio = await aXDCc.ratio();
-                    const expectedCollateralBobShouldReceive = (expectedSeizedCollateral.sub(expectedTreasuryFee)).mul(aXDCcRatio).div(WeiPerWad)
+                    const expectedCollateralBobShouldReceive = (expectedSeizedCollateral.sub(expectedTreasuryFee)).div(WeiPerWad)
 
                     AssertHelpers.assertAlmostEqual(
                         alicePosition.lockedCollateral.sub(alicePositionAfterLiquidation.lockedCollateral).toString(),
@@ -449,7 +448,7 @@ describe("LiquidationEngine", () => {
                         parseUnits(testParam.expectedSystemBadDebt, 45).toString()
                     )
                     AssertHelpers.assertAlmostEqual(
-                        (await aXDCc.balanceOf(BobAddress)).toString(),
+                        (bobWETHAfterLiq.div(WeiPerWad)).toString(),
                         expectedCollateralBobShouldReceive.toString()
                     )
                     AssertHelpers.assertAlmostEqual(
@@ -546,10 +545,9 @@ describe("LiquidationEngine", () => {
                         parseUnits(testParam.expectedSystemBadDebt, 45).toString()
                     )
 
-                    const aXDCcRatio = await aXDCc.ratio();
-                    const expectedCollateralBobShouldReceive = (expectedSeizedCollateral.sub(expectedTreasuryFee)).mul(aXDCcRatio).div(WeiPerWad)
+                    const expectedCollateralBobShouldReceive = (expectedSeizedCollateral.sub(expectedTreasuryFee)).div(WeiPerWad)
                     AssertHelpers.assertAlmostEqual(
-                        (await aXDCc.balanceOf(BobAddress)).toString(),
+                        (await provider.getBalance(BobAddress)).toString(),
                         expectedCollateralBobShouldReceive.toString()
                     )
                     AssertHelpers.assertAlmostEqual(
@@ -640,6 +638,7 @@ describe("LiquidationEngine", () => {
                         defaultAbiCoder.encode(["address", "bytes"], [BobAddress, []]),
                         { gasLimit: 2000000 }
                     )
+                    const bobWETHAfterLiq = await WXDC.balanceOf(BobAddress);
 
                     // // 5. Settle system bad debt
                     await systemDebtEngine.settleSystemBadDebt(await bookKeeper.systemBadDebt(systemDebtEngine.address), { gasLimit: 1000000 })
@@ -667,10 +666,9 @@ describe("LiquidationEngine", () => {
                         "System bad debt should be 0 FUSD"
                     ).to.be.equal(0)
 
-                    const aXDCcRatio = await aXDCc.ratio();
                     AssertHelpers.assertAlmostEqual(
-                        (await aXDCc.balanceOf(BobAddress)).toString(),
-                        parseEther("4.1309099").mul(aXDCcRatio).div(WeiPerWad).toString()
+                        (bobWETHAfterLiq.div(WeiPerWad)).toString(),
+                        parseEther("4.1309099").div(WeiPerWad).toString()
                     )
                     AssertHelpers.assertAlmostEqual(
                         bobStablecoinBeforeLiquidation.sub(bobStablecoinAfterLiquidation).toString(),
@@ -745,6 +743,7 @@ describe("LiquidationEngine", () => {
                         ["0x00", "0x00"],
                         { gasLimit: 4000000 }
                     )
+                    const bobWETHAfterLiq = await WXDC.balanceOf(BobAddress);
 
                     // 5. Settle system bad debt
                     await systemDebtEngine.settleSystemBadDebt(await bookKeeper.stablecoin(systemDebtEngine.address), { gasLimit: 1000000 })
@@ -773,11 +772,10 @@ describe("LiquidationEngine", () => {
                         (await bookKeeper.systemBadDebt(systemDebtEngine.address)).toString(),
                         parseUnits(testParam.expectedSystemBadDebt, 45).toString()
                     )
-                        const b = (await aXDCc.balanceOf(BobAddress)).toString()
-                    const aXDCcRatio = await aXDCc.ratio();
+
                     AssertHelpers.assertAlmostEqual(
-                        (await aXDCc.balanceOf(BobAddress)).toString(),
-                        expectedCollateralBobShouldReceive.mul(aXDCcRatio).div(WeiPerWad).toString()
+                        (bobWETHAfterLiq.div(WeiPerWad)).toString(),
+                        expectedCollateralBobShouldReceive.div(WeiPerWad).toString()
                     )
 
                     AssertHelpers.assertAlmostEqual(

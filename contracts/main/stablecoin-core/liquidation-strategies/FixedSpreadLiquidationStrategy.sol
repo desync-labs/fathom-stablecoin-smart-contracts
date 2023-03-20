@@ -192,7 +192,7 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         address _positionAddress, // Address that will receive any leftover collateral
         uint256 _debtShareToBeLiquidated, // The value of debt to be liquidated as specified by the liquidator [rad]
         uint256 _maxDebtShareToBeLiquidated, // The maximum value of debt to be liquidated as specified by the liquidator in case of full liquidation for slippage control [rad]
-        address _liquidatorAddress,  //<- liq. engine's address
+        address _liquidatorAddress,
         address _collateralRecipient,
         bytes calldata _data // Data to pass in external call; if length 0, no call is done
     ) external override nonReentrant whenNotPaused {
@@ -200,7 +200,6 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
             IAccessControlConfig(bookKeeper.accessControlConfig()).hasRole(keccak256("LIQUIDATION_ENGINE_ROLE"), msg.sender),
             "!liquidationEngingRole"
         );
-
         require(_positionDebtShare > 0, "FixedSpreadLiquidationStrategy/zero-debt");
         require(_positionCollateralAmount > 0, "FixedSpreadLiquidationStrategy/zero-collateral-amount");
         require(_positionAddress != address(0), "FixedSpreadLiquidationStrategy/zero-position-address");
@@ -258,10 +257,10 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         }
 
         address _stablecoin = address(stablecoinAdapter.stablecoin());
-        _stablecoin.safeTransferFrom(_collateralRecipient, address(this), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
+        _stablecoin.safeTransferFrom(_liquidatorAddress, address(this), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
         _stablecoin.safeApprove(address(stablecoinAdapter), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
-        stablecoinAdapter.depositRAD(_collateralRecipient, info.actualDebtValueToBeLiquidated, abi.encode(0));
-        bookKeeper.moveStablecoin(_collateralRecipient, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
+        stablecoinAdapter.depositRAD(_liquidatorAddress, info.actualDebtValueToBeLiquidated, abi.encode(0));
+        bookKeeper.moveStablecoin(_liquidatorAddress, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
 
         info.positionDebtShare = _positionDebtShare;
         info.positionCollateralAmount = _positionCollateralAmount;

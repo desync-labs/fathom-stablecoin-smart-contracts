@@ -2,6 +2,7 @@ const chai = require('chai');
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 const { expect } = require("chai");
+const AssertHelpers = require("../../helper/assert");
 
 const { AliceAddress, BobAddress, DeployerAddress } = require("../../helper/address");
 const { loadFixture } = require("../../helper/fixtures");
@@ -60,9 +61,15 @@ describe("SlidingWindowDexOracle", () => {
                 const observation = (await slidingWindowDexOracle.pairObservations(mockedPair.address, index))
                 const expectedPrice0 = cumulativePrice0.add(WeiPerWad.mul(2).mul(Resolution).div(WeiPerWad).mul(600));
                 const expectedPrice1 = cumulativePrice1.add(WeiPerWad.mul(Resolution).div(WeiPerWad.mul(2)).mul(600));
-
-                expect(observation.price0Cumulative).to.be.equal(BigNumber.from(expectedPrice0))
-                expect(observation.price1Cumulative).to.be.equal(BigNumber.from(expectedPrice1))
+    
+                AssertHelpers.assertAlmostEqual(
+                    observation.price0Cumulative,
+                    BigNumber.from(expectedPrice0)
+                )
+                AssertHelpers.assertAlmostEqual(
+                    observation.price1Cumulative,
+                    BigNumber.from(expectedPrice1)
+                )
             })
         })
     })

@@ -25,7 +25,7 @@ const setup = async () => {
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
     const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
     const priceOracle = await getProxy(proxyFactory, "PriceOracle");
-    const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
+    const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
 
     ({
@@ -39,7 +39,7 @@ const setup = async () => {
 
     return {
         bookKeeper,
-        ankrCollateralAdapter,
+        collateralTokenAdapter,
         positionManager,
         aliceProxyWallet,
         bobProxyWallet,
@@ -54,7 +54,7 @@ describe("PositionPermissions", () => {
     // Contracts
     let aliceProxyWallet
     let bobProxyWallet
-    let ankrCollateralAdapter
+    let collateralTokenAdapter
     let stablecoinAdapter
     let bookKeeper
     let positionManager
@@ -69,7 +69,7 @@ describe("PositionPermissions", () => {
     beforeEach(async () => {
         ({
             bookKeeper,
-            ankrCollateralAdapter,
+            collateralTokenAdapter,
             positionManager,
             aliceProxyWallet,
             bobProxyWallet,
@@ -177,7 +177,7 @@ describe("PositionPermissions", () => {
                                     await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                                     WeiPerWad.mul(-1),
                                     0,
-                                    ankrCollateralAdapter.address
+                                    collateralTokenAdapter.address
                                 );
                                 const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress2)
                                 expect(
@@ -199,7 +199,7 @@ describe("PositionPermissions", () => {
                                     await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                                     alicePositionAddress,
                                     WeiPerWad,
-                                    ankrCollateralAdapter.address,
+                                    collateralTokenAdapter.address,
                                 );
                                 const aliceMoveCollateral = await bookKeeper.positions(pools.XDC, alicePositionAddress)
                                 const fathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
@@ -273,7 +273,7 @@ describe("PositionPermissions", () => {
                                     await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                                     alicePositionAddress,
                                     WeiPerWad,
-                                    ankrCollateralAdapter.address,
+                                    collateralTokenAdapter.address,
                                 );
                                 const aliceMoveCollateral = await bookKeeper.positions(pools.XDC, alicePositionAddress)
                                 const fathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
@@ -347,7 +347,7 @@ describe("PositionPermissions", () => {
                                 await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                                 bobPositionAddress,
                                 WeiPerWad,
-                                ankrCollateralAdapter.address,
+                                collateralTokenAdapter.address,
                             );
                             const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                             const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
@@ -478,7 +478,7 @@ describe("PositionPermissions", () => {
                                     await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                                     WeiPerWad.mul(-1),
                                     0,
-                                    ankrCollateralAdapter.address
+                                    collateralTokenAdapter.address
                                 );
                                 const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress2)
                                 expect(
@@ -518,7 +518,7 @@ describe("PositionPermissions", () => {
                                     fathomStablecoinBalancefinal,
                                     "Alice should receive 2 FXD from drawing 2 FXD, because Alice drew 2 times"
                                 ).to.be.equal(WeiPerWad.mul(2))
-                                const alicePosition1Stake = await ankrCollateralAdapter.stake(alicePositionAddress)
+                                const alicePosition1Stake = await collateralTokenAdapter.stake(alicePositionAddress)
                                 expect(alicePosition1Stake, "Stake must be correctly updated after movePosition").to.be.equal(
                                     WeiPerWad.mul(2)
                                 )
@@ -611,7 +611,7 @@ describe("PositionPermissions", () => {
                                 await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                                 WeiPerWad.mul(-1),
                                 0,
-                                ankrCollateralAdapter.address
+                                collateralTokenAdapter.address
                             );
                             const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
                             expect(
@@ -638,7 +638,7 @@ describe("PositionPermissions", () => {
                                 await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                                 bobPositionAddress,
                                 WeiPerWad,
-                                ankrCollateralAdapter.address,
+                                collateralTokenAdapter.address,
                             );
                             const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                             const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
@@ -821,7 +821,7 @@ describe("PositionPermissions", () => {
                     let lockIFace = new ethers.utils.Interface(lockAbi);
                     const lockTokenCall = lockIFace.encodeFunctionData("lockXDC", [
                         positionManager.address,
-                        ankrCollateralAdapter.address,
+                        collateralTokenAdapter.address,
                         await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                         ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
                     ])
@@ -877,7 +877,7 @@ describe("PositionPermissions", () => {
                                 await positionManager.ownerLastPositionId(bobProxyWallet.address),
                                 WeiPerWad.mul(-1),
                                 0,
-                                ankrCollateralAdapter.address
+                                collateralTokenAdapter.address
                             );
                             const bobAdjustPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress)
                             expect(
@@ -899,7 +899,7 @@ describe("PositionPermissions", () => {
                                 await positionManager.ownerLastPositionId(bobProxyWallet.address),
                                 alicePositionAddress,
                                 WeiPerWad,
-                                ankrCollateralAdapter.address,
+                                collateralTokenAdapter.address,
                             );
                             const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                             const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
@@ -950,7 +950,7 @@ describe("PositionPermissions", () => {
                     let drawTokenCall = drawTokenIFace.encodeFunctionData("draw", [
                         positionManager.address,
                         stabilityFeeCollector.address,
-                        ankrCollateralAdapter.address,
+                        collateralTokenAdapter.address,
                         stablecoinAdapter.address,
                         await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                         WeiPerWad,
@@ -1060,7 +1060,7 @@ describe("PositionPermissions", () => {
                                 await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                                 WeiPerWad.mul(-1),
                                 0,
-                                ankrCollateralAdapter.address
+                                collateralTokenAdapter.address
                             );
                             const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
                             expect(
@@ -1088,7 +1088,7 @@ describe("PositionPermissions", () => {
                                 await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                                 bobPositionAddress,
                                 WeiPerWad,
-                                ankrCollateralAdapter.address
+                                collateralTokenAdapter.address
                             )
 
                             const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
@@ -1139,7 +1139,7 @@ describe("PositionPermissions", () => {
                         await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                         0,
                         alicePosition.debtShare,
-                        ankrCollateralAdapter.address,
+                        collateralTokenAdapter.address,
                         ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
                         { from: BobAddress }
                     )
@@ -1304,7 +1304,7 @@ describe("PositionPermissions", () => {
                                 await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                                 WeiPerWad.mul(-1),
                                 0,
-                                ankrCollateralAdapter.address
+                                collateralTokenAdapter.address
                             );
                             const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
                             expect(
@@ -1328,7 +1328,7 @@ describe("PositionPermissions", () => {
                                     await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                                     bobPositionAddress,
                                     WeiPerWad,
-                                    ankrCollateralAdapter.address
+                                    collateralTokenAdapter.address
                                 )
                             ).to.be.revertedWith("owner not allowed")
                         })
@@ -1362,7 +1362,7 @@ describe("PositionPermissions", () => {
                             await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                             0,
                             alicePosition.debtShare,
-                            ankrCollateralAdapter.address,
+                            collateralTokenAdapter.address,
                             ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
                             { from: BobAddress }
                         )
@@ -1464,7 +1464,7 @@ describe("PositionPermissions", () => {
                     alicePositionWalletPositionAfterExport.debtShare,
                     "debtShare should be 0 FXD, because Alice export"
                 ).to.be.equal(0)
-                const AliceAddressStake = await ankrCollateralAdapter.stake(AliceAddress)
+                const AliceAddressStake = await collateralTokenAdapter.stake(AliceAddress)
                 expect(AliceAddressStake, "Stake must be correctly updated after exportPosition").to.be.equal(WeiPerWad)
 
                 //6. alice import position back
@@ -1487,7 +1487,7 @@ describe("PositionPermissions", () => {
                     alicePositionWalletPositionAfterImport.debtShare,
                     "debtShare should be 1 FXD, because Alice Import"
                 ).to.be.equal(WeiPerWad)
-                const alicePositionStake = await ankrCollateralAdapter.stake(alicePositionAddress)
+                const alicePositionStake = await collateralTokenAdapter.stake(alicePositionAddress)
                 expect(alicePositionStake, "Stake must be correctly updated after importPosition").to.be.equal(WeiPerWad)
 
             })

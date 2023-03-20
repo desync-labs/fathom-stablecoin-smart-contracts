@@ -27,8 +27,8 @@ module.exports = async function (deployer) {
         "BookKeeperFlashMintArbitrager",
         "DelayFathomOraclePriceFeed",
         "DexPriceOracle",
-        "AnkrCollateralAdapter",
-        "SlidingWindowDexOracle"
+        "CollateralTokenAdapter",
+        "SlidingWindowDexOracle",
     ]
 
     const promises = contracts.map(contract => {

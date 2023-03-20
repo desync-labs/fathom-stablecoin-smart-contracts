@@ -116,7 +116,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
              ,"LiquidationEngine/batchLiquidate-invalid-arguments");
 
     for(uint i = 0; i < _collateralPoolIds.length; i++){
-        try this.liquidate(_collateralPoolIds[i], _positionAddresses[i],_debtShareToBeLiquidateds[i], _maxDebtShareToBeLiquidateds[i], _collateralRecipients[i], datas[i],msg.sender){
+        try this.liquidateForBatch(_collateralPoolIds[i], _positionAddresses[i],_debtShareToBeLiquidateds[i], _maxDebtShareToBeLiquidateds[i], _collateralRecipients[i], datas[i],msg.sender){
         } catch Error(string memory reason) {
             emit LiquidationFail(_collateralPoolIds[i], _positionAddresses[i], msg.sender, reason);
             continue;
@@ -132,7 +132,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
   }
 
   //This function is overload implementation of liquidate() and will only be called from LiquidationEngine contract to support batch liquidation, 
-  function liquidate(
+  function liquidateForBatch(
     bytes32 _collateralPoolId,
     address _positionAddress,
     uint256 _debtShareToBeLiquidated, // [rad]
@@ -157,6 +157,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated,_maxDebtShareToBeLiquidated, _collateralRecipient, _data, msg.sender);
   }
 
+
   function _liquidate(
     bytes32 _collateralPoolId,
     address _positionAddress,
@@ -166,7 +167,6 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     bytes calldata _data,
     address sender
   ) internal {
-
     require(live == 1, "LiquidationEngine/not-live");
     require(_debtShareToBeLiquidated != 0, "LiquidationEngine/zero-debt-value-to-be-liquidated");
     require(_maxDebtShareToBeLiquidated != 0, "LiquidationEngine/zero-max-debt-value-to-be-liquidated");
@@ -213,6 +213,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
       _collateralRecipient,
       _data
     );
+
     (_vars.newPositionLockedCollateral, _vars.newPositionDebtShare) = bookKeeper.positions(
       _collateralPoolId,
       _positionAddress
