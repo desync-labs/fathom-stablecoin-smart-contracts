@@ -22,7 +22,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     IBookKeeper public bookKeeper;
     address public stablecoin;
     address public token;
-    bool public publicAccessEnableStatus;
+    bool public isDecentralizedState;
     mapping(address => uint256) public tokenBalance;
 
     uint256 public feeIn; // fee in [wad]
@@ -30,16 +30,19 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     uint256 public lastUpdate;
 
     uint256 public remainingDailySwapAmount; // [wad]
-    uint256 public dailySwapLimitNumerator; // [wad]
-    uint256 public singleSwapLimitWeight; // 10000th
+    uint256 public dailySwapLimitNumerator; // 10000th
+    uint256 public singleSwapLimitNumerator; // 10000th
     uint256 public totalTokenFeeBalance; // [wad]
     uint256 public totalFXDFeeBalance; // [wad]
 
     uint256 public constant ONE_DAY = 86400;
-    uint256 public constant MINIMUM_DAILY_SWAP_LIMIT_NUMERATOR = 5;
+    uint256 public constant MINIMUM_DAILY_SWAP_LIMIT_NUMERATOR = 200;
     uint256 public constant MINIMUM_SINGLE_SWAP_LIMIT_WEIGHT = 50;
 
+    uint256 constant WAD = 10**18;
+    
     mapping(address => bool) usersWhitelist;
+    mapping(address => uint256) pastUserSwapBlockTime;
 
     event LogSetFeeIn(address indexed _caller, uint256 _feeIn);
     event LogSetFeeOut(address indexed _caller, uint256 _feeOut);
@@ -52,7 +55,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     event LogRemainingDailySwapAmount(uint256 _remainingDailySwapAmount);
     event LogStableSwapPauseState(bool _pauseState);
     event LogEmergencyWithdraw(address indexed _account);
-    event LogPublicEnableStatus(bool _oldPublicEnableStatus, bool _newPublicEnableStatus);
+    event LogDecentralizedStateStatus(bool _oldDecentralizedStateStatus, bool _newDecentralizedStateStatus);
     event LogAddToWhitelist(address indexed user);
     event LogRemoveFromWhitelist(address indexed user);
 
@@ -77,6 +80,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         address _token,
         address _stablecoin,
         uint256 _dailySwapLimitNumerator,
+        uint256 _singleSwapLimitNumerator,
         address[] calldata whitelistedUsers
     ) external initializer {
         PausableUpgradeable.__Pausable_init();
@@ -86,6 +90,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         stablecoin = _stablecoin;
         token = _token;
         dailySwapLimitNumerator = _dailySwapLimitNumerator;
+        singleSwapLimitNumerator = _singleSwapLimitNumerator;
         for(uint i;i<whitelistedUsers.length;i++){
             if(whitelistedUsers[i] != address(0)){
                 usersWhitelist[whitelistedUsers[i]] = true;
@@ -94,7 +99,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         }
     }
 
-    uint256 constant WAD = 10**18;
+    
 
     function setDailySwapLimitNumerator(uint256 newdailySwapLimitNumerator) external onlyOwner {
         require(newdailySwapLimitNumerator <= dailySwapLimitDenominator(),"StableSwapModule/numerator-over-denominator");
@@ -104,10 +109,10 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     }
 
     function setSingleSwapLimitWeight(uint256 newSingleSwapLimitWeight) external onlyOwner {
-        require(newSingleSwapLimitWeight <= singleSwapLimitWeightDenominator(),"StableSwapModule/numerator-over-denominator");
+        require(newSingleSwapLimitWeight <= singleSwapLimitDenominator(),"StableSwapModule/numerator-over-denominator");
         require(newSingleSwapLimitWeight >= MINIMUM_SINGLE_SWAP_LIMIT_WEIGHT, "StableSwapModule/less-than-minimum-single-swap-limit");
-        emit LogSingleSwapLimitUpdate(newSingleSwapLimitWeight, singleSwapLimitWeight);
-        singleSwapLimitWeight = newSingleSwapLimitWeight;
+        emit LogSingleSwapLimitUpdate(newSingleSwapLimitWeight, singleSwapLimitNumerator);
+        singleSwapLimitNumerator = newSingleSwapLimitWeight;
     }
 
     function setFeeIn(uint256 _feeIn) external onlyOwner {
@@ -122,9 +127,9 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogSetFeeOut(msg.sender, _feeOut);
     }
 
-    function setPublicAccessEnabled(bool _status) external onlyOwner{
-        publicAccessEnableStatus = _status;
-        emit LogPublicEnableStatus(publicAccessEnableStatus, _status);
+    function setDecentralizedStatesStatus(bool _status) external onlyOwner{
+        isDecentralizedState = _status;
+        emit LogDecentralizedStateStatus(isDecentralizedState, _status);
     }
 
     function addToWhitelist(address _user) external onlyOwner{
@@ -137,17 +142,20 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogRemoveFromWhitelist(_user);
     }
 
-    function swapTokenToStablecoin(address _usr, uint256 _amount) external override onlyWhitelisted(_usr) nonReentrant whenNotPaused {
+    function swapTokenToStablecoin(address _usr, uint256 _amount) external override whenNotPaused onlyWhitelistedIfNotDecentralized(msg.sender) nonReentrant  {
         require(_amount != 0, "StableSwapModule/amount-zero");
 
         uint256 tokenAmount18 = _convertDecimals(_amount, IToken(token).decimals(), 18);
         uint256 fee = (tokenAmount18 * feeIn) / WAD;
         uint256 stablecoinAmount = tokenAmount18 - fee;
         require(tokenBalance[stablecoin] >= stablecoinAmount, "swapTokenToStablecoin/not-enough-stablecoin-balance");
-
-        _checkSingleSwapLimit(tokenAmount18);
-        _udpateAndCheckDailyLimit(tokenAmount18);
         
+        if(isDecentralizedState){
+            _checkSingleSwapLimit(tokenAmount18);
+            _udpateAndCheckDailyLimit(tokenAmount18);
+            _checkAndUpdateOneSwapPerBlock(msg.sender);
+        }
+
         tokenBalance[stablecoin] -= stablecoinAmount;
         tokenBalance[token] += _amount;
         totalFXDFeeBalance += fee;
@@ -157,7 +165,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogSwapTokenToStablecoin(_usr, _amount, fee);
     }
 
-    function swapStablecoinToToken(address _usr, uint256 _amount) external override onlyWhitelisted(_usr) nonReentrant whenNotPaused {
+    function swapStablecoinToToken(address _usr, uint256 _amount) external override whenNotPaused onlyWhitelistedIfNotDecentralized(msg.sender) nonReentrant  {
         require(_amount != 0, "StableSwapModule/amount-zero");
         
         uint256 fee = (_amount * feeOut) / WAD;
@@ -165,8 +173,11 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         
         require(tokenBalance[token] >= tokenAmount, "swapStablecoinToToken/not-enough-token-balance");
         
-        _checkSingleSwapLimit(_amount);
-        _udpateAndCheckDailyLimit(_amount);
+        if(isDecentralizedState){
+            _checkSingleSwapLimit(_amount);
+            _udpateAndCheckDailyLimit(_amount);
+            _checkAndUpdateOneSwapPerBlock(msg.sender);
+        }
 
         tokenBalance[token] -= tokenAmount;
         tokenBalance[stablecoin] += _amount;
@@ -225,7 +236,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     function _udpateAndCheckDailyLimit(uint256 _amount) internal {
         if (block.timestamp - lastUpdate >= ONE_DAY) {
             lastUpdate = block.timestamp;
-            remainingDailySwapAmount = _calculateDailySwapLimit();
+            remainingDailySwapAmount = _dailySwapLimit();
         }
         require(remainingDailySwapAmount >= _amount, "_udpateAndCheckDailyLimit/daily-limit-exceeded");
         remainingDailySwapAmount -= _amount;
@@ -233,26 +244,29 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     }
 
     function _checkSingleSwapLimit(uint256 _amount) view internal {
-        uint256 TotalValueLocked = _calculateTotalValueLocked();
-        require(_amount<= TotalValueLocked * singleSwapLimitWeight / singleSwapLimitWeightDenominator(),
+        require(_amount<= TotalValueLocked() * singleSwapLimitNumerator / singleSwapLimitDenominator(),
                 "_checkSingleSwapLimit/single-swap-exceeds-limit");
     }
 
-    function _calculateDailySwapLimit() internal view returns (uint256){
-        uint256 TotalValueLocked = _calculateTotalValueLocked();
-        uint256 newDailySwapLimit = TotalValueLocked * dailySwapLimitNumerator/dailySwapLimitDenominator();
+    function _dailySwapLimit() internal view returns (uint256){
+        uint256 newDailySwapLimit = TotalValueLocked() * dailySwapLimitNumerator/dailySwapLimitDenominator();
         return newDailySwapLimit;
     }
 
-    function _calculateTotalValueLocked() internal view returns(uint256) {
+    function _checkAndUpdateOneSwapPerBlock(address account) internal {
+        require(pastUserSwapBlockTime[account]!=block.timestamp,'one-block-swap-limit-exceeded');
+        pastUserSwapBlockTime[account] = block.timestamp;
+    }
+
+    function TotalValueLocked() public view returns(uint256) {
         return tokenBalance[stablecoin] + _convertDecimals(tokenBalance[token], IToken(token).decimals(),18);
     }
 
     function dailySwapLimitDenominator() public pure returns (uint256){
-        return 100;
+        return 10000;
     }
 
-    function singleSwapLimitWeightDenominator() public pure returns (uint256){
+    function singleSwapLimitDenominator() public pure returns (uint256){
         return 10000;
     }
 
@@ -265,10 +279,10 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     }
     
 
-    modifier onlyWhitelisted(
+    modifier onlyWhitelistedIfNotDecentralized(
         address _account
     ){
-        if(!publicAccessEnableStatus){
+        if(!isDecentralizedState){
             require(usersWhitelist[_account],"Stablswap/user-not-whitelisted");
         }
         _;

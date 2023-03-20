@@ -12,6 +12,8 @@ const FathomToken = artifacts.require('FathomToken.sol');
 const ERC20 = artifacts.require('ERC20Mintable.sol');
 const ERC20Stable = artifacts.require('ERC20MintableStableSwap.sol')
 const SimplePriceFeed = artifacts.require('SimplePriceFeed.sol')
+const StableswapMultipleSwapsMock =  artifacts.require("StableswapMultipleSwapsMock");
+
 module.exports =  async function(deployer) {
   const promises = [
       deployer.deploy(ERC20, "US+", "US+", { gas: 3050000 }),
@@ -26,7 +28,7 @@ module.exports =  async function(deployer) {
   await Promise.all(promises);
 
   await deployer.deploy(MockedXDCStakingPool, aXDCcMocked.address, { gas: 3050000 });
-
+  
   // set ratio
   const aXDCc = await aXDCcMocked.at(aXDCcMocked.address);
   await aXDCc.setRatio(
@@ -40,6 +42,6 @@ module.exports =  async function(deployer) {
 
   await deployer.deploy(ERC20, "WXDC", "WXDC", { gas: 3050000 }),
   addresses[chainId].WXDC = ERC20.address;
-
+  await deployer.deploy(StableswapMultipleSwapsMock,{ gas: 3050000 })
   fs.writeFileSync('./externalAddresses.json', JSON.stringify(addresses));
 };

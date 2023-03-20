@@ -35,7 +35,8 @@ module.exports = async function (deployer) {
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const addresses = getAddresses(deployer.networkId())
-    const dailyLimitNumerator = 20
+    const dailyLimitNumerator = 2000//on denomination of 10000th, 2000/10000 = 20%
+    const singleSwapLimitNumerator = 100 ///on denomination of 10000th, 100/10000 = 1%
 
     const promises = [
         accessControlConfig.initialize({ gasLimit: 1000000 }),
@@ -98,6 +99,7 @@ module.exports = async function (deployer) {
             addresses.USD,
             fathomStablecoin.address,
             dailyLimitNumerator,
+            singleSwapLimitNumerator,
             [],
             { gasLimit: 1000000 }
         ),
