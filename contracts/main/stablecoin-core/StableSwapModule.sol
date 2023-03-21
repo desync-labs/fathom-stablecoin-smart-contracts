@@ -99,13 +99,12 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         }
     }
 
-    
-
     function setDailySwapLimitNumerator(uint256 newdailySwapLimitNumerator) external onlyOwner {
         require(newdailySwapLimitNumerator <= dailySwapLimitDenominator(),"StableSwapModule/numerator-over-denominator");
         require(newdailySwapLimitNumerator >= MINIMUM_DAILY_SWAP_LIMIT_NUMERATOR, "StableSwapModule/less-than-minimum-daily-swap-limit");
         emit LogDailySwapLimitUpdate(newdailySwapLimitNumerator, dailySwapLimitNumerator);
         dailySwapLimitNumerator = newdailySwapLimitNumerator;
+        remainingDailySwapAmount = _dailySwapLimit();
     }
 
     function setSingleSwapLimitWeight(uint256 newSingleSwapLimitWeight) external onlyOwner {
@@ -113,6 +112,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(newSingleSwapLimitWeight >= MINIMUM_SINGLE_SWAP_LIMIT_WEIGHT, "StableSwapModule/less-than-minimum-single-swap-limit");
         emit LogSingleSwapLimitUpdate(newSingleSwapLimitWeight, singleSwapLimitNumerator);
         singleSwapLimitNumerator = newSingleSwapLimitWeight;
+        remainingDailySwapAmount = _dailySwapLimit();
     }
 
     function setFeeIn(uint256 _feeIn) external onlyOwner {
@@ -194,6 +194,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_token.balanceOf(msg.sender) >= _amount, "depositStablecoin/not-enough-balance");
         tokenBalance[_token] += _amount;
         _token.safeTransferFrom(msg.sender, address(this), _amount);
+        remainingDailySwapAmount = _dailySwapLimit();
         emit LogDepositToken(msg.sender, _token, _amount);
     }
 
@@ -283,7 +284,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         address _account
     ){
         if(!isDecentralizedState){
-            require(usersWhitelist[_account],"Stablswap/user-not-whitelisted");
+            require(usersWhitelist[_account],"user-not-whitelisted");
         }
         _;
     }

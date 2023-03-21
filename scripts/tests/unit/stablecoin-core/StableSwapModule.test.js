@@ -364,9 +364,7 @@ describe("StableSwapModule", () => {
         await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad)
         await mockUSD.mock.balanceOf.returns(WeiPerWad.mul(2))
         await stableSwapModule.depositToken(mockFathomStablecoin.address, WeiPerWad)
-
         await stableSwapModule.setFeeIn(WeiPerWad.div(10))
-
         await expect(
           stableSwapModule.swapTokenToStablecoin(DeployerAddress, WeiPerWad)
         ).to.be.emit(stableSwapModule, "LogSwapTokenToStablecoin")
@@ -399,6 +397,7 @@ describe("StableSwapModule", () => {
         ).to.be.revertedWith("swapStablecoinToToken/not-enough-token-balance")
       })
     })
+
     context("exceed single swap limit", () => {
       it("should revert after setting decentralized state - single swap limit", async () => {
         const bigMoney = WeiPerWad.mul(1000000);
@@ -530,7 +529,6 @@ describe("StableSwapModule", () => {
     context("not authorized", () => {
       it("should revert", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(false)
-
         await expect(stableSwapModule.pause()).to.be.revertedWith("!(ownerRole or govRole)")
       })
     })
@@ -551,7 +549,6 @@ describe("StableSwapModule", () => {
     context("not authorized", () => {
       it("should revert", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(false)
-
         await expect(stableSwapModule.unpause()).to.be.revertedWith("!(ownerRole or govRole)")
       })
     })
@@ -559,9 +556,7 @@ describe("StableSwapModule", () => {
     context("when role can access", () => {
       it("should be success", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(true)
-
         await stableSwapModule.pause();
-
         await expect(
           stableSwapModule.unpause()
         ).to.be.emit(stableSwapModule, "LogStableSwapPauseState")

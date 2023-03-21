@@ -147,12 +147,14 @@ describe("StableSwapModule", () => {
                 for(let i =0;i < 10;i++){
                     console.log("Swapping Token to Stablecoin - No...........",i+1)
                     await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                    //increase block time so that a block is mined before swapping
                     await TimeHelpers.increase(1)
                 }
 
                 for(let i =0;i < 10;i++){
                     console.log("Swapping Stablecion to Token - No...........",i+1)
                     await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })    
+                    //increase block time so that a block is mined before swapping
                     await TimeHelpers.increase(1)
                 }
                 //revert because it exceed allowance
@@ -210,4 +212,45 @@ describe("StableSwapModule", () => {
             })
         })
     })
+
+    describe("#StableswapMultipleSwapsMock", async () => {
+        context("twoStablecoinToTokenSwapAtSameBlock- swap tokens in same block", async () => {
+            it("should revert if we swap tokens in same block", async () => {
+                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})  
+                await fathomStablecoin.approve(stableswapMultipleSwapsMock.address,MaxUint256,{gasLimit:8000000})
+                await expect(
+                    stableswapMultipleSwapsMock.twoStablecoinToTokenSwapAtSameBlock(stableSwapModule.address,fathomStablecoin.address,ONE_PERCENT_OF_TOTAL_DEPOSIT,{gasLimit:8000000})
+                ).to.be.revertedWith("no error message bubbled up - for second swap") //TODO: Why is error not bubbling up?
+            })
+         })
+
+         context("twoTokenToStablecoinSwapAtSameBlock- swap tokens in same block",async () => {
+            it("should revert if we swap tokens in same block", async () => {
+                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})  
+                await USDT.approve(stableswapMultipleSwapsMock.address,MaxUint256,{gasLimit:8000000})
+                await expect(
+                    stableswapMultipleSwapsMock.twoTokenToStablecoinSwapAtSameBlock(stableSwapModule.address,USDT.address,ONE_PERCENT_OF_TOTAL_DEPOSIT,{gasLimit:8000000})
+                ).to.be.revertedWith("no error message bubbled up - for second swap") //TODO: Why is error not bubbling up?
+            })
+         })
+    })
+
+    describe("#stableswapNotWhitelistedUserSwaps", async () => {
+        context("not whitelisted-swapTokenToStablecoin", () => {
+            it("should revert -  fail if the decentralized state is not activated and sender is not whitelisted", async () => {
+              await expect(
+                stableSwapModule.swapTokenToStablecoin(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT,{from: accounts[2]})
+              ).to.be.revertedWith("user-not-whitelisted")
+            })
+          })
+          context("not whitelisted-swapStablecoinToToken", () => {
+            it("should revert -  fail if the decentralized state is not activated and sender is not whitelisted", async () => {
+              await expect(
+                stableSwapModule.swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT, {from: accounts[2]})
+              ).to.be.revertedWith("user-not-whitelisted")
+            })
+        })
+    })
+
+    
 })

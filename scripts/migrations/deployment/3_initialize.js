@@ -93,14 +93,13 @@ module.exports = async function (deployer) {
             systemDebtEngine.address,
             { gasLimit: 1000000 }
         ),
-        
         stableSwapModule.initialize(
             bookKeeper.address,
             addresses.USD,
             fathomStablecoin.address,
             dailyLimitNumerator,
             singleSwapLimitNumerator,
-            [],
+            [],//@notice: This can be set to addresses you want to whitelist
             { gasLimit: 1000000 }
         ),
         flashMintArbitrager.initialize({ gasLimit: 1000000 }),

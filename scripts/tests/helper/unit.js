@@ -21,6 +21,6 @@ function weiToDecimal(input) {
 
 function rayToDecimal(input) {
   return Number((input/Math.pow(10, 27)).toFixed(2));
-}
+} 
 
 module.exports = {WeiPerWad, WeiPerBln, WeiPerRay, WeiPerRad, weiToRay, weiToDecimal, rayToDecimal}
