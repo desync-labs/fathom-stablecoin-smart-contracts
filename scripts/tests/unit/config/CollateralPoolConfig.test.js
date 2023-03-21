@@ -435,6 +435,13 @@ describe("CollateralPoolConfig", () => {
         ).to.be.revertedWith("CollateralPoolConfig/invalid-close-factor-bps")
       })
     })
+    context("when close factor bps is 0", () => {
+      it("should be revert", async () => {
+        await expect(
+          collateralPoolConfig.setCloseFactorBps(COLLATERAL_POOL_ID, BigNumber.from(0))
+        ).to.be.revertedWith("CollateralPoolConfig/invalid-close-factor-bps")
+      })
+    })
     context("when parameters are valid", () => {
       it("should success", async () => {
         await expect(collateralPoolConfig.setCloseFactorBps(COLLATERAL_POOL_ID, CLOSE_FACTOR_BPS))
