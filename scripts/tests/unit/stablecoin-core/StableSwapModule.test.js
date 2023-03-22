@@ -504,7 +504,6 @@ describe("StableSwapModule", () => {
     context("zero address", () => {
       it("should revert", async () => {
         await stableSwapModule.pause()
-
         await expect(
           stableSwapModule.emergencyWithdraw(AddressZero)
         ).to.be.revertedWith("withdrawFees/empty-account")
@@ -536,7 +535,6 @@ describe("StableSwapModule", () => {
     context("when role can access", () => {
       it("should be success", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(true)
-
         await expect(
           stableSwapModule.pause()
         ).to.be.emit(stableSwapModule, "LogStableSwapPauseState")

@@ -13,10 +13,11 @@ const { WeiPerWad } = require("../helper/unit");
 const { expect } = chai
 
 const TO_DEPOSIT = ethers.utils.parseEther("10000000")
-const TO_MINT= ethers.utils.parseEther("10000000")
+const TO_MINT= ethers.utils.parseEther("20000000")
 const TWENTY_PERCENT_OF_TO_DEPOSIT = ethers.utils.parseEther("4000000") //20Million * 20% = 400k
-const TEN_PERCENT_OF_TO_DEPOSIT = ethers.utils.parseEther("1000000")
+const THIRTY_PERCENT_OF_TO_DEPOSIT = ethers.utils.parseEther("6000000")
 const ONE_PERCENT_OF_TOTAL_DEPOSIT = ethers.utils.parseEther("200000")
+const FOURTY_PERCENT_OF_TO_DEPOSIT= ethers.utils.parseEther("8000000")
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const stableswapMultipleSwapsMock = await artifacts.initializeInterfaceAt("StableswapMultipleSwapsMock", "StableswapMultipleSwapsMock");
@@ -28,13 +29,12 @@ const setup = async () => {
     const usdtAddr = await stableSwapModule.token()
     const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
 
-    await fathomStablecoin.mint(DeployerAddress, TO_DEPOSIT, { gasLimit: 1000000 })
-
-    await USDT.mint(accounts[0], TO_DEPOSIT, { gasLimit: 1000000 })
-
     await USDT.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
     await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
     
+    await USDT.mint(DeployerAddress, TO_DEPOSIT, { gasLimit: 1000000 })
+    await fathomStablecoin.mint(DeployerAddress, TO_DEPOSIT, { gasLimit: 1000000 })
+
     await stableSwapModule.depositToken(USDT.address,TO_DEPOSIT,{ gasLimit: 1000000 })
     await stableSwapModule.depositToken(fathomStablecoin.address,TO_DEPOSIT,{ gasLimit: 1000000 })
 
@@ -138,6 +138,68 @@ describe("StableSwapModule", () => {
         })
     })
 
+    describe("#addToWhitelist", async () => {
+        context("add to whitelist and check it should swap", async () => {
+            it("should swapStablecoinToToken", async () => {
+                const whitelistAccount = accounts[2]
+                await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { from: whitelistAccount,gasLimit: 1000000})
+                await fathomStablecoin.mint(whitelistAccount, TO_MINT, { gasLimit: 1000000 })
+                await stableSwapModule.addToWhitelist(whitelistAccount)
+                const beforeBalanceOfStablecoin = await fathomStablecoin.balanceOf(whitelistAccount)
+                const beforeBalanceOfUSDT = await USDT.balanceOf(whitelistAccount)
+                
+                await stableSwapModule.swapStablecoinToToken(whitelistAccount,ethers.utils.parseEther("1000000"), {from: whitelistAccount, gasLimit: 1000000 })
+                const afterBalanceOfStablecoin = await fathomStablecoin.balanceOf(whitelistAccount)
+                const afterBalanceOfUSDT = await USDT.balanceOf(whitelistAccount)
+                expect(beforeBalanceOfStablecoin.sub(afterBalanceOfStablecoin)).to.be.equal(ethers.utils.parseEther("1000000"))
+                // 1000000 -> from swap, -ve 500-> from fee. Total balance = 1000000 - 1000 = 999000
+                expect(afterBalanceOfUSDT.sub(beforeBalanceOfUSDT)).to.be.equal(ethers.utils.parseEther("999000"))
+            })
+            
+        })
+
+        context("add to whitelist and check it should swap", async () => {
+            it("should swapTokenToStablecoin", async () => {
+                const whitelistAccount = accounts[2]
+                await USDT.approve(stableSwapModule.address, MaxUint256, { from: whitelistAccount,gasLimit: 1000000})
+                await USDT.mint(whitelistAccount, TO_MINT, { gasLimit: 1000000 })
+                await fathomStablecoin.mint(whitelistAccount, TO_MINT, { gasLimit: 1000000 })
+                await stableSwapModule.addToWhitelist(whitelistAccount)
+                await stableSwapModule.swapTokenToStablecoin(whitelistAccount,ethers.utils.parseEther("1000000"), { from: whitelistAccount,gasLimit: 1000000 })
+            })
+            
+        })
+    })
+
+    describe("#removeFromWhitelist", async () => {
+        context("add to whitelist and check it should swap and again remove from whitelist and check for revert", async () => {
+            it("should swapStablecoinToToken and revert", async () => {
+                const whitelistAccount = accounts[2]
+                await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { from: whitelistAccount,gasLimit: 1000000})
+                await fathomStablecoin.mint(whitelistAccount, TO_MINT, { gasLimit: 1000000 })
+                await stableSwapModule.addToWhitelist(whitelistAccount)
+                await stableSwapModule.swapStablecoinToToken(whitelistAccount,ethers.utils.parseEther("1000000"), {from: whitelistAccount, gasLimit: 1000000 })
+                await stableSwapModule.removeFromWhitelist(whitelistAccount)
+                await expect(stableSwapModule.swapStablecoinToToken(whitelistAccount,ethers.utils.parseEther("1000000"), {from: whitelistAccount, gasLimit: 1000000 })).to.be.revertedWith("user-not-whitelisted")
+            })
+            
+        })
+
+        context("add to whitelist and check it should swap and again remove from whitelist and check for revert", async () => {
+            it("should swapTokenToStablecoin and revert", async () => {
+                const whitelistAccount = accounts[2]
+                await USDT.approve(stableSwapModule.address, MaxUint256, { from: whitelistAccount,gasLimit: 1000000})
+                await USDT.mint(whitelistAccount, TO_MINT, { gasLimit: 1000000 })
+                await fathomStablecoin.mint(whitelistAccount, TO_MINT, { gasLimit: 1000000 })
+                await stableSwapModule.addToWhitelist(whitelistAccount)
+                await stableSwapModule.swapTokenToStablecoin(whitelistAccount,ethers.utils.parseEther("1000000"), { from: whitelistAccount,gasLimit: 1000000 })
+                await stableSwapModule.removeFromWhitelist(whitelistAccount)
+                await expect(stableSwapModule.swapTokenToStablecoin(whitelistAccount,ethers.utils.parseEther("1000000"), {from: whitelistAccount, gasLimit: 1000000 })).to.be.revertedWith("user-not-whitelisted")
+            })
+            
+        })
+    })
+
     describe("#dailyLimitCheck", async () => {
         context("check for daily limit", async() => {
             it("Should swap tokens and revert when dailyswap limit is reached", async() => {
@@ -170,6 +232,29 @@ describe("StableSwapModule", () => {
                 //again swap after increasing timestamp
                 //should succeed
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+            })
+        })
+
+        context("check for daily limit - depositToken", async() => {
+            it("Should update dailyLimit on depositing more token", async() => {
+                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
+                await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })    
+                await stableSwapModule.depositToken(USDT.address,TO_DEPOSIT,{ gasLimit: 1000000 })
+                await stableSwapModule.depositToken(fathomStablecoin.address,TO_DEPOSIT,{ gasLimit: 1000000 })
+                //Why GreaterThanOrEqual? Because there is one swap already done which incurs fee so total pool has increased
+                const remainingDailySwapAmount = await stableSwapModule.remainingDailySwapAmount() 
+                expect(remainingDailySwapAmount).to.be.gte(FOURTY_PERCENT_OF_TO_DEPOSIT);
+            })
+        })
+
+        context("check for daily limit - setDailySwapLimitNumerator", async() => {
+            it("Should update dailyLimit on depositing more token", async() => {
+                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
+                await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })    
+                await stableSwapModule.setDailySwapLimitNumerator(3000,{gasLimit: 8000000})
+                //Why GreaterThanOrEqual? Because there is one swap already done which incurs fee so total pool has increased
+                const remainingDailySwapAmount = await stableSwapModule.remainingDailySwapAmount() 
+                expect(remainingDailySwapAmount).to.be.gte(THIRTY_PERCENT_OF_TO_DEPOSIT);
             })
         })
     })

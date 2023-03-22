@@ -37,7 +37,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
     uint256 public constant ONE_DAY = 86400;
     uint256 public constant MINIMUM_DAILY_SWAP_LIMIT_NUMERATOR = 200;
-    uint256 public constant MINIMUM_SINGLE_SWAP_LIMIT_WEIGHT = 50;
+    uint256 public constant MINIMUM_SINGLE_SWAP_LIMIT_NUMERATOR = 50;
 
     uint256 constant WAD = 10**18;
     
@@ -104,15 +104,17 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(newdailySwapLimitNumerator >= MINIMUM_DAILY_SWAP_LIMIT_NUMERATOR, "StableSwapModule/less-than-minimum-daily-swap-limit");
         emit LogDailySwapLimitUpdate(newdailySwapLimitNumerator, dailySwapLimitNumerator);
         dailySwapLimitNumerator = newdailySwapLimitNumerator;
-        remainingDailySwapAmount = _dailySwapLimit();
+        if(isDecentralizedState){
+            lastUpdate = block.timestamp;
+            remainingDailySwapAmount = _dailySwapLimit();
+        }
     }
 
     function setSingleSwapLimitWeight(uint256 newSingleSwapLimitWeight) external onlyOwner {
         require(newSingleSwapLimitWeight <= singleSwapLimitDenominator(),"StableSwapModule/numerator-over-denominator");
-        require(newSingleSwapLimitWeight >= MINIMUM_SINGLE_SWAP_LIMIT_WEIGHT, "StableSwapModule/less-than-minimum-single-swap-limit");
+        require(newSingleSwapLimitWeight >= MINIMUM_SINGLE_SWAP_LIMIT_NUMERATOR, "StableSwapModule/less-than-minimum-single-swap-limit");
         emit LogSingleSwapLimitUpdate(newSingleSwapLimitWeight, singleSwapLimitNumerator);
         singleSwapLimitNumerator = newSingleSwapLimitWeight;
-        remainingDailySwapAmount = _dailySwapLimit();
     }
 
     function setFeeIn(uint256 _feeIn) external onlyOwner {
@@ -194,7 +196,10 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_token.balanceOf(msg.sender) >= _amount, "depositStablecoin/not-enough-balance");
         tokenBalance[_token] += _amount;
         _token.safeTransferFrom(msg.sender, address(this), _amount);
-        remainingDailySwapAmount = _dailySwapLimit();
+        if(isDecentralizedState){
+            lastUpdate = block.timestamp;
+            remainingDailySwapAmount = _dailySwapLimit();
+        }
         emit LogDepositToken(msg.sender, _token, _amount);
     }
 
@@ -250,7 +255,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     }
 
     function _dailySwapLimit() internal view returns (uint256){
-        uint256 newDailySwapLimit = TotalValueLocked() * dailySwapLimitNumerator/dailySwapLimitDenominator();
+        uint256 newDailySwapLimit = TotalValueLocked() * dailySwapLimitNumerator / dailySwapLimitDenominator();
         return newDailySwapLimit;
     }
 
