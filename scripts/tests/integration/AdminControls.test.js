@@ -1,5 +1,4 @@
 const chai = require('chai');
-const { ethers } = require("ethers");
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 
@@ -65,7 +64,7 @@ describe("AdminControls", () => {
     })
 
     describe("#pause", () => {
-        context("pause protocols", () => {
+        context("pause protocol", () => {
             it("protocol contracts should be paused", async () => {
                 await adminControls.pauseProtocol()
                 
@@ -81,7 +80,7 @@ describe("AdminControls", () => {
         })
     })
     describe("#unpause", () => {
-        context("unpause protocols", () => {
+        context("unpause protocol", () => {
             it("protocol contracts should be unpaused", async () => {
                 await adminControls.pauseProtocol()
 

@@ -75,8 +75,6 @@ contract AdminControls is OwnableUpgradeable {
         emit LogUnpauseProtocol();
     }
 
-
-
     function setBookKeeper(address _bookKeeper) external onlyOwnerOrGov {
         require(_bookKeeper != address(0), "AdminControls/zero-address");
         bookKeeper = _bookKeeper;
