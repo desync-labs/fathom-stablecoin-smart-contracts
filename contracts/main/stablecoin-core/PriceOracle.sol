@@ -92,6 +92,8 @@ contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceO
     }
 
     function setPrice(bytes32 _collateralPoolId) external whenNotPaused {
+        require(live == 1, "PriceOracle/not-live");
+        
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).collateralPools(_collateralPoolId).priceFeed);
         uint256 _liquidationRatio = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLiquidationRatio(_collateralPoolId);
         (bytes32 _rawPrice, bool _hasPrice) = _priceFeed.peekPrice();

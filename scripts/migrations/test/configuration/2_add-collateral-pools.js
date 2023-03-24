@@ -28,7 +28,7 @@ module.exports = async function (deployer) {
     const debtCeilingSetUp = WeiPerRad.mul(100000000000000);
 
     await simplePriceFeed.setPrice(WeiPerWad.mul(1), { gasLimit: 2000000 });
-    await simplePriceFeed.setPoolId(pools.XDC, { gasLimit: 1000000 });
+    await simplePriceFeed.setPoolId(pools.XDC, { gasLimit: 2000000 });
 
     const promises = [
         initPool(pools.XDC, ankrCollateralAdapter.address, simplePriceFeed.address, WeiPerRay)
