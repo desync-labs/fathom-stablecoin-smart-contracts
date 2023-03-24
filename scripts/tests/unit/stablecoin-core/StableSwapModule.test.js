@@ -119,21 +119,21 @@ describe("StableSwapModule", () => {
       it("should revert", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(false)
         await expect(
-          stableSwapModule.setSingleSwapLimitWeight(dailyLimitNumerator)
+          stableSwapModule.setSingleSwapLimitNumerator(dailyLimitNumerator)
         ).to.be.revertedWith("!ownerRole")
       })
     })
     context("lower than minimum", () => {
       it("should revert", async () => {
         await expect(
-          stableSwapModule.setSingleSwapLimitWeight(1)
+          stableSwapModule.setSingleSwapLimitNumerator(1)
         ).to.be.revertedWith("StableSwapModule/less-than-minimum-single-swap-limit")
       })
     })
     context("greater than denominator", () => {
       it("should revert", async () => {
         await expect(
-          stableSwapModule.setSingleSwapLimitWeight(1000000)
+          stableSwapModule.setSingleSwapLimitNumerator(1000000)
         ).to.be.revertedWith("StableSwapModule/numerator-over-denominator")
       })
     })
@@ -143,7 +143,7 @@ describe("StableSwapModule", () => {
         const newLimit = singleSwapLimitNumerator
 
         await expect(
-          stableSwapModule.setSingleSwapLimitWeight(newLimit)
+          stableSwapModule.setSingleSwapLimitNumerator(newLimit)
         ).to.be.emit(stableSwapModule, "LogSingleSwapLimitUpdate")
           .withArgs(newLimit, oldLimit)
         expect(await stableSwapModule.singleSwapLimitNumerator()).to.be.equal(newLimit)
