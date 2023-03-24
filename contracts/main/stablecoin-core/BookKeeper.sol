@@ -9,9 +9,10 @@ import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IAccessControlConfig.sol";
+import "../interfaces/IPausable.sol";
 
 /// @notice A contract which acts as a book keeper of the Fathom Stablecoin protocol. It has the ability to move collateral token and stablecoin with in the accounting state variable.
-contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable, IPausable {
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(accessControlConfig);
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
@@ -75,12 +76,12 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     }
 
     /// @dev access: OWNER_ROLE, GOV_ROLE
-    function pause() external onlyOwnerOrGov {
+    function pause() external override onlyOwnerOrGov {
         _pause();
     }
 
     /// @dev access: OWNER_ROLE, GOV_ROLE
-    function unpause() external onlyOwnerOrGov {
+    function unpause() external override onlyOwnerOrGov {
         _unpause();
     }
 
