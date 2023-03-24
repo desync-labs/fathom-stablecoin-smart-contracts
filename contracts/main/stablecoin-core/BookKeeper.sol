@@ -390,6 +390,8 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     }
 
     function mintUnbackedStablecoin(address _from, address _to, uint256 _value) external override nonReentrant whenNotPaused onlyMintable {
+        require(live == 1, "BookKeeper/not-live");
+
         systemBadDebt[_from] = add(systemBadDebt[_from], _value);
         stablecoin[_to] = add(stablecoin[_to], _value);
         totalUnbackedStablecoin = add(totalUnbackedStablecoin, _value);

@@ -5,11 +5,11 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../../interfaces/IBookKeeper.sol";
-import "../../interfaces/IToken.sol";
-import "../../interfaces/IGenericTokenAdapter.sol";
-import "../../interfaces/ICagable.sol";
-import "../../utils/SafeToken.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IToken.sol";
+import "../../main/interfaces/IGenericTokenAdapter.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/utils/SafeToken.sol";
 
 contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGenericTokenAdapter, ICagable {
     using SafeToken for address;
