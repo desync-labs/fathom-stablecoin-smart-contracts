@@ -537,12 +537,15 @@ describe("PositionManager", () => {
         })
         context("when Alice wants to export her own position to her own address", async () => {
             it("should be able to call exportPosition()", async () => {
-                await mockedTokenAdapter.mock.onMoveCollateral.returns()
-
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 const positionAddress = await positionManager.positions(1)
 
-                await mockedTokenAdapter.mock.onMoveCollateral.returns()
+                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
+                    positionAddress,
+                    AliceAddress,
+                    WeiPerWad.mul(2),
+                    []
+                ).returns()
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
                     positionAddress
@@ -566,7 +569,12 @@ describe("PositionManager", () => {
                 // Alice allows Bob to manage her position#1
                 await positionManagerAsAlice.allowManagePosition(1, BobAddress, 1)
 
-                await mockedTokenAdapter.mock.onMoveCollateral.returns()
+                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
+                    positionAddress,
+                    BobAddress,
+                    WeiPerWad.mul(2),
+                    []
+                ).returns()
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
                     positionAddress
@@ -604,7 +612,12 @@ describe("PositionManager", () => {
             it("should be able to call importPosition()", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 const positionAddress = await positionManager.positions(1)
-                await mockedTokenAdapter.mock.onMoveCollateral.returns()
+                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
+                    AliceAddress,
+                    positionAddress,
+                    WeiPerWad.mul(2),
+                    []
+                ).returns()
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
                     AliceAddress
@@ -630,7 +643,12 @@ describe("PositionManager", () => {
                 // Alice gives Bob migration access on her address
                 await positionManagerAsAlice.allowMigratePosition(BobAddress, 1)
 
-                await mockedTokenAdapter.mock.onMoveCollateral.returns()
+                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
+                    BobAddress,
+                    positionAddress,
+                    WeiPerWad.mul(2),
+                    []
+                ).returns()
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
                     BobAddress
@@ -682,7 +700,12 @@ describe("PositionManager", () => {
                 const position1Address = await positionManager.positions(1)
                 const position2Address = await positionManager.positions(2)
 
-                await mockedTokenAdapter.mock.onMoveCollateral.returns()
+                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
+                    position1Address,
+                    position2Address,
+                    WeiPerWad.mul(2),
+                    []
+                ).returns()
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
                     position1Address
@@ -710,7 +733,12 @@ describe("PositionManager", () => {
                     formatBytes32String("WXDC"),
                     position1Address
                 ).returns(WeiPerWad.mul(2), WeiPerWad.mul(1))
-                await mockedTokenAdapter.mock.onMoveCollateral.returns()
+                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
+                    position1Address,
+                    position2Address,
+                    WeiPerWad.mul(2),
+                    []
+                ).returns()
                 await mockedBookKeeper.mock.movePosition.withArgs(
                     formatBytes32String("WXDC"),
                     position1Address,
