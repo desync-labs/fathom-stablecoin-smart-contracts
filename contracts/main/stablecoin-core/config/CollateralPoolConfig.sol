@@ -186,6 +186,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
 
     function setDebtAccumulatedRate(bytes32 _collateralPoolId, uint256 _debtAccumulatedRate) external override {
         require(accessControlConfig.hasRole(accessControlConfig.BOOK_KEEPER_ROLE(), msg.sender), "!bookKeeperRole");
+        require(_debtAccumulatedRate >= RAY, "CollateralPoolConfig/invalid-debt-accumulated-rate");
         _collateralPools[_collateralPoolId].debtAccumulatedRate = _debtAccumulatedRate;
         emit LogSetDebtAccumulatedRate(msg.sender, _collateralPoolId, _debtAccumulatedRate);
     }
