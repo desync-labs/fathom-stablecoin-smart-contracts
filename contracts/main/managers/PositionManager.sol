@@ -289,7 +289,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_positionId]));
-        _tokenAdapter.onMoveCollateral(positions[_positionId], _destination, _debtShare, abi.encode());
+        _tokenAdapter.onMoveCollateral(positions[_positionId], _destination, _lockedCollateral, abi.encode());
         emit LogExportPosition(_positionId, positions[_positionId], _destination, _lockedCollateral, _debtShare);
     }
 
@@ -312,7 +312,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_positionId]));
-        _tokenAdapter.onMoveCollateral(_source, positions[_positionId], _debtShare, abi.encode());
+        _tokenAdapter.onMoveCollateral(_source, positions[_positionId], _lockedCollateral, abi.encode());
         emit LogImportPosition(_positionId, _source, positions[_positionId], _lockedCollateral, _debtShare);
     }
 
@@ -335,7 +335,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_sourceId]));
-        _tokenAdapter.onMoveCollateral(positions[_sourceId], positions[_destinationId], _debtShare, abi.encode());
+        _tokenAdapter.onMoveCollateral(positions[_sourceId], positions[_destinationId], _lockedCollateral, abi.encode());
         emit LogMovePosition(_sourceId, _destinationId, _lockedCollateral, _debtShare);
     }
 
