@@ -536,6 +536,21 @@ describe("CollateralPoolConfig", () => {
         ).to.be.revertedWith("!bookKeeperRole")
       })
     })
+    context("zero debt accumulated rate", () => {
+      it("should be revert", async () => {
+        await expect(
+          collateralPoolConfigAsAlice.setDebtAccumulatedRate(COLLATERAL_POOL_ID, 0)
+        ).to.be.revertedWith("CollateralPoolConfig/invalid-debt-accumulated-rate")
+      })
+    })
+    context("debt accumulated rate less then ray", () => {
+      it("should be revert", async () => {
+        await expect(
+          collateralPoolConfigAsAlice.setDebtAccumulatedRate(COLLATERAL_POOL_ID, WeiPerRay.sub(1))
+        ).to.be.revertedWith("CollateralPoolConfig/invalid-debt-accumulated-rate")
+      })
+    })
+
     context("when parameters are valid", () => {
       it("should success", async () => {
 
