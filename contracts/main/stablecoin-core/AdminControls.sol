@@ -13,7 +13,6 @@ contract AdminControls is OwnableUpgradeable {
     address public liquidationEngine;
     address public priceOracle;
     address public positionManager;
-    address public stableSwapModule;
     address public systemDebtEngine;
     address public flashMintModule;
     address public stablecoinAdapter;
@@ -36,7 +35,6 @@ contract AdminControls is OwnableUpgradeable {
         address _liquidationEngine,
         address _priceOracle,
         address _positionManager,
-        address _stableSwapModule,
         address _systemDebtEngine,
         address _flashMintModule,
         address _stablecoinAdapter
@@ -45,7 +43,6 @@ contract AdminControls is OwnableUpgradeable {
         liquidationEngine = _liquidationEngine;
         priceOracle = _priceOracle;
         positionManager = _positionManager;
-        stableSwapModule = _stableSwapModule;
         flashMintModule = _flashMintModule;
         systemDebtEngine = _systemDebtEngine;
         stablecoinAdapter = _stablecoinAdapter;
@@ -56,7 +53,6 @@ contract AdminControls is OwnableUpgradeable {
         IPausable(positionManager).pause();
         IPausable(liquidationEngine).pause();
         IPausable(systemDebtEngine).pause();
-        IPausable(stableSwapModule).pause();
         IPausable(flashMintModule).pause();
         IPausable(priceOracle).pause();
         IPausable(stablecoinAdapter).pause();
@@ -68,7 +64,6 @@ contract AdminControls is OwnableUpgradeable {
         IPausable(positionManager).unpause();
         IPausable(liquidationEngine).unpause();
         IPausable(systemDebtEngine).unpause();
-        IPausable(stableSwapModule).unpause();
         IPausable(flashMintModule).unpause();
         IPausable(priceOracle).unpause();
         IPausable(stablecoinAdapter).unpause();
@@ -93,11 +88,6 @@ contract AdminControls is OwnableUpgradeable {
     function setSystemDebtEngine(address _systemDebtEngine) external onlyOwnerOrGov {
         require(_systemDebtEngine != address(0), "AdminControls/zero-address");
         systemDebtEngine = _systemDebtEngine;
-    }
-
-    function setStableSwapModule(address _stableSwapModule) external onlyOwnerOrGov {
-        require(_stableSwapModule != address(0), "AdminControls/zero-address");
-        stableSwapModule = _stableSwapModule;
     }
 
     function setFlashMintModule(address _flashMintModule) external onlyOwnerOrGov {

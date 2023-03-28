@@ -20,7 +20,6 @@ const setup = async () => {
     const mockedStablecoinAdapter = await createMock("StablecoinAdapter");
     const mockedSystemDebtEngine = await createMock("SystemDebtEngine");
     const mockedPriceOracle = await createMock("PriceOracle");
-    const mockedStableSwapModule = await createMock("StableSwapModule");
     const mockedFlashMintModule = await createMock("FlashMintModule");
     const mockedBookKeeper = await createMock("BookKeeper");
     const mockedAccessControlConfig = await createMock("AccessControlConfig");
@@ -35,7 +34,6 @@ const setup = async () => {
     await mockedStablecoinAdapter.mock.pause.returns();
     await mockedSystemDebtEngine.mock.pause.returns();
     await mockedPriceOracle.mock.pause.returns();
-    await mockedStableSwapModule.mock.pause.returns();
     await mockedFlashMintModule.mock.pause.returns();
     await mockedBookKeeper.mock.pause.returns();
 
@@ -44,7 +42,6 @@ const setup = async () => {
     await mockedStablecoinAdapter.mock.unpause.returns();
     await mockedSystemDebtEngine.mock.unpause.returns();
     await mockedPriceOracle.mock.unpause.returns();
-    await mockedStableSwapModule.mock.unpause.returns();
     await mockedFlashMintModule.mock.unpause.returns();
     await mockedBookKeeper.mock.unpause.returns();
 
@@ -55,7 +52,6 @@ const setup = async () => {
         mockedLiquidationEngine.address,
         mockedPriceOracle.address,
         mockedPositionManager.address,
-        mockedStableSwapModule.address,
         mockedSystemDebtEngine.address,
         mockedFlashMintModule.address,
         mockedStablecoinAdapter.address
@@ -223,32 +219,6 @@ describe("AdminControls", () => {
                 await mockedAccessControlConfig.mock.hasRole.withArgs(GOV_ROLE, DeployerAddress).returns(true);
                 await adminControls.setPositionManager(randomAddr);
                 expect(await adminControls.positionManager()).to.be.equal(randomAddr)
-            })
-        })
-    })
-    describe("#setStableSwapModule", () => {
-        context("user has no access", () => {
-            it("should revert", async () => {
-                await expect(adminControls.setStableSwapModule(randomAddr)).to.be.revertedWith("!(ownerRole or govRole)");
-            })
-        })
-        context("zero address", () => {
-            it("should revert", async () => {
-                await expect(adminControls.setStableSwapModule(AddressZero)).to.be.revertedWith("!(ownerRole or govRole)");
-            })
-        })
-        context("user is owner", () => {
-            it("should succeed", async () => {
-                await mockedAccessControlConfig.mock.hasRole.withArgs(OWNER_ROLE, DeployerAddress).returns(true);
-                await adminControls.setStableSwapModule(randomAddr);
-                expect(await adminControls.stableSwapModule()).to.be.equal(randomAddr)
-            })
-        })
-        context("user is gov", () => {
-            it("should succeed", async () => {
-                await mockedAccessControlConfig.mock.hasRole.withArgs(GOV_ROLE, DeployerAddress).returns(true);
-                await adminControls.setStableSwapModule(randomAddr);
-                expect(await adminControls.stableSwapModule()).to.be.equal(randomAddr)
             })
         })
     })

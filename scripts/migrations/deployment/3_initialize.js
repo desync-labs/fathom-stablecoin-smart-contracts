@@ -124,7 +124,6 @@ module.exports = async function (deployer) {
             liquidationEngine.address,
             priceOracle.address,
             positionManager.address,
-            stableSwapModule.address,
             systemDebtEngine.address,
             flashMintModule.address,
             stablecoinAdapter.address
