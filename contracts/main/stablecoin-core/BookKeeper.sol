@@ -372,6 +372,9 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
 
         int256 _debtValue = mul(_vars.debtAccumulatedRate, _debtShare);
 
+        uint256 _poolStablecoinAmount = poolStablecoinIssued[_collateralPoolId];
+        poolStablecoinIssued[_collateralPoolId] = add(_poolStablecoinAmount, _debtValue);
+
         collateralToken[_collateralPoolId][_collateralCreditor] = sub(collateralToken[_collateralPoolId][_collateralCreditor], _collateralAmount);
         systemBadDebt[_stablecoinDebtor] = sub(systemBadDebt[_stablecoinDebtor], _debtValue);
         totalUnbackedStablecoin = sub(totalUnbackedStablecoin, _debtValue);
@@ -415,6 +418,10 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
         _vars.debtAccumulatedRate = add(_vars.debtAccumulatedRate, _debtAccumulatedRate);
         ICollateralPoolConfig(collateralPoolConfig).setDebtAccumulatedRate(_collateralPoolId, _vars.debtAccumulatedRate);
         int256 _value = mul(_vars.totalDebtShare, _debtAccumulatedRate); // [rad]
+
+        uint256 _poolStablecoinAmount = poolStablecoinIssued[_collateralPoolId];
+        poolStablecoinIssued[_collateralPoolId] = add(_poolStablecoinAmount, _value);
+
         stablecoin[_stabilityFeeRecipient] = add(stablecoin[_stabilityFeeRecipient], _value);
         totalStablecoinIssued = add(totalStablecoinIssued, _value);
     }
