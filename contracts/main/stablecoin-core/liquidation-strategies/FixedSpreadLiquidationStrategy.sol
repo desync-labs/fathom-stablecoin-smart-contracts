@@ -76,20 +76,26 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         _;
     }
 
+    modifier onlyOwner() {
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
+        _;
+    }
+
     function initialize(address _bookKeeper, address _priceOracle, address _liquidationEngine, address _systemDebtEngine, address _stablecoinAdapter) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
-        IBookKeeper(_bookKeeper).totalStablecoinIssued(); // Sanity Check Call
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
 
-        IPriceOracle(_priceOracle).stableCoinReferencePrice(); // Sanity Check Call
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "FixedSpreadLiquidationStrategy/invalid-priceOracle"); // Sanity Check Call
         priceOracle = IPriceOracle(_priceOracle);
 
-        ILiquidationEngine(_liquidationEngine).live(); // Sanity Check Call
+        require(ILiquidationEngine(_liquidationEngine).live() == 1, "FixedSpreadLiquidationStrategy/liquidationEngine-not-live"); // Sanity Check Call
         liquidationEngine = ILiquidationEngine(_liquidationEngine);
 
-        ISystemDebtEngine(_systemDebtEngine).surplusBuffer(); // Sanity Check Call
+        require(ISystemDebtEngine(_systemDebtEngine).surplusBuffer() >= 0, "FixedSpreadLiquidationStrategy/invalid-systemDebtEngine"); // Sanity Check Call
         systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
 
         stablecoinAdapter = IStablecoinAdapter(_stablecoinAdapter); //StablecoinAdapter to deposit FXD to bookKeeper
@@ -281,6 +287,21 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
             info.collateralAmountToBeLiquidated,
             info.treasuryFees
         );
+    }
+
+    function setPriceOracle(address _priceOracle) external onlyOwner {
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "FixedSpreadLiquidationStrategy/invalid-priceOracle"); // Sanity Check Call
+        priceOracle = IPriceOracle(_priceOracle);
+    }
+
+    function setBookKeeper(address _bookKeeper) external onlyOwner {
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
+        bookKeeper = IBookKeeper(_bookKeeper);
+    }
+
+    function setLiquidationEngine(address _liquidationEngine) external onlyOwner {
+        require(ILiquidationEngine(_liquidationEngine).live() == 1, "FixedSpreadLiquidationStrategy/liquidationEngine-not-live"); // Sanity Check Call
+        liquidationEngine = ILiquidationEngine(_liquidationEngine);
     }
 
     function pause() external onlyOwnerOrGov {
