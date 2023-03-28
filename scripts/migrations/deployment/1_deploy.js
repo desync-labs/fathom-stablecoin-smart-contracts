@@ -26,6 +26,7 @@ const DelayFathomOraclePriceFeed = artifacts.require('DelayFathomOraclePriceFeed
 
 const CollateralTokenAdapter = artifacts.require('CollateralTokenAdapter.sol');
 const ProxyActionsStorage = artifacts.require('ProxyActionsStorage.sol');
+const AdminControls = artifacts.require('AdminControls.sol');
 
 module.exports =  async function(deployer) {
   let promises = [
@@ -55,6 +56,7 @@ module.exports =  async function(deployer) {
       deployer.deploy(CollateralTokenAdapter, { gas: 7050000 }),
       deployer.deploy(ProxyActionsStorage, { gas: 7050000 }),
       deployer.deploy(SlidingWindowDexOracle, { gas: 7050000 }),
+      deployer.deploy(AdminControls, { gas: 7050000 }),
   ];
 
   await Promise.all(promises);

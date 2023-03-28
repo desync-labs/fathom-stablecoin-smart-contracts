@@ -14,13 +14,14 @@ import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/ILiquidationStrategy.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ISetPrice.sol";
+import "../interfaces/IPausable.sol";
 
 /// @title LiquidationEngine
 /** @notice A contract which is the manager for all of the liquidations of the protocol.
     LiquidationEngine will be the interface for the liquidator to trigger any positions into the liquidation process.
 */
 
-contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable, ILiquidationEngine {
+contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable, ILiquidationEngine, IPausable {
   using SafeMathUpgradeable for uint256;
   address public priceOracle;
 
@@ -272,12 +273,12 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
 
   // --- pause ---
   /// @dev access: OWNER_ROLE, GOV_ROLE
-  function pause() external onlyOwnerOrGov {
+  function pause() external override onlyOwnerOrGov {
     _pause();
   }
 
   /// @dev access: OWNER_ROLE, GOV_ROLE
-  function unpause() external onlyOwnerOrGov {
+  function unpause() external override onlyOwnerOrGov {
     _unpause();
   }
 

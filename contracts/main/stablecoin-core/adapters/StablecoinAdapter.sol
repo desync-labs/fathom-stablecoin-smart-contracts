@@ -9,8 +9,9 @@ import "../../interfaces/IBookKeeper.sol";
 import "../../interfaces/IToken.sol";
 import "../../interfaces/IStablecoinAdapter.sol";
 import "../../interfaces/ICagable.sol";
+import "../../interfaces/IPausable.sol";
 
-contract StablecoinAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable {
+contract StablecoinAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable, IPausable {
     IBookKeeper public override bookKeeper; // CDP Engine
     IStablecoin public override stablecoin; // Stablecoin Token
     uint256 public live; // Active Flag
@@ -79,11 +80,11 @@ contract StablecoinAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         stablecoin.mint(usr, wad);
     }
 
-    function pause() external onlyOwnerOrGov {
+    function pause() external override onlyOwnerOrGov {
         _pause();
     }
 
-    function unpause() external onlyOwnerOrGov {
+    function unpause() external override onlyOwnerOrGov {
         _unpause();
     }
 }

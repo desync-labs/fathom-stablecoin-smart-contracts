@@ -8,13 +8,14 @@ import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
+import "../interfaces/IPausable.sol";
 
 /** @notice A contract which manages the bad debt and the surplus of the system.
     SystemDebtEngine will be the debitor or debtor when a position is liquidated. 
     The debt recorded in the name of SystemDebtEngine will be considered as system bad debt unless it is cleared by liquidation.
     The stability fee will be accrued and kept within SystemDebtEngine. As it is the debtor, therefore SystemDebtEngine should be the holder of the surplus and use it to settle the bad debt.
 */
-contract SystemDebtEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, ISystemDebtEngine, ICagable {
+contract SystemDebtEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, ISystemDebtEngine, ICagable, IPausable {
     IBookKeeper public bookKeeper; // CDP Engine
     uint256 public override surplusBuffer; // Surplus buffer         [rad]
     uint256 public live; // Active Flag
@@ -112,11 +113,11 @@ contract SystemDebtEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogUncage();
     }
 
-    function pause() external onlyOwnerOrGov {
+    function pause() external override onlyOwnerOrGov {
         _pause();
     }
 
-    function unpause() external onlyOwnerOrGov {
+    function unpause() external override onlyOwnerOrGov {
         _unpause();
     }
 }

@@ -29,6 +29,7 @@ module.exports = async function (deployer) {
         "DexPriceOracle",
         "CollateralTokenAdapter",
         "SlidingWindowDexOracle",
+        "AdminControls"
     ]
 
     const promises = contracts.map(contract => {
