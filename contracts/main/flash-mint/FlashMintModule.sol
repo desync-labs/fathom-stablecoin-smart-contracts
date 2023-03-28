@@ -10,14 +10,25 @@ import "../interfaces/IBookKeeperFlashLender.sol";
 import "../interfaces/IStablecoin.sol";
 import "../interfaces/IStablecoinAdapter.sol";
 import "../interfaces/IBookKeeper.sol";
+import "../interfaces/IPausable.sol";
 import "../utils/SafeToken.sol";
 
-contract FlashMintModule is PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender {
+contract FlashMintModule is PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender, IPausable {
     using SafeToken for address;
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
+        _;
+    }
+
+    modifier onlyOwnerOrGov() {
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        require(
+            _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
+                _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
+            "!(ownerRole or govRole)"
+        );
         _;
     }
 
@@ -155,5 +166,15 @@ contract FlashMintModule is PausableUpgradeable, IERC3156FlashLender, IBookKeepe
 
     function refreshApproval() external lock onlyOwner {
         address(stablecoin).safeApprove(address(stablecoinAdapter), type(uint256).max);
+    }
+
+      /// @dev access: OWNER_ROLE, GOV_ROLE
+    function pause() external override onlyOwnerOrGov {
+        _pause();
+    }
+
+    /// @dev access: OWNER_ROLE, GOV_ROLE
+    function unpause() external override onlyOwnerOrGov {
+        _unpause();
     }
 }
