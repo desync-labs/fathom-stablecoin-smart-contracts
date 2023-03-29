@@ -7,4 +7,8 @@ interface IStablecoin is IToken {
     function mint(address, uint256) external;
 
     function burn(address, uint256) external;
+
+    function increaseAllowance(address, uint256) external returns (bool);
+
+    function decreaseAllowance(address, uint256) external returns (bool);
 }
