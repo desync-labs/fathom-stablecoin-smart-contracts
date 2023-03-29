@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-
+import "@openzeppelin/contracts/utils/Address.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
@@ -125,6 +125,9 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     address public override accessControlConfig;
 
     function initialize(address _collateralPoolConfig, address _accessControlConfig) external initializer {
+        require(Address.isContract(_collateralPoolConfig),"BookKeeper/collateral-pool-config: NOT_CONTRACT_ADDRESS");
+        require(Address.isContract(_accessControlConfig),"BookKeeper/access-control-config: NOT_CONTRACT_ADDRESS");
+
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
