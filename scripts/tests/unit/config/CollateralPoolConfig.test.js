@@ -386,6 +386,13 @@ describe("CollateralPoolConfig", () => {
         )
       })
     })
+    context("when stability fee rate is zero", () => {
+      it("should be revert", async () => {
+        await expect(collateralPoolConfig.setStabilityFeeRate(COLLATERAL_POOL_ID, 0)).to.be.revertedWith(
+          "CollateralPoolConfig/invalid-stability-fee-rate"
+        )
+      })
+    })
     context("when stability fee rate too large", () => {
       it("should be revert", async () => {
         await expect(collateralPoolConfig.setStabilityFeeRate(COLLATERAL_POOL_ID, WeiPerRad)).to.be.revertedWith(

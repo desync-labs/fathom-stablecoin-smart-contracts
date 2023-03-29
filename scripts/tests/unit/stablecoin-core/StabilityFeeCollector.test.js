@@ -97,31 +97,6 @@ describe("StabilityFeeCollector", () => {
         })
     })
 
-    describe("#setGlobalStabilityFeeRate", () => {
-        context("when the caller is not the owner", async () => {
-            xit("should revert", async () => {
-                await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
-                await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
-                await mockedAccessControlConfig.mock.hasRole.returns(false)
-
-                await expect(stabilityFeeCollectorAsAlice.setGlobalStabilityFeeRate(UnitHelpers.WeiPerWad)).to.be.revertedWith(
-                    "!ownerRole"
-                )
-            })
-        })
-        context("when the caller is the owner", async () => {
-            xit("should be able to call setGlobalStabilityFeeRate", async () => {
-                await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
-                await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
-                await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-                await expect(stabilityFeeCollector.setGlobalStabilityFeeRate(UnitHelpers.WeiPerRay))
-                    .to.emit(stabilityFeeCollector, "LogSetGlobalStabilityFeeRate")
-                    .withArgs(DeployerAddress, UnitHelpers.WeiPerRay)
-            })
-        })
-    })
-
     describe("#setSystemDebtEngine", () => {
         context("when the caller is not the owner", async () => {
             it("should revert", async () => {

@@ -82,7 +82,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _collateralPools[_collateralPoolId].priceFeed = _priceFeed;
         require(_liquidationRatio >= RAY, "CollateralPoolConfig/invalid-liquidation-ratio");
         _collateralPools[_collateralPoolId].liquidationRatio = _liquidationRatio;
-        require(_stabilityFeeRate == 0 || _stabilityFeeRate >= RAY, "CollateralPoolConfig/invalid-stability-fee-rate");
+        require(_stabilityFeeRate >= RAY, "CollateralPoolConfig/invalid-stability-fee-rate");
         // Maximum stability fee rate is 50% yearly
         require(_stabilityFeeRate <= 1000000012857214317438491659, "CollateralPoolConfig/stability-fee-rate-too-large");
         _collateralPools[_collateralPoolId].stabilityFeeRate = _stabilityFeeRate;
@@ -148,7 +148,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     The above `stabilityFeeRate` will be the value we will use in this contract.
   */
     function setStabilityFeeRate(bytes32 _collateralPool, uint256 _stabilityFeeRate) external onlyOwner {
-        require(_stabilityFeeRate == 0 || _stabilityFeeRate >= RAY, "CollateralPoolConfig/invalid-stability-fee-rate");
+        require(_stabilityFeeRate >= RAY, "CollateralPoolConfig/invalid-stability-fee-rate");
         // Maximum stability fee rate is 50% yearly
         require(_stabilityFeeRate <= 1000000012857214317438491659, "CollateralPoolConfig/stability-fee-rate-too-large");
         _collateralPools[_collateralPool].stabilityFeeRate = _stabilityFeeRate;
