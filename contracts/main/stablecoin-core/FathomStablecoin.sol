@@ -43,6 +43,7 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
     }
 
     function transferFrom(address _src, address _dst, uint256 _wad) public override returns (bool) {
+        require(_wad > 0, "FathomStablecoin/zero-amount");
         uint256 currentAllowance = allowance[_src][msg.sender];
         require(balanceOf[_src] >= _wad, "FathomStablecoin/insufficient-balance");
         if (_src != msg.sender && currentAllowance != type(uint).max) {
