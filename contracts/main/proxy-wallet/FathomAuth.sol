@@ -17,12 +17,14 @@ contract FathomAuth is FathomAuthEvents {
         emit LogSetOwner(msg.sender);
     }
 
-    function setOwner(address _owner) external onlyOwner {
+    function setOwner(address _owner) external auth {
+        require(_owner != address(0), "FathomAuth/set-zero-address-owner");
         owner = _owner;
         emit LogSetOwner(owner);
     }
 
     function setAuthority(IAuthority _authority) external auth {
+        require(address(_authority) != address(0), "FathomAuth/set-zero-address-authority");
         authority = _authority;
         emit LogSetAuthority(address(authority));
     }
