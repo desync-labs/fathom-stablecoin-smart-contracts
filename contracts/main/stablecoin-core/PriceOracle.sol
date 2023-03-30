@@ -37,7 +37,7 @@ contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceO
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
-        IBookKeeper(_bookKeeper).collateralPoolConfig(); // Sanity check call
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         stableCoinReferencePrice = ONE;
         live = 1;
@@ -81,6 +81,12 @@ contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceO
             "!(ownerRole or showStopperRole)"
         );
         _;
+    }
+
+    function setBookKeeper(address _bookKeeper) external onlyOwner {
+        require(live == 1, "PriceOracle/not-live");
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
+        bookKeeper = IBookKeeper(_bookKeeper);
     }
 
     function setStableCoinReferencePrice(uint256 _referencePrice) external onlyOwner {

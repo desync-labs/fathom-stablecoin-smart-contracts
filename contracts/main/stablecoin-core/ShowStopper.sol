@@ -45,7 +45,7 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
     function initialize(address _bookKeeper) external initializer {
         PausableUpgradeable.__Pausable_init();
 
-        IBookKeeper(_bookKeeper).totalStablecoinIssued(); // Sanity Check Call
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         live = 1;
     }
@@ -92,8 +92,7 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
 
     function setBookKeeper(address _bookKeeper) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
-
-        IBookKeeper(_bookKeeper).totalStablecoinIssued(); // Sanity Check Call
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         emit LogSetBookKeeper(msg.sender, _bookKeeper);
     }

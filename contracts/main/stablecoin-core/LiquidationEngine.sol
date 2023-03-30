@@ -14,6 +14,7 @@ import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/ILiquidationStrategy.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ISetPrice.sol";
+import "../interfaces/IPriceOracle.sol";
 import "../interfaces/IPausable.sol";
 
 /// @title LiquidationEngine
@@ -67,6 +68,12 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     _;
   }
 
+  modifier onlyOwner() {
+    IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+    require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
+    _;
+  }
+
     modifier onlyWhitelisted() {
     require(liquidatorsWhitelist[msg.sender] == 1, "LiquidationEngine/liquidator-not-whitelisted");
     _;
@@ -77,14 +84,14 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     PausableUpgradeable.__Pausable_init();
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
-    IBookKeeper(_bookKeeper).totalStablecoinIssued(); // Sanity Check Call
+    require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "LiquidationEngine/invalid-bookKeeper"); // Sanity Check Call
     bookKeeper = IBookKeeper(_bookKeeper);
 
-    ISystemDebtEngine(_systemDebtEngine).surplusBuffer(); // Sanity Check Call
+    require(ISystemDebtEngine(_systemDebtEngine).surplusBuffer() >= 0, "LiquidationEngine/invalid-systemDebtEngine"); // Sanity Check Call
     systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
 
+    require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "LiquidationEngine/invalid-priceOracle"); // Sanity Check Call
     priceOracle = _priceOracle;
-
     live = 1;
   }
 
@@ -110,10 +117,10 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
   ) external override nonReentrant whenNotPaused onlyWhitelisted {
 
     require(_collateralPoolIds.length == _positionAddresses.length &&
-            _collateralPoolIds.length == _debtShareToBeLiquidateds.length && 
-            _collateralPoolIds.length == _maxDebtShareToBeLiquidateds.length && 
-            _collateralPoolIds.length == _collateralRecipients.length && 
-            _collateralPoolIds.length == datas.length 
+            _collateralPoolIds.length == _debtShareToBeLiquidateds.length &&
+            _collateralPoolIds.length == _maxDebtShareToBeLiquidateds.length &&
+            _collateralPoolIds.length == _collateralRecipients.length &&
+            _collateralPoolIds.length == datas.length
              ,"LiquidationEngine/batchLiquidate-invalid-arguments");
 
     for(uint i = 0; i < _collateralPoolIds.length; i++){
@@ -132,7 +139,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     }
   }
 
-  //This function is overload implementation of liquidate() and will only be called from LiquidationEngine contract to support batch liquidation, 
+  //This function is overload implementation of liquidate() and will only be called from LiquidationEngine contract to support batch liquidation,
   function liquidateForBatch(
     bytes32 _collateralPoolId,
     address _positionAddress,
@@ -251,9 +258,15 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
   }
 
   function setPriceOracle(address _priceOracle) external onlyOwnerOrShowStopper {
-    require(_priceOracle != address(0), "_priceOracle cannot be zero address");
     require(live == 1, "LiquidationEngine/not-live");
+    require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "LiquidationEngine/invalid-priceOracle"); // Sanity Check Call
     priceOracle = _priceOracle;
+  }
+
+  function setBookKeeper(address _bookKeeper) external onlyOwner {
+    require(live == 1, "LiquidationEngine/not-live");
+    require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "LiquidationEngine/invalid-bookKeeper"); // Sanity Check Call
+    bookKeeper = IBookKeeper(_bookKeeper);
   }
 
   /// @dev access: OWNER_ROLE, SHOW_STOPPER_ROLE
