@@ -132,6 +132,8 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
         collateralPoolConfig = _collateralPoolConfig;
+        
+        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "BookKeeper/msgsender-not-owner"); // Sanity Check Call
         accessControlConfig = _accessControlConfig;
         live = 1;
     }
@@ -198,7 +200,7 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
-        IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender); // Sanity Check Call
+        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "BookKeeper/msgsender-not-owner"); // Sanity Check Call
         accessControlConfig = _accessControlConfig;
 
         emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
