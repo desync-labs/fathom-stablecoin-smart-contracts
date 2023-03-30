@@ -22,7 +22,6 @@ contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeabl
 
     IBookKeeper public bookKeeper;
     address public systemDebtEngine;
-    uint256 public globalStabilityFeeRate; // Global, per-second stability fee debtAccumulatedRate [ray]
 
     function initialize(address _bookKeeper, address _systemDebtEngine) external initializer {
         PausableUpgradeable.__Pausable_init();
@@ -103,7 +102,6 @@ contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeabl
     }
 
     // --- Administration ---
-    event LogSetGlobalStabilityFeeRate(address indexed _caller, uint256 _data);
     event LogSetSystemDebtEngine(address indexed _caller, address _data);
 
     modifier onlyOwner() {
@@ -145,7 +143,7 @@ contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeabl
         require(systemDebtEngine != address(0), "StabilityFeeCollector/system-debt-engine-not-set");
 
         _debtAccumulatedRate = rmul(
-            rpow(add(globalStabilityFeeRate, _stabilityFeeRate), block.timestamp - _lastAccumulationTime, RAY),
+            rpow(_stabilityFeeRate, block.timestamp - _lastAccumulationTime, RAY),
             _previousDebtAccumulatedRate
         );
 
