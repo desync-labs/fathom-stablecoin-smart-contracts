@@ -17,7 +17,7 @@ contract FathomAuth is FathomAuthEvents {
         emit LogSetOwner(msg.sender);
     }
 
-    function setOwner(address _owner) external auth {
+    function setOwner(address _owner) external onlyOwner {
         owner = _owner;
         emit LogSetOwner(owner);
     }
@@ -29,6 +29,11 @@ contract FathomAuth is FathomAuthEvents {
 
     modifier auth() {
         require(isAuthorized(msg.sender, msg.sig), "fathom-auth-unauthorized");
+        _;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "only owner allowed");
         _;
     }
 
