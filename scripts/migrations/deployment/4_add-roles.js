@@ -18,7 +18,7 @@ module.exports =  async function(deployer) {
     const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const adminControls = await getProxy(proxyFactory, "AdminControls");
-    
+
     await accessControlConfig.grantRole(await accessControlConfig.BOOK_KEEPER_ROLE(), bookKeeper.address)
 
     await accessControlConfig.grantRole(await accessControlConfig.POSITION_MANAGER_ROLE(), positionManager.address)
