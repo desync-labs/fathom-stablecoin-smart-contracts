@@ -134,6 +134,51 @@ describe("FathomStablecoin", () => {
         })
     })
 
+    context("#increaseAllowance", () => {
+        it("should be able increase allowance", async () => {
+            const allowanceDeployerAliceBefore = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+            expect(allowanceDeployerAliceBefore).to.be.equal(0)
+
+            await expect(fathomStablecoinAsAlice.increaseAllowance(DeployerAddress, WeiPerWad))
+                .to.emit(fathomStablecoin, "Approval")
+                .withArgs(AliceAddress, DeployerAddress, WeiPerWad)
+
+            const allowanceDeployerAliceAfter = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+            expect(allowanceDeployerAliceAfter).to.be.equal(WeiPerWad)
+        })
+    })
+
+    context("#decreaseAllowance", () => {
+        context("decrease below zero", () => {
+            it("should revert", async () => {
+                const allowanceDeployerAliceBefore = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+                expect(allowanceDeployerAliceBefore).to.be.equal(0)
+
+                await fathomStablecoinAsAlice.increaseAllowance(DeployerAddress, WeiPerWad)
+
+                await expect(fathomStablecoinAsAlice.decreaseAllowance(DeployerAddress, WeiPerWad.add(1))).to.be.revertedWith("FathomStablecoin/decreased-allowance-below-zero");
+
+                const allowanceDeployerAliceAfter = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+                expect(allowanceDeployerAliceAfter).to.be.equal(WeiPerWad)
+            })
+        })
+        context("valid decrease", () => {
+            it("should be able decrease allowance", async () => {
+                const allowanceDeployerAliceBefore = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+                expect(allowanceDeployerAliceBefore).to.be.equal(0)
+
+                await fathomStablecoinAsAlice.increaseAllowance(DeployerAddress, WeiPerWad.mul(2))
+
+                await expect(fathomStablecoinAsAlice.decreaseAllowance(DeployerAddress, WeiPerWad))
+                    .to.emit(fathomStablecoin, "Approval")
+                    .withArgs(AliceAddress, DeployerAddress, WeiPerWad)
+
+                const allowanceDeployerAliceAfter = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+                expect(allowanceDeployerAliceAfter).to.be.equal(WeiPerWad)
+            })
+        })
+    })
+
     context("#mint", () => {
         context("when the caller is not the owner", async () => {
             it("should revert", async () => {

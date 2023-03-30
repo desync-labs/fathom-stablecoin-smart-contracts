@@ -10,11 +10,12 @@ import "../interfaces/IPriceFeed.sol";
 import "../interfaces/IPriceOracle.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
+import "../interfaces/IPausable.sol";
 
 /** @notice A contract which is the price oracle of the BookKeeper to keep all collateral pools updated with the latest price of the collateral.
     The price oracle is important in reflecting the current state of the market price.
 */
-contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceOracle, ICagable {
+contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceOracle, ICagable, IPausable {
     struct CollateralPool {
         IPriceFeed priceFeed; // Price Feed
         uint256 liquidationRatio; // Liquidation ratio or Collateral ratio [ray]
@@ -36,7 +37,7 @@ contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceO
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
-        IBookKeeper(_bookKeeper).collateralPoolConfig(); // Sanity check call
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         stableCoinReferencePrice = ONE;
         live = 1;
@@ -82,6 +83,12 @@ contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceO
         _;
     }
 
+    function setBookKeeper(address _bookKeeper) external onlyOwner {
+        require(live == 1, "PriceOracle/not-live");
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
+        bookKeeper = IBookKeeper(_bookKeeper);
+    }
+
     function setStableCoinReferencePrice(uint256 _referencePrice) external onlyOwner {
         require(live == 1, "PriceOracle/not-live");
         require(_referencePrice > 0, "PriceOracle/zero-reference-price");
@@ -116,11 +123,11 @@ contract PriceOracle is PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceO
         emit LogUncage();
     }
 
-    function pause() external onlyOwnerOrGov {
+    function pause() external override onlyOwnerOrGov {
         _pause();
     }
 
-    function unpause() external onlyOwnerOrGov {
+    function unpause() external override onlyOwnerOrGov {
         _unpause();
     }
 }

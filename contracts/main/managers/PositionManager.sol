@@ -11,7 +11,7 @@ import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/IShowStopper.sol";
 import "../interfaces/ISetPrice.sol";
 import "../interfaces/IPriceFeed.sol";
-
+import "../interfaces/IPriceOracle.sol";
 
 contract PositionManager is PausableUpgradeable, IManager {
     address public override bookKeeper;
@@ -76,12 +76,13 @@ contract PositionManager is PausableUpgradeable, IManager {
     function initialize(address _bookKeeper, address _showStopper, address _priceOracle) external initializer {
         PausableUpgradeable.__Pausable_init();
 
-        IBookKeeper(_bookKeeper).totalStablecoinIssued(); // Sanity Check Call
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "PositionManager/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = _bookKeeper;
 
-        IShowStopper(_showStopper).live(); // Sanity Check Call
+        require(IShowStopper(_showStopper).live() == 1, "PositionManager/showStopper-not-live"); // Sanity Check Call
         showStopper = _showStopper;
 
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
         priceOracle = _priceOracle;
     }
 
@@ -359,10 +360,14 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
     }
 
-
     function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
-        require(_priceOracle != address(0), "_priceOracle cannot be zero address");
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
         priceOracle = _priceOracle;
+    }
+
+    function setBookKeeper(address _bookKeeper) external onlyOwnerOrGov {
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "PositionManager/invalid-bookKeeper"); // Sanity Check Call
+        bookKeeper = _bookKeeper;
     }
 
     function pause() external onlyOwnerOrGov {

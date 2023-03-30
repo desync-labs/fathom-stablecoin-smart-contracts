@@ -11,12 +11,13 @@ import "../interfaces/IStablecoinAdapter.sol";
 import "../interfaces/IStablecoin.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IStableSwapModule.sol";
+import "../interfaces/IPausable.sol";
 import "../utils/SafeToken.sol";
 
 // Stable Swap Module
 // Allows anyone to go between FUSD and the Token by pooling the liquidity
 // An optional fee is charged for incoming and outgoing transfers
-contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModule {
+contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModule, IPausable {
     using SafeToken for address;
 
     IBookKeeper public bookKeeper;
@@ -163,12 +164,12 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogWithdrawFees(_destination, pendingFXDBalance, pendingTokenBalance);
     }
 
-    function pause() external onlyOwnerOrGov {
+    function pause() external override onlyOwnerOrGov {
         _pause();
         emit LogStableSwapPauseState(true);
     }
 
-    function unpause() external onlyOwnerOrGov {
+    function unpause() external override onlyOwnerOrGov {
         _unpause();
         emit LogStableSwapPauseState(false);
     }

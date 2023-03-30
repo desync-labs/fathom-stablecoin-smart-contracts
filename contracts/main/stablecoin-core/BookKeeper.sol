@@ -4,14 +4,15 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-
+import "@openzeppelin/contracts/utils/Address.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IAccessControlConfig.sol";
+import "../interfaces/IPausable.sol";
 
 /// @notice A contract which acts as a book keeper of the Fathom Stablecoin protocol. It has the ability to move collateral token and stablecoin with in the accounting state variable.
-contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable, IPausable {
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(accessControlConfig);
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
@@ -75,12 +76,12 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     }
 
     /// @dev access: OWNER_ROLE, GOV_ROLE
-    function pause() external onlyOwnerOrGov {
+    function pause() external override onlyOwnerOrGov {
         _pause();
     }
 
     /// @dev access: OWNER_ROLE, GOV_ROLE
-    function unpause() external onlyOwnerOrGov {
+    function unpause() external override onlyOwnerOrGov {
         _unpause();
     }
 
@@ -124,10 +125,15 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     address public override accessControlConfig;
 
     function initialize(address _collateralPoolConfig, address _accessControlConfig) external initializer {
+        require(Address.isContract(_collateralPoolConfig),"BookKeeper/collateral-pool-config: NOT_CONTRACT_ADDRESS");
+        require(Address.isContract(_accessControlConfig),"BookKeeper/access-control-config: NOT_CONTRACT_ADDRESS");
+
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
         collateralPoolConfig = _collateralPoolConfig;
+        
+        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "BookKeeper/msgsender-not-owner"); // Sanity Check Call
         accessControlConfig = _accessControlConfig;
         live = 1;
     }
@@ -194,7 +200,7 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
-        IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender); // Sanity Check Call
+        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "BookKeeper/msgsender-not-owner"); // Sanity Check Call
         accessControlConfig = _accessControlConfig;
 
         emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
@@ -372,6 +378,9 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
 
         int256 _debtValue = mul(_vars.debtAccumulatedRate, _debtShare);
 
+        uint256 _poolStablecoinAmount = poolStablecoinIssued[_collateralPoolId];
+        poolStablecoinIssued[_collateralPoolId] = add(_poolStablecoinAmount, _debtValue);
+
         collateralToken[_collateralPoolId][_collateralCreditor] = sub(collateralToken[_collateralPoolId][_collateralCreditor], _collateralAmount);
         systemBadDebt[_stablecoinDebtor] = sub(systemBadDebt[_stablecoinDebtor], _debtValue);
         totalUnbackedStablecoin = sub(totalUnbackedStablecoin, _debtValue);
@@ -415,6 +424,10 @@ contract BookKeeper is IBookKeeper, PausableUpgradeable, ReentrancyGuardUpgradea
         _vars.debtAccumulatedRate = add(_vars.debtAccumulatedRate, _debtAccumulatedRate);
         ICollateralPoolConfig(collateralPoolConfig).setDebtAccumulatedRate(_collateralPoolId, _vars.debtAccumulatedRate);
         int256 _value = mul(_vars.totalDebtShare, _debtAccumulatedRate); // [rad]
+
+        uint256 _poolStablecoinAmount = poolStablecoinIssued[_collateralPoolId];
+        poolStablecoinIssued[_collateralPoolId] = add(_poolStablecoinAmount, _value);
+
         stablecoin[_stabilityFeeRecipient] = add(stablecoin[_stabilityFeeRecipient], _value);
         totalStablecoinIssued = add(totalStablecoinIssued, _value);
     }
