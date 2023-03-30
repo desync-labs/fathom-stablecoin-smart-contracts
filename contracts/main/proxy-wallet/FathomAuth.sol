@@ -34,6 +34,11 @@ contract FathomAuth is FathomAuthEvents {
         _;
     }
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "only owner allowed");
+        _;
+    }
+
     function isAuthorized(address _src, bytes4 _sig) internal view returns (bool) {
         if (_src == address(this)) {
             return true;

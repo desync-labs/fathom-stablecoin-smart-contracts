@@ -43,10 +43,11 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
     }
 
     function transferFrom(address _src, address _dst, uint256 _wad) public override returns (bool) {
+        uint256 currentAllowance = allowance[_src][msg.sender];
         require(balanceOf[_src] >= _wad, "FathomStablecoin/insufficient-balance");
-        if (_src != msg.sender && allowance[_src][msg.sender] != type(uint).max) {
-            require(allowance[_src][msg.sender] >= _wad, "FathomStablecoin/insufficient-allowance");
-            allowance[_src][msg.sender] = sub(allowance[_src][msg.sender], _wad);
+        if (_src != msg.sender && currentAllowance != type(uint).max) {
+            require(currentAllowance >= _wad, "FathomStablecoin/insufficient-allowance");
+            _approve(_src, msg.sender, currentAllowance - _wad);
         }
         balanceOf[_src] = sub(balanceOf[_src], _wad);
         balanceOf[_dst] = add(balanceOf[_dst], _wad);
@@ -74,8 +75,20 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
     }
 
     function approve(address _usr, uint256 _wad) external override returns (bool) {
-        allowance[msg.sender][_usr] = _wad;
-        emit Approval(msg.sender, _usr, _wad);
+        _approve(msg.sender, _usr, _wad);
+        return true;
+    }
+
+    function increaseAllowance(address _usr, uint256 _wad) external override returns (bool) {
+        _approve(msg.sender, _usr, allowance[msg.sender][_usr] + _wad);
+        return true;
+    }
+
+    function decreaseAllowance(address _usr, uint256 _wad) external override returns (bool) {
+        uint256 currentAllowance = allowance[msg.sender][_usr];
+        require(currentAllowance >= _wad, "FathomStablecoin/decreased-allowance-below-zero");
+        _approve(msg.sender, _usr, currentAllowance - _wad);
+
         return true;
     }
 
@@ -89,5 +102,17 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
 
     function move(address _src, address _dst, uint256 _wad) external {
         transferFrom(_src, _dst, _wad);
+    }
+
+    function _approve(
+        address _owner,
+        address _spender,
+        uint256 _amount
+    ) internal {
+        require(_owner != address(0), "FathomStablecoin/approve-from-zero-address");
+        require(_spender != address(0), "FathomStablecoin/approve-to-zero-address");
+
+        allowance[_owner][_spender] = _amount;
+        emit Approval(_owner, _spender, _amount);
     }
 }
