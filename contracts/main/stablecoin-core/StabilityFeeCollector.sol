@@ -7,12 +7,14 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IStabilityFeeCollector.sol";
+import "../interfaces/IPausable.sol";
+
 
 /** @notice A contract which acts as a collector for the stability fee.
     The stability fee is a fee that is collected from the minter of Fathom Stablecoin in a per-seconds basis.
     The stability fee will be accumulated in the system as a surplus to settle any bad debt.
 */
-contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeable, IStabilityFeeCollector {
+contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeable, IStabilityFeeCollector, IPausable {
     struct CollateralPool {
         uint256 stabilityFeeRate; // Collateral-specific, per-second stability fee debtAccumulatedRate or mint interest debtAccumulatedRate [ray]
         uint256 lastAccumulationTime; // Time of last call to `collect` [unix epoch time]
@@ -151,11 +153,11 @@ contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeabl
         ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).updateLastAccumulationTime(_collateralPoolId);
     }
 
-    function pause() external onlyOwnerOrGov {
+    function pause() external override onlyOwnerOrGov {
         _pause();
     }
 
-    function unpause() external onlyOwnerOrGov {
+    function unpause() external override onlyOwnerOrGov {
         _unpause();
     }
 }

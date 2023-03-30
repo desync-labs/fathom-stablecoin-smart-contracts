@@ -32,6 +32,7 @@ module.exports = async function (deployer) {
     const dexPriceOracle = await getProxy(proxyFactory, "DexPriceOracle");
     const ankrCollateralAdapter = await getProxy(proxyFactory, "AnkrCollateralAdapter");
     const proxyActionsStorage = await getProxy(proxyFactory, "ProxyActionsStorage");
+    const adminControls = await getProxy(proxyFactory, "AdminControls");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const addresses = getAddresses(deployer.networkId())
@@ -92,7 +93,7 @@ module.exports = async function (deployer) {
             systemDebtEngine.address,
             { gasLimit: 1000000 }
         ),
-        
+
         stableSwapModule.initialize(
             bookKeeper.address,
             addresses.USD,
@@ -118,6 +119,15 @@ module.exports = async function (deployer) {
             accessControlConfig.address,
             pools.XDC
         ),
+        adminControls.initialize(
+            bookKeeper.address,
+            liquidationEngine.address,
+            priceOracle.address,
+            positionManager.address,
+            systemDebtEngine.address,
+            flashMintModule.address,
+            stablecoinAdapter.address
+        )
     ];
 
     await Promise.all(promises);
