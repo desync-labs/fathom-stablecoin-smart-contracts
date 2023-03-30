@@ -98,8 +98,8 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         require(ISystemDebtEngine(_systemDebtEngine).surplusBuffer() >= 0, "FixedSpreadLiquidationStrategy/invalid-systemDebtEngine"); // Sanity Check Call
         systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
 
+        require(address(IStablecoinAdapter(_stablecoinAdapter).stablecoin()) != address(0), "FixedSpreadLiquidationStrategy/invalid-stablecoinAdapter"); // Sanity Check Call
         stablecoinAdapter = IStablecoinAdapter(_stablecoinAdapter); //StablecoinAdapter to deposit FXD to bookKeeper
-
     }
 
     uint256 constant BLN = 10 ** 9;
