@@ -256,7 +256,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogEmergencyWithdraw(_account);
     }
 
-    function totalValueLocked() public view returns(uint256) {
+    function totalValueLocked() external view returns(uint256) {
         return tokenBalance[stablecoin] + _convertDecimals(tokenBalance[token], IToken(token).decimals(),18);
     }
 
@@ -292,5 +292,4 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     ) internal pure returns (uint256 result) {
         result = _toDecimals >= _fromDecimals ? _amount * (10**(_toDecimals - _fromDecimals)) : _amount / (10**(_fromDecimals - _toDecimals));
     }
-    
 }
