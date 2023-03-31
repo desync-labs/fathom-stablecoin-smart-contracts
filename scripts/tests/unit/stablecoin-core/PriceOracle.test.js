@@ -22,6 +22,7 @@ const loadFixtureHandler = async () => {
     const mockedPriceFeed = await createMock("SimplePriceFeed")
 
     await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+    await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
     await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
     await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
     await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))

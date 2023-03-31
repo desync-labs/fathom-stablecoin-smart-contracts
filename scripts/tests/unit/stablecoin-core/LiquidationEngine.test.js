@@ -32,6 +32,8 @@ const loadFixtureHandler = async () => {
   await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
   await mockedAccessControlConfig.mock.hasRole.returns(true)
   await mockedPriceOracle.mock.setPrice.returns()
+  await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
+
   await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address);
   await mockedPriceFeed.mock.isPriceOk.returns(true);
 

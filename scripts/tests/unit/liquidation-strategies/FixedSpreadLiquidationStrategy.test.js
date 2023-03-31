@@ -29,10 +29,11 @@ const loadFixtureHandler = async () => {
     await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address)
 
     await mockedBookKeeper.mock.totalStablecoinIssued.returns(BigNumber.from("0"))
-    await mockedLiquidationEngine.mock.live.returns(BigNumber.from("0"))
+    await mockedLiquidationEngine.mock.live.returns(BigNumber.from("1"))
     await mockedSystemDebtEngine.mock.surplusBuffer.returns(BigNumber.from("0"))
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(BigNumber.from("0"))
     await mockedAccessControlConfig.mock.hasRole.returns(true)
+    await mockedStablecoinAdapter.mock.stablecoin.returns(DeployerAddress);
 
     const fixedSpreadLiquidationStrategy = getContract("FixedSpreadLiquidationStrategy", DeployerAddress)
     const fixedSpreadLiquidationStrategyAsAlice = getContract("FixedSpreadLiquidationStrategy", AliceAddress)

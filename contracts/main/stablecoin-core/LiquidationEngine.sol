@@ -83,15 +83,17 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
   function initialize(address _bookKeeper, address _systemDebtEngine, address _priceOracle) external initializer {
     PausableUpgradeable.__Pausable_init();
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
-
+    // revert("LiquidationEngine/here#1");
     require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "LiquidationEngine/invalid-bookKeeper"); // Sanity Check Call
     bookKeeper = IBookKeeper(_bookKeeper);
-
+    // revert("LiquidationEngine/here#2");
     require(ISystemDebtEngine(_systemDebtEngine).surplusBuffer() >= 0, "LiquidationEngine/invalid-systemDebtEngine"); // Sanity Check Call
     systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
-
+    // revert("LiquidationEngine/here#3");
     require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "LiquidationEngine/invalid-priceOracle"); // Sanity Check Call
     priceOracle = _priceOracle;
+    // revert("LiquidationEngine/here#4");
+
     live = 1;
   }
 

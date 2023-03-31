@@ -148,7 +148,6 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
 
         poolStablecoinIssued[_collateralPoolId] = IBookKeeper(bookKeeper).poolStablecoinIssued(_collateralPoolId);
 
-
         uint256 _totalDebtShare = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getTotalDebtShare(_collateralPoolId);
         address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId);
         IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);

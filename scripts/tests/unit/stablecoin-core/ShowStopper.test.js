@@ -78,6 +78,8 @@ describe("ShowStopper", () => {
 
     await mockedPriceFeed.mock.readPrice.returns(formatBytes32BigNumber(WeiPerWad))
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
+    await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRad);
+    
     await showStopper.cagePool(formatBytes32String("XDC"))
     await mockedBookKeeper.mock.positionWhitelist.returns(BigNumber.from(0))
     await mockedTokenAdapter.mock.onMoveCollateral.returns();
@@ -167,6 +169,7 @@ describe("ShowStopper", () => {
           await mockedLiquidationEngine.mock.cage.returns()
           await mockedSystemDebtEngine.mock.cage.returns()
           await mockedPriceOracle.mock.cage.returns()
+          await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRad);
 
           await showStopper.setBookKeeper(await mockedBookKeeper.address)
           await showStopper.setLiquidationEngine(mockedLiquidationEngine.address)
@@ -193,6 +196,7 @@ describe("ShowStopper", () => {
           await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
           await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
           await mockedAccessControlConfig.mock.hasRole.returns(true)
+          await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRad);
 
           await expect(showStopper.cagePool(formatBytes32String("XDC"))).to.be.revertedWith(
             "ShowStopper/still-live"
@@ -224,6 +228,7 @@ describe("ShowStopper", () => {
 
           await mockedPriceFeed.mock.readPrice.returns(formatBytes32BigNumber(WeiPerWad))
           await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
+          await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRad);
 
           await showStopper.cagePool(formatBytes32String("XDC"))
 
@@ -466,7 +471,6 @@ describe("ShowStopper", () => {
           await setup()
 
           await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
-          await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRay)
           await showStopper.finalizeDebt()
 
           await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address)
@@ -487,8 +491,6 @@ describe("ShowStopper", () => {
           await setup()
 
           await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
-          await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRay)
-
           await showStopper.finalizeDebt()
 
           await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(WeiPerRay)
@@ -545,8 +547,6 @@ describe("ShowStopper", () => {
             await setup()
 
             await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
-            await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRay)
-
             await showStopper.finalizeDebt()
 
             await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(WeiPerRay)
@@ -567,8 +567,6 @@ describe("ShowStopper", () => {
             await setup()
 
             await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
-            await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRay)
-
             await showStopper.finalizeDebt()
 
             await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(WeiPerRay)
@@ -599,7 +597,6 @@ describe("ShowStopper", () => {
             await setup()
 
             await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
-            await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRay)
             await showStopper.finalizeDebt()
 
             await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(WeiPerRay)

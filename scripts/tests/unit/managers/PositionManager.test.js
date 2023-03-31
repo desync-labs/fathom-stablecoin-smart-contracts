@@ -22,6 +22,7 @@ const loadFixtureHandler = async () => {
     await mockedBookKeeper.mock.totalStablecoinIssued.returns(0);
     await mockedBookKeeper.mock.whitelist.returns();
     await mockedPriceOracle.mock.setPrice.returns()
+    await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
     await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
     await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(WeiPerRay)
     await mockedCollateralPoolConfig.mock.getAdapter.returns(mockedTokenAdapter.address)
