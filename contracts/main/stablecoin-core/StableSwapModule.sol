@@ -35,18 +35,24 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     uint256 public totalTokenFeeBalance; // [wad]
     uint256 public totalFXDFeeBalance; // [wad]
     uint256 public totalValueDeposited;
+    uint256 public numberOfSwapsLimitPerUser;
+    uint256 public blocksPerLimit;
 
     uint256 public constant DAILY_SWAP_LIMIT_DENOMINATOR = 10000;
     uint256 public constant SINGLE_SWAP_LIMIT_DENOMINATOR = 10000;
-
-    uint256 public constant ONE_DAY = 86400;
     uint256 public constant MINIMUM_DAILY_SWAP_LIMIT_NUMERATOR = 200;
     uint256 public constant MINIMUM_SINGLE_SWAP_LIMIT_NUMERATOR = 50;
+    uint256 public constant MINIMUM_BLOCKS_PER_LIMIT = 1;
+    uint256 public constant MINIMUM_NUMBER_OF_SWAPS_LIMIT_PER_USER = 1;
+
+    uint256 public constant ONE_DAY = 86400;
+    
 
     uint256 constant WAD = 10**18;
     
     mapping(address => bool) usersWhitelist;
-    mapping(address => uint256) pastUserSwapBlockTime;
+    mapping(address => uint256) numberOfSwapsRemainingPerUserInBlockLimit;
+    mapping(address => uint256) lastSwapBlockNumberPerUser;
 
     event LogSetFeeIn(address indexed _caller, uint256 _feeIn);
     event LogSetFeeOut(address indexed _caller, uint256 _feeOut);
@@ -62,6 +68,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     event LogDecentralizedStateStatus(bool _oldDecentralizedStateStatus, bool _newDecentralizedStateStatus);
     event LogAddToWhitelist(address indexed user);
     event LogRemoveFromWhitelist(address indexed user);
+    event LogNumberOfSwapsLimitPerUserUpdate(uint256 _newNumberOfSwapsLimitPerUser, uint256 _oldNumberOfSwapsLimitPerUser);
+    event LogBlocksPerLimitUpdate(uint256 _newBlocksPerLimit, uint256 _oldBlocksPerLimit);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -92,16 +100,25 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         address _stablecoin,
         uint256 _dailySwapLimitNumerator,
         uint256 _singleSwapLimitNumerator,
+        uint256 _numberOfSwapsLimitPerUser,
+        uint256 _blocksPerLimit,
         address[] calldata whitelistedUsers
     ) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
         require(_dailySwapLimitNumerator >= MINIMUM_DAILY_SWAP_LIMIT_NUMERATOR, "initialize/less-than-minimum-daily-swap-limit");
+        require(_singleSwapLimitNumerator >= MINIMUM_SINGLE_SWAP_LIMIT_NUMERATOR, "initialize/less-than-minimum-single-swap-limit");
+        require(_numberOfSwapsLimitPerUser >= MINIMUM_NUMBER_OF_SWAPS_LIMIT_PER_USER, "initialize/less-than-minimum-number-of-swaps-limit-per-user");
+        require(_blocksPerLimit >= MINIMUM_BLOCKS_PER_LIMIT, "initialize/less-than-minimum-blocks-per-limit");
+
         bookKeeper = IBookKeeper(_bookKeeper);
         stablecoin = _stablecoin;
         token = _token;
         dailySwapLimitNumerator = _dailySwapLimitNumerator;
         singleSwapLimitNumerator = _singleSwapLimitNumerator;
+        numberOfSwapsLimitPerUser = _numberOfSwapsLimitPerUser;
+        blocksPerLimit = _blocksPerLimit;
+
         for(uint i;i<whitelistedUsers.length;i++){
             if(whitelistedUsers[i] != address(0)){
                 usersWhitelist[whitelistedUsers[i]] = true;
@@ -121,13 +138,22 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         }
     }
 
-    function setSingleSwapLimitNumerator(uint256 newSingleSwapLimitWeight) external onlyOwner {
-        require(newSingleSwapLimitWeight <= SINGLE_SWAP_LIMIT_DENOMINATOR,"StableSwapModule/numerator-over-denominator");
-        require(newSingleSwapLimitWeight >= MINIMUM_SINGLE_SWAP_LIMIT_NUMERATOR, "StableSwapModule/less-than-minimum-single-swap-limit");
-        emit LogSingleSwapLimitUpdate(newSingleSwapLimitWeight, singleSwapLimitNumerator);
-        singleSwapLimitNumerator = newSingleSwapLimitWeight;
+    function setSingleSwapLimitNumerator(uint256 newSingleSwapLimitNumerator) external onlyOwner {
+        require(newSingleSwapLimitNumerator <= SINGLE_SWAP_LIMIT_DENOMINATOR,"StableSwapModule/numerator-over-denominator");
+        require(newSingleSwapLimitNumerator >= MINIMUM_SINGLE_SWAP_LIMIT_NUMERATOR, "StableSwapModule/less-than-minimum-single-swap-limit");
+        emit LogSingleSwapLimitUpdate(newSingleSwapLimitNumerator, singleSwapLimitNumerator);
+        singleSwapLimitNumerator = newSingleSwapLimitNumerator;
     }
-
+    function setNumberOfSwapsLimitPerUser(uint256 newNumberOfSwapsLimitPerUser) external onlyOwner {
+        require(newNumberOfSwapsLimitPerUser >= MINIMUM_NUMBER_OF_SWAPS_LIMIT_PER_USER, "StableSwapModule/less-than-minimum-number-of-swaps-limit-per-user");
+        emit LogNumberOfSwapsLimitPerUserUpdate(newNumberOfSwapsLimitPerUser, numberOfSwapsLimitPerUser);
+        numberOfSwapsLimitPerUser = newNumberOfSwapsLimitPerUser;
+    }
+    function setBlocksPerLimit(uint256 newBlocksPerLimit) external onlyOwner {
+        require(newBlocksPerLimit >= MINIMUM_BLOCKS_PER_LIMIT, "StableSwapModule/less-than-minimum-blocks-per-limit");
+        emit LogBlocksPerLimitUpdate(newBlocksPerLimit, blocksPerLimit);
+        blocksPerLimit = newBlocksPerLimit;
+    }
     function setFeeIn(uint256 _feeIn) external onlyOwner {
         require(_feeIn <= 5 * 1e17, "StableSwapModule/invalid-fee-in"); // Max feeIn is 0.5 Ethers or 50%
         feeIn = _feeIn;
@@ -166,8 +192,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         
         if(isDecentralizedState){
             _checkSingleSwapLimit(tokenAmount18);
-            _udpateAndCheckDailyLimit(tokenAmount18);
-            _checkAndUpdateOneSwapPerBlock();
+            _updateAndCheckDailyLimit(tokenAmount18);
+            _updateAndCheckNumberOfSwapsInBlocksPerLimit();
         }
 
         tokenBalance[stablecoin] -= stablecoinAmount;
@@ -189,8 +215,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         
         if(isDecentralizedState){
             _checkSingleSwapLimit(_amount);
-            _udpateAndCheckDailyLimit(_amount);
-            _checkAndUpdateOneSwapPerBlock();
+            _updateAndCheckDailyLimit(_amount);
+            _updateAndCheckNumberOfSwapsInBlocksPerLimit();
         }
 
         tokenBalance[token] -= tokenAmount;
@@ -260,12 +286,12 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         return tokenBalance[stablecoin] + _convertDecimals(tokenBalance[token], IToken(token).decimals(),18);
     }
 
-    function _udpateAndCheckDailyLimit(uint256 _amount) internal {
+    function _updateAndCheckDailyLimit(uint256 _amount) internal {
         if (block.timestamp - lastUpdate >= ONE_DAY) {
             lastUpdate = block.timestamp;
             remainingDailySwapAmount = _dailySwapLimit();
         }
-        require(remainingDailySwapAmount >= _amount, "_udpateAndCheckDailyLimit/daily-limit-exceeded");
+        require(remainingDailySwapAmount >= _amount, "_updateAndCheckDailyLimit/daily-limit-exceeded");
         remainingDailySwapAmount -= _amount;
         emit LogRemainingDailySwapAmount(remainingDailySwapAmount);
     }
@@ -280,9 +306,13 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         return newDailySwapLimit;
     }
 
-    function _checkAndUpdateOneSwapPerBlock() internal {
-        require(pastUserSwapBlockTime[msg.sender]!=block.timestamp,'one-block-swap-limit-exceeded');
-        pastUserSwapBlockTime[msg.sender] = block.timestamp;
+    function _updateAndCheckNumberOfSwapsInBlocksPerLimit() internal {
+        if (block.number - lastSwapBlockNumberPerUser[msg.sender] >= blocksPerLimit) {
+            lastSwapBlockNumberPerUser[msg.sender] = block.number;
+            numberOfSwapsRemainingPerUserInBlockLimit[msg.sender] = numberOfSwapsLimitPerUser;
+        }
+        require(numberOfSwapsRemainingPerUserInBlockLimit[msg.sender] > 0, "_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded");
+        numberOfSwapsRemainingPerUserInBlockLimit[msg.sender] = numberOfSwapsRemainingPerUserInBlockLimit[msg.sender] - 1;
     }
 
     function _convertDecimals(

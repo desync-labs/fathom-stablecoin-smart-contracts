@@ -11,6 +11,8 @@ const { WeiPerRay, WeiPerWad } = require("../../helper/unit")
 const { loadFixture } = require("../../helper/fixtures");
 const dailyLimitNumerator = 2000//on denomination of 10000th, 2000/10000 = 20%
 const singleSwapLimitNumerator = 100 ///on denomination of 10000th, 100/10000 = 1%
+const numberOfSwapsLimitPerUser = 1;
+const numberOfSwapsLimitPerBlock = 2;
 
 const loadFixtureHandler = async () => {
   mockedAccessControlConfig = await createMock("AccessControlConfig");
@@ -46,6 +48,8 @@ const loadFixtureHandler = async () => {
     mockFathomStablecoin.address,
     dailyLimitNumerator,
     singleSwapLimitNumerator,
+    numberOfSwapsLimitPerUser,
+    numberOfSwapsLimitPerBlock,
     [DeployerAddress]
   )
 
@@ -355,7 +359,7 @@ describe("StableSwapModule", () => {
         await stableSwapModule.swapTokenToStablecoin(DeployerAddress, swapMoney)
         await expect(
           stableSwapModule.swapTokenToStablecoin(DeployerAddress, swapMoney)
-        ).to.be.revertedWith("one-block-swap-limit-exceeded")
+        ).to.be.revertedWith("_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded")
       })
     })
 
@@ -420,7 +424,7 @@ describe("StableSwapModule", () => {
         await stableSwapModule.swapStablecoinToToken(DeployerAddress, swapMoney)
         await expect(
           stableSwapModule.swapStablecoinToToken(DeployerAddress, swapMoney)
-        ).to.be.revertedWith("one-block-swap-limit-exceeded")
+        ).to.be.revertedWith("_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded")
       })
     })
     context("swap stablecoin to token", () => {

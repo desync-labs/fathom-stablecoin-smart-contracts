@@ -37,7 +37,8 @@ module.exports = async function (deployer) {
     const addresses = getAddresses(deployer.networkId())
     const dailyLimitNumerator = 2000//on denomination of 10000th, 2000/10000 = 20%
     const singleSwapLimitNumerator = 100 ///on denomination of 10000th, 100/10000 = 1%
-
+    const numberOfSwapsLimitPerUser = 1;
+    const numberOfSwapsLimitPerBlock = 2;
     const promises = [
         accessControlConfig.initialize({ gasLimit: 1000000 }),
         collateralPoolConfig.initialize(accessControlConfig.address, { gasLimit: 1000000 }),
@@ -99,6 +100,8 @@ module.exports = async function (deployer) {
             fathomStablecoin.address,
             dailyLimitNumerator,
             singleSwapLimitNumerator,
+            numberOfSwapsLimitPerUser,
+            numberOfSwapsLimitPerBlock,
             [],//@notice: This can be set to addresses you want to whitelist
             { gasLimit: 1000000 }
         ),

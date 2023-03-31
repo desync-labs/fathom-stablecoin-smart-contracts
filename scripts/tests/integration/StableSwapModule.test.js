@@ -222,10 +222,10 @@ describe("StableSwapModule", () => {
                 //revert because it exceed allowance
                 
                 await expect(stableSwapModule.swapTokenToStablecoin(DeployerAddress,ethers.utils.parseEther("100"), { gasLimit: 1000000 })
-                ).to.be.revertedWith("_udpateAndCheckDailyLimit/daily-limit-exceeded")
+                ).to.be.revertedWith("_updateAndCheckDailyLimit/daily-limit-exceeded")
                 await TimeHelpers.increase(1)
                 await expect(stableSwapModule.swapStablecoinToToken(DeployerAddress,ethers.utils.parseEther("100"), { gasLimit: 1000000 })
-                ).to.be.revertedWith("_udpateAndCheckDailyLimit/daily-limit-exceeded")
+                ).to.be.revertedWith("_updateAndCheckDailyLimit/daily-limit-exceeded")
                 await TimeHelpers.increase(1)
                 const ONE_DAY = 86400
                 await TimeHelpers.increase(ONE_DAY+20)
@@ -271,7 +271,7 @@ describe("StableSwapModule", () => {
     })
 
     describe("#singleBlockLimitCheck", async () => {
-        context("check for daily limit", async() => {
+        context("check for block limit", async() => {
             it("Should revert when SingleSwap Limit is reached", async() => {
                 //first swap which takes all the allowance
                 await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
@@ -279,7 +279,94 @@ describe("StableSwapModule", () => {
                     ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
 
                 await expect(stableSwapModule.swapTokenToStablecoin(DeployerAddress
-                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })).to.be.revertedWith('one-block-swap-limit-exceeded')
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })).to.be.revertedWith('_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded')
+            })
+        })
+    })
+
+    describe("#checkForDifferentBlockLimitsSet", async () => {
+        context("check for block limit - setting 2 swaps per 3 blocks", async() => {
+            it("Should revert when SingleSwap Limit is reached", async() => {
+                //first swap which takes all the allowance
+                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
+                const newNumberOfSwapsLimitPerUser = 2
+                const newBlocksPerLimit = 3
+                await stableSwapModule.setNumberOfSwapsLimitPerUser(newNumberOfSwapsLimitPerUser, { gasLimit: 1000000 })
+                await stableSwapModule.setBlocksPerLimit(newBlocksPerLimit, { gasLimit: 1000000 })
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+    
+                await expect(stableSwapModule.swapTokenToStablecoin(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })).to.be.revertedWith('_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded')
+            })
+        })
+        context("check for block limit", async() => {
+            it("Should be successful and not reach limit - setting 3 swaps per 3 blocks", async() => {
+                //first swap which takes all the allowance
+                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
+                const newNumberOfSwapsLimitPerUser = 3
+                const newBlocksPerLimit = 3
+                await stableSwapModule.setNumberOfSwapsLimitPerUser(newNumberOfSwapsLimitPerUser, { gasLimit: 1000000 })
+                await stableSwapModule.setBlocksPerLimit(newBlocksPerLimit, { gasLimit: 1000000 })
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress
+                        ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+    
+            })
+        })
+        context("check for block limit", async() => {
+            it("Should revert for extra swap in the limit and then again be sucessful after enough block passes", async() => {
+                //first swap which takes all the allowance
+                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
+                const newNumberOfSwapsLimitPerUser = 3
+                const newBlocksPerLimit = 500
+                await stableSwapModule.setNumberOfSwapsLimitPerUser(newNumberOfSwapsLimitPerUser, { gasLimit: 1000000 })
+                await stableSwapModule.setBlocksPerLimit(newBlocksPerLimit, { gasLimit: 1000000 })
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress
+                        ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                
+                await expect(stableSwapModule.swapTokenToStablecoin(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })).to.be.revertedWith('_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded')
+
+
+                const currentBlockNumber = await TimeHelpers.latestBlockNumber()
+                const blockNumberToWait = currentBlockNumber.add(newBlocksPerLimit)
+                await TimeHelpers.advanceBlockTo(blockNumberToWait)
+
+                await stableSwapModule.swapStablecoinToToken(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+
+                // await stableSwapModule.swapStablecoinToToken(DeployerAddress
+                //     ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+            })
+        })
+
+        context("twoStablecoinToTokenSwapAtSameBlock- swap tokens in same block", async () => {
+            it("Should be successful for two swaps in same block", async () => {
+                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})  
+                const newNumberOfSwapsLimitPerUser = 3
+                const newBlocksPerLimit = 3
+                await stableSwapModule.setNumberOfSwapsLimitPerUser(newNumberOfSwapsLimitPerUser, { gasLimit: 1000000 })
+                await stableSwapModule.setBlocksPerLimit(newBlocksPerLimit, { gasLimit: 1000000 })
+
+                await fathomStablecoin.approve(stableswapMultipleSwapsMock.address,MaxUint256,{gasLimit:8000000})
+                await stableswapMultipleSwapsMock.twoStablecoinToTokenSwapAtSameBlock(stableSwapModule.address,fathomStablecoin.address,ONE_PERCENT_OF_TOTAL_DEPOSIT,{gasLimit:8000000});
             })
         })
     })
@@ -305,7 +392,7 @@ describe("StableSwapModule", () => {
                 await fathomStablecoin.approve(stableswapMultipleSwapsMock.address,MaxUint256,{gasLimit:8000000})
                 await expect(
                     stableswapMultipleSwapsMock.twoStablecoinToTokenSwapAtSameBlock(stableSwapModule.address,fathomStablecoin.address,ONE_PERCENT_OF_TOTAL_DEPOSIT,{gasLimit:8000000})
-                ).to.be.revertedWith("no error message bubbled up - for second swap") //TODO: Why is error not bubbling up?
+                ).to.be.revertedWith("_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded")
             })
          })
 
@@ -315,7 +402,7 @@ describe("StableSwapModule", () => {
                 await USDT.approve(stableswapMultipleSwapsMock.address,MaxUint256,{gasLimit:8000000})
                 await expect(
                     stableswapMultipleSwapsMock.twoTokenToStablecoinSwapAtSameBlock(stableSwapModule.address,USDT.address,ONE_PERCENT_OF_TOTAL_DEPOSIT,{gasLimit:8000000})
-                ).to.be.revertedWith("no error message bubbled up - for second swap") //TODO: Why is error not bubbling up?
+                ).to.be.revertedWith("_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded") //TODO: Why is error not bubbling up?
             })
          })
     })
@@ -336,6 +423,4 @@ describe("StableSwapModule", () => {
             })
         })
     })
-
-    
 })
