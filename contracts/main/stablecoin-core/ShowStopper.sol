@@ -29,6 +29,8 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
     mapping(bytes32 => uint256) public totalDebtShare; // Total debt per collateralPoolId      [wad]
     mapping(bytes32 => uint256) public finalCashPrice; // Final redeemStablecoin price        [ray]
 
+    mapping(bytes32 => uint256) poolStablecoinIssued; // poolStablecoinIssued per collateral pool [rad]
+
     mapping(address => uint256) public stablecoinAccumulator; //    [wad]
     mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
 
@@ -143,6 +145,10 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
     function cagePool(bytes32 _collateralPoolId) external onlyOwner {
         require(live == 0, "ShowStopper/still-live");
         require(cagePrice[_collateralPoolId] == 0, "ShowStopper/cage-price-collateral-pool-id-already-defined");
+
+        poolStablecoinIssued[_collateralPoolId] = IBookKeeper(bookKeeper).poolStablecoinIssued(_collateralPoolId);
+
+
         uint256 _totalDebtShare = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getTotalDebtShare(_collateralPoolId);
         address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId);
         IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);
@@ -203,12 +209,13 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
         require(debt != 0, "ShowStopper/debt-zero");
         require(finalCashPrice[_collateralPoolId] == 0, "ShowStopper/final-cash-price-collateral-pool-id-already-defined");
 
-        uint256 poolStablecoinIssued = IBookKeeper(bookKeeper).poolStablecoinIssued(_collateralPoolId);
         uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getDebtAccumulatedRate(
             _collateralPoolId
         ); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
-        finalCashPrice[_collateralPoolId] = mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) / (poolStablecoinIssued / RAY);
+
+        finalCashPrice[_collateralPoolId] = mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) / (poolStablecoinIssued[_collateralPoolId] / RAY);
+
         emit LogFinalizeCashPrice(_collateralPoolId);
     }
 
