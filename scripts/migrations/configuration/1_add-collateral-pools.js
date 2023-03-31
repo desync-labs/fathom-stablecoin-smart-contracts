@@ -26,6 +26,8 @@ module.exports = async function (deployer) {
     const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);
     const debtCeilingSetUp = WeiPerRad.mul(10000000).div(2);
 
+    await delayFathomOraclePriceFeed.peekPrice({ gasLimit: 2000000 });
+
     const promises = [
         initPool(pools.XDC, collateralTokenAdapter.address, delayFathomOraclePriceFeed.address, LIQUIDATIONRATIO_75),
     ]
@@ -33,7 +35,7 @@ module.exports = async function (deployer) {
     await Promise.all(promises);
 
     await bookKeeper.setTotalDebtCeiling(debtCeilingSetUpTotal, { gasLimit: 2000000 });
-    await delayFathomOraclePriceFeed.peekPrice({ gasLimit: 2000000 });
+
 
     async function initPool(poolId, adapter, priceFeed, liquidationRatio) {
         await collateralPoolConfig.initCollateralPool(
