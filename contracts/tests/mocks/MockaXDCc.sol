@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 pragma solidity 0.8.17;
 
 contract MockaXDCc is ERC20 {
-    
     uint256 public ratio;
 
     constructor(string memory _name, string memory _symbol) ERC20(_name, _symbol) {
@@ -18,5 +17,5 @@ contract MockaXDCc is ERC20 {
 
     function mint(address _to, uint256 _amount) external {
         _mint(_to, _amount);
-  }
+    }
 }

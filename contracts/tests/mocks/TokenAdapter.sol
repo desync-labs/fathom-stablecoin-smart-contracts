@@ -59,7 +59,7 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
     }
 
     function cage() external override onlyOwnerOrShowStopper {
-        if(live == 1) {
+        if (live == 1) {
             live = 0;
             emit LogCage();
         }

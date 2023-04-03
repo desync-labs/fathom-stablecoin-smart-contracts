@@ -12,6 +12,16 @@ contract FathomAuth is FathomAuthEvents {
     IAuthority public authority;
     address public owner;
 
+    modifier auth() {
+        require(isAuthorized(msg.sender, msg.sig), "fathom-auth-unauthorized");
+        _;
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "only owner allowed");
+        _;
+    }
+
     constructor() {
         owner = msg.sender;
         emit LogSetOwner(msg.sender);
@@ -27,16 +37,6 @@ contract FathomAuth is FathomAuthEvents {
         require(address(_authority) != address(0), "FathomAuth/set-zero-address-authority");
         authority = _authority;
         emit LogSetAuthority(address(authority));
-    }
-
-    modifier auth() {
-        require(isAuthorized(msg.sender, msg.sig), "fathom-auth-unauthorized");
-        _;
-    }
-
-    modifier onlyOwner() {
-        require(msg.sender == owner, "only owner allowed");
-        _;
     }
 
     function isAuthorized(address _src, bytes4 _sig) internal view returns (bool) {

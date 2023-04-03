@@ -10,7 +10,7 @@ import "../interfaces/IStabilityFeeCollector.sol";
 import "../interfaces/IPausable.sol";
 
 contract StabilityFeeCollectorMath {
-    uint256 constant RAY = 10 ** 27;
+    uint256 internal constant RAY = 10 ** 27;
 
     function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
         assembly {
@@ -150,10 +150,7 @@ contract StabilityFeeCollector is StabilityFeeCollectorMath, PausableUpgradeable
         require(block.timestamp >= _lastAccumulationTime, "StabilityFeeCollector/invalid-block.timestamp");
         require(systemDebtEngine != address(0), "StabilityFeeCollector/system-debt-engine-not-set");
 
-        _debtAccumulatedRate = rmul(
-            rpow(_stabilityFeeRate, block.timestamp - _lastAccumulationTime, RAY),
-            _previousDebtAccumulatedRate
-        );
+        _debtAccumulatedRate = rmul(rpow(_stabilityFeeRate, block.timestamp - _lastAccumulationTime, RAY), _previousDebtAccumulatedRate);
 
         bookKeeper.accrueStabilityFee(_collateralPoolId, systemDebtEngine, diff(_debtAccumulatedRate, _previousDebtAccumulatedRate));
         ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).updateLastAccumulationTime(_collateralPoolId);

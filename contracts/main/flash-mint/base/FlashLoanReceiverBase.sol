@@ -7,7 +7,7 @@ import "../../interfaces/IERC3156FlashBorrower.sol";
 import "../../utils/SafeToken.sol";
 
 contract FlashLoanReceiverBaseMath {
-    uint256 constant RAY = 10 ** 27;
+    uint256 internal constant RAY = 10 ** 27;
 
     function rad(uint256 _wad) internal pure returns (uint256) {
         return mul(_wad, RAY);

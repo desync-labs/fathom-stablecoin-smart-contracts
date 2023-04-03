@@ -62,14 +62,7 @@ contract BookKeeperMath {
 }
 
 /// @notice A contract which acts as a book keeper of the Fathom Stablecoin protocol. It has the ability to move collateral token and stablecoin with in the accounting state variable.
-contract BookKeeper is
-    IBookKeeper,
-    ICagable,
-    IPausable,
-    BookKeeperMath,
-    PausableUpgradeable,
-    ReentrancyGuardUpgradeable
-{
+contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, PausableUpgradeable, ReentrancyGuardUpgradeable {
     using Address for address;
 
     struct Position {
@@ -177,9 +170,12 @@ contract BookKeeper is
     // --- Init ---
 
     function initialize(address _collateralPoolConfig, address _accessControlConfig) external initializer {
-        require(_collateralPoolConfig.isContract(),"BookKeeper/collateral-pool-config: NOT_CONTRACT_ADDRESS");
-        require(_accessControlConfig.isContract(),"BookKeeper/access-control-config: NOT_CONTRACT_ADDRESS");
-        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "BookKeeper/msgsender-not-owner"); // Sanity Check Call
+        require(_collateralPoolConfig.isContract(), "BookKeeper/collateral-pool-config: NOT_CONTRACT_ADDRESS");
+        require(_accessControlConfig.isContract(), "BookKeeper/access-control-config: NOT_CONTRACT_ADDRESS");
+        require(
+            IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender),
+            "BookKeeper/msgsender-not-owner"
+        ); // Sanity Check Call
 
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
@@ -198,7 +194,10 @@ contract BookKeeper is
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
-        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "BookKeeper/msgsender-not-owner"); // Sanity Check Call
+        require(
+            IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender),
+            "BookKeeper/msgsender-not-owner"
+        ); // Sanity Check Call
         accessControlConfig = _accessControlConfig;
         emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
@@ -211,7 +210,7 @@ contract BookKeeper is
     // --- Cage ---
 
     function cage() external override onlyOwnerOrShowStopper {
-        if(live == 1) {
+        if (live == 1) {
             live = 0;
             emit LogCage();
         }
@@ -273,6 +272,7 @@ contract BookKeeper is
         stablecoin[_dst] = add(stablecoin[_dst], _value);
     }
 
+    // solhint-disable function-max-lines
     function adjustPosition(
         bytes32 _collateralPoolId,
         address _positionAddress,
@@ -337,6 +337,8 @@ contract BookKeeper is
             _poolStablecoinAmount // [rad]
         );
     }
+
+    // solhint-enable function-max-lines
 
     function movePosition(
         bytes32 _collateralPoolId,

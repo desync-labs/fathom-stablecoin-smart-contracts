@@ -12,7 +12,7 @@ interface ICollateralAdapter {
 
     function onMoveCollateral(address src, address dst, uint256 wad, bytes calldata data) external;
 
-    function collateralPoolId() external view returns (bytes32);
-
     function moveStake(address, address, uint256, bytes calldata) external;
+
+    function collateralPoolId() external view returns (bytes32);
 }

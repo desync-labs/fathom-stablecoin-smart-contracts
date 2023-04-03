@@ -12,8 +12,6 @@ import "../interfaces/IToken.sol";
 // sliding window oracle that uses observations collected over a window to provide moving price averages in the past
 // `windowSize` with a precision of `windowSize / granularity`
 contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
-    uint8 public constant RESOLUTION = 112;
-
     struct Observation {
         uint256 timestamp;
         uint256 price0Cumulative;
@@ -37,11 +35,9 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
     // mapping from pair address to a list of price observations of that pair
     mapping(address => Observation[]) public pairObservations;
 
-    function initialize(
-        address _factory,
-        uint256 _windowSize,
-        uint8 _granularity
-    ) external initializer {
+    uint8 public constant RESOLUTION = 112;
+
+    function initialize(address _factory, uint256 _windowSize, uint8 _granularity) external initializer {
         require(_granularity > 1, "SlidingWindowDexOracle/invalid-granularity");
         require((periodSize = _windowSize / _granularity) * _granularity == _windowSize, "SlidingWindowDexOracle/window-not-evenly-divisible");
         factory = _factory;
@@ -89,7 +85,7 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
         require(timeElapsed >= windowSize - periodSize * 2, "SlidingWindowDexOracle/unexpected-time-elapsed");
 
         (uint256 price0Cumulative, uint256 price1Cumulative) = currentCumulativePrice(pair);
-        (address token0,) = FathomSwapLibrary.sortTokens(tokenA, tokenB);
+        (address token0, ) = FathomSwapLibrary.sortTokens(tokenA, tokenB);
         price = tokenA == token0
             ? (((price0Cumulative - firstObservation.price0Cumulative) / timeElapsed) * 1e18) >> RESOLUTION
             : (((price1Cumulative - firstObservation.price1Cumulative) / timeElapsed) * 1e18) >> RESOLUTION;

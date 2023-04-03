@@ -102,7 +102,7 @@ contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, Reentran
     }
 
     function cage() external override onlyOwnerOrShowStopper {
-        if(live == 1) {
+        if (live == 1) {
             live = 0;
             bookKeeper.settleSystemBadDebt(min(bookKeeper.stablecoin(address(this)), bookKeeper.systemBadDebt(address(this))));
             emit LogCage();

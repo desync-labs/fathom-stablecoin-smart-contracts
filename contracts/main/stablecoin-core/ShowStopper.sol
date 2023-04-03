@@ -14,8 +14,8 @@ import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
 
 contract ShowStopperMath {
-    uint256 constant WAD = 10 ** 18;
-    uint256 constant RAY = 10 ** 27;
+    uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant RAY = 10 ** 27;
 
     function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         _z = _x + _y;
@@ -59,7 +59,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     mapping(bytes32 => uint256) public totalDebtShare; // Total debt per collateralPoolId      [wad]
     mapping(bytes32 => uint256) public finalCashPrice; // Final redeemStablecoin price        [ray]
 
-    mapping(bytes32 => uint256) poolStablecoinIssued; // poolStablecoinIssued per collateral pool [rad]
+    mapping(bytes32 => uint256) public poolStablecoinIssued; // poolStablecoinIssued per collateral pool [rad]
 
     mapping(address => uint256) public stablecoinAccumulator; //    [wad]
     mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
@@ -215,7 +215,9 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         ); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
 
-        finalCashPrice[_collateralPoolId] = mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) / (poolStablecoinIssued[_collateralPoolId] / RAY);
+        finalCashPrice[_collateralPoolId] =
+            mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) /
+            (poolStablecoinIssued[_collateralPoolId] / RAY);
 
         emit LogFinalizeCashPrice(_collateralPoolId);
     }

@@ -13,7 +13,7 @@ import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IPausable.sol";
 
 contract PriceOracleMath {
-    uint256 constant ONE = 10 ** 27;
+    uint256 internal constant ONE = 10 ** 27;
 
     function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         require(_y == 0 || (_z = _x * _y) / _y == _x);
@@ -33,13 +33,13 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpg
         uint256 liquidationRatio; // Liquidation ratio or Collateral ratio [ray]
     }
 
+    uint256 internal constant MIN_REFERENCE_PRICE = 10 ** 24;
+    uint256 internal constant MAX_REFERENCE_PRICE = 2 * (10 ** 27);
+
     IBookKeeper public bookKeeper; // CDP Engine
     uint256 public override stableCoinReferencePrice; // ref per FUSD [ray] :: value of stablecoin in the reference asset (e.g. $1 per Fathom USD)
 
     uint256 public live;
-
-    uint256 constant MinReferencePrice = 10 ** 24;
-    uint256 constant MaxReferencePrice = 2 * (10 ** 27);
 
     event LogSetPrice(
         bytes32 indexed _poolId,
@@ -98,7 +98,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpg
 
     function setStableCoinReferencePrice(uint256 _referencePrice) external onlyOwner isLive {
         require(_referencePrice > 0, "PriceOracle/zero-reference-price");
-        require(_referencePrice > MinReferencePrice && _referencePrice < MaxReferencePrice , "PriceOracle/invalid-reference-price");
+        require(_referencePrice > MIN_REFERENCE_PRICE && _referencePrice < MAX_REFERENCE_PRICE, "PriceOracle/invalid-reference-price");
         stableCoinReferencePrice = _referencePrice;
         emit LogSetStableCoinReferencePrice(msg.sender, _referencePrice);
     }
@@ -115,7 +115,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpg
     }
 
     function cage() external override onlyOwnerOrShowStopper {
-        if(live == 1) {
+        if (live == 1) {
             live = 0;
             emit LogCage();
         }

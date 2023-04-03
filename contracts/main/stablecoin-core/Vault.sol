@@ -27,22 +27,16 @@ contract Vault is IVault {
         collateralAdapter = _collateralAdapter;
     }
 
-    function deposit(
-        uint256 _amount
-    ) external onlyAdapter {
+    function deposit(uint256 _amount) external onlyAdapter {
         IERC20(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
         emit Deposit(_amount);
     }
 
-    function withdraw(
-        uint256 _amount
-    ) external onlyAdapter {
+    function withdraw(uint256 _amount) external onlyAdapter {
         _withdraw(_amount);
     }
 
-    function _withdraw(
-        uint256 _amount
-    ) internal {
+    function _withdraw(uint256 _amount) internal {
         IERC20(collateralToken).safeTransfer(msg.sender, _amount);
         emit Withdraw(_amount);
     }

@@ -29,7 +29,6 @@ contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBo
 
     uint256 constant RAY = 10 ** 27;
 
-
     function onBookKeeperFlashLoan(
         address, // initiator
         uint256 loanValue, // [rad]
@@ -45,8 +44,8 @@ contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBo
         uint256 loanAmount = loanValue / RAY;
 
         // 1. Swap AUSD to BUSD at a DEX
-    //    vars.stableSwapModule.stablecoinAdapter().bookKeeper().whitelist(address(vars.stableSwapModule.stablecoinAdapter()));
-      //  vars.stableSwapModule.stablecoinAdapter().withdraw(address(this), loanAmount, abi.encode(0));
+        //    vars.stableSwapModule.stablecoinAdapter().bookKeeper().whitelist(address(vars.stableSwapModule.stablecoinAdapter()));
+        //  vars.stableSwapModule.stablecoinAdapter().withdraw(address(this), loanAmount, abi.encode(0));
         uint256 balanceBefore = vars.stableSwapToken.myBalance();
         stablecoin.safeApprove(vars.router, type(uint).max);
         IFathomSwapRouter(vars.router).swapExactTokensForTokens(loanAmount, 0, path, address(this), block.timestamp);
@@ -54,12 +53,12 @@ contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBo
         uint256 balanceAfter = vars.stableSwapToken.myBalance();
 
         // 2. Swap BUSD to AUSD at StableSwapModule
-     //   vars.stableSwapToken.safeApprove(address(vars.stableSwapModule.authTokenAdapter()), type(uint).max);
-        vars.stableSwapModule.swapTokenToStablecoin( address(this),balanceAfter.sub(balanceBefore));
-       // vars.stableSwapToken.safeApprove(address(vars.stableSwapModule.authTokenAdapter()), 0);
+        //   vars.stableSwapToken.safeApprove(address(vars.stableSwapModule.authTokenAdapter()), type(uint).max);
+        vars.stableSwapModule.swapTokenToStablecoin(address(this), balanceAfter.sub(balanceBefore));
+        // vars.stableSwapToken.safeApprove(address(vars.stableSwapModule.authTokenAdapter()), 0);
 
         // 3. Approve AUSD for FlashMintModule
-      //  stablecoin.safeApprove(address(vars.stableSwapModule.stablecoinAdapter()), loanAmount.add(fee.div(RAY)));
+        //  stablecoin.safeApprove(address(vars.stableSwapModule.stablecoinAdapter()), loanAmount.add(fee.div(RAY)));
         //vars.stableSwapModule.stablecoinAdapter().deposit(msg.sender, loanAmount.add(fee.div(RAY)), abi.encode(0));
 
         return keccak256("BookKeeperFlashBorrower.onBookKeeperFlashLoan");

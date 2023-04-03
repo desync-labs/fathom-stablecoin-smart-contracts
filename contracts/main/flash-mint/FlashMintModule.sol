@@ -14,9 +14,9 @@ import "../interfaces/IPausable.sol";
 import "../utils/SafeToken.sol";
 
 contract FlashMintModuleMath {
-    uint256 constant WAD = 10 ** 18;
-    uint256 constant RAY = 10 ** 27;
-    uint256 constant RAD = 10 ** 45;
+    uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant RAY = 10 ** 27;
+    uint256 internal constant RAD = 10 ** 45;
 
     function _add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         require((_z = _x + _y) >= _x);
@@ -84,6 +84,16 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
         address(stablecoin).safeApprove(_stablecoinAdapter, type(uint256).max);
     }
 
+    /// @dev access: OWNER_ROLE, GOV_ROLE
+    function pause() external override onlyOwnerOrGov {
+        _pause();
+    }
+
+    /// @dev access: OWNER_ROLE, GOV_ROLE
+    function unpause() external override onlyOwnerOrGov {
+        _unpause();
+    }
+
     function setMax(uint256 _data) external onlyOwner {
         // Add an upper limit of 10^27 Stablecoin to avoid breaking technical assumptions of Stablecoin << 2^256 - 1
         require((max = _data) <= RAD, "FlashMintModule/ceiling-too-high");
@@ -96,19 +106,6 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
     }
 
     // --- ERC 3156 Spec ---
-    function maxFlashLoan(address _token) external view override returns (uint256) {
-        if (_token == address(stablecoin) && locked == 0) {
-            return max;
-        } else {
-            return 0;
-        }
-    }
-
-    function flashFee(address _token, uint256 _amount) external view override returns (uint256) {
-        require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
-
-        return _mul(_amount, feeRate) / WAD;
-    }
 
     function flashLoan(IERC3156FlashBorrower _receiver, address _token, uint256 _amount, bytes calldata _data) external override lock returns (bool) {
         require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
@@ -124,7 +121,7 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
         stablecoinAdapter.withdraw(address(_receiver), _amount, abi.encode(0));
 
         emit LogFlashLoan(address(_receiver), _token, _amount, _fee);
-        
+
         require(_receiver.onFlashLoan(msg.sender, _token, _amount, _fee, _data) == CALLBACK_SUCCESS, "FlashMintModule/callback-failed");
         address(stablecoin).safeTransferFrom(address(_receiver), address(this), _total); // The fee is also enforced here
         stablecoinAdapter.deposit(address(this), _total, abi.encode(0));
@@ -170,13 +167,17 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
         address(stablecoin).safeApprove(address(stablecoinAdapter), type(uint256).max);
     }
 
-      /// @dev access: OWNER_ROLE, GOV_ROLE
-    function pause() external override onlyOwnerOrGov {
-        _pause();
+    function maxFlashLoan(address _token) external view override returns (uint256) {
+        if (_token == address(stablecoin) && locked == 0) {
+            return max;
+        } else {
+            return 0;
+        }
     }
 
-    /// @dev access: OWNER_ROLE, GOV_ROLE
-    function unpause() external override onlyOwnerOrGov {
-        _unpause();
+    function flashFee(address _token, uint256 _amount) external view override returns (uint256) {
+        require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
+
+        return _mul(_amount, feeRate) / WAD;
     }
 }

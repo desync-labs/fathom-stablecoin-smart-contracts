@@ -7,9 +7,10 @@ import "./ProxyWallet.sol";
 
 /// @dev This factory deploys new proxy instances through build(). Deployed proxy addresses are logged
 contract ProxyWalletFactory is OwnableUpgradeable {
-    event LogCreated(address indexed _sender, address indexed _owner, address _proxy);
     mapping(address => bool) public isProxy;
     address public proxyActionStorage;
+
+    event LogCreated(address indexed _sender, address indexed _owner, address _proxy);
 
     function initialize(address _proxyActionStorage) external initializer {
         OwnableUpgradeable.__Ownable_init();

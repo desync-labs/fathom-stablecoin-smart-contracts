@@ -14,7 +14,7 @@ interface IGenericTokenAdapter {
 
     function onMoveCollateral(address src, address dst, uint256 wad, bytes calldata data) external;
 
-    function collateralPoolId() external view returns (bytes32);
-
     function collateralToken() external returns (address);
+
+    function collateralPoolId() external view returns (bytes32);
 }

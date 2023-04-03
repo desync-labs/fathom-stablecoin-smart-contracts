@@ -20,6 +20,11 @@ import "../utils/SafeToken.sol";
 contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModule, IPausable {
     using SafeToken for address;
 
+    uint256 public constant ONE_DAY = 86400;
+    uint256 public constant MINIMUM_DAILY_SWAP_LIMIT = 1000 * 1e18;
+
+    uint256 internal constant WAD = 10 ** 18;
+
     IBookKeeper public bookKeeper;
     address public stablecoin;
     address public token;
@@ -34,9 +39,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     uint256 public dailySwapLimit; // [wad]
     uint256 public totalTokenFeeBalance; // [wad]
     uint256 public totalFXDFeeBalance; // [wad]
-
-    uint256 public constant ONE_DAY = 86400;
-    uint256 public constant MINIMUM_DAILY_SWAP_LIMIT = 1000 * 1e18;
 
     event LogSetFeeIn(address indexed _caller, uint256 _feeIn);
     event LogSetFeeOut(address indexed _caller, uint256 _feeOut);
@@ -65,12 +67,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         _;
     }
 
-    function initialize(
-        address _bookKeeper,
-        address _token,
-        address _stablecoin,
-        uint256 _dailySwapLimit
-    ) external initializer {
+    function initialize(address _bookKeeper, address _token, address _stablecoin, uint256 _dailySwapLimit) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
         require(_dailySwapLimit >= MINIMUM_DAILY_SWAP_LIMIT, "initialize/less-than-minimum-daily-swap-limit");
@@ -79,8 +76,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         token = _token;
         dailySwapLimit = _dailySwapLimit;
     }
-
-    uint256 constant WAD = 10**18;
 
     function setDailySwapLimit(uint256 newdailySwapLimit) external onlyOwner {
         require(newdailySwapLimit >= MINIMUM_DAILY_SWAP_LIMIT, "StableSwapModule/less-than-minimum-daily-swap-limit");
@@ -151,12 +146,12 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_destination != address(0), "withdrawFees/wrong-destination");
         require(totalFXDFeeBalance != 0 || totalTokenFeeBalance != 0, "withdrawFees/no-fee-balance");
         uint256 pendingFXDBalance = totalFXDFeeBalance;
-        if(pendingFXDBalance !=0) {
+        if (pendingFXDBalance != 0) {
             totalFXDFeeBalance = 0;
             stablecoin.safeTransfer(_destination, pendingFXDBalance);
         }
         uint256 pendingTokenBalance = totalTokenFeeBalance;
-        if(pendingTokenBalance !=0) {
+        if (pendingTokenBalance != 0) {
             totalTokenFeeBalance = 0;
             token.safeTransfer(_destination, pendingTokenBalance);
         }
@@ -193,11 +188,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogRemainingDailySwapAmount(remainingDailySwapAmount);
     }
 
-    function _convertDecimals(
-        uint256 _amount,
-        uint8 _fromDecimals,
-        uint8 _toDecimals
-    ) internal pure returns (uint256 result) {
-        result = _toDecimals >= _fromDecimals ? _amount * (10**(_toDecimals - _fromDecimals)) : _amount / (10**(_fromDecimals - _toDecimals));
+    function _convertDecimals(uint256 _amount, uint8 _fromDecimals, uint8 _toDecimals) internal pure returns (uint256 result) {
+        result = _toDecimals >= _fromDecimals ? _amount * (10 ** (_toDecimals - _fromDecimals)) : _amount / (10 ** (_fromDecimals - _toDecimals));
     }
 }

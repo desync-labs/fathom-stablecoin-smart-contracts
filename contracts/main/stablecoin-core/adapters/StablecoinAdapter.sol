@@ -12,7 +12,7 @@ import "../../interfaces/ICagable.sol";
 import "../../interfaces/IPausable.sol";
 
 contract StablecoinAdapterMath {
-    uint256 constant ONE = 10 ** 27;
+    uint256 internal constant ONE = 10 ** 27;
 
     function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
         require(y == 0 || (z = x * y) / y == x);
@@ -54,7 +54,7 @@ contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, Reentr
     }
 
     function cage() external override onlyOwnerOrShowStopper {
-        if(live == 1) {
+        if (live == 1) {
             live = 0;
             emit LogCage();
         }
