@@ -11,7 +11,7 @@ typechain
 typechain-types
 /build
 
-
+addresses.json
 #Hardhat files
 cache
 artifacts
