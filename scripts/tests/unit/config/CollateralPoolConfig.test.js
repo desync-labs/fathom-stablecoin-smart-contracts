@@ -37,8 +37,11 @@ const loadFixtureHandler = async () => {
     await mockedAccessControlConfig.mock.STABILITY_FEE_COLLECTOR_ROLE.returns(formatBytes32String("STABILITY_FEE_COLLECTOR_ROLE"))
     await mockedAccessControlConfig.mock.hasRole.returns(true)
 
+    // await mockedAccessControlConfig.mock.collateralPoolId.returns(COLLATERAL_POOL_ID)
+
     await mockedSimplePriceFeed.mock.peekPrice.returns(formatBytes32BigNumber(BigNumber.from("0")), true);
     await mockedCollateralTokenAdapter.mock.decimals.returns(0);
+    await mockedCollateralTokenAdapter.mock.collateralPoolId.returns(COLLATERAL_POOL_ID)
 
     await collateralPoolConfig.initialize(mockedAccessControlConfig.address)
     return {
@@ -416,6 +419,22 @@ describe("CollateralPoolConfig", () => {
         await expect(
           collateralPoolConfigAsAlice.setAdapter(COLLATERAL_POOL_ID, mockedCollateralTokenAdapter.address)
         ).to.be.revertedWith("!ownerRole")
+      })
+    })
+    context("when the parameters are invalid", () => {
+      it("should be revert when adapter's input is address(0)", async () => {
+        await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+        await expect(
+          collateralPoolConfigAsAlice.setAdapter(COLLATERAL_POOL_ID, ethers.constants.AddressZero)
+        ).to.be.revertedWith("CollateralPoolConfig/setAdapter-zero-address")
+      })
+      it("should be revert when collateralPoolId is wrong)", async () => {
+        await mockedAccessControlConfig.mock.hasRole.returns(true)
+        
+        await expect(
+          collateralPoolConfigAsAlice.setAdapter(ethers.constants.HashZero, mockedCollateralTokenAdapter.address)
+        ).to.be.revertedWith("CollateralPoolConfig/setAdapter-wrongPoolId")
       })
     })
     context("when parameters are valid", () => {
