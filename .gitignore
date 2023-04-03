@@ -10,6 +10,7 @@ coverage.json
 typechain
 typechain-types
 /build
+addresses.json
 
 
 #Hardhat files
