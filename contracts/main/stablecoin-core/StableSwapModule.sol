@@ -48,9 +48,9 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     uint256 public constant ONE_DAY = 86400;
     uint256 constant WAD = 10**18;
     
-    mapping(address => bool) usersWhitelist;
-    mapping(address => uint256) numberOfSwapsRemainingPerUserInBlockLimit;
-    mapping(address => uint256) lastSwapBlockNumberPerUser;
+    mapping(address => bool) public usersWhitelist;
+    mapping(address => uint256) public numberOfSwapsRemainingPerUserInBlockLimit;
+    mapping(address => uint256) public lastSwapBlockNumberPerUser;
 
     event LogSetFeeIn(address indexed _caller, uint256 _feeIn);
     event LogSetFeeOut(address indexed _caller, uint256 _feeOut);
@@ -170,8 +170,11 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         usersWhitelist[_user] = false;
         emit LogRemoveFromWhitelist(_user);
     }
-    
 
+    function isUserWhitelisted(address _user) external view returns(bool){
+        return usersWhitelist[_user];
+    }
+    
     function swapTokenToStablecoin(address _usr, uint256 _amount) external override whenNotPaused onlyWhitelistedIfNotDecentralized() nonReentrant  {
         require(_amount != 0, "StableSwapModule/amount-zero");
 

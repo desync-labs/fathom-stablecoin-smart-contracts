@@ -329,7 +329,8 @@ describe("StableSwapModule", () => {
                 //first swap which takes all the allowance
                 await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
                 const newNumberOfSwapsLimitPerUser = 3
-                const newBlocksPerLimit = 500
+                const newBlocksPerLimit = 10
+                const blockNumbersToReachForNextSwap = 12
                 await stableSwapModule.setNumberOfSwapsLimitPerUser(newNumberOfSwapsLimitPerUser, { gasLimit: 1000000 })
                 await stableSwapModule.setBlocksPerLimit(newBlocksPerLimit, { gasLimit: 1000000 })
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress
@@ -344,9 +345,9 @@ describe("StableSwapModule", () => {
                 await expect(stableSwapModule.swapTokenToStablecoin(DeployerAddress
                     ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })).to.be.revertedWith('_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded')
 
-                const currentBlockNumber = await TimeHelpers.latestBlockNumber()
-                const blockNumberToWait = currentBlockNumber.add(newBlocksPerLimit)
-                await TimeHelpers.advanceBlockTo(blockNumberToWait)
+                for(let i = 0; i<blockNumbersToReachForNextSwap; i++){
+                    await TimeHelpers.advanceBlock()
+                }
 
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress
                     ,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
@@ -415,6 +416,7 @@ describe("StableSwapModule", () => {
             })
         })
     })
+    
 
     describe("#stableswapNotWhitelistedUserSwaps", async () => {
         context("not whitelisted-swapTokenToStablecoin", () => {
@@ -429,6 +431,22 @@ describe("StableSwapModule", () => {
               await expect(
                 stableSwapModule.swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT, {from: accounts[2]})
               ).to.be.revertedWith("user-not-whitelisted")
+            })
+        })
+    })
+
+    describe("#getIsUsersWhitelisted", async () => {
+        context("is whitelisted should be true", () => {
+            it("should return true", async () => {
+                const isUserWhitelisted = await stableSwapModule.isUserWhitelisted(DeployerAddress)
+                expect(isUserWhitelisted).to.be.equal(true)
+            })
+          })
+
+        context("is whitelisted should be true", () => {
+        it("should return false", async () => {
+            const isUserWhitelisted = await stableSwapModule.isUserWhitelisted(accounts[2])
+            expect(isUserWhitelisted).to.be.equal(false)
             })
         })
     })
