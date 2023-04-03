@@ -5,6 +5,7 @@
 .env
 *.DS_Store
 externalAddresses.json
+addresses.json
 yarn.lock
 package-lock.json
 coverage
