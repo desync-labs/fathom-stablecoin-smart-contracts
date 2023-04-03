@@ -16,6 +16,7 @@ import "../../interfaces/IFlashLendingCallee.sol";
 import "../../interfaces/IGenericTokenAdapter.sol";
 import "../../interfaces/IManager.sol";
 import "../../interfaces/IStablecoinAdapter.sol";
+import "../../interfaces/IERC165.sol";
 import "../../utils/SafeToken.sol";
 
 contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
@@ -49,6 +50,8 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
     IStablecoinAdapter public stablecoinAdapter; //StablecoinAdapter to deposit FXD to bookKeeper
 
     uint256 public flashLendingEnabled;
+
+    bytes4 internal constant FLASH_LENDING_ID = 0xaf7bd142;
 
     event LogFixedSpreadLiquidate(
         bytes32 indexed _collateralPoolId,
@@ -251,20 +254,21 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
             flashLendingEnabled == 1 &&
             _data.length > 0 &&
             _collateralRecipient != address(bookKeeper) &&
-            _collateralRecipient != address(liquidationEngine)
+            _collateralRecipient != address(liquidationEngine) && 
+            IERC165(_collateralRecipient).supportsInterface(FLASH_LENDING_ID)
         ) {
             //there should be ERC165 function selector check added to above condition
              bookKeeper.moveCollateral(
-            _collateralPoolId,
-            address(this),
-            _collateralRecipient,
-            info.collateralAmountToBeLiquidated.sub(info.treasuryFees)
+                _collateralPoolId,
+                address(this),
+                _collateralRecipient,
+                info.collateralAmountToBeLiquidated.sub(info.treasuryFees)
             );
             _adapter.onMoveCollateral(
-            address(this),
-            _collateralRecipient,
-            info.collateralAmountToBeLiquidated.sub(info.treasuryFees),
-            abi.encode(0)
+                address(this),
+                _collateralRecipient,
+                info.collateralAmountToBeLiquidated.sub(info.treasuryFees),
+                abi.encode(0)
             );
             IFlashLendingCallee(_collateralRecipient).flashLendingCall(
                 msg.sender,
