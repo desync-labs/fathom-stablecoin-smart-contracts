@@ -31,9 +31,9 @@ contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBo
 
 
     function onBookKeeperFlashLoan(
-        address initiator,
+        address, // initiator
         uint256 loanValue, // [rad]
-        uint256 fee,
+        uint256, // fee
         bytes calldata data
     ) external override returns (bytes32) {
         LocalVars memory vars;

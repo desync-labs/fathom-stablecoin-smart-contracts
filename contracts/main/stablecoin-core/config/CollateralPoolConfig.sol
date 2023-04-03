@@ -15,34 +15,29 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
 
     uint256 constant RAY = 10 ** 27;
 
-    event LogSetPriceWithSafetyMargin(address indexed _caller, bytes32 _collateralPoolId, uint256 _priceWithSafetyMargin);
-    event LogSetDebtCeiling(address indexed _caller, bytes32 _collateralPoolId, uint256 _debtCeiling);
-    event LogSetDebtFloor(address indexed _caller, bytes32 _collateralPoolId, uint256 _debtFloor);
-    event LogSetPriceFeed(address indexed _caller, bytes32 _poolId, address _priceFeed);
-    event LogSetLiquidationRatio(address indexed _caller, bytes32 _poolId, uint256 _data);
-    event LogSetStabilityFeeRate(address indexed _caller, bytes32 _poolId, uint256 _data);
-    event LogSetAdapter(address indexed _caller, bytes32 _collateralPoolId, address _adapter);
-    event LogSetCloseFactorBps(address indexed _caller, bytes32 _collateralPoolId, uint256 _closeFactorBps);
-    event LogSetLiquidatorIncentiveBps(address indexed _caller, bytes32 _collateralPoolId, uint256 _liquidatorIncentiveBps);
-    event LogSetTreasuryFeesBps(address indexed _caller, bytes32 _collateralPoolId, uint256 _treasuryFeeBps);
-    event LogSetStrategy(address indexed _caller, bytes32 _collateralPoolId, address strategy);
-    event LogSetTotalDebtShare(address indexed _caller, bytes32 _collateralPoolId, uint256 _totalDebtShare);
-    event LogSetDebtAccumulatedRate(address indexed _caller, bytes32 _collateralPoolId, uint256 _debtAccumulatedRate);
+    mapping(bytes32 => ICollateralPoolConfig.CollateralPool) private _collateralPools;
+    IAccessControlConfig public accessControlConfig;
+
+    event LogSetPriceWithSafetyMargin(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _priceWithSafetyMargin);
+    event LogSetDebtCeiling(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _debtCeiling);
+    event LogSetDebtFloor(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _debtFloor);
+    event LogSetPriceFeed(address indexed _caller, bytes32 indexed _poolId, address _priceFeed);
+    event LogSetLiquidationRatio(address indexed _caller, bytes32 indexed _poolId, uint256 _data);
+    event LogSetStabilityFeeRate(address indexed _caller, bytes32 indexed _poolId, uint256 _data);
+    event LogSetAdapter(address indexed _caller, bytes32 indexed _collateralPoolId, address _adapter);
+    event LogSetCloseFactorBps(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _closeFactorBps);
+    event LogSetLiquidatorIncentiveBps(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _liquidatorIncentiveBps);
+    event LogSetTreasuryFeesBps(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _treasuryFeeBps);
+    event LogSetStrategy(address indexed _caller, bytes32 indexed _collateralPoolId, address strategy);
+    event LogSetTotalDebtShare(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _totalDebtShare);
+    event LogSetDebtAccumulatedRate(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _debtAccumulatedRate);
     event LogInitCollateralPoolId(
-        bytes32 _collateralPoolId,
+        bytes32 indexed _collateralPoolId,
         uint256 _debtCeiling,
         uint256 _liquidationRatio,
         uint256 _stabilityFeeRate,
         address _adapter
     );
-
-    mapping(bytes32 => ICollateralPoolConfig.CollateralPool) private _collateralPools;
-
-    function collateralPools(bytes32 _collateralPoolId) external view override returns (ICollateralPoolConfig.CollateralPool memory) {
-        return _collateralPools[_collateralPoolId];
-    }
-
-    IAccessControlConfig public accessControlConfig;
 
     modifier onlyOwner() {
         require(accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
@@ -199,6 +194,10 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     function updateLastAccumulationTime(bytes32 _collateralPoolId) external override {
         require(accessControlConfig.hasRole(accessControlConfig.STABILITY_FEE_COLLECTOR_ROLE(), msg.sender), "!stabilityFeeCollectorRole");
         _collateralPools[_collateralPoolId].lastAccumulationTime = block.timestamp;
+    }
+
+    function collateralPools(bytes32 _collateralPoolId) external view override returns (ICollateralPoolConfig.CollateralPool memory) {
+        return _collateralPools[_collateralPoolId];
     }
 
     function getTotalDebtShare(bytes32 _collateralPoolId) external view override returns (uint256) {

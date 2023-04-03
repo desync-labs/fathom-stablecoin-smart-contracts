@@ -11,7 +11,15 @@ import "../../interfaces/IStablecoinAdapter.sol";
 import "../../interfaces/ICagable.sol";
 import "../../interfaces/IPausable.sol";
 
-contract StablecoinAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable, IPausable {
+contract StablecoinAdapterMath {
+    uint256 constant ONE = 10 ** 27;
+
+    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require(y == 0 || (z = x * y) / y == x);
+    }
+}
+
+contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable, IPausable {
     IBookKeeper public override bookKeeper; // CDP Engine
     IStablecoin public override stablecoin; // Stablecoin Token
     uint256 public live; // Active Flag
@@ -56,12 +64,6 @@ contract StablecoinAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         require(live == 0, "StablecoinAdapter/not-caged");
         live = 1;
         emit LogUncage();
-    }
-
-    uint256 constant ONE = 10 ** 27;
-
-    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require(y == 0 || (z = x * y) / y == x);
     }
 
     function deposit(address usr, uint256 wad, bytes calldata /* data */) external payable override nonReentrant whenNotPaused {

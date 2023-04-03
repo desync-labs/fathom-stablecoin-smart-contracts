@@ -6,22 +6,68 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "../../../interfaces/IBookKeeper.sol";
-import "../../../interfaces/IAnkrColAdapter.sol";
+import "../../../interfaces/ICollateralAdapter.sol";
 import "../../../interfaces/ICagable.sol";
 import "../../../interfaces/IManager.sol";
 import "../../../interfaces/IProxyRegistry.sol";
 import "../../../utils/SafeToken.sol";
-import "../../../apis/ankr/interfaces/IAnkrStakingPool.sol";
-import "../../../apis/ankr/interfaces/ICertToken.sol";
 import "../../../interfaces/IVault.sol";
 
-
-/// @dev receives WXDC from users and deposit in Vault.
-contract CollateralTokenAdapter is IAnkrColAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
-    using SafeToken for address;
-
+contract CollateralTokenAdapterMath {
     uint256 internal constant WAD = 10**18;
     uint256 internal constant RAY = 10**27;
+
+
+    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x + _y) >= _x, "ds-math-add-overflow");
+    }
+
+    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x - _y) <= _x, "ds-math-sub-underflow");
+    }
+
+    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require(_y == 0 || (_z = _x * _y) / _y == _x, "ds-math-mul-overflow");
+    }
+
+    function div(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require(_y > 0, "ds-math-div-by-zero");
+        _z = _x / _y;
+    }
+
+    function divup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = add(_x, sub(_y, 1)) / _y;
+    }
+
+    function wmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = mul(_x, _y) / WAD;
+    }
+
+    function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = mul(_x, WAD) / _y;
+    }
+
+    function wdivup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = divup(mul(_x, WAD), _y);
+    }
+
+    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = mul(_x, _y) / RAY;
+    }
+
+    function rmulup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = divup(mul(_x, _y), RAY);
+    }
+
+    function rdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = mul(_x, RAY) / _y;
+    }
+}
+
+/// @dev receives WXDC from users and deposit in Vault.
+contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+    using SafeToken for address;
+
     uint256 public live;
     bool flagVault;
 
@@ -93,51 +139,6 @@ contract CollateralTokenAdapter is IAnkrColAdapter, PausableUpgradeable, Reentra
         positionManager = IManager(_positionManager);
 
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
-    }
-
-    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x + _y) >= _x, "ds-math-add-overflow");
-    }
-
-    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x - _y) <= _x, "ds-math-sub-underflow");
-    }
-
-    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y == 0 || (_z = _x * _y) / _y == _x, "ds-math-mul-overflow");
-    }
-
-    function div(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y > 0, "ds-math-div-by-zero");
-        _z = _x / _y;
-    }
-
-    function divup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = add(_x, sub(_y, 1)) / _y;
-    }
-
-    function wmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, _y) / WAD;
-    }
-
-    function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, WAD) / _y;
-    }
-
-    function wdivup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = divup(mul(_x, WAD), _y);
-    }
-
-    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, _y) / RAY;
-    }
-
-    function rmulup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = divup(mul(_x, _y), RAY);
-    }
-
-    function rdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, RAY) / _y;
     }
 
     /// @dev Ignore collateralTokens that have been directly transferred

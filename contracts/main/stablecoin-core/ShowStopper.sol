@@ -13,7 +13,37 @@ import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
 
-contract ShowStopper is PausableUpgradeable, IShowStopper {
+contract ShowStopperMath {
+    uint256 constant WAD = 10 ** 18;
+    uint256 constant RAY = 10 ** 27;
+
+    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = _x + _y;
+        require(_z >= _x);
+    }
+
+    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x - _y) <= _x);
+    }
+
+    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require(_y == 0 || (_z = _x * _y) / _y == _x);
+    }
+
+    function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        return _x <= _y ? _x : _y;
+    }
+
+    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = mul(_x, _y) / RAY;
+    }
+
+    function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = mul(_x, WAD) / _y;
+    }
+}
+
+contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     IBookKeeper public bookKeeper; // CDP Engine
     ILiquidationEngine public liquidationEngine;
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
@@ -44,42 +74,6 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
     event LogAccumulateStablecoin(address indexed ownerAddress, uint256 amount);
     event LogRedeemStablecoin(bytes32 indexed collateralPoolId, address indexed ownerAddress, uint256 amount);
 
-    function initialize(address _bookKeeper) external initializer {
-        PausableUpgradeable.__Pausable_init();
-
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
-        bookKeeper = IBookKeeper(_bookKeeper);
-        live = 1;
-    }
-
-    uint256 constant WAD = 10 ** 18;
-    uint256 constant RAY = 10 ** 27;
-
-    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = _x + _y;
-        require(_z >= _x);
-    }
-
-    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x - _y) <= _x);
-    }
-
-    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y == 0 || (_z = _x * _y) / _y == _x);
-    }
-
-    function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        return _x <= _y ? _x : _y;
-    }
-
-    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, _y) / RAY;
-    }
-
-    function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, WAD) / _y;
-    }
-
     event LogSetBookKeeper(address indexed caller, address _bookKeeper);
     event LogSetLiquidationEngine(address indexed caller, address _liquidationEngine);
     event LogSetSystemDebtEngine(address indexed caller, address _systemDebtEngine);
@@ -90,6 +84,14 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
+    }
+
+    function initialize(address _bookKeeper) external initializer {
+        PausableUpgradeable.__Pausable_init();
+
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
+        bookKeeper = IBookKeeper(_bookKeeper);
+        live = 1;
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwner {

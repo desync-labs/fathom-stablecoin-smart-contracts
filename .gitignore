@@ -1,23 +1,21 @@
 /node_modules
+/build
 .npm-debug.log
-*.DS_Store
 .vscode
 .env
+*.DS_Store
+externalAddresses.json
 yarn.lock
 package-lock.json
 coverage
 coverage.json
 typechain
 typechain-types
-/build
+privateKey
 
 
 #Hardhat files
 cache
 artifacts
-
-fathomapp-subgraph/build
-fathomapp-subgraph/generated
-fathomapp-subgraph/node_modules
 
 *.zip

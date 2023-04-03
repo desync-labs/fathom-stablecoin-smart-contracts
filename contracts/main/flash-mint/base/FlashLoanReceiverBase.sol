@@ -6,18 +6,7 @@ import "../../interfaces/IBookKeeperFlashBorrower.sol";
 import "../../interfaces/IERC3156FlashBorrower.sol";
 import "../../utils/SafeToken.sol";
 
-abstract contract FlashLoanReceiverBase is IBookKeeperFlashBorrower, IERC3156FlashBorrower {
-    using SafeToken for address;
-
-    FlashMintModule public flash;
-
-    bytes32 public constant CALLBACK_SUCCESS = keccak256("ERC3156FlashBorrower.onFlashLoan");
-    bytes32 public constant CALLBACK_SUCCESS_BOOK_KEEPER_STABLE_COIN = keccak256("BookKeeperFlashBorrower.onBookKeeperFlashLoan");
-
-    constructor(address _flash) {
-        flash = FlashMintModule(_flash);
-    }
-
+contract FlashLoanReceiverBaseMath {
     uint256 constant RAY = 10 ** 27;
 
     function rad(uint256 _wad) internal pure returns (uint256) {
@@ -30,6 +19,19 @@ abstract contract FlashLoanReceiverBase is IBookKeeperFlashBorrower, IERC3156Fla
 
     function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         require(_y == 0 || (_z = _x * _y) / _y == _x);
+    }
+}
+
+abstract contract FlashLoanReceiverBase is FlashLoanReceiverBaseMath, IBookKeeperFlashBorrower, IERC3156FlashBorrower {
+    using SafeToken for address;
+
+    FlashMintModule public flash;
+
+    bytes32 public constant CALLBACK_SUCCESS = keccak256("ERC3156FlashBorrower.onFlashLoan");
+    bytes32 public constant CALLBACK_SUCCESS_BOOK_KEEPER_STABLE_COIN = keccak256("BookKeeperFlashBorrower.onBookKeeperFlashLoan");
+
+    constructor(address _flash) {
+        flash = FlashMintModule(_flash);
     }
 
     // --- Helper Functions ---

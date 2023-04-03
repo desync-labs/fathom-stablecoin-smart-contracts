@@ -23,10 +23,10 @@ contract ProxyWalletRegistry is OwnableUpgradeable {
     }
 
     /// @dev Deploys a new proxy instance and sets custom owner of proxy
-    function build(address owner) public returns (address payable _proxy) {
-        require(proxies[owner] == ProxyWallet(payable(address(0)))); // Not allow new proxy if the user already has one
-        _proxy = factory.build(owner);
-        proxies[owner] = ProxyWallet(_proxy);
+    function build(address _owner) public returns (address payable _proxy) {
+        require(proxies[_owner] == ProxyWallet(payable(address(0)))); // Not allow new proxy if the user already has one
+        _proxy = factory.build(_owner);
+        proxies[_owner] = ProxyWallet(_proxy);
     }
 
     function setOwner(address _newOwner) external {

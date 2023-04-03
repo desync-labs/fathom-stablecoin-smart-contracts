@@ -19,7 +19,7 @@ contract FlashMintArbitrager is OwnableUpgradeable, IERC3156FlashBorrower {
     }
 
 
-    function onFlashLoan(address initiator, address token, uint256 amount, uint256 fee, bytes calldata data) external override returns (bytes32) {
+    function onFlashLoan(address, address token, uint256 amount, uint256 fee, bytes calldata data) external override returns (bytes32) {
         (address router, address stableSwapToken, address stableSwapModule) = abi.decode(data, (address, address, address));
         address[] memory path = new address[](2);
         path[0] = token;
