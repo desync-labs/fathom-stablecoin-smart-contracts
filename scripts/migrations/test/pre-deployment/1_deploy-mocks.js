@@ -11,6 +11,8 @@ const ERC20 = artifacts.require('ERC20Mintable.sol');
 const WXDC = artifacts.require('WXDC.sol');
 const ERC20Stable = artifacts.require('ERC20MintableStableSwap.sol')
 const SimplePriceFeed = artifacts.require('SimplePriceFeed.sol')
+const StableswapMultipleSwapsMock =  artifacts.require("StableswapMultipleSwapsMock");
+
 module.exports =  async function(deployer) {
   const promises = [
       deployer.deploy(ERC20, "US+", "US+", { gas: 3050000 }),
@@ -28,6 +30,6 @@ module.exports =  async function(deployer) {
 
   await deployer.deploy(WXDC, { gas: 3050000 }),
   addresses[chainId].WXDC = WXDC.address;
-
+  await deployer.deploy(StableswapMultipleSwapsMock,{ gas: 3050000 })
   fs.writeFileSync('./externalAddresses.json', JSON.stringify(addresses));
 };
