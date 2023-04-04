@@ -151,6 +151,8 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function setAdapter(bytes32 _collateralPoolId, address _adapter) external onlyOwner {
+        require(_adapter != address(0), "CollateralPoolConfig/setAdapter-zero-address");
+        require(IGenericTokenAdapter(_adapter).collateralPoolId() == _collateralPoolId, "CollateralPoolConfig/setAdapter-wrongPoolId");
         _collateralPools[_collateralPoolId].adapter = _adapter;
         emit LogSetAdapter(msg.sender, _collateralPoolId, _adapter);
     }

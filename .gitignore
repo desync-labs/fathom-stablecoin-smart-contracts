@@ -13,6 +13,8 @@ coverage.json
 typechain
 typechain-types
 privateKey
+/build
+addresses.json
 
 
 #Hardhat files
