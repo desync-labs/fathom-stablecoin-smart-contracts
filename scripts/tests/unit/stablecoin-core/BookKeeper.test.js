@@ -124,7 +124,7 @@ describe("BookKeeper", () => {
                 // bob call move collateral from alice to bob
                 await await expect(
                     bookKeeperAsBob.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
-                ).to.be.revertedWith("BookKeeper/moveCollateral/not-allowed")
+                ).to.be.revertedWith("BookKeeper/not-allowed-position-adjustment")
             })
 
             context("when alice allow bob to move collateral", () => {
