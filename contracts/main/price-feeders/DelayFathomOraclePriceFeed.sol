@@ -20,6 +20,23 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
     address public token0;
     address public token1;
 
+    event LogSetPriceLife(address indexed _caller, uint256 _second);
+    event LogSetTimeDelay(address indexed _caller, uint256 _second);
+
+    modifier onlyOwner() {
+        require(accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
+        _;
+    }
+
+    modifier onlyOwnerOrGov() {
+        require(
+            accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender) ||
+                accessControlConfig.hasRole(accessControlConfig.GOV_ROLE(), msg.sender),
+            "!(ownerRole or govRole)"
+        );
+        _;
+    }
+
     function initialize(address _fathomOracle, address _token0, address _token1, address _accessControlConfig, bytes32 _poolId) external initializer {
         PausableUpgradeable.__Pausable_init();
 
@@ -36,37 +53,15 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
         poolId = _poolId;
     }
 
-    modifier onlyOwner() {
-        require(accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
-        _;
-    }
-
-    modifier onlyOwnerOrGov() {
-        require(
-            accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender) ||
-                accessControlConfig.hasRole(accessControlConfig.GOV_ROLE(), msg.sender),
-            "!(ownerRole or govRole)"
-        );
-        _;
-    }
-
-    event LogSetPriceLife(address indexed _caller, uint256 _second);
-    event LogSetTimeDelay(address indexed _caller, uint256 _second);
-
-    function readPrice() external view override returns (bytes32) {
-        return bytes32(delayedPrice);
-    }
-
     function peekPrice() external override returns (bytes32, bool) {
-       return _peekPrice();
-    }
-
-    function isPriceOk() external view override returns (bool) {
-        return _isPriceOk();
+        return _peekPrice();
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
-        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "FathomOraclePriceFeed/msgsender-not-owner");
+        require(
+            IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender),
+            "FathomOraclePriceFeed/msgsender-not-owner"
+        );
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
     }
 
@@ -77,7 +72,7 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
     }
 
     function setTimeDelay(uint256 _second) external onlyOwner {
-        require(_second <= priceLife &&_second >= 5 minutes && _second <= 1 days, "FathomOraclePriceFeed/bad-delay-time");
+        require(_second <= priceLife && _second >= 5 minutes && _second <= 1 days, "FathomOraclePriceFeed/bad-delay-time");
         _peekPrice();
         timeDelay = _second;
         emit LogSetTimeDelay(msg.sender, _second);
@@ -101,9 +96,9 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
         require(_oracle != address(0), "FathomOraclePriceFeed: ZERO_ADDRESS");
         fathomOracle = IFathomOracle(_oracle);
     }
-    
+
     function setPoolId(bytes32 _poolId) external onlyOwner {
-       poolId = _poolId;
+        poolId = _poolId;
     }
 
     function pause() external onlyOwnerOrGov {
@@ -119,16 +114,24 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
         _setPrice();
     }
 
+    function readPrice() external view override returns (bytes32) {
+        return bytes32(delayedPrice);
+    }
+
+    function isPriceOk() external view override returns (bool) {
+        return _isPriceOk();
+    }
+
     function _peekPrice() internal returns (bytes32, bool) {
         if (block.timestamp >= lastUpdateTS + timeDelay) {
-          _setPrice();
+            _setPrice();
         }
         return (bytes32(delayedPrice), _isPriceOk());
     }
 
     function _setPrice() internal {
         (uint256 _price, uint256 _lastUpdate) = fathomOracle.getPrice(token0, token1);
-        
+
         require(_price > 0, "FathomOraclePriceFeed/wrong-price");
         require(_lastUpdate <= block.timestamp, "FathomOraclePriceFeed/wrong-lastUpdate");
 

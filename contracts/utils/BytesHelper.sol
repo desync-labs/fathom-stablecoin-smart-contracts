@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.8.0 <0.9.0;
+pragma solidity 0.8.17;
 
 /**
  * @title Bytes Helper
@@ -222,11 +222,7 @@ library BytesHelper {
      * @param start Start index
      * @param length Slice length
      */
-    function _getSlice(
-        bytes memory data,
-        uint start,
-        uint length
-    ) internal pure returns (bytes memory result) {
+    function _getSlice(bytes memory data, uint start, uint length) internal pure returns (bytes memory result) {
         require(data.length >= (start + length), "_getSlice: Wrong start or length");
 
         assembly {
@@ -266,11 +262,7 @@ library BytesHelper {
      * @param start Start index
      * @param end End index
      */
-    function _getSliceBytes32(
-        bytes32[] memory data,
-        uint start,
-        uint end
-    ) internal pure returns (bytes32[] memory) {
+    function _getSliceBytes32(bytes32[] memory data, uint start, uint end) internal pure returns (bytes32[] memory) {
         bytes32[] memory result = new bytes32[](end - start);
         for (uint i = 0; i < end - start; i++) {
             result[i] = data[i + start];
@@ -284,11 +276,7 @@ library BytesHelper {
      * @param start Start index
      * @param end End index
      */
-    function _getSlice(
-        bytes[] memory data,
-        uint start,
-        uint end
-    ) internal pure returns (bytes[] memory) {
+    function _getSlice(bytes[] memory data, uint start, uint end) internal pure returns (bytes[] memory) {
         bytes[] memory result = new bytes[](end - start);
         for (uint i = 0; i < end - start; i++) {
             result[i] = data[i + start];

@@ -19,6 +19,11 @@ import "../utils/SafeToken.sol";
 contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModule {
     using SafeToken for address;
 
+    uint256 public constant ONE_DAY = 86400;
+    uint256 public constant MINIMUM_DAILY_SWAP_LIMIT = 1000 * 1e18;
+
+    uint256 internal constant WAD = 10 ** 18;
+
     IBookKeeper public bookKeeper;
     address public stablecoin;
     address public token;
@@ -44,6 +49,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     uint256 public constant MINIMUM_SINGLE_SWAP_LIMIT_NUMERATOR = 20; //20/10000 = 0.2%
     uint256 public constant MINIMUM_BLOCKS_PER_LIMIT = 1;
     uint256 public constant MINIMUM_NUMBER_OF_SWAPS_LIMIT_PER_USER = 1;
+
 
     uint256 public constant ONE_DAY = 86400;
     uint256 constant WAD = 10**18;
@@ -84,7 +90,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         );
         _;
     }
-
+    
     modifier onlyWhitelistedIfNotDecentralized(){
         if(!isDecentralizedState){
             require(usersWhitelist[msg.sender],"user-not-whitelisted");
@@ -241,13 +247,13 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_destination != address(0), "withdrawFees/wrong-destination");
         require(totalFXDFeeBalance != 0 || totalTokenFeeBalance != 0, "withdrawFees/no-fee-balance");
         uint256 pendingFXDBalance = totalFXDFeeBalance;
-        if(pendingFXDBalance !=0) {
+        if (pendingFXDBalance != 0) {
             totalFXDFeeBalance = 0;
             tokenBalance[stablecoin] -= pendingFXDBalance;
             stablecoin.safeTransfer(_destination, pendingFXDBalance);
         }
         uint256 pendingTokenBalance = totalTokenFeeBalance;
-        if(pendingTokenBalance !=0) {
+        if (pendingTokenBalance != 0) {
             totalTokenFeeBalance = 0;
             tokenBalance[token] -= pendingTokenBalance;
             token.safeTransfer(_destination, pendingTokenBalance);
@@ -288,7 +294,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         remainingDailySwapAmount -= _amount;
         emit LogRemainingDailySwapAmount(remainingDailySwapAmount);
     }
-
     function _checkSingleSwapLimit(uint256 _amount) view internal {
         require(_amount<= totalValueDeposited * singleSwapLimitNumerator / SINGLE_SWAP_LIMIT_DENOMINATOR,
                 "_checkSingleSwapLimit/single-swap-exceeds-limit");

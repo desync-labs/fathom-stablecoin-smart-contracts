@@ -2,18 +2,6 @@
 pragma solidity 0.8.17;
 
 interface IManager {
-    function mapPositionHandlerToOwner(address) external view returns (address);
-
-    function ownerWhitelist(address, uint256, address) external view returns (uint256);
-
-    function collateralPools(uint256) external view returns (bytes32);
-
-    function owners(uint256) external view returns (address);
-
-    function positions(uint256) external view returns (address);
-
-    function bookKeeper() external view returns (address);
-
     function open(bytes32, address) external returns (uint256);
 
     function give(uint256, address) external;
@@ -36,10 +24,17 @@ interface IManager {
 
     function updatePrice(bytes32 _poolId) external;
 
-    function redeemLockedCollateral(
-        uint256 _posId,
-        address _adapter,
-        address _collateralReceiver,
-        bytes calldata _data
-    ) external;
+    function redeemLockedCollateral(uint256 _posId, address _adapter, address _collateralReceiver, bytes calldata _data) external;
+
+    function mapPositionHandlerToOwner(address) external view returns (address);
+
+    function ownerWhitelist(address, uint256, address) external view returns (uint256);
+
+    function collateralPools(uint256) external view returns (bytes32);
+
+    function owners(uint256) external view returns (address);
+
+    function positions(uint256) external view returns (address);
+
+    function bookKeeper() external view returns (address);
 }

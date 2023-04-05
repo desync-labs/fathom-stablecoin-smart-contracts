@@ -13,8 +13,39 @@ import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IPausable.sol";
 import "../utils/SafeToken.sol";
 
-contract FlashMintModule is PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender, IPausable {
+contract FlashMintModuleMath {
+    uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant RAY = 10 ** 27;
+    uint256 internal constant RAD = 10 ** 45;
+
+    function _add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x + _y) >= _x);
+    }
+
+    function _mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require(_y == 0 || (_z = _x * _y) / _y == _x);
+    }
+}
+
+contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender, IPausable {
     using SafeToken for address;
+
+    IBookKeeper public bookKeeper;
+    IStablecoinAdapter public stablecoinAdapter;
+    IStablecoin public stablecoin;
+    address public systemDebtEngine; // systemDebtEngine intentionally set immutable to save gas
+
+    uint256 public max; // Maximum borrowable stablecoin  [wad]
+    uint256 public feeRate; // Fee                     [wad = 100%]
+    uint256 private locked; // Reentrancy guard
+
+    bytes32 public constant CALLBACK_SUCCESS = keccak256("ERC3156FlashBorrower.onFlashLoan");
+    bytes32 public constant CALLBACK_SUCCESS_BOOK_KEEPER_STABLE_COIN = keccak256("BookKeeperFlashBorrower.onBookKeeperFlashLoan");
+
+    event LogSetMax(uint256 _data);
+    event LogSetFeeRate(uint256 _data);
+    event LogFlashLoan(address indexed _receiver, address indexed _token, uint256 _amount, uint256 _fee);
+    event LogBookKeeperFlashLoan(address indexed _receiver, uint256 _amount, uint256 _fee);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -31,23 +62,6 @@ contract FlashMintModule is PausableUpgradeable, IERC3156FlashLender, IBookKeepe
         );
         _;
     }
-
-    IBookKeeper public bookKeeper;
-    IStablecoinAdapter public stablecoinAdapter;
-    IStablecoin public stablecoin;
-    address public systemDebtEngine; // systemDebtEngine intentionally set immutable to save gas
-
-    uint256 public max; // Maximum borrowable stablecoin  [wad]
-    uint256 public feeRate; // Fee                     [wad = 100%]
-    uint256 private locked; // Reentrancy guard
-
-    bytes32 public constant CALLBACK_SUCCESS = keccak256("ERC3156FlashBorrower.onFlashLoan");
-    bytes32 public constant CALLBACK_SUCCESS_BOOK_KEEPER_STABLE_COIN = keccak256("BookKeeperFlashBorrower.onBookKeeperFlashLoan");
-
-    event LogSetMax(uint256 _data);
-    event LogSetFeeRate(uint256 _data);
-    event LogFlashLoan(address indexed _receiver, address _token, uint256 _amount, uint256 _fee);
-    event LogBookKeeperFlashLoan(address indexed _receiver, uint256 _amount, uint256 _fee);
 
     modifier lock() {
         require(locked == 0, "FlashMintModule/reentrancy-guard");
@@ -70,16 +84,14 @@ contract FlashMintModule is PausableUpgradeable, IERC3156FlashLender, IBookKeepe
         address(stablecoin).safeApprove(_stablecoinAdapter, type(uint256).max);
     }
 
-    uint256 constant WAD = 10 ** 18;
-    uint256 constant RAY = 10 ** 27;
-    uint256 constant RAD = 10 ** 45;
-
-    function _add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x + _y) >= _x);
+    /// @dev access: OWNER_ROLE, GOV_ROLE
+    function pause() external override onlyOwnerOrGov {
+        _pause();
     }
 
-    function _mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y == 0 || (_z = _x * _y) / _y == _x);
+    /// @dev access: OWNER_ROLE, GOV_ROLE
+    function unpause() external override onlyOwnerOrGov {
+        _unpause();
     }
 
     function setMax(uint256 _data) external onlyOwner {
@@ -94,19 +106,6 @@ contract FlashMintModule is PausableUpgradeable, IERC3156FlashLender, IBookKeepe
     }
 
     // --- ERC 3156 Spec ---
-    function maxFlashLoan(address _token) external view override returns (uint256) {
-        if (_token == address(stablecoin) && locked == 0) {
-            return max;
-        } else {
-            return 0;
-        }
-    }
-
-    function flashFee(address _token, uint256 _amount) external view override returns (uint256) {
-        require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
-
-        return _mul(_amount, feeRate) / WAD;
-    }
 
     function flashLoan(IERC3156FlashBorrower _receiver, address _token, uint256 _amount, bytes calldata _data) external override lock returns (bool) {
         require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
@@ -122,7 +121,7 @@ contract FlashMintModule is PausableUpgradeable, IERC3156FlashLender, IBookKeepe
         stablecoinAdapter.withdraw(address(_receiver), _amount, abi.encode(0));
 
         emit LogFlashLoan(address(_receiver), _token, _amount, _fee);
-        
+
         require(_receiver.onFlashLoan(msg.sender, _token, _amount, _fee, _data) == CALLBACK_SUCCESS, "FlashMintModule/callback-failed");
         address(stablecoin).safeTransferFrom(address(_receiver), address(this), _total); // The fee is also enforced here
         stablecoinAdapter.deposit(address(this), _total, abi.encode(0));
@@ -168,13 +167,17 @@ contract FlashMintModule is PausableUpgradeable, IERC3156FlashLender, IBookKeepe
         address(stablecoin).safeApprove(address(stablecoinAdapter), type(uint256).max);
     }
 
-      /// @dev access: OWNER_ROLE, GOV_ROLE
-    function pause() external override onlyOwnerOrGov {
-        _pause();
+    function maxFlashLoan(address _token) external view override returns (uint256) {
+        if (_token == address(stablecoin) && locked == 0) {
+            return max;
+        } else {
+            return 0;
+        }
     }
 
-    /// @dev access: OWNER_ROLE, GOV_ROLE
-    function unpause() external override onlyOwnerOrGov {
-        _unpause();
+    function flashFee(address _token, uint256 _amount) external view override returns (uint256) {
+        require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
+
+        return _mul(_amount, feeRate) / WAD;
     }
 }

@@ -13,47 +13,9 @@ import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
 
-contract ShowStopper is PausableUpgradeable, IShowStopper {
-    IBookKeeper public bookKeeper; // CDP Engine
-    ILiquidationEngine public liquidationEngine;
-    ISystemDebtEngine public systemDebtEngine; // Debt Engine
-    IPriceOracle public priceOracle;
-
-    uint256 public override live; // Active Flag
-    uint256 public cagedTimestamp; // Time of cage                   [unix epoch time]
-    uint256 public cageCoolDown; // Processing Cooldown Length             [seconds]
-    uint256 public debt; // Total outstanding stablecoin following processing [rad]
-
-    mapping(bytes32 => uint256) public cagePrice; // Cage price              [ray]
-    mapping(bytes32 => uint256) public badDebtAccumulator; // Collateral badDebtAccumulator    [wad]
-    mapping(bytes32 => uint256) public totalDebtShare; // Total debt per collateralPoolId      [wad]
-    mapping(bytes32 => uint256) public finalCashPrice; // Final redeemStablecoin price        [ray]
-
-    mapping(bytes32 => uint256) poolStablecoinIssued; // poolStablecoinIssued per collateral pool [rad]
-
-    mapping(address => uint256) public stablecoinAccumulator; //    [wad]
-    mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
-
-    event LogCage();
-    event LogCageCollateralPool(bytes32 indexed collateralPoolId);
-
-    event LogAccumulateBadDebt(bytes32 indexed collateralPoolId, address indexed positionAddress, uint256 amount, uint256 debtShare);
-    event LogRedeemLockedCollateral(bytes32 indexed collateralPoolId, address indexed positionAddress, uint256 lockedCollateral);
-    event LogFinalizeDebt();
-    event LogFinalizeCashPrice(bytes32 indexed collateralPoolId);
-    event LogAccumulateStablecoin(address indexed ownerAddress, uint256 amount);
-    event LogRedeemStablecoin(bytes32 indexed collateralPoolId, address indexed ownerAddress, uint256 amount);
-
-    function initialize(address _bookKeeper) external initializer {
-        PausableUpgradeable.__Pausable_init();
-
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
-        bookKeeper = IBookKeeper(_bookKeeper);
-        live = 1;
-    }
-
-    uint256 constant WAD = 10 ** 18;
-    uint256 constant RAY = 10 ** 27;
+contract ShowStopperMath {
+    uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant RAY = 10 ** 27;
 
     function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         _z = _x + _y;
@@ -79,6 +41,38 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
     function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         _z = mul(_x, WAD) / _y;
     }
+}
+
+contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
+    IBookKeeper public bookKeeper; // CDP Engine
+    ILiquidationEngine public liquidationEngine;
+    ISystemDebtEngine public systemDebtEngine; // Debt Engine
+    IPriceOracle public priceOracle;
+
+    uint256 public override live; // Active Flag
+    uint256 public cagedTimestamp; // Time of cage                   [unix epoch time]
+    uint256 public cageCoolDown; // Processing Cooldown Length             [seconds]
+    uint256 public debt; // Total outstanding stablecoin following processing [rad]
+
+    mapping(bytes32 => uint256) public cagePrice; // Cage price              [ray]
+    mapping(bytes32 => uint256) public badDebtAccumulator; // Collateral badDebtAccumulator    [wad]
+    mapping(bytes32 => uint256) public totalDebtShare; // Total debt per collateralPoolId      [wad]
+    mapping(bytes32 => uint256) public finalCashPrice; // Final redeemStablecoin price        [ray]
+
+    mapping(bytes32 => uint256) public poolStablecoinIssued; // poolStablecoinIssued per collateral pool [rad]
+
+    mapping(address => uint256) public stablecoinAccumulator; //    [wad]
+    mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
+
+    event LogCage();
+    event LogCageCollateralPool(bytes32 indexed collateralPoolId);
+
+    event LogAccumulateBadDebt(bytes32 indexed collateralPoolId, address indexed positionAddress, uint256 amount, uint256 debtShare);
+    event LogRedeemLockedCollateral(bytes32 indexed collateralPoolId, address indexed positionAddress, uint256 lockedCollateral);
+    event LogFinalizeDebt();
+    event LogFinalizeCashPrice(bytes32 indexed collateralPoolId);
+    event LogAccumulateStablecoin(address indexed ownerAddress, uint256 amount);
+    event LogRedeemStablecoin(bytes32 indexed collateralPoolId, address indexed ownerAddress, uint256 amount);
 
     event LogSetBookKeeper(address indexed caller, address _bookKeeper);
     event LogSetLiquidationEngine(address indexed caller, address _liquidationEngine);
@@ -90,6 +84,14 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
+    }
+
+    function initialize(address _bookKeeper) external initializer {
+        PausableUpgradeable.__Pausable_init();
+
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
+        bookKeeper = IBookKeeper(_bookKeeper);
+        live = 1;
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwner {
@@ -213,7 +215,9 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
         ); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
 
-        finalCashPrice[_collateralPoolId] = mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) / (poolStablecoinIssued[_collateralPoolId] / RAY);
+        finalCashPrice[_collateralPoolId] =
+            mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) /
+            (poolStablecoinIssued[_collateralPoolId] / RAY);
 
         emit LogFinalizeCashPrice(_collateralPoolId);
     }

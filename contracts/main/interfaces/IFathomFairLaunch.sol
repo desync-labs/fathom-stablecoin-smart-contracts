@@ -6,9 +6,9 @@ interface IFathomFairLaunch {
 
     function withdraw(address, uint256, uint256) external;
 
-    function pendingFathom(uint256 _pid, address _user) external view returns (uint256);
-
     function emergencyWithdraw(uint256) external;
+
+    function pendingFathom(uint256 _pid, address _user) external view returns (uint256);
 
     function owner() external view returns (address);
 

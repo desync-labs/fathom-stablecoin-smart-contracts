@@ -13,7 +13,27 @@ import "../interfaces/ISetPrice.sol";
 import "../interfaces/IPriceFeed.sol";
 import "../interfaces/IPriceOracle.sol";
 
-contract PositionManager is PausableUpgradeable, IManager {
+contract PositionManagerMath {
+    function _safeAdd(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x + _y) >= _x, "add overflow");
+    }
+
+    function _safeSub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x - _y) <= _x, "sub overflow");
+    }
+
+    function _safeToInt(uint256 _x) internal pure returns (int256 _y) {
+        _y = int256(_x);
+        require(_y >= 0, "must not negative");
+    }
+}
+
+contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
+    struct List {
+        uint256 prev;
+        uint256 next;
+    }
+
     address public override bookKeeper;
     address public showStopper;
     address public priceOracle;
@@ -38,11 +58,6 @@ contract PositionManager is PausableUpgradeable, IManager {
     mapping(address => mapping(uint256 => mapping(address => uint256))) public override ownerWhitelist;
     /// @dev Mapping of owner => whitelisted address that can migrate position
     mapping(address => mapping(address => uint256)) public migrationWhitelist;
-
-    struct List {
-        uint256 prev;
-        uint256 next;
-    }
 
     event LogNewPosition(address indexed _usr, address indexed _own, uint256 indexed _positionId);
     event LogAllowManagePosition(address indexed _caller, uint256 indexed _positionId, address _owner, address _user, uint256 _ok);
@@ -84,19 +99,6 @@ contract PositionManager is PausableUpgradeable, IManager {
 
         require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
         priceOracle = _priceOracle;
-    }
-
-    function _safeAdd(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x + _y) >= _x, "add overflow");
-    }
-
-    function _safeSub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x - _y) <= _x, "sub overflow");
-    }
-
-    function _safeToInt(uint256 _x) internal pure returns (int256 _y) {
-        _y = int256(_x);
-        require(_y >= 0, "must not negative");
     }
 
     /// @dev Allow/disallow a user to manage the position
@@ -206,7 +208,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         bytes calldata _data
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
         bytes32 _collateralPoolId = collateralPools[_positionId];
-        require(_isPriceHealthy(_collateralPoolId), "PositionManager/price-is-not-healthy");
+        _requireHealthyPrice(_collateralPoolId);
 
         address _positionAddress = positions[_positionId];
         IBookKeeper(bookKeeper).adjustPosition(
@@ -218,7 +220,7 @@ contract PositionManager is PausableUpgradeable, IManager {
             _debtShare
         );
         IGenericTokenAdapter(_adapter).onAdjustPosition(_positionAddress, _positionAddress, _collateralValue, _debtShare, _data);
-        
+
         ISetPrice(priceOracle).setPrice(_collateralPoolId);
     }
 
@@ -236,7 +238,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         bytes calldata _data
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
         bytes32 _collateralPoolId = collateralPools[_positionId];
-        require(_isPriceHealthy(_collateralPoolId), "PositionManager/price-is-not-healthy");
+        _requireHealthyPrice(_collateralPoolId);
 
         IBookKeeper(bookKeeper).moveCollateral(collateralPools[_positionId], positions[_positionId], _destination, _wad);
         IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
@@ -258,7 +260,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         address _adapter,
         bytes calldata _data
     ) external whenNotPaused onlyOwnerAllowed(_positionId) {
-        require(_isPriceHealthy(_collateralPoolId), "PositionManager/price-is-not-healthy");
+        _requireHealthyPrice(_collateralPoolId);
 
         IBookKeeper(bookKeeper).moveCollateral(_collateralPoolId, positions[_positionId], _destination, _wad);
         IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
@@ -382,8 +384,8 @@ contract PositionManager is PausableUpgradeable, IManager {
         ISetPrice(priceOracle).setPrice(_poolId);
     }
 
-    function _isPriceHealthy(bytes32 _poolId) internal view returns(bool) {
+    function _requireHealthyPrice(bytes32 _poolId) internal view {
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_poolId));
-        return _priceFeed.isPriceOk();
+        require(_priceFeed.isPriceOk(), "PositionManager/price-is-not-healthy");
     }
 }

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
+// solhint-disable func-name-mixedcase
 interface IAccessControlConfig {
     function hasRole(bytes32 role, address account) external view returns (bool);
 
@@ -26,3 +27,4 @@ interface IAccessControlConfig {
 
     function COLLATERAL_MANAGER_ROLE() external view returns (bytes32);
 }
+// solhint-enable func-name-mixedcase

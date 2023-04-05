@@ -2,6 +2,12 @@
 pragma solidity 0.8.17;
 
 interface IFathomVaultConfig {
+    function whitelistedCallers(address caller) external returns (bool);
+
+    function whitelistedLiquidators(address caller) external returns (bool);
+
+    function approvedAddStrategies(address addStrats) external returns (bool);
+
     /// @dev Return minimum BaseToken debt size per position.
     function minDebtSize() external view returns (uint256);
 
@@ -17,12 +23,6 @@ interface IFathomVaultConfig {
     function getReservePoolBps() external view returns (uint256);
 
     function getKillBps() external view returns (uint256);
-
-    function whitelistedCallers(address caller) external returns (bool);
-
-    function whitelistedLiquidators(address caller) external returns (bool);
-
-    function approvedAddStrategies(address addStrats) external returns (bool);
 
     function isWorker(address worker) external view returns (bool);
 

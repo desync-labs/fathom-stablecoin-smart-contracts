@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config();
 
 module.exports = {
   networks: {
@@ -25,18 +24,15 @@ module.exports = {
       gasPrice: '0x3b9aca00',
     },
     apothem: {
-      // host: "https://rpc.apothem.network",
       host: "https://erpc.apothem.network/",
-      // host: "https://apothem.xdcrpc.com/",
-      // private_key: fs.readFileSync("./privateKey").toString(),
-      private_key: process.env.GORLI_DEPLOYER,
+      private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },
-    // fromEnv: {
-      // host: process.env.ETH_HOST, // export ETH_HOST=...
-      // private_key: process.env.ETH_PK, // export ETH_PK=...
-      // gasPrice: process.env.GAS_PRICE, // export GAS_PRICE=...
-    // },
+    fromEnv: {
+      host: process.env.ETH_HOST, // export ETH_HOST=...
+      private_key: process.env.ETH_PK, // export ETH_PK=...
+      gasPrice: process.env.GAS_PRICE, // export GAS_PRICE=...
+    },
   },
   compilers: {
     solc: {
@@ -46,7 +42,7 @@ module.exports = {
           enabled: true,
           runs: 200,
         },
-        // evmVersion: 'constantinople',
+        evmVersion: 'istanbul',
       },
     },
   },

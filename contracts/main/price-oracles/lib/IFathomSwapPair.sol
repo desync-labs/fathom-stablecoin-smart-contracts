@@ -1,21 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+// solhint-disable func-name-mixedcase
 interface IFathomSwapPair {
     event Approval(address indexed owner, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
 
-    function name() external pure returns (string memory);
-
-    function symbol() external pure returns (string memory);
-
-    function decimals() external pure returns (uint8);
-
-    function totalSupply() external view returns (uint);
-
-    function balanceOf(address owner) external view returns (uint);
-
-    function allowance(address owner, address spender) external view returns (uint);
+    event Mint(address indexed sender, uint amount0, uint amount1);
+    event Burn(address indexed sender, uint amount0, uint amount1, address indexed to);
+    event Swap(address indexed sender, uint amount0In, uint amount1In, uint amount0Out, uint amount1Out, address indexed to);
+    event Sync(uint112 reserve0, uint112 reserve1);
 
     function approve(address spender, uint value) external returns (bool);
 
@@ -23,20 +17,29 @@ interface IFathomSwapPair {
 
     function transferFrom(address from, address to, uint value) external returns (bool);
 
-    function DOMAIN_SEPARATOR() external view returns (bytes32);
+    function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external;
 
-    function PERMIT_TYPEHASH() external pure returns (bytes32);
+    function mint(address to) external returns (uint liquidity);
+
+    function burn(address to) external returns (uint amount0, uint amount1);
+
+    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external;
+
+    function skim(address to) external;
+
+    function sync() external;
+
+    function initialize(address, address) external;
+
+    function DOMAIN_SEPARATOR() external view returns (bytes32);
 
     function nonces(address owner) external view returns (uint);
 
-    function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external;
+    function totalSupply() external view returns (uint);
 
-    event Mint(address indexed sender, uint amount0, uint amount1);
-    event Burn(address indexed sender, uint amount0, uint amount1, address indexed to);
-    event Swap(address indexed sender, uint amount0In, uint amount1In, uint amount0Out, uint amount1Out, address indexed to);
-    event Sync(uint112 reserve0, uint112 reserve1);
+    function balanceOf(address owner) external view returns (uint);
 
-    function MINIMUM_LIQUIDITY() external pure returns (uint);
+    function allowance(address owner, address spender) external view returns (uint);
 
     function factory() external view returns (address);
 
@@ -52,15 +55,14 @@ interface IFathomSwapPair {
 
     function kLast() external view returns (uint);
 
-    function mint(address to) external returns (uint liquidity);
+    function name() external pure returns (string memory);
 
-    function burn(address to) external returns (uint amount0, uint amount1);
+    function symbol() external pure returns (string memory);
 
-    function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external;
+    function decimals() external pure returns (uint8);
 
-    function skim(address to) external;
+    function PERMIT_TYPEHASH() external pure returns (bytes32);
 
-    function sync() external;
-
-    function initialize(address, address) external;
+    function MINIMUM_LIQUIDITY() external pure returns (uint);
 }
+// solhint-enable func-name-mixedcase
