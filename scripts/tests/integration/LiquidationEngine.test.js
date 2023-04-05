@@ -635,7 +635,7 @@ describe("LiquidationEngine", () => {
                         debtShareToRepay,
                         MaxUint256,
                         BobAddress,
-                        defaultAbiCoder.encode(["address", "bytes"], [BobAddress, []]),
+                        "0x",
                         { gasLimit: 2000000 }
                     )
                     const bobWETHAfterLiq = await WXDC.balanceOf(BobAddress);
@@ -740,7 +740,7 @@ describe("LiquidationEngine", () => {
                         [debtShareToRepay, debtShareToRepay],
                         [MaxUint256, MaxUint256],
                         [BobAddress, BobAddress],
-                        ["0x00", "0x00"],
+                        ["0x", "0x"],
                         { gasLimit: 4000000 }
                     )
                     const bobWETHAfterLiq = await WXDC.balanceOf(BobAddress);
