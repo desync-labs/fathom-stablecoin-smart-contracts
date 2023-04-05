@@ -16,7 +16,7 @@ privateKey
 /build
 addresses.json
 
-
+addresses.json
 #Hardhat files
 cache
 artifacts
