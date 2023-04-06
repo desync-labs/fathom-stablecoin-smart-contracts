@@ -146,7 +146,7 @@ describe("ShowStopper", () => {
     })
     describe("#accumulateBadDebt, #redeemLockedCollateral", () => {
         context("when the caller is not the position owner", () => {
-            it("should be able to redeemLockedCollateral", async () => {
+            it("should not be able to redeemLockedCollateral", async () => {
                 // alice's position #1
                 //  a. open a new position
                 //  b. lock WXDC
