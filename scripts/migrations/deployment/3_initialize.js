@@ -167,6 +167,8 @@ module.exports = async function (deployer) {
         collateralTokenAdapter: collateralTokenAdapter.address,
         delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address,
         adminControls: adminControls.address,
+        pluginPriceOracle: pluginPriceOracle.address,
+        centralizedOraclePriceFeed: centralizedOraclePriceFeed.address
     }
 
     fs.writeFileSync('./addresses.json', JSON.stringify(newAddresses));
