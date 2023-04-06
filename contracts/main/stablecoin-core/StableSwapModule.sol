@@ -21,7 +21,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
     uint256 public constant ONE_DAY = 86400;
     uint256 public constant MINIMUM_DAILY_SWAP_LIMIT = 1000 * 1e18;
-
     uint256 internal constant WAD = 10 ** 18;
 
     IBookKeeper public bookKeeper;
@@ -49,10 +48,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     uint256 public constant MINIMUM_SINGLE_SWAP_LIMIT_NUMERATOR = 20; //20/10000 = 0.2%
     uint256 public constant MINIMUM_BLOCKS_PER_LIMIT = 1;
     uint256 public constant MINIMUM_NUMBER_OF_SWAPS_LIMIT_PER_USER = 1;
-
-
-    uint256 public constant ONE_DAY = 86400;
-    uint256 constant WAD = 10**18;
     
     mapping(address => bool) public usersWhitelist;
     mapping(address => uint256) public numberOfSwapsRemainingPerUserInBlockLimit;
