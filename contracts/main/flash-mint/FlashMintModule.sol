@@ -115,7 +115,7 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
         uint256 _fee = _mul(_amount, feeRate) / WAD;
         uint256 _total = _add(_amount, _fee);
 
-        //_amt is in RAD, to calculat internal balance of stablecoin
+        //_amt is in RAD, to calculate internal balance of stablecoin
         bookKeeper.mintUnbackedStablecoin(address(this), address(this), _amt);
         //minting requested amount to flashMint receiver
         stablecoinAdapter.withdraw(address(_receiver), _amount, abi.encode(0));
