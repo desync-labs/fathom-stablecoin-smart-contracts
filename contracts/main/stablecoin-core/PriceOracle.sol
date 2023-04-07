@@ -11,6 +11,7 @@ import "../interfaces/IPriceOracle.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IPausable.sol";
+import "../interfaces/ISetPrice.sol";
 
 contract PriceOracleMath {
     uint256 internal constant ONE = 10 ** 27;
@@ -27,7 +28,7 @@ contract PriceOracleMath {
 /** @notice A contract which is the price oracle of the BookKeeper to keep all collateral pools updated with the latest price of the collateral.
     The price oracle is important in reflecting the current state of the market price.
 */
-contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceOracle, ICagable, IPausable {
+contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
     struct CollateralPool {
         IPriceFeed priceFeed; // Price Feed
         uint256 liquidationRatio; // Liquidation ratio or Collateral ratio [ray]
@@ -103,7 +104,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpg
         emit LogSetStableCoinReferencePrice(msg.sender, _referencePrice);
     }
 
-    function setPrice(bytes32 _collateralPoolId) external whenNotPaused isLive {
+    function setPrice(bytes32 _collateralPoolId) external override whenNotPaused isLive {
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).collateralPools(_collateralPoolId).priceFeed);
         uint256 _liquidationRatio = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLiquidationRatio(_collateralPoolId);
         (bytes32 _rawPrice, bool _hasPrice) = _priceFeed.peekPrice();
