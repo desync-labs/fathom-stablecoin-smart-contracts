@@ -33,6 +33,8 @@ module.exports = async function (deployer) {
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const proxyActionsStorage = await getProxy(proxyFactory, "ProxyActionsStorage");
     const adminControls = await getProxy(proxyFactory, "AdminControls");
+    const pluginPriceOracle = await getProxy(proxyFactory, "PluginPriceOracle");
+    const centralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const addresses = getAddresses(deployer.networkId())
@@ -109,9 +111,7 @@ module.exports = async function (deployer) {
         ),
         flashMintArbitrager.initialize({ gasLimit: 1000000 }),
         bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
-
         dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
-
         collateralTokenAdapter.initialize(
             bookKeeper.address,
             pools.XDC,
@@ -135,7 +135,9 @@ module.exports = async function (deployer) {
             systemDebtEngine.address,
             flashMintModule.address,
             stablecoinAdapter.address
-        )
+        ),
+        pluginPriceOracle.initialize(accessControlConfig.address, addresses.PluginOracle),
+        centralizedOraclePriceFeed.initialize(pluginPriceOracle.address, accessControlConfig.address, pools.XDC)
     ];
 
     await Promise.all(promises);
@@ -164,6 +166,9 @@ module.exports = async function (deployer) {
         fathomStablecoinProxyActions: FathomStablecoinProxyActions.address,
         collateralTokenAdapter: collateralTokenAdapter.address,
         delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address,
+        adminControls: adminControls.address,
+        pluginPriceOracle: pluginPriceOracle.address,
+        centralizedOraclePriceFeed: centralizedOraclePriceFeed.address
     }
 
     fs.writeFileSync('./addresses.json', JSON.stringify(newAddresses));
