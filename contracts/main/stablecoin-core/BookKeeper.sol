@@ -408,6 +408,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
       By executing this function, the SystemDebtEngine must have enough stablecoin which will come from the Surplus of the protocol.
       A successful `settleSystemBadDebt` would remove the bad debt from the system.
     */
+    //@sangjun 2023 apr 03:09 PM, but I don't see any modifier that restricts only systemDebtEngine's involvement
     function settleSystemBadDebt(uint256 _value) external override nonReentrant whenNotPaused {
         systemBadDebt[msg.sender] = sub(systemBadDebt[msg.sender], _value);
         stablecoin[msg.sender] = sub(stablecoin[msg.sender], _value);

@@ -51,6 +51,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
 
     uint256 public override live; // Active Flag
     uint256 public cagedTimestamp; // Time of cage                   [unix epoch time]
+    //@sangjun, from cage till finalize debt, coolDown time is allowed for people to skim their positions
     uint256 public cageCoolDown; // Processing Cooldown Length             [seconds]
     uint256 public debt; // Total outstanding stablecoin following processing [rad]
 
@@ -58,8 +59,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     mapping(bytes32 => uint256) public badDebtAccumulator; // Collateral badDebtAccumulator    [wad]
     mapping(bytes32 => uint256) public totalDebtShare; // Total debt per collateralPoolId      [wad]
     mapping(bytes32 => uint256) public finalCashPrice; // Final redeemStablecoin price        [ray]
-
-    mapping(bytes32 => uint256) public poolStablecoinIssued; // poolStablecoinIssued per collateral pool [rad]
 
     mapping(address => uint256) public stablecoinAccumulator; //    [wad]
     mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
@@ -148,9 +147,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         require(live == 0, "ShowStopper/still-live");
         require(cagePrice[_collateralPoolId] == 0, "ShowStopper/cage-price-collateral-pool-id-already-defined");
 
-        //@Sangjun 2023 April 12th Wed 10;55 AM, later the below line should be assessed and possibly removed
-        poolStablecoinIssued[_collateralPoolId] = IBookKeeper(bookKeeper).poolStablecoinIssued(_collateralPoolId);
-
         uint256 _totalDebtShare = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getTotalDebtShare(_collateralPoolId);
         address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId);
         IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);
@@ -196,11 +192,13 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
 
     /** @dev Finalize the total debt of the system after the emergency shutdown.
       This function should be called after:
+      //@sangjun, below line is very important
       - Every positions has undergone `accumulateBadDebt` or `snip` to settle all the debt.
       //@sangjun, well snip is a fn that cancels auctions, so not really relevent
       - System surplus must be zero, this means all surplus should be used to settle bad debt already.
-      //@sangjun where de hell can systemBadDeby be settled in showStopper?? I thought it's only in systemDebtEngine. Need to investigate
-      //2023 APR 12 2:51PM
+      //@sangjun 2023 APR 12 2:51PM where de hell can systemBadDeby be settled in showStopper?? I thought it's only in systemDebtEngine. Need to investigate
+      //2023 apr 12 3:96 PM, there is no badDebtSetlling fn in showStopper. settleSystemDebt fn is in bookKeeper and it can be called only by systemDebtEngine
+      // okei, it doesn't have it either in Alpaca
       - The emergency shutdown cooldown period must have passed.
       This total debt will be equivalent to the total stablecoin issued which should already reflect 
       the correct value if all the above requirements before calling `finalizeDebt` are satisfied.
@@ -234,9 +232,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
 
         finalCashPrice[_collateralPoolId] =
             mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) /
-                        //@sangjun thaw() we may have to change below code to
-                        //once debt is redefined, need to say byebye to poolStablecoinIssued
-            (poolStablecoinIssued[_collateralPoolId] / RAY);
+            (debt / RAY);
 
         emit LogFinalizeCashPrice(_collateralPoolId);
     }
