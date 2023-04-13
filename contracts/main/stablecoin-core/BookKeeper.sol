@@ -385,7 +385,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
     ) external override nonReentrant whenNotPaused onlyLiquidationEngine {
         Position storage position = positions[_collateralPoolId][_positionAddress];
         ICollateralPoolConfig.CollateralPoolInfo memory _vars = ICollateralPoolConfig(collateralPoolConfig).getCollateralPoolInfo(_collateralPoolId);
-        //@sangjun -- col from postion
+        // -- col from postion
         position.lockedCollateral = add(position.lockedCollateral, _collateralAmount);
         //@sanjun -- debt from position
         position.debtShare = add(position.debtShare, _debtShare);
@@ -396,9 +396,9 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
 
         uint256 _poolStablecoinAmount = poolStablecoinIssued[_collateralPoolId];
         poolStablecoinIssued[_collateralPoolId] = add(_poolStablecoinAmount, _debtValue);
-        //@sangjun ++ col to _collateralCreditor(showStopper in case of skim/accumulateBadDebt)
+        // ++ col to _collateralCreditor(showStopper in case of skim/accumulateBadDebt)
         collateralToken[_collateralPoolId][_collateralCreditor] = sub(collateralToken[_collateralPoolId][_collateralCreditor], _collateralAmount);
-        //@sangjun ++ debt to systemDebyEngine
+        // ++ debt to systemDebyEngine
         systemBadDebt[_stablecoinDebtor] = sub(systemBadDebt[_stablecoinDebtor], _debtValue);
         totalUnbackedStablecoin = sub(totalUnbackedStablecoin, _debtValue);
     }
@@ -408,7 +408,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
       By executing this function, the SystemDebtEngine must have enough stablecoin which will come from the Surplus of the protocol.
       A successful `settleSystemBadDebt` would remove the bad debt from the system.
     */
-    //@sangjun 2023 apr 03:09 PM, but I don't see any modifier that restricts only systemDebtEngine's involvement
+    // 2023 apr 03:09 PM, but I don't see any modifier that restricts only systemDebtEngine's involvement
     function settleSystemBadDebt(uint256 _value) external override nonReentrant whenNotPaused {
         systemBadDebt[msg.sender] = sub(systemBadDebt[msg.sender], _value);
         stablecoin[msg.sender] = sub(stablecoin[msg.sender], _value);

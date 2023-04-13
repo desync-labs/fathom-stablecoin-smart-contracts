@@ -45,7 +45,7 @@ module.exports =  async function(deployer) {
     await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), stableSwapModule.address)
 
     await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), stablecoinAdapter.address);
-
+ 
     await accessControlConfig.grantRole(await accessControlConfig.GOV_ROLE(), adminControls.address)
 
     await bookKeeper.whitelist(stablecoinAdapter.address, { gasLimit: 1000000 });
