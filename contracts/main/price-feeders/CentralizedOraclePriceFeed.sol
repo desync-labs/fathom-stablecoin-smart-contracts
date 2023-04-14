@@ -65,11 +65,11 @@ contract CentralizedOraclePriceFeed is PausableUpgradeable, IPriceFeed {
        poolId = _poolId;
     }
 
-    function readPrice() external view override returns (bytes32) {
-        return bytes32(lastPrice);
+    function readPrice() external view override returns (uint256) {
+        return lastPrice;
     }
 
-    function peekPrice() external override returns (bytes32, bool) {
+    function peekPrice() external override returns (uint256, bool) {
         (uint256 _price, uint256 _lastUpdate) = fathomOracle.getPrice();
         
         require(_price > 0, "FathomOraclePriceFeed/wrong-price");
@@ -77,7 +77,7 @@ contract CentralizedOraclePriceFeed is PausableUpgradeable, IPriceFeed {
 
         lastPrice = _price;
         lastUpdateTS = _lastUpdate;
-        return (bytes32(lastPrice), _isPriceOk());
+        return (lastPrice, _isPriceOk());
     }
 
     function isPriceOk() external view override returns (bool) {

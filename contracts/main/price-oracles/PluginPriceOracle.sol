@@ -10,7 +10,6 @@ import "../apis/interfaces/IPluginInvokeOracle.sol";
 contract PluginPriceOracle is Initializable, IFathomCentralizedOracle {
     IPluginInvokeOracle public oracle;
     IAccessControlConfig public accessControlConfig;
-    bytes32 public requestId; 
 
     modifier onlyOwner() {
         require(accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
@@ -20,7 +19,7 @@ contract PluginPriceOracle is Initializable, IFathomCentralizedOracle {
     function initialize(address _accessControlConfig, address _oracle) external initializer {
         require(_accessControlConfig != address(0), "PluginPriceOracle: ZERO_ADDRESS");
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
-        require(IPluginInvokeOracle(_oracle).showPrice() > 0, "PluginPriceOracle/invalid-oracle");
+        require(IPluginInvokeOracle(_oracle).latestAnswer() > 0, "PluginPriceOracle/invalid-oracle");
         oracle = IPluginInvokeOracle(_oracle);
     }
 
@@ -30,17 +29,17 @@ contract PluginPriceOracle is Initializable, IFathomCentralizedOracle {
     }
 
     function setOracle(address _oracle) external onlyOwner {
-        require(oracle.showPrice() > 0, "PluginPriceOracle/invalid-oracle");
+        require(IPluginInvokeOracle(_oracle).latestAnswer() > 0, "PluginPriceOracle/invalid-oracle");
         oracle = IPluginInvokeOracle(_oracle);
     }
-    
-    function getPrice() external view returns(uint256 price, uint256 lastUpdated) {
-        price = _toWad(oracle.showPrice());
+
+    function getPrice() external view returns (uint256 price, uint256 lastUpdated) {
+        price = _toWad(uint256(oracle.latestAnswer()));
         lastUpdated = oracle.latestTimestamp();
     }
-
-    /// price from plugin oracle returns multiplied y 1000
+    
+    /// price from plugin oracle returns multiplied y 10000 and we want it in wad
     function _toWad(uint256 amount) private pure returns(uint256) {
-        return amount * 1e15;
+        return amount * 1e14;
     }
 }

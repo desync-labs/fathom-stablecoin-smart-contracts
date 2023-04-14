@@ -53,7 +53,7 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
         poolId = _poolId;
     }
 
-    function peekPrice() external override returns (bytes32, bool) {
+    function peekPrice() external override returns (uint256, bool) {
         return _peekPrice();
     }
 
@@ -114,19 +114,19 @@ contract DelayFathomOraclePriceFeed is PausableUpgradeable, IFathomOraclePriceFe
         _setPrice();
     }
 
-    function readPrice() external view override returns (bytes32) {
-        return bytes32(delayedPrice);
+    function readPrice() external view override returns (uint256) {
+        return delayedPrice;
     }
 
     function isPriceOk() external view override returns (bool) {
         return _isPriceOk();
     }
 
-    function _peekPrice() internal returns (bytes32, bool) {
+    function _peekPrice() internal returns (uint256, bool) {
         if (block.timestamp >= lastUpdateTS + timeDelay) {
             _setPrice();
         }
-        return (bytes32(delayedPrice), _isPriceOk());
+        return (delayedPrice, _isPriceOk());
     }
 
     function _setPrice() internal {
