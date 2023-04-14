@@ -51,7 +51,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
 
     uint256 public override live; // Active Flag
     uint256 public cagedTimestamp; // Time of cage                   [unix epoch time]
-    //, from cage till finalize debt, coolDown time is allowed for people to skim their positions
     uint256 public cageCoolDown; // Processing Cooldown Length             [seconds]
     uint256 public debt; // Total outstanding stablecoin following processing [rad]
 
@@ -155,15 +154,10 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         emit LogCageCollateralPool(_collateralPoolId);
     }
 
-    // 2023 April 12th Wed, 10;57 am, maybe the reason alpaca was calculating cashPrice by dividing bt debt was because they planned to give out col in basket like DAO?
-    // 2023 April 12th 12:16 PM, yes it is.
     /** @dev Inspect the specified position and use the cage price of the collateral pool id to calculate the current badDebtAccumulator of the position.
       The badDebtAccumulator will be tracked per collateral pool. It will be used in the determination of the stablecoin redemption price 
       to make sure that all badDebtAccumulator will be covered. This process will clear the debt from the position.
   */
-  // skim
-  //, it is logically assumable that the skim function moves leaves excess collateral to the position and move the rest to showStopper
-  //please refer to "should be able to redeemLockedCollateral" test 
     function accumulateBadDebt(bytes32 _collateralPoolId, address _positionAddress) external {
         require(cagePrice[_collateralPoolId] != 0, "ShowStopper/cage-price-collateral-pool-id-not-defined");
         uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getDebtAccumulatedRate(
@@ -176,9 +170,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
 
         require(_amount < 2 ** 255 && _debtShare < 2 ** 255, "ShowStopper/overflow");
 
-        // 2023 Apr 12 Wed 2:42 PM
-        //sending collateral(as much as debt) to showStopper
-        //the debtValue will be obsorbed by systemDebtEngine and will be recorded as unbacked Stablecoin
         bookKeeper.confiscatePosition(
             _collateralPoolId,
             _positionAddress,
@@ -192,26 +183,17 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
 
     /** @dev Finalize the total debt of the system after the emergency shutdown.
       This function should be called after:
-      //, below line is very important
       - Every positions has undergone `accumulateBadDebt` or `snip` to settle all the debt.
-      //, well snip is a fn that cancels auctions, so not really relevent
       - System surplus must be zero, this means all surplus should be used to settle bad debt already.
-      // 2023 APR 12 2:51PM where de hell can systemBadDeby be settled in showStopper?? I thought it's only in systemDebtEngine. Need to investigate
-      //2023 apr 12 3:96 PM, there is no badDebtSetlling fn in showStopper. settleSystemDebt fn is in bookKeeper and it can be called only by systemDebtEngine
-      // okei, it doesn't have it either in Alpaca
       - The emergency shutdown cooldown period must have passed.
       This total debt will be equivalent to the total stablecoin issued which should already reflect 
       the correct value if all the above requirements before calling `finalizeDebt` are satisfied.
     */
-    // thaw()
     function finalizeDebt() external {
         require(live == 0, "ShowStopper/still-live");
         require(debt == 0, "ShowStopper/debt-not-zero");
         require(bookKeeper.stablecoin(address(systemDebtEngine)) == 0, "ShowStopper/surplus-not-zero");
         require(block.timestamp >= add(cagedTimestamp, cageCoolDown), "ShowStopper/cage-cool-down-not-finished");
-            // thaw() we may have to change below code to
-            //        debt = sub(vat.debt(), cure.tell());
-
         debt = bookKeeper.totalStablecoinIssued();
         emit LogFinalizeDebt();
     }
@@ -220,7 +202,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
       The redeemStablecoin price is the price where the Fathom Stablecoin owner will be entitled to cagedTimestamp redeeming from Fathom Stablecoin -> collateral token.
       The redeemStablecoin price will take into account the deficit/surplus of this collateral pool and calculate the price so that any bad debt will be covered.
     */
-    // flow
     function finalizeCashPrice(bytes32 _collateralPoolId) external {
         require(debt != 0, "ShowStopper/debt-zero");
         require(finalCashPrice[_collateralPoolId] == 0, "ShowStopper/final-cash-price-collateral-pool-id-already-defined");
@@ -237,8 +218,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         emit LogFinalizeCashPrice(_collateralPoolId);
     }
 
-    // pack
-    // 5:30 PM does this mean that .. users should just top up stablecoin amount to proxyWallet?
     /// @dev Accumulate the deposited stablecoin of the caller into a stablecoinAccumulator to be redeemed into collateral token later
     function accumulateStablecoin(uint256 _amount) external {
         require(_amount != 0, "ShowStopper/amount-zero");
@@ -247,7 +226,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         stablecoinAccumulator[msg.sender] = add(stablecoinAccumulator[msg.sender], _amount);
         emit LogAccumulateStablecoin(msg.sender, _amount);
     }
-    // cash
+
     /// @dev Redeem all the stablecoin in the stablecoinAccumulator of the caller into the corresponding collateral token
     function redeemStablecoin(bytes32 _collateralPoolId, uint256 _amount) external {
         require(_amount != 0, "ShowStopper/amount-zero");

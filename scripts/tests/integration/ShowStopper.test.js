@@ -28,6 +28,7 @@ const setup = async () => {
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
 
+
     ({
         proxyWallets: [aliceProxyWallet, bobProxyWallet],
     } = await createProxyWallets([AliceAddress, BobAddress]));
@@ -489,6 +490,17 @@ describe("ShowStopper", () => {
                 )
 
                 //, 2023 4/13 11:57 PM, then how to withdraw collateral?
+                // withdraw collateral from the Vault
+                // it's either through proxyActions || directly calling collateralTokenAdapter
+                //
+                const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
+
+                await collateralTokenAdapter.cage();
+                await collateralTokenAdapter.withdraw(AliceAddress, WeiPerWad.mul(5));
+                const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
+                expect(await WXDC.balanceOf(AliceAddress)).to.be.equal(
+                    "2500000000000000000"
+                )
             })
         })
     })
