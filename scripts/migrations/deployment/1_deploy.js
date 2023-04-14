@@ -25,8 +25,8 @@ const DelayFathomOraclePriceFeed = artifacts.require('DelayFathomOraclePriceFeed
 const CollateralTokenAdapter = artifacts.require('CollateralTokenAdapter.sol');
 const ProxyActionsStorage = artifacts.require('ProxyActionsStorage.sol');
 const AdminControls = artifacts.require('AdminControls.sol');
-const PluginPriceOracle = artifacts.require('PluginPriceOracle.sol');
-const CentralizedOraclePriceFeed = artifacts.require('CentralizedOraclePriceFeed.sol');
+// const PluginPriceOracle = artifacts.require('PluginPriceOracle.sol');
+// const CentralizedOraclePriceFeed = artifacts.require('CentralizedOraclePriceFeed.sol');
 
 module.exports =  async function(deployer) {
   let promises = [
@@ -57,8 +57,8 @@ module.exports =  async function(deployer) {
       deployer.deploy(ProxyActionsStorage, { gas: 7050000 }),
       deployer.deploy(SlidingWindowDexOracle, { gas: 7050000 }),
       deployer.deploy(AdminControls, { gas: 7050000 }),
-      deployer.deploy(PluginPriceOracle, { gas: 7050000 }),
-      deployer.deploy(CentralizedOraclePriceFeed, { gas: 7050000 })
+      // deployer.deploy(PluginPriceOracle, { gas: 7050000 }),
+      // deployer.deploy(CentralizedOraclePriceFeed, { gas: 7050000 })
   ];
 
   await Promise.all(promises);
