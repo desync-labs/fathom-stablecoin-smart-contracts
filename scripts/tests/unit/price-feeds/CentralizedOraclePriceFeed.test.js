@@ -14,7 +14,7 @@ const { formatBytes32String } = ethers.utils
 const COLLATERAL_POOL_ID = formatBytes32String("XDC")
 
 
-describe("Delay Fathom Oracle with mockedCentralizedPriceOracle - Unit Test Suite", () => {
+describe("CentralizedOraclePriceFeed", () => {
     let mockedCentralizedPriceOracle
     let mockedAccessControlConfig
 
@@ -47,7 +47,7 @@ describe("Delay Fathom Oracle with mockedCentralizedPriceOracle - Unit Test Suit
                 await mockedAccessControlConfig2.mock.hasRole.returns(false);
                 await mockedAccessControlConfig2.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"));
 
-                await expect(centralizedOraclePriceFeed.setAccessControlConfig(mockedAccessControlConfig2.address)).to.be.revertedWith("FathomOraclePriceFeed/msgsender-not-owner");
+                await expect(centralizedOraclePriceFeed.setAccessControlConfig(mockedAccessControlConfig2.address)).to.be.revertedWith("CentralizedOraclePriceFeed/msgsender-not-owner");
             })
         })
 
@@ -73,12 +73,12 @@ describe("Delay Fathom Oracle with mockedCentralizedPriceOracle - Unit Test Suit
         })
         context("price life is less than 5 min", async () => {
             it("should revert", async () => {
-                await expect(centralizedOraclePriceFeed.setPriceLife(299)).to.be.revertedWith("FathomOraclePriceFeed/bad-price-life");
+                await expect(centralizedOraclePriceFeed.setPriceLife(299)).to.be.revertedWith("CentralizedOraclePriceFeed/bad-price-life");
             })
         })
         context("price life is greater than 1 day", async () => {
             it("should revert", async () => {
-                await expect(centralizedOraclePriceFeed.setPriceLife(86401)).to.be.revertedWith("FathomOraclePriceFeed/bad-price-life");
+                await expect(centralizedOraclePriceFeed.setPriceLife(86401)).to.be.revertedWith("CentralizedOraclePriceFeed/bad-price-life");
             })
         })
         context("set price life", async () => {
@@ -99,7 +99,7 @@ describe("Delay Fathom Oracle with mockedCentralizedPriceOracle - Unit Test Suit
         })
         context("zero address", async () => {
             it("should revert", async () => {
-                await expect(centralizedOraclePriceFeed.setOracle(AddressZero)).to.be.revertedWith("FathomOraclePriceFeed: ZERO_ADDRESS");
+                await expect(centralizedOraclePriceFeed.setOracle(AddressZero)).to.be.revertedWith("CentralizedOraclePriceFeed/zero-access-control-config");
             })
         })
         context("set oracle", async () => {
@@ -118,13 +118,13 @@ describe("Delay Fathom Oracle with mockedCentralizedPriceOracle - Unit Test Suit
         context("zero price", async () => {
             it("should revert", async () => {
                 await mockedCentralizedPriceOracle.mock.getPrice.returns(0, await latest());
-                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("FathomOraclePriceFeed/wrong-price");
+                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("CentralizedOraclePriceFeed/wrong-price");
             })
         })
         context("zero invalid timestamp", async () => {
             it("should revert", async () => {
                 await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad, await latest() + 1);
-                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("FathomOraclePriceFeed/wrong-lastUpdate");
+                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("CentralizedOraclePriceFeed/wrong-lastUpdate");
             })
         })
         context("peek price", async () => {

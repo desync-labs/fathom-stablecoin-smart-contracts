@@ -35,7 +35,7 @@ contract CentralizedOraclePriceFeed is PausableUpgradeable, IPriceFeed {
     function initialize(address _fathomOracle, address _accessControlConfig, bytes32 _poolId) external initializer {
         PausableUpgradeable.__Pausable_init();
 
-        require(_accessControlConfig != address(0), "CentralizedOraclePriceFeed: ZERO_ADDRESS");
+        require(_accessControlConfig != address(0), "CentralizedOraclePriceFeed/zero-access-control-config");
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
 
         fathomOracle = IFathomCentralizedOracle(_fathomOracle);
@@ -56,7 +56,7 @@ contract CentralizedOraclePriceFeed is PausableUpgradeable, IPriceFeed {
     }
 
     function setOracle(address _oracle) external onlyOwner {
-        require(_oracle != address(0), "CentralizedOraclePriceFeed: ZERO_ADDRESS");
+        require(_oracle != address(0), "CentralizedOraclePriceFeed/zero-access-control-config");
         fathomOracle = IFathomCentralizedOracle(_oracle);
         this.peekPrice();
     }
