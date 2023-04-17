@@ -59,8 +59,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     mapping(bytes32 => uint256) public totalDebtShare; // Total debt per collateralPoolId      [wad]
     mapping(bytes32 => uint256) public finalCashPrice; // Final redeemStablecoin price        [ray]
 
-    mapping(bytes32 => uint256) public poolStablecoinIssued; // poolStablecoinIssued per collateral pool [rad]
-
     mapping(address => uint256) public stablecoinAccumulator; //    [wad]
     mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
 
@@ -148,8 +146,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         require(live == 0, "ShowStopper/still-live");
         require(cagePrice[_collateralPoolId] == 0, "ShowStopper/cage-price-collateral-pool-id-already-defined");
 
-        poolStablecoinIssued[_collateralPoolId] = IBookKeeper(bookKeeper).poolStablecoinIssued(_collateralPoolId);
-
         uint256 _totalDebtShare = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getTotalDebtShare(_collateralPoolId);
         address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId);
         IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);
@@ -217,7 +213,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
 
         finalCashPrice[_collateralPoolId] =
             mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) /
-            (poolStablecoinIssued[_collateralPoolId] / RAY);
+            (debt / RAY);
 
         emit LogFinalizeCashPrice(_collateralPoolId);
     }
