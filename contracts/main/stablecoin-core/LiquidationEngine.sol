@@ -118,7 +118,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         uint256[] calldata _maxDebtShareToBeLiquidateds, // [rad]
         address[] calldata _collateralRecipients,
         bytes[] calldata datas
-    ) external override nonReentrant whenNotPaused onlyWhitelisted {
+    ) external override nonReentrant onlyWhitelisted {
         require(
             _collateralPoolIds.length == _positionAddresses.length &&
                 _collateralPoolIds.length == _debtShareToBeLiquidateds.length &&
