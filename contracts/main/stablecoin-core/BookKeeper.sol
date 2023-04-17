@@ -194,10 +194,6 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
-        require(
-            IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender),
-            "BookKeeper/msgsender-not-owner"
-        ); // Sanity Check Call
         accessControlConfig = _accessControlConfig;
         emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
