@@ -35,7 +35,7 @@ contract CentralizedOraclePriceFeed is PausableUpgradeable, IPriceFeed {
     function initialize(address _fathomOracle, address _accessControlConfig, bytes32 _poolId) external initializer {
         PausableUpgradeable.__Pausable_init();
 
-        require(_accessControlConfig != address(0), "FathomOraclePriceFeed: ZERO_ADDRESS");
+        require(_accessControlConfig != address(0), "CentralizedOraclePriceFeed: ZERO_ADDRESS");
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
 
         fathomOracle = IFathomCentralizedOracle(_fathomOracle);
@@ -44,19 +44,19 @@ contract CentralizedOraclePriceFeed is PausableUpgradeable, IPriceFeed {
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
-        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "FathomOraclePriceFeed/msgsender-not-owner");
+        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "CentralizedOraclePriceFeed/msgsender-not-owner");
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
     }
 
     function setPriceLife(uint256 _second) external onlyOwner {
-        require(_second >= 5 minutes && _second <= 1 days, "FathomOraclePriceFeed/bad-price-life");
+        require(_second >= 5 minutes && _second <= 1 days, "CentralizedOraclePriceFeed/bad-price-life");
         priceLife = _second;
         this.peekPrice();
         emit LogSetPriceLife(msg.sender, _second);
     }
 
     function setOracle(address _oracle) external onlyOwner {
-        require(_oracle != address(0), "FathomOraclePriceFeed: ZERO_ADDRESS");
+        require(_oracle != address(0), "CentralizedOraclePriceFeed: ZERO_ADDRESS");
         fathomOracle = IFathomCentralizedOracle(_oracle);
         this.peekPrice();
     }
@@ -65,23 +65,15 @@ contract CentralizedOraclePriceFeed is PausableUpgradeable, IPriceFeed {
        poolId = _poolId;
     }
 
-    function readPrice() external view override returns (uint256) {
-        return lastPrice;
-    }
-
     function peekPrice() external override returns (uint256, bool) {
         (uint256 _price, uint256 _lastUpdate) = fathomOracle.getPrice();
         
-        require(_price > 0, "FathomOraclePriceFeed/wrong-price");
-        require(_lastUpdate <= block.timestamp, "FathomOraclePriceFeed/wrong-lastUpdate");
+        require(_price > 0, "CentralizedOraclePriceFeed/wrong-price");
+        require(_lastUpdate <= block.timestamp, "CentralizedOraclePriceFeed/wrong-lastUpdate");
 
         lastPrice = _price;
         lastUpdateTS = _lastUpdate;
         return (lastPrice, _isPriceOk());
-    }
-
-    function isPriceOk() external view override returns (bool) {
-        return _isPriceOk();
     }
 
     function pause() external onlyOwnerOrGov {
@@ -91,6 +83,14 @@ contract CentralizedOraclePriceFeed is PausableUpgradeable, IPriceFeed {
     function unpause() external onlyOwnerOrGov {
         _unpause();
         this.peekPrice();
+    }
+
+    function readPrice() external view override returns (uint256) {
+        return lastPrice;
+    }
+
+    function isPriceOk() external view override returns (bool) {
+        return _isPriceOk();
     }
 
     function _isPriceFresh() internal view returns (bool) {

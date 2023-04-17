@@ -15,16 +15,16 @@ contract PluginOracleMock is IPluginInvokeOracle {
         price = _price;
     }
 
-    function depositPLI(uint256 _value) external returns(bool){
+    function depositPLI(uint256) external returns(bool){
         return true;
     }
 
-    function requestData(address _caller) external override returns (uint256){
+    function requestData(address) external override returns (uint256){
         return ++requestId;
     }
 
-    function showPrice(uint256 id) external override view returns(uint256){
-        return price;
+    function showPrice(uint256) external override view returns(uint256, uint256){
+        return (price, block.timestamp);
     }
 
     function latestAnswer() external override view returns (int256){
@@ -39,11 +39,11 @@ contract PluginOracleMock is IPluginInvokeOracle {
         return requestId;
     }
 
-    function getAnswer(uint256 roundId) external override view returns (int256){
+    function getAnswer(uint256) external override view returns (int256){
         return int256(price);
     }
     
-    function getTimestamp(uint256 roundId) external override view returns (uint256){
+    function getTimestamp(uint256) external override view returns (uint256){
         return block.timestamp;
     }
 }
