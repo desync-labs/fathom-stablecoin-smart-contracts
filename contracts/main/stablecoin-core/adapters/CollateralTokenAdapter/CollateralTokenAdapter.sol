@@ -266,7 +266,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         emit LogDeposit(_amount); // wxdc
     }
 
-    /// @dev   /// withdraw collateral tokens from staking contract, and update BookKeeper and update BookKeeper
+    /// @dev   /// withdraw collateral tokens from staking contract, and update BookKeeper
     /// @param _usr The position address to be updated
     /// @param _amount The amount to be deposited
     function _withdraw(address _usr, uint256 _amount) private {
