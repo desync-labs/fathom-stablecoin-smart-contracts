@@ -45,7 +45,7 @@ describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () =
   describe("DelayFathomOraclePriceFeed Contract Tests", () => {
     it("Check latestrice method returns correct default price value", async () => {
       const returnValue = await delayFathomOraclePriceFeed.delayedPrice();
-      expect(returnValue).to.be.equal(0);
+      expect(returnValue.price).to.be.equal(0);
     });
 
     it("Check timeDelay method returns correct default time delay value", async () => {
@@ -59,7 +59,7 @@ describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () =
     });
 
     it("Check setTimeDelay function reverts with 'FathomOraclePriceFeed/bad-delay-time' when parameter is less than 900(seconds) / 15 minutes", async () => {
-      await expect(delayFathomOraclePriceFeed.setTimeDelay(10)).to.be.revertedWith("FathomOraclePriceFeed/bad-delay-time");
+      await expect(delayFathomOraclePriceFeed.setTimeDelay(10)).to.be.revertedWith("DelayPriceFeed/bad-delay-time");
     });
 
     it("Check timeDelay method returns correct time delay value after calling setTimeDelay with valid parameter value", async () => {
@@ -116,15 +116,14 @@ describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () =
     });
 
     it("Check peekPrice method returns delayed price when current price is not 0 and after time delay has passed", async () => {
-      await mockedDexPriceOracle.mock.getPrice.returns(100, await latest())
+      const latestTS = await latest()
+      await mockedDexPriceOracle.mock.getPrice.returns(100, latestTS)
       await delayFathomOraclePriceFeed.setTimeDelay(900);
-
-      await delayFathomOraclePriceFeed.peekPrice();
 
       await increase(900);
       await mockedDexPriceOracle.mock.getPrice.returns(200, await latest())
-
       await delayFathomOraclePriceFeed.peekPrice();
+
       const returnValue = await delayFathomOraclePriceFeed.callStatic.peekPrice();
       expect(Number(returnValue[0])).to.be.equal(100);
       expect(returnValue[1]).to.be.true;
@@ -135,32 +134,32 @@ describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () =
       // set time delay will call peekPrice and set initial price in this test run
       await delayFathomOraclePriceFeed.setTimeDelay(900);
 
-      expect(Number(await delayFathomOraclePriceFeed.delayedPrice())).to.be.equal(100);
-      expect(Number(await delayFathomOraclePriceFeed.latestPrice())).to.be.equal(100);
+      expect(await delayFathomOraclePriceFeed.readPrice()).to.be.equal(100);
+      expect(await delayFathomOraclePriceFeed.nextPrice()).to.be.equal(100);
 
       // not enough time passed for update
       await increase(300);
       await mockedDexPriceOracle.mock.getPrice.returns(90, await latest())
       await delayFathomOraclePriceFeed.peekPrice();
 
-      expect(await delayFathomOraclePriceFeed.delayedPrice()).to.be.equal(100);
-      expect(await delayFathomOraclePriceFeed.latestPrice()).to.be.equal(100);
+      expect(await delayFathomOraclePriceFeed.readPrice()).to.be.equal(100);
+      expect(await delayFathomOraclePriceFeed.nextPrice()).to.be.equal(100);
 
       // now we expect to get price updated
       await increase(600);
       await mockedDexPriceOracle.mock.getPrice.returns(200, await latest())
       await delayFathomOraclePriceFeed.peekPrice();
 
-      expect(await delayFathomOraclePriceFeed.delayedPrice()).to.be.equal(100);
-      expect(await delayFathomOraclePriceFeed.latestPrice()).to.be.equal(200);
+      expect(await delayFathomOraclePriceFeed.readPrice()).to.be.equal(100);
+      expect(await delayFathomOraclePriceFeed.nextPrice()).to.be.equal(200);
 
       // and update price one more time
       await increase(900);
       await mockedDexPriceOracle.mock.getPrice.returns(250, await latest())
       await delayFathomOraclePriceFeed.peekPrice();
 
-      expect(await delayFathomOraclePriceFeed.delayedPrice()).to.be.equal(200);
-      expect(await delayFathomOraclePriceFeed.latestPrice()).to.be.equal(250);
+      expect(await delayFathomOraclePriceFeed.readPrice()).to.be.equal(200);
+      expect(await delayFathomOraclePriceFeed.nextPrice()).to.be.equal(250);
     });
 
     it("Check readPrice method returns current price with default price value", async () => {

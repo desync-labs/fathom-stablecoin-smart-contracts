@@ -274,10 +274,10 @@ contract FixedSpreadLiquidationStrategy is FixedSpreadLiquidationStrategyMath, P
     function getFeedPrice(bytes32 collateralPoolId) internal returns (uint256 feedPrice) {
         address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(collateralPoolId);
         IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);
-        (bytes32 price, bool priceOk) = _priceFeed.peekPrice();
+        (uint256 price, bool priceOk) = _priceFeed.peekPrice();
         require(priceOk, "FixedSpreadLiquidationStrategy/invalid-price");
         // (price [wad] * BLN [10 ** 9] ) [ray] / priceOracle.stableCoinReferencePrice [ray]
-        feedPrice = rdiv(mul(uint256(price), BLN), priceOracle.stableCoinReferencePrice()); // [ray]
+        feedPrice = rdiv(mul(price, BLN), priceOracle.stableCoinReferencePrice()); // [ray]
     }
 
     // solhint-disable function-max-lines
