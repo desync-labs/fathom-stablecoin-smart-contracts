@@ -21,7 +21,6 @@ import "../../utils/SafeToken.sol";
 
 contract FixedSpreadLiquidationStrategyMath {
     uint256 internal constant BLN = 10 ** 9;
-    uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAY = 10 ** 27;
 
     function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
