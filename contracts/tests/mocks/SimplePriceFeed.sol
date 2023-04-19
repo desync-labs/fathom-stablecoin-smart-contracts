@@ -40,7 +40,7 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
     }
 
     event LogSetPrice(address indexed _caller, uint256 _price, uint256 indexed _lastUpdate);
-    event LogSetPriceLife(address indexed _caller, uint256 _second);
+    // event LogSetPriceLife(address indexed _caller, uint256 _second);
 
     /// @dev access: OWNER_ROLE
     function setPrice(uint256 _price) external onlyOwner {
@@ -79,11 +79,11 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
         return _isPriceOk();
     }
 
-    function _isPriceFresh() internal view returns (bool) {
+    function isPriceFresh() external view override returns (bool) {
         return lastUpdate >= block.timestamp - priceLife;
     }
 
     function _isPriceOk() internal view returns (bool) {
-        return _isPriceFresh() && !paused();
+        return this.isPriceFresh() && !paused();
     }
 }

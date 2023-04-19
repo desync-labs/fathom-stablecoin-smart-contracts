@@ -3,7 +3,6 @@ const fs = require('fs');
 const pools = require("../../common/collateral");
 const { getAddresses } = require("../../common/addresses");
 const { getProxy } = require("../../common/proxies");
-const { ethers } = require("ethers");
 
 const FathomStablecoinProxyActions = artifacts.require('FathomStablecoinProxyActions.sol');
 
@@ -122,8 +121,8 @@ module.exports = async function (deployer) {
 
         delayFathomOraclePriceFeed.initialize(
             dexPriceOracle.address,
-            addresses.USD,
             addresses.WXDC,
+            addresses.USD,
             accessControlConfig.address,
             pools.XDC
         ),

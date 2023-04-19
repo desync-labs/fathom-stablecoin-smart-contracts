@@ -8,7 +8,7 @@ const { ethers } = require("ethers");
 const { WeiPerWad } = require("../../helper/unit");
 const { DeployerAddress, AddressZero} = require("../../helper/address");
 const { getContract, createMock } = require("../../helper/contracts");
-const { latest } = require('../../helper/time');
+const { increase, latest } = require('../../helper/time');
 const { formatBytes32String } = ethers.utils
 
 const COLLATERAL_POOL_ID = formatBytes32String("XDC")
@@ -47,7 +47,7 @@ describe("CentralizedOraclePriceFeed", () => {
                 await mockedAccessControlConfig2.mock.hasRole.returns(false);
                 await mockedAccessControlConfig2.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"));
 
-                await expect(centralizedOraclePriceFeed.setAccessControlConfig(mockedAccessControlConfig2.address)).to.be.revertedWith("CentralizedOraclePriceFeed/msgsender-not-owner");
+                await expect(centralizedOraclePriceFeed.setAccessControlConfig(mockedAccessControlConfig2.address)).to.be.revertedWith("DelayPriceFeed/msgsender-not-owner");
             })
         })
 
@@ -73,12 +73,12 @@ describe("CentralizedOraclePriceFeed", () => {
         })
         context("price life is less than 5 min", async () => {
             it("should revert", async () => {
-                await expect(centralizedOraclePriceFeed.setPriceLife(299)).to.be.revertedWith("CentralizedOraclePriceFeed/bad-price-life");
+                await expect(centralizedOraclePriceFeed.setPriceLife(299)).to.be.revertedWith("DelayPriceFeed/bad-price-life");
             })
         })
         context("price life is greater than 1 day", async () => {
             it("should revert", async () => {
-                await expect(centralizedOraclePriceFeed.setPriceLife(86401)).to.be.revertedWith("CentralizedOraclePriceFeed/bad-price-life");
+                await expect(centralizedOraclePriceFeed.setPriceLife(86401)).to.be.revertedWith("DelayPriceFeed/bad-price-life");
             })
         })
         context("set price life", async () => {
@@ -108,8 +108,8 @@ describe("CentralizedOraclePriceFeed", () => {
                 await mockedCentralizedPriceOracle2.mock.getPrice.returns(WeiPerWad.mul(2), await latest());
 
                 await centralizedOraclePriceFeed.setOracle(mockedCentralizedPriceOracle2.address);
-                expect(await centralizedOraclePriceFeed.fathomOracle()).to.be.equal(mockedCentralizedPriceOracle2.address);
-                expect(await centralizedOraclePriceFeed.lastPrice()).to.be.equal(WeiPerWad.mul(2));
+                expect(await centralizedOraclePriceFeed.oracle()).to.be.equal(mockedCentralizedPriceOracle2.address);
+                expect(await centralizedOraclePriceFeed.readPrice()).to.be.equal(WeiPerWad.mul(2));
             })
         })
     })
@@ -135,8 +135,63 @@ describe("CentralizedOraclePriceFeed", () => {
                 const result = await centralizedOraclePriceFeed.callStatic.peekPrice();
                 await centralizedOraclePriceFeed.peekPrice();
                 expect(result[0]).to.be.equal(WeiPerWad.mul(2));
-                expect(await centralizedOraclePriceFeed.lastPrice()).to.be.equal(WeiPerWad.mul(2));
-                expect(await centralizedOraclePriceFeed.lastUpdateTS()).to.be.equal(lastTS);
+                expect(await centralizedOraclePriceFeed.readPrice()).to.be.equal(WeiPerWad.mul(2));
+                expect((await centralizedOraclePriceFeed.delayedPrice()).lastUpdate).to.be.equal(lastTS);
+            })
+        })
+        context("delay not passed", async () => {
+            it("price not updated", async () => {
+                const expectedTS = await latest();
+                await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad.mul(2), expectedTS);
+                await centralizedOraclePriceFeed.peekPrice();
+
+                await increase(900);
+                await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad.mul(3), await latest());
+                await centralizedOraclePriceFeed.peekPrice();
+
+                await increase(800);
+                await centralizedOraclePriceFeed.peekPrice();
+
+                expect(await centralizedOraclePriceFeed.readPrice()).to.be.equal(WeiPerWad.mul(2));
+                expect((await centralizedOraclePriceFeed.delayedPrice()).lastUpdate).to.be.equal(expectedTS);
+            })
+        })
+        context("delay not passed, but price is outdated", async () => {
+            it("price updated", async () => {
+                const oldPriceTS = (await latest() - 1800);
+                await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad, oldPriceTS);
+                await centralizedOraclePriceFeed.peekPrice();
+
+                await increase(100);
+                const expectedTS = await latest();
+                await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad.mul(3), expectedTS);
+                await centralizedOraclePriceFeed.peekPrice();
+
+                await increase(100);
+                await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad.mul(3), await latest());
+                await centralizedOraclePriceFeed.peekPrice();
+
+                expect(await centralizedOraclePriceFeed.readPrice()).to.be.equal(WeiPerWad.mul(3));
+                expect((await centralizedOraclePriceFeed.delayedPrice()).lastUpdate).to.be.equal(expectedTS);
+            })
+        })
+        context("delay passed", async () => {
+            it("price updated", async () => {
+                await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad.mul(2), await latest());
+                await centralizedOraclePriceFeed.peekPrice();
+
+                await increase(900);
+
+                const expectedTS = await latest();
+                await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad.mul(3), expectedTS);
+                await centralizedOraclePriceFeed.peekPrice();
+
+                await increase(900);
+                await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad.mul(4), await latest());
+                await centralizedOraclePriceFeed.peekPrice();
+;
+                expect(await centralizedOraclePriceFeed.readPrice()).to.be.equal(WeiPerWad.mul(3));
+                expect((await centralizedOraclePriceFeed.delayedPrice()).lastUpdate).to.be.equal(expectedTS);
             })
         })
     })
