@@ -46,7 +46,8 @@ const setup = async () => {
         fathomStablecoin,
         fathomStablecoinProxyActions,
         stablecoinAdapter,
-        stabilityFeeCollector
+        stabilityFeeCollector,
+        simplePriceFeed
     }
 }
 
@@ -58,9 +59,9 @@ describe("PositionPermissions", () => {
     let stablecoinAdapter
     let bookKeeper
     let positionManager
-    let fathomStablecoinProxyActions
     let fathomStablecoin
     let stabilityFeeCollector
+    let simplePriceFeed
 
     before(async () => {
         await snapshot.revertToSnapshot();
@@ -76,7 +77,8 @@ describe("PositionPermissions", () => {
             fathomStablecoin,
             fathomStablecoinProxyActions,
             stablecoinAdapter,
-            stabilityFeeCollector
+            stabilityFeeCollector,
+            simplePriceFeed
         } = await loadFixture(setup));
     })
 
@@ -1490,6 +1492,33 @@ describe("PositionPermissions", () => {
                 const alicePositionStake = await collateralTokenAdapter.stake(alicePositionAddress)
                 expect(alicePositionStake, "Stake must be correctly updated after importPosition").to.be.equal(WeiPerWad)
 
+            })
+        })
+        context("position ceiling", async () => {
+            context("open position exceeds position ceiling", async () => {
+                it("should revert", async () => {
+                    await simplePriceFeed.setPrice(WeiPerRay.div(1000), { gasLimit: 1000000 });
+                    await expect(
+                        PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(20), WeiPerWad.mul(10001))
+                    ).to.be.revertedWith("BookKeeper/position-debt-ceiling-exceeded")
+
+                })
+            })
+            context("adjust position exceeds position ceiling", async () => {
+                it("should revert", async () => {
+                    await simplePriceFeed.setPrice(WeiPerRay.div(1000), { gasLimit: 1000000 });
+                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(20), WeiPerWad.mul(10000))
+                    await expect(
+                        PositionHelper.adjustPosition(
+                            aliceProxyWallet,
+                            AliceAddress,
+                            await positionManager.ownerLastPositionId(aliceProxyWallet.address),
+                            0,
+                            WeiPerWad,
+                            collateralTokenAdapter.address
+                        )
+                    ).to.be.revertedWith("BookKeeper/position-debt-ceiling-exceeded")
+                })
             })
         })
     })
