@@ -211,9 +211,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         ); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
 
-        finalCashPrice[_collateralPoolId] =
-            mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) /
-            (debt / RAY);
+        finalCashPrice[_collateralPoolId] = mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) / (debt / RAY);
 
         emit LogFinalizeCashPrice(_collateralPoolId);
     }

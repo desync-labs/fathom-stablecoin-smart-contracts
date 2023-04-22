@@ -48,7 +48,7 @@ contract DelayFathomOraclePriceFeed is DelayPriceFeedBase {
         this.peekPrice();
     }
 
-    function _retrivePrice() internal view override returns (PriceInfo memory){
+    function _retrivePrice() internal view override returns (PriceInfo memory) {
         (uint256 _price, uint256 _lastUpdate) = IFathomOracle(fathomOracle).getPrice(token0, token1);
 
         require(_price > 0, "DelayFathomOraclePriceFeed/wrong-price");

@@ -38,11 +38,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         uint256 _stabilityFeeRate,
         address _adapter
     );
-    event LogPositionDebtCeiling(
-        address _messageSender, 
-        bytes32 _collateralPoolId, 
-        uint256 _positionDebtCeiling
-    );
+    event LogPositionDebtCeiling(address _messageSender, bytes32 _collateralPoolId, uint256 _positionDebtCeiling);
 
     modifier onlyOwner() {
         require(accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
@@ -126,6 +122,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _collateralPools[_collateralPoolId].positionDebtCeiling = _positionDebtCeiling;
         emit LogPositionDebtCeiling(msg.sender, _collateralPoolId, _positionDebtCeiling);
     }
+
     function setPriceFeed(bytes32 _poolId, address _priceFeed) external onlyOwner {
         require(_priceFeed != address(0), "CollateralPoolConfig/zero-price-feed");
         require(IPriceFeed(_priceFeed).poolId() == _poolId, "CollateralPoolConfig/wrong-price-feed-pool");

@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol"
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IPausable.sol";
 
-contract ProxyActionsStorage is PausableUpgradeable, IPausable{
+contract ProxyActionsStorage is PausableUpgradeable, IPausable {
     address public proxyAction;
     address public bookKeeper;
 
@@ -28,7 +28,7 @@ contract ProxyActionsStorage is PausableUpgradeable, IPausable{
     }
 
     function initialize(address _proxyAction, address _bookKeeper) external initializer {
-        require(_proxyAction != address(0) && _bookKeeper != address(0),"ProxyActionsStorage/zero-address");
+        require(_proxyAction != address(0) && _bookKeeper != address(0), "ProxyActionsStorage/zero-address");
         PausableUpgradeable.__Pausable_init();
 
         proxyAction = _proxyAction;
@@ -42,7 +42,7 @@ contract ProxyActionsStorage is PausableUpgradeable, IPausable{
     // --- pause ---
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
-    _pause();
+        _pause();
     }
 
     /// @dev access: OWNER_ROLE, GOV_ROLE

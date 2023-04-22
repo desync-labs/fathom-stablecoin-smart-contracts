@@ -155,10 +155,12 @@ contract FixedSpreadLiquidationStrategy is FixedSpreadLiquidationStrategyMath, P
     ) external override nonReentrant whenNotPaused {
         require(
             IAccessControlConfig(bookKeeper.accessControlConfig()).hasRole(
-                IAccessControlConfig(bookKeeper.accessControlConfig()).LIQUIDATION_ENGINE_ROLE(), msg.sender),
+                IAccessControlConfig(bookKeeper.accessControlConfig()).LIQUIDATION_ENGINE_ROLE(),
+                msg.sender
+            ),
             "!liquidationEngingRole"
         );
-        
+
         require(_positionDebtShare > 0, "FixedSpreadLiquidationStrategy/zero-debt");
         require(_positionCollateralAmount > 0, "FixedSpreadLiquidationStrategy/zero-collateral-amount");
         require(_positionAddress != address(0), "FixedSpreadLiquidationStrategy/zero-position-address");
@@ -204,7 +206,7 @@ contract FixedSpreadLiquidationStrategy is FixedSpreadLiquidationStrategyMath, P
             flashLendingEnabled == 1 &&
             _data.length > 0 &&
             _collateralRecipient != address(bookKeeper) &&
-            _collateralRecipient != address(liquidationEngine) && 
+            _collateralRecipient != address(liquidationEngine) &&
             IERC165(_collateralRecipient).supportsInterface(FLASH_LENDING_ID)
         ) {
             //there should be ERC165 function selector check added to above condition
@@ -214,12 +216,7 @@ contract FixedSpreadLiquidationStrategy is FixedSpreadLiquidationStrategyMath, P
                 _collateralRecipient,
                 info.collateralAmountToBeLiquidated.sub(info.treasuryFees)
             );
-            _adapter.onMoveCollateral(
-                address(this),
-                _collateralRecipient,
-                info.collateralAmountToBeLiquidated.sub(info.treasuryFees),
-                abi.encode(0)
-            );
+            _adapter.onMoveCollateral(address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
             IFlashLendingCallee(_collateralRecipient).flashLendingCall(
                 msg.sender,
                 info.actualDebtValueToBeLiquidated,

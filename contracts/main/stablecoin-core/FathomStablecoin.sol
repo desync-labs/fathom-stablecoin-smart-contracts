@@ -30,7 +30,6 @@ contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpg
     mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
 
-
     function initialize(string memory _name, string memory _symbol) external initializer {
         AccessControlUpgradeable.__AccessControl_init();
 

@@ -24,7 +24,10 @@ contract PluginPriceOracle is Initializable, IFathomCentralizedOracle {
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
-        require(IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender), "PluginPriceOracle/msgsender-not-owner");
+        require(
+            IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender),
+            "PluginPriceOracle/msgsender-not-owner"
+        );
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
     }
 
@@ -37,9 +40,9 @@ contract PluginPriceOracle is Initializable, IFathomCentralizedOracle {
         price = _toWad(uint256(oracle.latestAnswer()));
         lastUpdated = oracle.latestTimestamp();
     }
-    
+
     /// price from plugin oracle returns multiplied y 10000 and we want it in wad
-    function _toWad(uint256 amount) private pure returns(uint256) {
+    function _toWad(uint256 amount) private pure returns (uint256) {
         return amount * 1e14;
     }
 }
