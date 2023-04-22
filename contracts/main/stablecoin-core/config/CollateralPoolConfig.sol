@@ -38,6 +38,11 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         uint256 _stabilityFeeRate,
         address _adapter
     );
+    event LogPositionDebtCeiling(
+        address _messageSender, 
+        bytes32 _collateralPoolId, 
+        uint256 _positionDebtCeiling
+    );
 
     modifier onlyOwner() {
         require(accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");

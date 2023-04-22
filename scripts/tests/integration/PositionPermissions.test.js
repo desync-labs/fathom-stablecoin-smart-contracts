@@ -80,6 +80,8 @@ describe("PositionPermissions", () => {
             stabilityFeeCollector,
             simplePriceFeed
         } = await loadFixture(setup));
+
+
     })
 
     describe("#permissions", async () => {
@@ -1498,16 +1500,16 @@ describe("PositionPermissions", () => {
             context("open position exceeds position ceiling", async () => {
                 it("should revert", async () => {
                     await simplePriceFeed.setPrice(WeiPerRay.div(1000), { gasLimit: 1000000 });
-                    await expect(
-                        PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(20), WeiPerWad.mul(10001))
-                    ).to.be.revertedWith("BookKeeper/position-debt-ceiling-exceeded")
 
+                    await expect(
+                        PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2000), WeiPerWad.mul(1000001))
+                    ).to.be.revertedWith("BookKeeper/position-debt-ceiling-exceeded")
                 })
             })
             context("adjust position exceeds position ceiling", async () => {
                 it("should revert", async () => {
                     await simplePriceFeed.setPrice(WeiPerRay.div(1000), { gasLimit: 1000000 });
-                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(20), WeiPerWad.mul(10000))
+                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2000), WeiPerWad.mul(1000000))
                     await expect(
                         PositionHelper.adjustPosition(
                             aliceProxyWallet,
