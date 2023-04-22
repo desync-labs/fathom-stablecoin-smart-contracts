@@ -154,9 +154,11 @@ contract FixedSpreadLiquidationStrategy is FixedSpreadLiquidationStrategyMath, P
         bytes calldata _data // Data to pass in external call; if length 0, no call is done
     ) external override nonReentrant whenNotPaused {
         require(
-            IAccessControlConfig(bookKeeper.accessControlConfig()).hasRole(keccak256("LIQUIDATION_ENGINE_ROLE"), msg.sender),
+            IAccessControlConfig(bookKeeper.accessControlConfig()).hasRole(
+                IAccessControlConfig(bookKeeper.accessControlConfig()).LIQUIDATION_ENGINE_ROLE(), msg.sender),
             "!liquidationEngingRole"
         );
+        
         require(_positionDebtShare > 0, "FixedSpreadLiquidationStrategy/zero-debt");
         require(_positionCollateralAmount > 0, "FixedSpreadLiquidationStrategy/zero-collateral-amount");
         require(_positionAddress != address(0), "FixedSpreadLiquidationStrategy/zero-position-address");
