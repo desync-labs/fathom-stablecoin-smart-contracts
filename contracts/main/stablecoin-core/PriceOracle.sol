@@ -3,7 +3,6 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IPriceFeed.sol";
@@ -28,7 +27,7 @@ contract PriceOracleMath {
 /** @notice A contract which is the price oracle of the BookKeeper to keep all collateral pools updated with the latest price of the collateral.
     The price oracle is important in reflecting the current state of the market price.
 */
-contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
+contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
     struct CollateralPool {
         IPriceFeed priceFeed; // Price Feed
         uint256 liquidationRatio; // Liquidation ratio or Collateral ratio [ray]
@@ -83,8 +82,6 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpg
 
     function initialize(address _bookKeeper) external initializer {
         PausableUpgradeable.__Pausable_init();
-        ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
-
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         stableCoinReferencePrice = ONE;
