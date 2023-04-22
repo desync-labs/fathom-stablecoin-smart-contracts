@@ -3,14 +3,24 @@
 pragma solidity 0.8.17;
 
 interface ILiquidationEngine {
-    function liquidate(
-        bytes32 _collateralPoolId,
-        address _positionAddress,
-        uint256 _debtShareToBeLiquidated, // [rad]
-        uint256 _maxDebtShareToBeLiquidated, // [rad]
-        address _collateralRecipient,
-        bytes calldata data
-    ) external;
+  function liquidate(
+    bytes32 _collateralPoolId,
+    address _positionAddress,
+    uint256 _debtShareToBeLiquidated, // [rad]
+    uint256 _maxDebtShareToBeLiquidated, // [rad]
+    address _collateralRecipient,
+    bytes calldata data
+  ) external;
+
+  function liquidate(
+    bytes32 _collateralPoolId,
+    address _positionAddress,
+    uint256 _debtShareToBeLiquidated, // [rad]
+    uint256 _maxDebtShareToBeLiquidated, // [rad]
+    address _collateralRecipient,
+    bytes calldata data,
+    address sender
+  ) external;
 
     function liquidateForBatch(
         bytes32 _collateralPoolId,
@@ -31,5 +41,5 @@ interface ILiquidationEngine {
         bytes[] calldata datas
     ) external;
 
-    function live() external view returns (uint256);
+  function live() external view returns (uint256);
 }

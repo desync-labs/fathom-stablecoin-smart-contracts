@@ -302,8 +302,6 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
                 -int256(_vars.newPositionDebtShare)
             );
         }
-
-        ISetPrice(priceOracle).setPrice(_collateralPoolId);
     }
 
     // solhint-enable function-max-lines
