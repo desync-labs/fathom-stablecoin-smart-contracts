@@ -29,7 +29,6 @@ contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpg
 
     mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
-    mapping(address => uint256) public nonces;
 
 
     function initialize(string memory _name, string memory _symbol) external initializer {
