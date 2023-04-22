@@ -6,6 +6,7 @@ const DevAddress = "0x0CF4bC892112518f96506Df151185d0F572CfF5f";
 const TreasuryAddress = "0x299739f52346940c7c1E8E156dfD51A6eE61A5Da";
 const AddressOne = "0x0000000000000000000000000000000000000001"
 const AddressTwo = "0x0000000000000000000000000000000000000002"
+const apothemDeployerTest = "0xB4A0403376CA4f0a99b863840EfFf78bc061d71F";
 
 
-module.exports = {AddressZero, DeployerAddress, AliceAddress, BobAddress, DevAddress, TreasuryAddress, AddressOne, AddressTwo}
+module.exports = {AddressZero, DeployerAddress, AliceAddress, BobAddress, DevAddress, TreasuryAddress, AddressOne, AddressTwo, apothemDeployerTest}

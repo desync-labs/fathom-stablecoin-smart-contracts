@@ -14,12 +14,10 @@
     "lint": "solhint 'contracts/**/*.sol'",
     "pre-release": "npm run prettier && npm run lint && npm run test-with-timeout",
     "migrate-reset": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run migrateAndConfigureForTests",
-    "migrate-reset-mainnet": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployMainnet",
-    "migrate-reset-kovan": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployKovan",
-    "migrate-reset-ropsten": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployRopsten",
-    "migrate-reset-ac-mainnet": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployACMainnet",
-    "migrate-reset-ac-kovan": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployACKovan",
-    "migrate-reset-ac-ropsten": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployACRopsten"
+    "migrate-reset-local": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployLocal",
+    "migrate-reset-apothem": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployApothem",
+    "deploy-tokens-local": "coralX scenario --run deployTokensLocal",
+    "deploy-tokens-apothem": "coralX scenario --run deployTokensApothem"
   },
   "author": "",
   "license": "",

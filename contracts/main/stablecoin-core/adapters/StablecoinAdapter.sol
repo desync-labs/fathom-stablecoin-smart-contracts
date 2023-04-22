@@ -9,8 +9,17 @@ import "../../interfaces/IBookKeeper.sol";
 import "../../interfaces/IToken.sol";
 import "../../interfaces/IStablecoinAdapter.sol";
 import "../../interfaces/ICagable.sol";
+import "../../interfaces/IPausable.sol";
 
-contract StablecoinAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable {
+contract StablecoinAdapterMath {
+    uint256 internal constant ONE = 10 ** 27;
+
+    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require(y == 0 || (z = x * y) / y == x);
+    }
+}
+
+contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable, IPausable {
     IBookKeeper public override bookKeeper; // CDP Engine
     IStablecoin public override stablecoin; // Stablecoin Token
     uint256 public live; // Active Flag
@@ -45,9 +54,10 @@ contract StablecoinAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     }
 
     function cage() external override onlyOwnerOrShowStopper {
-        require(live == 1, "StablecoinAdapter/not-live");
-        live = 0;
-        emit LogCage();
+        if (live == 1) {
+            live = 0;
+            emit LogCage();
+        }
     }
 
     function uncage() external override onlyOwnerOrShowStopper {
@@ -56,15 +66,14 @@ contract StablecoinAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         emit LogUncage();
     }
 
-    uint256 constant ONE = 10 ** 27;
-
-    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require(y == 0 || (z = x * y) / y == x);
-    }
-
     function deposit(address usr, uint256 wad, bytes calldata /* data */) external payable override nonReentrant whenNotPaused {
         bookKeeper.moveStablecoin(address(this), usr, mul(ONE, wad));
         stablecoin.burn(msg.sender, wad);
+    }
+
+    function depositRAD(address usr, uint256 ray, bytes calldata /* data */) external payable override nonReentrant whenNotPaused {
+        bookKeeper.moveStablecoin(address(this), usr, ray);
+        stablecoin.burn(msg.sender, (ray / ONE) + 1);
     }
 
     function withdraw(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
@@ -73,11 +82,11 @@ contract StablecoinAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         stablecoin.mint(usr, wad);
     }
 
-    function pause() external onlyOwnerOrGov {
+    function pause() external override onlyOwnerOrGov {
         _pause();
     }
 
-    function unpause() external onlyOwnerOrGov {
+    function unpause() external override onlyOwnerOrGov {
         _unpause();
     }
 }

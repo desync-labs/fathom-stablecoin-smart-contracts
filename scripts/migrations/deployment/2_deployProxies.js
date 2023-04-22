@@ -16,18 +16,22 @@ module.exports = async function (deployer) {
         "PriceOracle",
         "ShowStopper",
         "PositionManager",
-        "SimplePriceFeed",
         "FixedSpreadLiquidationStrategy",
         "StabilityFeeCollector",
         "ProxyWalletRegistry",
+        "ProxyWalletFactory",
+        "ProxyActionsStorage",
         "FlashMintModule",
-        "AuthTokenAdapter",
         "StableSwapModule",
         "FlashMintArbitrager",
         "BookKeeperFlashMintArbitrager",
-        "FathomOraclePriceFeedFactory",
+        "DelayFathomOraclePriceFeed",
         "DexPriceOracle",
-        "CollateralTokenAdapterFactory"
+        "CollateralTokenAdapter",
+        "SlidingWindowDexOracle",
+        "AdminControls",
+        "PluginPriceOracle",
+        "CentralizedOraclePriceFeed"
     ]
 
     const promises = contracts.map(contract => {

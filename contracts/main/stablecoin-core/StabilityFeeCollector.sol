@@ -7,29 +7,10 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IStabilityFeeCollector.sol";
+import "../interfaces/IPausable.sol";
 
-/** @notice A contract which acts as a collector for the stability fee.
-    The stability fee is a fee that is collected from the minter of Fathom Stablecoin in a per-seconds basis.
-    The stability fee will be accumulated in the system as a surplus to settle any bad debt.
-*/
-contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeable, IStabilityFeeCollector {
-    struct CollateralPool {
-        uint256 stabilityFeeRate; // Collateral-specific, per-second stability fee debtAccumulatedRate or mint interest debtAccumulatedRate [ray]
-        uint256 lastAccumulationTime; // Time of last call to `collect` [unix epoch time]
-    }
-
-    IBookKeeper public bookKeeper;
-    address public systemDebtEngine;
-    uint256 public globalStabilityFeeRate; // Global, per-second stability fee debtAccumulatedRate [ray]
-
-    function initialize(address _bookKeeper, address _systemDebtEngine) external initializer {
-        PausableUpgradeable.__Pausable_init();
-        ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
-
-        bookKeeper = IBookKeeper(_bookKeeper);
-        require(_systemDebtEngine != address(0), "StabilityFeeCollector/bad-system-debt-engine-address");
-        systemDebtEngine = _systemDebtEngine;
-    }
+contract StabilityFeeCollectorMath {
+    uint256 internal constant RAY = 10 ** 27;
 
     function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
         assembly {
@@ -82,8 +63,6 @@ contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeabl
         }
     }
 
-    uint256 constant RAY = 10 ** 27;
-
     function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         _z = _x + _y;
         require(_z >= _x);
@@ -99,9 +78,21 @@ contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeabl
         require(_y == 0 || _z / _y == _x);
         _z = _z / RAY;
     }
+}
 
-    // --- Administration ---
-    event LogSetGlobalStabilityFeeRate(address indexed _caller, uint256 _data);
+/** @notice A contract which acts as a collector for the stability fee.
+    The stability fee is a fee that is collected from the minter of Fathom Stablecoin in a per-seconds basis.
+    The stability fee will be accumulated in the system as a surplus to settle any bad debt.
+*/
+contract StabilityFeeCollector is StabilityFeeCollectorMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStabilityFeeCollector, IPausable {
+    struct CollateralPool {
+        uint256 stabilityFeeRate; // Collateral-specific, per-second stability fee debtAccumulatedRate or mint interest debtAccumulatedRate [ray]
+        uint256 lastAccumulationTime; // Time of last call to `collect` [unix epoch time]
+    }
+
+    IBookKeeper public bookKeeper;
+    address public systemDebtEngine;
+
     event LogSetSystemDebtEngine(address indexed _caller, address _data);
 
     modifier onlyOwner() {
@@ -120,13 +111,21 @@ contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeabl
         _;
     }
 
-    /// @dev Set the global stability fee debtAccumulatedRate which will be apply to every collateral pool. Please see the explanation on the input format from the `setStabilityFeeRate` function.
-    function setGlobalStabilityFeeRate(uint256 _globalStabilityFeeRate) external onlyOwner {
-        require(_globalStabilityFeeRate == 0 || _globalStabilityFeeRate >= RAY, "StabilityFeeCollector/invalid-stability-fee-rate");
-        // Maximum stability fee rate is 50% yearly
-        require(_globalStabilityFeeRate <= 1000000012857214317438491659, "StabilityFeeCollector/stability-fee-rate-too-large");
-        globalStabilityFeeRate = _globalStabilityFeeRate;
-        emit LogSetGlobalStabilityFeeRate(msg.sender, _globalStabilityFeeRate);
+    function initialize(address _bookKeeper, address _systemDebtEngine) external initializer {
+        PausableUpgradeable.__Pausable_init();
+        ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
+
+        bookKeeper = IBookKeeper(_bookKeeper);
+        require(_systemDebtEngine != address(0), "StabilityFeeCollector/bad-system-debt-engine-address");
+        systemDebtEngine = _systemDebtEngine;
+    }
+
+    function pause() external override onlyOwnerOrGov {
+        _pause();
+    }
+
+    function unpause() external override onlyOwnerOrGov {
+        _unpause();
     }
 
     function setSystemDebtEngine(address _systemDebtEngine) external onlyOwner {
@@ -151,20 +150,9 @@ contract StabilityFeeCollector is PausableUpgradeable, ReentrancyGuardUpgradeabl
         require(block.timestamp >= _lastAccumulationTime, "StabilityFeeCollector/invalid-block.timestamp");
         require(systemDebtEngine != address(0), "StabilityFeeCollector/system-debt-engine-not-set");
 
-        _debtAccumulatedRate = rmul(
-            rpow(add(globalStabilityFeeRate, _stabilityFeeRate), block.timestamp - _lastAccumulationTime, RAY),
-            _previousDebtAccumulatedRate
-        );
+        _debtAccumulatedRate = rmul(rpow(_stabilityFeeRate, block.timestamp - _lastAccumulationTime, RAY), _previousDebtAccumulatedRate);
 
         bookKeeper.accrueStabilityFee(_collateralPoolId, systemDebtEngine, diff(_debtAccumulatedRate, _previousDebtAccumulatedRate));
         ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).updateLastAccumulationTime(_collateralPoolId);
-    }
-
-    function pause() external onlyOwnerOrGov {
-        _pause();
-    }
-
-    function unpause() external onlyOwnerOrGov {
-        _unpause();
     }
 }

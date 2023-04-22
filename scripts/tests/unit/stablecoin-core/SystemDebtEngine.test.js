@@ -14,7 +14,7 @@ const loadFixtureHandler = async () => {
     mockedAccessControlConfig = await createMock("AccessControlConfig");
     mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
     mockedBookKeeper = await createMock("BookKeeper");
-    mockedCollateralTokenAdapter = await createMock("CollateralTokenAdapter");
+    mockedCollateralTokenAdapter = await createMock("TokenAdapter");
 
     systemDebtEngine = getContract("SystemDebtEngine", DeployerAddress)
     systemDebtEngineAsAlice = getContract("SystemDebtEngine", AliceAddress)
@@ -108,6 +108,23 @@ describe("SystemDebtEngine", () => {
           expect(await systemDebtEngineAsAlice.live()).to.be.equal(1)
 
           await expect(systemDebtEngineAsAlice.cage()).to.emit(systemDebtEngineAsAlice, "LogCage").withArgs()
+
+          expect(await systemDebtEngineAsAlice.live()).to.be.equal(0)
+        })
+      })
+
+      context("when was already caged", () => {
+        it("should not fail", async () => {
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+          await mockedBookKeeper.mock.settleSystemBadDebt.returns()
+
+          expect(await systemDebtEngineAsAlice.live()).to.be.equal(1)
+
+          await expect(systemDebtEngineAsAlice.cage()).to.emit(systemDebtEngineAsAlice, "LogCage").withArgs()
+
+          expect(await systemDebtEngineAsAlice.live()).to.be.equal(0)
+
+          await systemDebtEngineAsAlice.cage()
 
           expect(await systemDebtEngineAsAlice.live()).to.be.equal(0)
         })

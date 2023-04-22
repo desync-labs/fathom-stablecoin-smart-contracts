@@ -5,15 +5,45 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 import "../interfaces/IBookKeeper.sol";
+import "../interfaces/IShowStopper.sol";
 import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/IPriceFeed.sol";
 import "../interfaces/IPriceOracle.sol";
 import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
-import "../interfaces/IShowStopper.sol";
 
-contract ShowStopper is PausableUpgradeable, IShowStopper {
+contract ShowStopperMath {
+    uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant RAY = 10 ** 27;
+
+    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = _x + _y;
+        require(_z >= _x);
+    }
+
+    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x - _y) <= _x);
+    }
+
+    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require(_y == 0 || (_z = _x * _y) / _y == _x);
+    }
+
+    function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        return _x <= _y ? _x : _y;
+    }
+
+    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = mul(_x, _y) / RAY;
+    }
+
+    function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = mul(_x, WAD) / _y;
+    }
+}
+
+contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     IBookKeeper public bookKeeper; // CDP Engine
     ILiquidationEngine public liquidationEngine;
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
@@ -42,42 +72,6 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
     event LogAccumulateStablecoin(address indexed ownerAddress, uint256 amount);
     event LogRedeemStablecoin(bytes32 indexed collateralPoolId, address indexed ownerAddress, uint256 amount);
 
-    function initialize(address _bookKeeper) external initializer {
-        PausableUpgradeable.__Pausable_init();
-
-        IBookKeeper(_bookKeeper).totalStablecoinIssued(); // Sanity Check Call
-        bookKeeper = IBookKeeper(_bookKeeper);
-        live = 1;
-    }
-
-    uint256 constant WAD = 10 ** 18;
-    uint256 constant RAY = 10 ** 27;
-
-    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = _x + _y;
-        require(_z >= _x);
-    }
-
-    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x - _y) <= _x);
-    }
-
-    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y == 0 || (_z = _x * _y) / _y == _x);
-    }
-
-    function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        return _x <= _y ? _x : _y;
-    }
-
-    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, _y) / RAY;
-    }
-
-    function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, WAD) / _y;
-    }
-
     event LogSetBookKeeper(address indexed caller, address _bookKeeper);
     event LogSetLiquidationEngine(address indexed caller, address _liquidationEngine);
     event LogSetSystemDebtEngine(address indexed caller, address _systemDebtEngine);
@@ -90,10 +84,17 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
         _;
     }
 
+    function initialize(address _bookKeeper) external initializer {
+        PausableUpgradeable.__Pausable_init();
+
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
+        bookKeeper = IBookKeeper(_bookKeeper);
+        live = 1;
+    }
+
     function setBookKeeper(address _bookKeeper) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
-
-        IBookKeeper(_bookKeeper).totalStablecoinIssued(); // Sanity Check Call
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         emit LogSetBookKeeper(msg.sender, _bookKeeper);
     }
@@ -144,11 +145,12 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
     function cagePool(bytes32 _collateralPoolId) external onlyOwner {
         require(live == 0, "ShowStopper/still-live");
         require(cagePrice[_collateralPoolId] == 0, "ShowStopper/cage-price-collateral-pool-id-already-defined");
+
         uint256 _totalDebtShare = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getTotalDebtShare(_collateralPoolId);
         address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId);
         IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);
         totalDebtShare[_collateralPoolId] = _totalDebtShare;
-        cagePrice[_collateralPoolId] = wdiv(priceOracle.stableCoinReferencePrice(), uint256(_priceFeed.readPrice()));
+        cagePrice[_collateralPoolId] = wdiv(priceOracle.stableCoinReferencePrice(), _priceFeed.readPrice());
         emit LogCageCollateralPool(_collateralPoolId);
     }
 
@@ -177,35 +179,6 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
             -int256(_debtShare)
         );
         emit LogAccumulateBadDebt(_collateralPoolId, _positionAddress, _amount, _debtShare);
-    }
-
-    /** @dev Redeem locked collateral from the position which has been safely settled by the emergency shutdown and give the collateral back to the position owner.
-      The position to be freed must has no debt at all. That means it must have gone through the process of `accumulateBadDebt` or `smip` already.
-      The position will be limited to the caller address. If the position address is not an EOA address but is managed by a position manager contract,
-      the owner of the position will have to move the collateral inside the position to the owner address first before calling `redeemLockedCollateral`.
-    */
-    function redeemLockedCollateral(
-        bytes32 _collateralPoolId,
-        IGenericTokenAdapter _adapter,
-        address _positionAddress,
-        address _collateralReceiver,
-        bytes calldata _data
-    ) external override {
-        require(live == 0, "ShowStopper/still-live");
-        require(_positionAddress == msg.sender || bookKeeper.positionWhitelist(_positionAddress, msg.sender) == 1, "ShowStopper/not-allowed");
-        (uint256 _lockedCollateralAmount, uint256 _debtShare) = bookKeeper.positions(_collateralPoolId, _positionAddress);
-        require(_debtShare == 0, "ShowStopper/debtShare-not-zero");
-        require(_lockedCollateralAmount < 2 ** 255, "ShowStopper/overflow");
-        bookKeeper.confiscatePosition(
-            _collateralPoolId,
-            _positionAddress,
-            _collateralReceiver,
-            address(systemDebtEngine),
-            -int256(_lockedCollateralAmount),
-            0
-        );
-        _adapter.onMoveCollateral(_positionAddress, _collateralReceiver, _lockedCollateralAmount, _data);
-        emit LogRedeemLockedCollateral(_collateralPoolId, _collateralReceiver, _lockedCollateralAmount);
     }
 
     /** @dev Finalize the total debt of the system after the emergency shutdown.
@@ -237,7 +210,9 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
             _collateralPoolId
         ); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
+
         finalCashPrice[_collateralPoolId] = mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) / (debt / RAY);
+
         emit LogFinalizeCashPrice(_collateralPoolId);
     }
 
@@ -261,5 +236,34 @@ contract ShowStopper is PausableUpgradeable, IShowStopper {
             "ShowStopper/insufficient-stablecoin-accumulator-balance"
         );
         emit LogRedeemStablecoin(_collateralPoolId, msg.sender, _amount);
+    }
+
+    /** @dev Redeem locked collateral from the position which has been safely settled by the emergency shutdown and give the collateral back to the position owner.
+      The position to be freed must has no debt at all. That means it must have gone through the process of `accumulateBadDebt` or `smip` already.
+      The position will be limited to the caller address. If the position address is not an EOA address but is managed by a position manager contract,
+      the owner of the position will have to move the collateral inside the position to the owner address first before calling `redeemLockedCollateral`.
+    */
+    function redeemLockedCollateral(
+        bytes32 _collateralPoolId,
+        IGenericTokenAdapter _adapter,
+        address _positionAddress,
+        address _collateralReceiver,
+        bytes calldata _data
+    ) external override {
+        require(live == 0, "ShowStopper/still-live");
+        require(_positionAddress == msg.sender || bookKeeper.positionWhitelist(_positionAddress, msg.sender) == 1, "ShowStopper/not-allowed");
+        (uint256 _lockedCollateralAmount, uint256 _debtShare) = bookKeeper.positions(_collateralPoolId, _positionAddress);
+        require(_debtShare == 0, "ShowStopper/debtShare-not-zero");
+        require(_lockedCollateralAmount < 2 ** 255, "ShowStopper/overflow");
+        bookKeeper.confiscatePosition(
+            _collateralPoolId,
+            _positionAddress,
+            _collateralReceiver,
+            address(systemDebtEngine),
+            -int256(_lockedCollateralAmount),
+            0
+        );
+        _adapter.onMoveCollateral(_positionAddress, _collateralReceiver, _lockedCollateralAmount, _data);
+        emit LogRedeemLockedCollateral(_collateralPoolId, _collateralReceiver, _lockedCollateralAmount);
     }
 }

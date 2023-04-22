@@ -21,6 +21,7 @@ interface ICollateralPoolConfig {
         uint256 liquidatorIncentiveBps; // Percentage (BPS) of how much additional collateral will be given to the liquidator incentive
         uint256 treasuryFeesBps; // Percentage (BPS) of how much additional collateral will be transferred to the treasury
         address strategy; // Liquidation strategy for this collateral pool
+        uint256 positionDebtCeiling; // position debt ceiling of this collateral pool [rad]
     }
 
     struct CollateralPoolInfo {
@@ -29,17 +30,20 @@ interface ICollateralPoolConfig {
         uint256 debtCeiling; // [rad]
         uint256 priceWithSafetyMargin; // [ray]
         uint256 debtFloor; // [rad]
+        uint256 positionDebtCeiling; // [rad]
     }
 
     function setPriceWithSafetyMargin(bytes32 collateralPoolId, uint256 priceWithSafetyMargin) external;
-
-    function collateralPools(bytes32 _collateralPoolId) external view returns (CollateralPool memory);
 
     function setTotalDebtShare(bytes32 _collateralPoolId, uint256 _totalDebtShare) external;
 
     function setDebtAccumulatedRate(bytes32 _collateralPoolId, uint256 _debtAccumulatedRate) external;
 
+    function setPositionDebtCeiling(bytes32 _collateralPoolId, uint256 _positionDebtCeiling) external;
+
     function updateLastAccumulationTime(bytes32 _collateralPoolId) external;
+
+    function collateralPools(bytes32 _collateralPoolId) external view returns (CollateralPool memory);
 
     function getTotalDebtShare(bytes32 _collateralPoolId) external view returns (uint256);
 
@@ -50,6 +54,8 @@ interface ICollateralPoolConfig {
     function getDebtCeiling(bytes32 _collateralPoolId) external view returns (uint256);
 
     function getDebtFloor(bytes32 _collateralPoolId) external view returns (uint256);
+
+    function getPositionDebtCeiling(bytes32 _collateralPoolId) external view returns (uint256);
 
     function getPriceFeed(bytes32 _collateralPoolId) external view returns (address);
 

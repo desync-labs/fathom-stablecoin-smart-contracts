@@ -11,6 +11,7 @@ const { getContract, createMock } = require("../../helper/contracts");
 const { loadFixture } = require("../../helper/fixtures");
 
 const { formatBytes32String } = ethers.utils
+const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 
 const loadFixtureHandler = async () => {
     const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
@@ -70,7 +71,7 @@ describe("BookKeeper", () => {
                 await mockedAccessControlConfig.mock.hasRole.returns(false)
 
                 await expect(
-                    bookKeeperAsAlice.addCollateral(formatBytes32String("WXDC"), DeployerAddress, WeiPerWad)
+                    bookKeeperAsAlice.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad)
                 ).to.be.revertedWith("!adapterRole")
             })
         })
@@ -83,12 +84,12 @@ describe("BookKeeper", () => {
                     // init WXDC collateral pool
                     await mockedCollateralPoolConfig.mock.getStabilityFeeRate.returns(WeiPerRay)
 
-                    const collateralTokenBefore = await bookKeeper.collateralToken(formatBytes32String("WXDC"), DeployerAddress)
+                    const collateralTokenBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, DeployerAddress)
                     expect(collateralTokenBefore).to.be.equal(0)
 
-                    await bookKeeper.addCollateral(formatBytes32String("WXDC"), DeployerAddress, WeiPerWad, { gasLimit: 1000000 })
+                    await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad, { gasLimit: 1000000 })
 
-                    const collateralTokenAfter = await bookKeeper.collateralToken(formatBytes32String("WXDC"), DeployerAddress)
+                    const collateralTokenAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, DeployerAddress)
                     expect(collateralTokenAfter).to.be.equal(WeiPerWad)
                 })
             })
@@ -102,15 +103,15 @@ describe("BookKeeper", () => {
                     await mockedCollateralPoolConfig.mock.getStabilityFeeRate.returns(WeiPerRay)
 
                     // add collateral 1 WXDC
-                    await bookKeeper.addCollateral(formatBytes32String("WXDC"), DeployerAddress, WeiPerWad, { gasLimit: 1000000 })
+                    await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad, { gasLimit: 1000000 })
 
-                    const collateralTokenBefore = await bookKeeper.collateralToken(formatBytes32String("WXDC"), DeployerAddress)
+                    const collateralTokenBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, DeployerAddress)
                     expect(collateralTokenBefore).to.be.equal(WeiPerWad)
 
                     // add collateral -1 WXDC
-                    await bookKeeper.addCollateral(formatBytes32String("WXDC"), DeployerAddress, WeiPerWad.mul(-1), { gasLimit: 1000000 })
+                    await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad.mul(-1), { gasLimit: 1000000 })
 
-                    const collateralTokenAfter = await bookKeeper.collateralToken(formatBytes32String("WXDC"), DeployerAddress)
+                    const collateralTokenAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, DeployerAddress)
                     expect(collateralTokenAfter).to.be.equal(0)
                 })
             })
@@ -122,8 +123,8 @@ describe("BookKeeper", () => {
             it("should be revert", async () => {
                 // bob call move collateral from alice to bob
                 await await expect(
-                    bookKeeperAsBob.moveCollateral(formatBytes32String("WXDC"), AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
-                ).to.be.revertedWith("BookKeeper/not-allowed")
+                    bookKeeperAsBob.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
+                ).to.be.revertedWith("BookKeeper/not-allowed-position-adjustment")
             })
 
             context("when alice allow bob to move collateral", () => {
@@ -131,22 +132,22 @@ describe("BookKeeper", () => {
                     await mockedAccessControlConfig.mock.hasRole.returns(true)
 
                     // add collateral 1 WXDC to alice
-                    await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad, { gasLimit: 1000000 })
+                    await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad, { gasLimit: 1000000 })
 
-                    const collateralTokenAliceBefore = await bookKeeper.collateralToken(formatBytes32String("WXDC"), AliceAddress)
+                    const collateralTokenAliceBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress)
                     expect(collateralTokenAliceBefore).to.be.equal(WeiPerWad)
-                    const collateralTokenBobBefore = await bookKeeper.collateralToken(formatBytes32String("WXDC"), BobAddress)
+                    const collateralTokenBobBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)
                     expect(collateralTokenBobBefore).to.be.equal(0)
 
                     // alice allow bob to move collateral
                     await bookKeeperAsAlice.whitelist(BobAddress)
 
                     // bob call move collateral from alice to bob
-                    await bookKeeperAsBob.moveCollateral(formatBytes32String("WXDC"), AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
+                    await bookKeeperAsBob.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
 
-                    const collateralTokenAliceAfter = await bookKeeper.collateralToken(formatBytes32String("WXDC"), AliceAddress)
+                    const collateralTokenAliceAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress)
                     expect(collateralTokenAliceAfter).to.be.equal(0)
-                    const collateralTokenBobAfter = await bookKeeper.collateralToken(formatBytes32String("WXDC"), BobAddress)
+                    const collateralTokenBobAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)
                     expect(collateralTokenBobAfter).to.be.equal(WeiPerWad)
                 })
             })
@@ -157,7 +158,7 @@ describe("BookKeeper", () => {
                 it("shold be revert", async () => {
                     // alice call move collateral from alice to bob
                     await expect(
-                        bookKeeperAsAlice.moveCollateral(formatBytes32String("WXDC"), AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
+                        bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
                     ).to.be.reverted
                 })
             })
@@ -166,19 +167,19 @@ describe("BookKeeper", () => {
                     await mockedAccessControlConfig.mock.hasRole.returns(true)
 
                     // add collateral 1 WXDC to alice
-                    await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad, { gasLimit: 1000000 })
+                    await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad, { gasLimit: 1000000 })
 
-                    const collateralTokenAliceBefore = await bookKeeper.collateralToken(formatBytes32String("WXDC"), AliceAddress)
+                    const collateralTokenAliceBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress)
                     expect(collateralTokenAliceBefore).to.be.equal(WeiPerWad)
-                    const collateralTokenBobBefore = await bookKeeper.collateralToken(formatBytes32String("WXDC"), BobAddress)
+                    const collateralTokenBobBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)
                     expect(collateralTokenBobBefore).to.be.equal(0)
 
                     // move collateral 1 WXDC from alice to bob
-                    await bookKeeperAsAlice.moveCollateral(formatBytes32String("WXDC"), AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
+                    await bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
 
-                    const collateralTokenAliceAfter = await bookKeeper.collateralToken(formatBytes32String("WXDC"), AliceAddress)
+                    const collateralTokenAliceAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress)
                     expect(collateralTokenAliceAfter).to.be.equal(0)
-                    const collateralTokenBobAfter = await bookKeeper.collateralToken(formatBytes32String("WXDC"), BobAddress)
+                    const collateralTokenBobAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)
                     expect(collateralTokenBobAfter).to.be.equal(WeiPerWad)
                 })
             })
@@ -260,7 +261,7 @@ describe("BookKeeper", () => {
 
                 await expect(
                     bookKeeper.adjustPosition(
-                        formatBytes32String("WXDC"),
+                        COLLATERAL_POOL_ID,
                         DeployerAddress,
                         DeployerAddress,
                         DeployerAddress,
@@ -282,11 +283,12 @@ describe("BookKeeper", () => {
                     debtCeiling: 0,
                     priceWithSafetyMargin: 0,
                     debtFloor: 0,
+                    positionDebtCeiling: WeiPerRad.mul(1000000)
                 })
 
                 await expect(
                     bookKeeper.adjustPosition(
-                        formatBytes32String("WXDC"),
+                        COLLATERAL_POOL_ID,
                         DeployerAddress,
                         DeployerAddress,
                         DeployerAddress,
@@ -316,11 +318,12 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10000),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: 0,
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         await expect(
                             bookKeeperAsAlice.adjustPosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 BobAddress,
                                 AliceAddress,
@@ -347,7 +350,7 @@ describe("BookKeeper", () => {
 
                                 await expect(
                                     bookKeeperAsAlice.adjustPosition(
-                                        formatBytes32String("WXDC"),
+                                        COLLATERAL_POOL_ID,
                                         AliceAddress,
                                         BobAddress,
                                         AliceAddress,
@@ -376,20 +379,21 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10000),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: 0,
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
 
                                 // add collateral to bob 10 WXDC
-                                await bookKeeper.addCollateral(formatBytes32String("WXDC"), BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                                 // alice allow bob to move stablecoin
                                 await bookKeeperAsBob.whitelist(AliceAddress)
 
-                                const positionBefore = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                                const positionBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                                 expect(positionBefore.lockedCollateral).to.be.equal(0)
 
                                 // lock collateral
                                 await bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     AliceAddress,
                                     BobAddress,
                                     AliceAddress,
@@ -398,7 +402,7 @@ describe("BookKeeper", () => {
                                     { gasLimit: 1000000 }
                                 )
 
-                                const positionAfter = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                                const positionAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                                 expect(positionAfter.lockedCollateral).to.be.equal(WeiPerWad.mul(10))
                             })
                         })
@@ -418,7 +422,7 @@ describe("BookKeeper", () => {
 
                             await expect(
                                 bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     AliceAddress,
                                     AliceAddress,
                                     AliceAddress,
@@ -446,17 +450,18 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10000),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // add collateral to bob 10 WXDC
-                            await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                            const positionBefore = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                            const positionBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                             expect(positionBefore.lockedCollateral).to.be.equal(0)
 
                             // lock collateral
                             await bookKeeperAsAlice.adjustPosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 AliceAddress,
                                 AliceAddress,
@@ -465,7 +470,7 @@ describe("BookKeeper", () => {
                                 { gasLimit: 1000000 }
                             )
 
-                            const positionAfter = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                            const positionAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                             expect(positionAfter.lockedCollateral).to.be.equal(WeiPerWad.mul(10))
                         })
                     })
@@ -487,7 +492,7 @@ describe("BookKeeper", () => {
                             // free collateral
                             await expect(
                                 bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     AliceAddress,
                                     AliceAddress,
                                     AliceAddress,
@@ -516,14 +521,15 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10000),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // add collateral to alice 10 WXDC
-                            await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                             // lock collateral
                             await bookKeeperAsAlice.adjustPosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 AliceAddress,
                                 AliceAddress,
@@ -532,17 +538,17 @@ describe("BookKeeper", () => {
                                 { gasLimit: 1000000 }
                             )
 
-                            const positionAliceBefore = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                            const positionAliceBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                             expect(positionAliceBefore.lockedCollateral).to.be.equal(WeiPerWad.mul(10))
                             const collateralTokenAliceBefore = await bookKeeper.collateralToken(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress
                             )
                             expect(collateralTokenAliceBefore).to.be.equal(0)
 
                             // free collateral
                             await bookKeeperAsAlice.adjustPosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 AliceAddress,
                                 AliceAddress,
@@ -550,10 +556,10 @@ describe("BookKeeper", () => {
                                 0
                             )
 
-                            const positionAliceAfter = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                            const positionAliceAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                             expect(positionAliceAfter.lockedCollateral).to.be.equal(WeiPerWad.mul(9))
                             const collateralTokenAliceAfter = await bookKeeper.collateralToken(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress
                             )
                             expect(collateralTokenAliceAfter).to.be.equal(WeiPerWad)
@@ -575,7 +581,7 @@ describe("BookKeeper", () => {
                             // free collateral
                             await expect(
                                 bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     AliceAddress,
                                     BobAddress,
                                     AliceAddress,
@@ -604,14 +610,15 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10000),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // add collateral to alice 10 WXDC
-                            await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                             // lock collateral
                             await bookKeeperAsAlice.adjustPosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 AliceAddress,
                                 AliceAddress,
@@ -620,14 +627,14 @@ describe("BookKeeper", () => {
                                 { gasLimit: 1000000 }
                             )
 
-                            const positionAliceBefore = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                            const positionAliceBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                             expect(positionAliceBefore.lockedCollateral).to.be.equal(WeiPerWad.mul(10))
-                            const collateralTokenBobBefore = await bookKeeper.collateralToken(formatBytes32String("WXDC"), BobAddress)
+                            const collateralTokenBobBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)
                             expect(collateralTokenBobBefore).to.be.equal(0)
 
                             // free collateral
                             await bookKeeperAsAlice.adjustPosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 BobAddress,
                                 AliceAddress,
@@ -636,9 +643,9 @@ describe("BookKeeper", () => {
                                 { gasLimit: 1000000 }
                             )
 
-                            const positionAliceAfter = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                            const positionAliceAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                             expect(positionAliceAfter.lockedCollateral).to.be.equal(WeiPerWad.mul(9))
-                            const collateralTokenBobAfter = await bookKeeper.collateralToken(formatBytes32String("WXDC"), BobAddress)
+                            const collateralTokenBobAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)
                             expect(collateralTokenBobAfter).to.be.equal(WeiPerWad)
                         })
                     })
@@ -664,6 +671,7 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad,
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // set total debt ceiling 10 rad
@@ -671,7 +679,7 @@ describe("BookKeeper", () => {
 
                             await expect(
                                 bookKeeper.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     DeployerAddress,
                                     DeployerAddress,
                                     DeployerAddress,
@@ -699,6 +707,7 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // set total debt ceiling 1 rad
@@ -706,7 +715,7 @@ describe("BookKeeper", () => {
 
                             await expect(
                                 bookKeeper.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     DeployerAddress,
                                     DeployerAddress,
                                     DeployerAddress,
@@ -735,6 +744,7 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: 0,
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
@@ -742,7 +752,7 @@ describe("BookKeeper", () => {
 
                         await expect(
                             bookKeeper.adjustPosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 DeployerAddress,
                                 DeployerAddress,
                                 DeployerAddress,
@@ -771,17 +781,18 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // set total debt ceiling 10 rad
                             await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                             // add collateral to 10 WXDC
-                            await bookKeeper.addCollateral(formatBytes32String("WXDC"), BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                             // bob lock collateral 10 WXDC
                             await bookKeeperAsBob.adjustPosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 BobAddress,
                                 BobAddress,
                                 BobAddress,
@@ -792,7 +803,7 @@ describe("BookKeeper", () => {
 
                             await expect(
                                 bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     BobAddress,
                                     BobAddress,
                                     BobAddress,
@@ -820,17 +831,18 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: 0,
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
 
                                 // set total debt ceiling 10 rad
                                 await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                                 // add collateral to 10 WXDC
-                                await bookKeeper.addCollateral(formatBytes32String("WXDC"), BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                                 // bob lock collateral 10 WXDC
                                 await bookKeeperAsBob.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     BobAddress,
                                     BobAddress,
                                     BobAddress,
@@ -839,7 +851,7 @@ describe("BookKeeper", () => {
                                     { gasLimit: 1000000 }
                                 )
 
-                                const positionBobBefore = await bookKeeper.positions(formatBytes32String("WXDC"), BobAddress)
+                                const positionBobBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, BobAddress)
                                 expect(positionBobBefore.debtShare).to.be.equal(0)
 
                                 const stablecoinAliceBefore = await bookKeeper.stablecoin(AliceAddress)
@@ -850,7 +862,7 @@ describe("BookKeeper", () => {
 
                                 // alice draw
                                 await bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     BobAddress,
                                     BobAddress,
                                     AliceAddress,
@@ -859,7 +871,7 @@ describe("BookKeeper", () => {
                                     { gasLimit: 1000000 }
                                 );
 
-                                const positionBobAfter = await bookKeeper.positions(formatBytes32String("WXDC"), BobAddress)
+                                const positionBobAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, BobAddress)
                                 expect(positionBobAfter.debtShare).to.be.equal(WeiPerWad.mul(10))
 
                                 const stablecoinAliceAfter = await bookKeeper.stablecoin(AliceAddress)
@@ -883,17 +895,18 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // set total debt ceiling 10 rad
                             await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                             // add collateral to 10 WXDC
-                            await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                             // alice lock collateral 10 WXDC
                             await bookKeeperAsAlice.adjustPosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 AliceAddress,
                                 AliceAddress,
@@ -902,7 +915,7 @@ describe("BookKeeper", () => {
                                 { gasLimit: 1000000 }
                             )
 
-                            const positionaliceBefore = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                            const positionaliceBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                             expect(positionaliceBefore.debtShare).to.be.equal(0)
 
                             const stablecoinAliceBefore = await bookKeeper.stablecoin(AliceAddress)
@@ -910,7 +923,7 @@ describe("BookKeeper", () => {
 
                             // alice draw
                             await bookKeeperAsAlice.adjustPosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 AliceAddress,
                                 AliceAddress,
@@ -919,7 +932,7 @@ describe("BookKeeper", () => {
                                 { gasLimit: 1000000 }
                             )
 
-                            const positionaliceAfter = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                            const positionaliceAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                             expect(positionaliceAfter.debtShare).to.be.equal(WeiPerWad.mul(10))
                             const stablecoinAliceAfter = await bookKeeper.stablecoin(AliceAddress)
                             expect(stablecoinAliceAfter).to.be.equal(WeiPerRad.mul(10))
@@ -940,17 +953,18 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: WeiPerRad.mul(20),
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // set total debt ceiling 10 rad
                             await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                             // add collateral to 10 WXDC
-                            await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                             // alice lock collateral 10 WXDC
                             await bookKeeperAsAlice.adjustPosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 AliceAddress,
                                 AliceAddress,
@@ -962,7 +976,7 @@ describe("BookKeeper", () => {
                             // alice draw
                             await expect(
                                 bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     AliceAddress,
                                     AliceAddress,
                                     AliceAddress,
@@ -989,17 +1003,18 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: WeiPerRad.mul(1),
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
 
                                 // set total debt ceiling 10 rad
                                 await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                                 // add collateral to 10 WXDC
-                                await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                                 // alice lock collateral 10 WXDC
                                 await bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     AliceAddress,
                                     AliceAddress,
                                     AliceAddress,
@@ -1010,7 +1025,7 @@ describe("BookKeeper", () => {
 
                                 // alice draw
                                 await bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     AliceAddress,
                                     AliceAddress,
                                     AliceAddress,
@@ -1019,7 +1034,7 @@ describe("BookKeeper", () => {
                                     { gasLimit: 1000000 }
                                 )
 
-                                const positionaliceBefore = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                                const positionaliceBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                                 expect(positionaliceBefore.debtShare).to.be.equal(WeiPerWad.mul(10))
                                 const stablecoinAliceBefore = await bookKeeper.stablecoin(AliceAddress)
                                 expect(stablecoinAliceBefore).to.be.equal(WeiPerRad.mul(10))
@@ -1030,10 +1045,11 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: WeiPerRad.mul(1),
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
                                 // alice wipe
                                 await bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     AliceAddress,
                                     AliceAddress,
                                     AliceAddress,
@@ -1042,7 +1058,7 @@ describe("BookKeeper", () => {
                                     { gasLimit: 1000000 }
                                 )
 
-                                const positionaliceAfter = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                                const positionaliceAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                                 expect(positionaliceAfter.debtShare).to.be.equal(0)
 
                                 const stablecoinAliceAfter = await bookKeeper.stablecoin(AliceAddress)
@@ -1064,17 +1080,18 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: WeiPerRad.mul(5),
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
 
                                 // set total debt ceiling 10 rad
                                 await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                                 // add collateral to 10 WXDC
-                                await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                                 // alice lock collateral 10 WXDC
                                 await bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     AliceAddress,
                                     AliceAddress,
                                     AliceAddress,
@@ -1085,7 +1102,7 @@ describe("BookKeeper", () => {
 
                                 // alice draw
                                 await bookKeeperAsAlice.adjustPosition(
-                                    formatBytes32String("WXDC"),
+                                    COLLATERAL_POOL_ID,
                                     AliceAddress,
                                     AliceAddress,
                                     AliceAddress,
@@ -1100,11 +1117,12 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: WeiPerRad.mul(5),
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
                                 // alice wipe
                                 await expect(
                                     bookKeeperAsAlice.adjustPosition(
-                                        formatBytes32String("WXDC"),
+                                        COLLATERAL_POOL_ID,
                                         AliceAddress,
                                         AliceAddress,
                                         AliceAddress,
@@ -1137,17 +1155,18 @@ describe("BookKeeper", () => {
                         debtCeiling: WeiPerRad.mul(10),
                         priceWithSafetyMargin: WeiPerRay,
                         debtFloor: WeiPerRad.mul(1),
+                        positionDebtCeiling: WeiPerRad.mul(1000000)
                     })
 
                     // set total debt ceiling 10 rad
                     await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                     // add collateral to 10 WXDC
-                    await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                    await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                     // alice lock collateral 10 WXDC
                     await bookKeeperAsAlice.adjustPosition(
-                        formatBytes32String("WXDC"),
+                        COLLATERAL_POOL_ID,
                         AliceAddress,
                         AliceAddress,
                         AliceAddress,
@@ -1158,14 +1177,14 @@ describe("BookKeeper", () => {
 
                     await expect(
                         bookKeeperAsAlice.movePosition(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             AliceAddress,
                             BobAddress,
                             WeiPerWad.mul(5),
                             WeiPerWad.mul(1),
                             { gasLimit: 1000000 }
                         )
-                    ).to.be.revertedWith("BookKeeper/not-allowed")
+                    ).to.be.revertedWith("BookKeeper/movePosition/not-allowed")
                 })
             })
             context("when bob allow alice to manage a position", () => {
@@ -1183,17 +1202,18 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                         // add collateral to 10 WXDC
-                        await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                        await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                         // alice lock collateral 10 WXDC
                         await bookKeeperAsAlice.adjustPosition(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             AliceAddress,
                             AliceAddress,
                             AliceAddress,
@@ -1207,7 +1227,7 @@ describe("BookKeeper", () => {
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 BobAddress,
                                 WeiPerWad.mul(10),
@@ -1231,17 +1251,18 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                         // add collateral to 10 WXDC
-                        await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                        await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                         // alice lock collateral 10 WXDC
                         await bookKeeperAsAlice.adjustPosition(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             AliceAddress,
                             AliceAddress,
                             AliceAddress,
@@ -1255,7 +1276,7 @@ describe("BookKeeper", () => {
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 BobAddress,
                                 WeiPerWad.mul(0),
@@ -1279,17 +1300,18 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(2),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                         // add collateral to 10 WXDC
-                        await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                        await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                         // alice lock collateral 10 WXDC
                         await bookKeeperAsAlice.adjustPosition(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             AliceAddress,
                             AliceAddress,
                             AliceAddress,
@@ -1303,7 +1325,7 @@ describe("BookKeeper", () => {
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 BobAddress,
                                 WeiPerWad.mul(5),
@@ -1327,17 +1349,18 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(2),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                         // add collateral to 10 WXDC
-                        await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                        await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                         // alice lock collateral 10 WXDC
                         await bookKeeperAsAlice.adjustPosition(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             AliceAddress,
                             AliceAddress,
                             AliceAddress,
@@ -1351,7 +1374,7 @@ describe("BookKeeper", () => {
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
-                                formatBytes32String("WXDC"),
+                                COLLATERAL_POOL_ID,
                                 AliceAddress,
                                 BobAddress,
                                 WeiPerWad.mul(5),
@@ -1375,17 +1398,18 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                         // add collateral to 10 WXDC
-                        await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
+                        await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                         // alice lock collateral 10 WXDC
                         await bookKeeperAsAlice.adjustPosition(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             AliceAddress,
                             AliceAddress,
                             AliceAddress,
@@ -1397,27 +1421,27 @@ describe("BookKeeper", () => {
                         // bob allow alice to manage a position
                         await bookKeeperAsBob.whitelist(AliceAddress)
 
-                        const positionAliceBefore = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                        const positionAliceBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                         expect(positionAliceBefore.lockedCollateral).to.be.equal(WeiPerWad.mul(10))
                         expect(positionAliceBefore.debtShare).to.be.equal(WeiPerWad.mul(2))
 
-                        const positionBobBefore = await bookKeeper.positions(formatBytes32String("WXDC"), BobAddress)
+                        const positionBobBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, BobAddress)
                         expect(positionBobBefore.lockedCollateral).to.be.equal(0)
                         expect(positionBobBefore.debtShare).to.be.equal(0)
 
                         await bookKeeperAsAlice.movePosition(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             AliceAddress,
                             BobAddress,
                             WeiPerWad.mul(5),
                             WeiPerWad.mul(1)
                         )
 
-                        const positionAliceAfter = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                        const positionAliceAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                         expect(positionAliceAfter.lockedCollateral).to.be.equal(WeiPerWad.mul(5))
                         expect(positionAliceAfter.debtShare).to.be.equal(WeiPerWad.mul(1))
 
-                        const positionBobAfter = await bookKeeper.positions(formatBytes32String("WXDC"), BobAddress)
+                        const positionBobAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, BobAddress)
                         expect(positionBobAfter.lockedCollateral).to.be.equal(WeiPerWad.mul(5))
                         expect(positionBobAfter.debtShare).to.be.equal(WeiPerWad.mul(1))
                     })
@@ -1432,7 +1456,7 @@ describe("BookKeeper", () => {
                 await mockedAccessControlConfig.mock.hasRole.returns(false)
                 await expect(
                     bookKeeperAsAlice.confiscatePosition(
-                        formatBytes32String("WXDC"),
+                        COLLATERAL_POOL_ID,
                         AliceAddress,
                         DeployerAddress,
                         DeployerAddress,
@@ -1461,16 +1485,17 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 1 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad, { gasLimit: 1000000 })
 
                         // add collateral to 1 WXDC
-                        await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad, { gasLimit: 1000000 })
+                        await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad, { gasLimit: 1000000 })
                         // adjust position
                         await bookKeeperAsAlice.adjustPosition(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             AliceAddress,
                             AliceAddress,
                             AliceAddress,
@@ -1479,11 +1504,11 @@ describe("BookKeeper", () => {
                             { gasLimit: 1000000 }
                         )
 
-                        const positionBefore = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                        const positionBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                         expect(positionBefore.lockedCollateral).to.be.equal(WeiPerWad)
                         expect(positionBefore.debtShare).to.be.equal(WeiPerWad)
                         const collateralTokenCreditorBefore = await bookKeeper.collateralToken(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             DeployerAddress
                         )
                         expect(collateralTokenCreditorBefore).to.be.equal(0)
@@ -1491,6 +1516,8 @@ describe("BookKeeper", () => {
                         expect(systemBadDebtDebtorBefore).to.be.equal(0)
                         const totalUnbackedStablecoinBefore = await bookKeeper.totalUnbackedStablecoin()
                         expect(totalUnbackedStablecoinBefore).to.be.equal(0)
+                        const poolStablecoinIssuedBefore = await bookKeeper.poolStablecoinIssued(COLLATERAL_POOL_ID)
+                        expect(poolStablecoinIssuedBefore).to.be.equal(WeiPerRad)
                         await mockedCollateralPoolConfig.mock.getTotalDebtShare.returns(WeiPerWad.mul(1))
                         await mockedCollateralPoolConfig.mock.getCollateralPoolInfo.returns({
                             debtAccumulatedRate: WeiPerRay,
@@ -1498,10 +1525,11 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
                         // confiscate position
                         await bookKeeper.confiscatePosition(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             AliceAddress,
                             DeployerAddress,
                             DeployerAddress,
@@ -1510,11 +1538,11 @@ describe("BookKeeper", () => {
                             { gasLimit: 1000000 }
                         )
 
-                        const positionAfter = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                        const positionAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                         expect(positionAfter.lockedCollateral).to.be.equal(0)
                         expect(positionAfter.debtShare).to.be.equal(0)
                         const collateralTokenCreditorAfter = await bookKeeper.collateralToken(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             DeployerAddress
                         )
                         expect(collateralTokenCreditorAfter).to.be.equal(WeiPerWad)
@@ -1522,6 +1550,8 @@ describe("BookKeeper", () => {
                         expect(systemBadDebtDebtorAfter).to.be.equal(WeiPerRad)
                         const totalUnbackedStablecoinAfter = await bookKeeper.totalUnbackedStablecoin()
                         expect(totalUnbackedStablecoinAfter).to.be.equal(WeiPerRad)
+                        const poolStablecoinIssuedAfter = await bookKeeper.poolStablecoinIssued(COLLATERAL_POOL_ID)
+                        expect(poolStablecoinIssuedAfter).to.be.equal(0)
                     })
                 })
                 context("when liquidating some in position", () => {
@@ -1540,16 +1570,17 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
                         // add collateral to 2 WXDC
-                        await bookKeeper.addCollateral(formatBytes32String("WXDC"), AliceAddress, WeiPerWad.mul(2), { gasLimit: 1000000 })
+                        await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(2), { gasLimit: 1000000 })
                         // adjust position
                         await bookKeeperAsAlice.adjustPosition(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             AliceAddress,
                             AliceAddress,
                             AliceAddress,
@@ -1558,11 +1589,11 @@ describe("BookKeeper", () => {
                             { gasLimit: 1000000 }
                         )
 
-                        const positionBefore = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                        const positionBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                         expect(positionBefore.lockedCollateral).to.be.equal(WeiPerWad.mul(2))
                         expect(positionBefore.debtShare).to.be.equal(WeiPerWad.mul(2))
                         const collateralTokenCreditorBefore = await bookKeeper.collateralToken(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             DeployerAddress
                         )
                         expect(collateralTokenCreditorBefore).to.be.equal(0)
@@ -1576,11 +1607,12 @@ describe("BookKeeper", () => {
                             totalDebtShare: WeiPerWad.mul(2),
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
-                            debtFloor: WeiPerRad.mul(1)
+                            debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
                         // confiscate position
                         await bookKeeper.confiscatePosition(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             AliceAddress,
                             DeployerAddress,
                             DeployerAddress,
@@ -1589,11 +1621,11 @@ describe("BookKeeper", () => {
                             { gasLimit: 1000000 }
                         )
 
-                        const positionAfter = await bookKeeper.positions(formatBytes32String("WXDC"), AliceAddress)
+                        const positionAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                         expect(positionAfter.lockedCollateral).to.be.equal(WeiPerWad)
                         expect(positionAfter.debtShare).to.be.equal(WeiPerWad)
                         const collateralTokenCreditorAfter = await bookKeeper.collateralToken(
-                            formatBytes32String("WXDC"),
+                            COLLATERAL_POOL_ID,
                             DeployerAddress
                         )
                         expect(collateralTokenCreditorAfter).to.be.equal(WeiPerWad)
@@ -1684,7 +1716,7 @@ describe("BookKeeper", () => {
                 await mockedAccessControlConfig.mock.hasRole.returns(false)
 
                 await expect(
-                    bookKeeperAsAlice.accrueStabilityFee(formatBytes32String("WXDC"), DeployerAddress, WeiPerRay, { gasLimit: 1000000 })
+                    bookKeeperAsAlice.accrueStabilityFee(COLLATERAL_POOL_ID, DeployerAddress, WeiPerRay, { gasLimit: 1000000 })
                 ).to.be.revertedWith("!stabilityFeeCollectorRole")
             })
         })
@@ -1696,7 +1728,7 @@ describe("BookKeeper", () => {
                     await bookKeeper.cage()
 
                     await expect(
-                        bookKeeper.accrueStabilityFee(formatBytes32String("WXDC"), DeployerAddress, WeiPerRay, { gasLimit: 1000000 })
+                        bookKeeper.accrueStabilityFee(COLLATERAL_POOL_ID, DeployerAddress, WeiPerRay, { gasLimit: 1000000 })
                     ).to.be.revertedWith("BookKeeper/not-live")
                 })
             })
@@ -1716,16 +1748,17 @@ describe("BookKeeper", () => {
                         debtCeiling: WeiPerRad.mul(10),
                         priceWithSafetyMargin: WeiPerRay,
                         debtFloor: WeiPerRad.mul(1),
+                        positionDebtCeiling: WeiPerRad.mul(1000000)
                     })
 
                     // set total debt ceiling 1 rad
                     await bookKeeper.setTotalDebtCeiling(WeiPerRad, { gasLimit: 1000000 })
 
                     // add collateral to 1 WXDC
-                    await bookKeeper.addCollateral(formatBytes32String("WXDC"), DeployerAddress, WeiPerWad, { gasLimit: 1000000 })
+                    await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad, { gasLimit: 1000000 })
                     // adjust position
                     await bookKeeper.adjustPosition(
-                        formatBytes32String("WXDC"),
+                        COLLATERAL_POOL_ID,
                         DeployerAddress,
                         DeployerAddress,
                         DeployerAddress,
@@ -1738,6 +1771,8 @@ describe("BookKeeper", () => {
                     expect(stablecoinDeployerBefore).to.be.equal(WeiPerRad)
                     const totalStablecoinIssuedBefore = await bookKeeper.totalStablecoinIssued()
                     expect(totalStablecoinIssuedBefore).to.be.equal(WeiPerRad)
+                    const poolStablecoinIssuedBefore = await bookKeeper.poolStablecoinIssued(COLLATERAL_POOL_ID)
+                    expect(poolStablecoinIssuedBefore).to.be.equal(WeiPerRad)
 
                     await mockedCollateralPoolConfig.mock.getTotalDebtShare.returns(WeiPerWad.mul(1))
                     await mockedCollateralPoolConfig.mock.getCollateralPoolInfo.returns({
@@ -1746,14 +1781,17 @@ describe("BookKeeper", () => {
                         debtCeiling: WeiPerRad.mul(10),
                         priceWithSafetyMargin: WeiPerRay,
                         debtFloor: WeiPerRad.mul(1),
+                        positionDebtCeiling: WeiPerRad.mul(1000000)
                     })
 
-                    await bookKeeper.accrueStabilityFee(formatBytes32String("WXDC"), DeployerAddress, WeiPerRay, { gasLimit: 1000000 })
+                    await bookKeeper.accrueStabilityFee(COLLATERAL_POOL_ID, DeployerAddress, WeiPerRay, { gasLimit: 1000000 })
 
                     const stablecoinDeployerAfter = await bookKeeper.stablecoin(DeployerAddress)
                     expect(stablecoinDeployerAfter).to.be.equal(WeiPerRad.mul(2))
                     const totalStablecoinIssuedAfter = await bookKeeper.totalStablecoinIssued()
                     expect(totalStablecoinIssuedAfter).to.be.equal(WeiPerRad.mul(2))
+                    const poolStablecoinIssuedAfter = await bookKeeper.poolStablecoinIssued(COLLATERAL_POOL_ID)
+                    expect(poolStablecoinIssuedAfter).to.be.equal(WeiPerRad.mul(2))
                 })
             })
         })
@@ -1847,6 +1885,22 @@ describe("BookKeeper", () => {
                 expect(await bookKeeperAsAlice.live()).to.be.equal(0)
             })
         })
+
+        context("when was already caged", () => {
+            it("should not fail", async () => {
+              await mockedAccessControlConfig.mock.hasRole.returns(true)
+    
+              expect(await bookKeeperAsAlice.live()).to.be.equal(1)
+
+              await expect(bookKeeperAsAlice.cage()).to.emit(bookKeeperAsAlice, "LogCage").withArgs()
+
+              expect(await bookKeeperAsAlice.live()).to.be.equal(0)
+    
+              await bookKeeperAsAlice.cage()
+    
+              expect(await bookKeeperAsAlice.live()).to.be.equal(0)
+            })
+          })
     })
 
     describe("#uncage", () => {

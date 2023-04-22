@@ -11,8 +11,29 @@ import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/IShowStopper.sol";
 import "../interfaces/ISetPrice.sol";
 import "../interfaces/IPriceFeed.sol";
+import "../interfaces/IPriceOracle.sol";
 
-contract PositionManager is PausableUpgradeable, IManager {
+contract PositionManagerMath {
+    function _safeAdd(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x + _y) >= _x, "add overflow");
+    }
+
+    function _safeSub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x - _y) <= _x, "sub overflow");
+    }
+
+    function _safeToInt(uint256 _x) internal pure returns (int256 _y) {
+        _y = int256(_x);
+        require(_y >= 0, "must not negative");
+    }
+}
+
+contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
+    struct List {
+        uint256 prev;
+        uint256 next;
+    }
+
     address public override bookKeeper;
     address public showStopper;
     address public priceOracle;
@@ -37,11 +58,6 @@ contract PositionManager is PausableUpgradeable, IManager {
     mapping(address => mapping(uint256 => mapping(address => uint256))) public override ownerWhitelist;
     /// @dev Mapping of owner => whitelisted address that can migrate position
     mapping(address => mapping(address => uint256)) public migrationWhitelist;
-
-    struct List {
-        uint256 prev;
-        uint256 next;
-    }
 
     event LogNewPosition(address indexed _usr, address indexed _own, uint256 indexed _positionId);
     event LogAllowManagePosition(address indexed _caller, uint256 indexed _positionId, address _owner, address _user, uint256 _ok);
@@ -75,26 +91,14 @@ contract PositionManager is PausableUpgradeable, IManager {
     function initialize(address _bookKeeper, address _showStopper, address _priceOracle) external initializer {
         PausableUpgradeable.__Pausable_init();
 
-        IBookKeeper(_bookKeeper).totalStablecoinIssued(); // Sanity Check Call
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "PositionManager/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = _bookKeeper;
 
-        IShowStopper(_showStopper).live(); // Sanity Check Call
+        require(IShowStopper(_showStopper).live() == 1, "PositionManager/showStopper-not-live"); // Sanity Check Call
         showStopper = _showStopper;
 
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
         priceOracle = _priceOracle;
-    }
-
-    function _safeAdd(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x + _y) >= _x, "add overflow");
-    }
-
-    function _safeSub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x - _y) <= _x, "sub overflow");
-    }
-
-    function _safeToInt(uint256 _x) internal pure returns (int256 _y) {
-        _y = int256(_x);
-        require(_y >= 0, "must not negative");
     }
 
     /// @dev Allow/disallow a user to manage the position
@@ -204,7 +208,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         bytes calldata _data
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
         bytes32 _collateralPoolId = collateralPools[_positionId];
-        require(_isPriceHealthy(_collateralPoolId), "PositionManager/price-is-not-healthy");
+        _requireHealthyPrice(_collateralPoolId);
 
         address _positionAddress = positions[_positionId];
         IBookKeeper(bookKeeper).adjustPosition(
@@ -216,7 +220,7 @@ contract PositionManager is PausableUpgradeable, IManager {
             _debtShare
         );
         IGenericTokenAdapter(_adapter).onAdjustPosition(_positionAddress, _positionAddress, _collateralValue, _debtShare, _data);
-        
+
         ISetPrice(priceOracle).setPrice(_collateralPoolId);
     }
 
@@ -234,7 +238,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         bytes calldata _data
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
         bytes32 _collateralPoolId = collateralPools[_positionId];
-        require(_isPriceHealthy(_collateralPoolId), "PositionManager/price-is-not-healthy");
+        _requireHealthyPrice(_collateralPoolId);
 
         IBookKeeper(bookKeeper).moveCollateral(collateralPools[_positionId], positions[_positionId], _destination, _wad);
         IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
@@ -256,7 +260,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         address _adapter,
         bytes calldata _data
     ) external whenNotPaused onlyOwnerAllowed(_positionId) {
-        require(_isPriceHealthy(_collateralPoolId), "PositionManager/price-is-not-healthy");
+        _requireHealthyPrice(_collateralPoolId);
 
         IBookKeeper(bookKeeper).moveCollateral(_collateralPoolId, positions[_positionId], _destination, _wad);
         IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
@@ -288,7 +292,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_positionId]));
-        _tokenAdapter.onMoveCollateral(positions[_positionId], _destination, _debtShare, abi.encode());
+        _tokenAdapter.onMoveCollateral(positions[_positionId], _destination, _lockedCollateral, abi.encode());
         emit LogExportPosition(_positionId, positions[_positionId], _destination, _lockedCollateral, _debtShare);
     }
 
@@ -311,7 +315,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_positionId]));
-        _tokenAdapter.onMoveCollateral(_source, positions[_positionId], _debtShare, abi.encode());
+        _tokenAdapter.onMoveCollateral(_source, positions[_positionId], _lockedCollateral, abi.encode());
         emit LogImportPosition(_positionId, _source, positions[_positionId], _lockedCollateral, _debtShare);
     }
 
@@ -334,21 +338,8 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_sourceId]));
-        _tokenAdapter.onMoveCollateral(positions[_sourceId], positions[_destinationId], _debtShare, abi.encode());
+        _tokenAdapter.onMoveCollateral(positions[_sourceId], positions[_destinationId], _lockedCollateral, abi.encode());
         emit LogMovePosition(_sourceId, _destinationId, _lockedCollateral, _debtShare);
-    }
-
-    function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
-        require(_priceOracle != address(0), "_priceOracle cannot be zero address");
-        priceOracle = _priceOracle;
-    }
-
-    function pause() external onlyOwnerOrGov {
-        _pause();
-    }
-
-    function unpause() external onlyOwnerOrGov {
-        _unpause();
     }
 
     /// @dev Redeem locked collateral from a position when emergency shutdown is activated
@@ -371,12 +362,30 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
     }
 
+    function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
+        priceOracle = _priceOracle;
+    }
+
+    function setBookKeeper(address _bookKeeper) external onlyOwnerOrGov {
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "PositionManager/invalid-bookKeeper"); // Sanity Check Call
+        bookKeeper = _bookKeeper;
+    }
+
+    function pause() external onlyOwnerOrGov {
+        _pause();
+    }
+
+    function unpause() external onlyOwnerOrGov {
+        _unpause();
+    }
+
     function updatePrice(bytes32 _poolId) external override whenNotPaused {
         ISetPrice(priceOracle).setPrice(_poolId);
     }
 
-    function _isPriceHealthy(bytes32 _poolId) internal view returns(bool) {
+    function _requireHealthyPrice(bytes32 _poolId) internal view {
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_poolId));
-        return _priceFeed.isPriceOk();
+        require(_priceFeed.isPriceOk(), "PositionManager/price-is-not-healthy");
     }
 }

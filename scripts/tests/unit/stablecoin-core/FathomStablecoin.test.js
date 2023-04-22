@@ -41,6 +41,13 @@ describe("FathomStablecoin", () => {
                     ).to.be.revertedWith("FathomStablecoin/insufficient-balance")
                 })
             })
+            context("amount is zero", () => {
+                it("should be revert", async () => {
+                    await expect(
+                        fathomStablecoinAsAlice.transferFrom(AliceAddress, BobAddress, 0)
+                    ).to.be.revertedWith("FathomStablecoin/zero-amount")
+                })
+            })
             context("when alice has enough token", () => {
                 context("when the caller is not the owner", async () => {
                     it("should revert", async () => {
@@ -124,6 +131,51 @@ describe("FathomStablecoin", () => {
 
             const allowanceDeployerAliceAfter = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
             expect(allowanceDeployerAliceAfter).to.be.equal(WeiPerWad)
+        })
+    })
+
+    context("#increaseAllowance", () => {
+        it("should be able increase allowance", async () => {
+            const allowanceDeployerAliceBefore = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+            expect(allowanceDeployerAliceBefore).to.be.equal(0)
+
+            await expect(fathomStablecoinAsAlice.increaseAllowance(DeployerAddress, WeiPerWad))
+                .to.emit(fathomStablecoin, "Approval")
+                .withArgs(AliceAddress, DeployerAddress, WeiPerWad)
+
+            const allowanceDeployerAliceAfter = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+            expect(allowanceDeployerAliceAfter).to.be.equal(WeiPerWad)
+        })
+    })
+
+    context("#decreaseAllowance", () => {
+        context("decrease below zero", () => {
+            it("should revert", async () => {
+                const allowanceDeployerAliceBefore = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+                expect(allowanceDeployerAliceBefore).to.be.equal(0)
+
+                await fathomStablecoinAsAlice.increaseAllowance(DeployerAddress, WeiPerWad)
+
+                await expect(fathomStablecoinAsAlice.decreaseAllowance(DeployerAddress, WeiPerWad.add(1))).to.be.revertedWith("FathomStablecoin/decreased-allowance-below-zero");
+
+                const allowanceDeployerAliceAfter = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+                expect(allowanceDeployerAliceAfter).to.be.equal(WeiPerWad)
+            })
+        })
+        context("valid decrease", () => {
+            it("should be able decrease allowance", async () => {
+                const allowanceDeployerAliceBefore = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+                expect(allowanceDeployerAliceBefore).to.be.equal(0)
+
+                await fathomStablecoinAsAlice.increaseAllowance(DeployerAddress, WeiPerWad.mul(2))
+
+                await expect(fathomStablecoinAsAlice.decreaseAllowance(DeployerAddress, WeiPerWad))
+                    .to.emit(fathomStablecoin, "Approval")
+                    .withArgs(AliceAddress, DeployerAddress, WeiPerWad)
+
+                const allowanceDeployerAliceAfter = await fathomStablecoin.allowance(AliceAddress, DeployerAddress)
+                expect(allowanceDeployerAliceAfter).to.be.equal(WeiPerWad)
+            })
         })
     })
 

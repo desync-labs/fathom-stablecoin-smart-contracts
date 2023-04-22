@@ -4,23 +4,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "../interfaces/IStablecoin.sol";
 
-contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
-    bytes32 public constant OWNER_ROLE = DEFAULT_ADMIN_ROLE;
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
-
-    string public name; // Fathom USD Stablecoin
-    string public symbol; // FUSD
-    string public constant version = "1";
-    uint8 public constant override decimals = 18;
-    uint256 public totalSupply;
-
-    mapping(address => uint256) public override balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
-    mapping(address => uint256) public nonces;
-
-    event Approval(address indexed src, address indexed guy, uint256 wad);
-    event Transfer(address indexed src, address indexed dst, uint256 wad);
-
+contract FathomStablecoinMath {
     function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         require((_z = _x + _y) >= _x);
     }
@@ -28,6 +12,23 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
     function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         require((_z = _x - _y) <= _x);
     }
+}
+
+contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpgradeable {
+    bytes32 public constant OWNER_ROLE = DEFAULT_ADMIN_ROLE;
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+
+    // solhint-disable-next-line const-name-snakecase
+    string public constant version = "1";
+    // solhint-disable-next-line const-name-snakecase
+    uint8 public constant decimals = 18;
+
+    string public name; // Fathom USD Stablecoin
+    string public symbol; // FUSD
+    uint256 public totalSupply;
+
+    mapping(address => uint256) public override balanceOf;
+    mapping(address => mapping(address => uint256)) public allowance;
 
     function initialize(string memory _name, string memory _symbol) external initializer {
         AccessControlUpgradeable.__AccessControl_init();
@@ -40,18 +41,6 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
 
     function transfer(address _dst, uint256 _wad) external override returns (bool) {
         return transferFrom(msg.sender, _dst, _wad);
-    }
-
-    function transferFrom(address _src, address _dst, uint256 _wad) public override returns (bool) {
-        require(balanceOf[_src] >= _wad, "FathomStablecoin/insufficient-balance");
-        if (_src != msg.sender && allowance[_src][msg.sender] != type(uint).max) {
-            require(allowance[_src][msg.sender] >= _wad, "FathomStablecoin/insufficient-allowance");
-            allowance[_src][msg.sender] = sub(allowance[_src][msg.sender], _wad);
-        }
-        balanceOf[_src] = sub(balanceOf[_src], _wad);
-        balanceOf[_dst] = add(balanceOf[_dst], _wad);
-        emit Transfer(_src, _dst, _wad);
-        return true;
     }
 
     function mint(address _usr, uint256 _wad) external override {
@@ -74,8 +63,20 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
     }
 
     function approve(address _usr, uint256 _wad) external override returns (bool) {
-        allowance[msg.sender][_usr] = _wad;
-        emit Approval(msg.sender, _usr, _wad);
+        _approve(msg.sender, _usr, _wad);
+        return true;
+    }
+
+    function increaseAllowance(address _usr, uint256 _wad) external override returns (bool) {
+        _approve(msg.sender, _usr, allowance[msg.sender][_usr] + _wad);
+        return true;
+    }
+
+    function decreaseAllowance(address _usr, uint256 _wad) external override returns (bool) {
+        uint256 currentAllowance = allowance[msg.sender][_usr];
+        require(currentAllowance >= _wad, "FathomStablecoin/decreased-allowance-below-zero");
+        _approve(msg.sender, _usr, currentAllowance - _wad);
+
         return true;
     }
 
@@ -89,5 +90,27 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
 
     function move(address _src, address _dst, uint256 _wad) external {
         transferFrom(_src, _dst, _wad);
+    }
+
+    function transferFrom(address _src, address _dst, uint256 _wad) public override returns (bool) {
+        require(_wad > 0, "FathomStablecoin/zero-amount");
+        uint256 currentAllowance = allowance[_src][msg.sender];
+        require(balanceOf[_src] >= _wad, "FathomStablecoin/insufficient-balance");
+        if (_src != msg.sender && currentAllowance != type(uint).max) {
+            require(currentAllowance >= _wad, "FathomStablecoin/insufficient-allowance");
+            _approve(_src, msg.sender, currentAllowance - _wad);
+        }
+        balanceOf[_src] = sub(balanceOf[_src], _wad);
+        balanceOf[_dst] = add(balanceOf[_dst], _wad);
+        emit Transfer(_src, _dst, _wad);
+        return true;
+    }
+
+    function _approve(address _owner, address _spender, uint256 _amount) internal {
+        require(_owner != address(0), "FathomStablecoin/approve-from-zero-address");
+        require(_spender != address(0), "FathomStablecoin/approve-to-zero-address");
+
+        allowance[_owner][_spender] = _amount;
+        emit Approval(_owner, _spender, _amount);
     }
 }

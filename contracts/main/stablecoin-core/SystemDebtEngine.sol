@@ -8,25 +8,9 @@ import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
+import "../interfaces/IPausable.sol";
 
-/** @notice A contract which manages the bad debt and the surplus of the system.
-    SystemDebtEngine will be the debitor or debtor when a position is liquidated. 
-    The debt recorded in the name of SystemDebtEngine will be considered as system bad debt unless it is cleared by liquidation.
-    The stability fee will be accrued and kept within SystemDebtEngine. As it is the debtor, therefore SystemDebtEngine should be the holder of the surplus and use it to settle the bad debt.
-*/
-contract SystemDebtEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, ISystemDebtEngine, ICagable {
-    IBookKeeper public bookKeeper; // CDP Engine
-    uint256 public override surplusBuffer; // Surplus buffer         [rad]
-    uint256 public live; // Active Flag
-
-    function initialize(address _bookKeeper) external initializer {
-        PausableUpgradeable.__Pausable_init();
-        ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
-
-        bookKeeper = IBookKeeper(_bookKeeper);
-        live = 1;
-    }
-
+contract SystemDebtEngineMath {
     function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         require((_z = _x + _y) >= _x);
     }
@@ -38,6 +22,19 @@ contract SystemDebtEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         return _x <= _y ? _x : _y;
     }
+}
+
+/** @notice A contract which manages the bad debt and the surplus of the system.
+    SystemDebtEngine will be the debitor or debtor when a position is liquidated. 
+    The debt recorded in the name of SystemDebtEngine will be considered as system bad debt unless it is cleared by liquidation.
+    The stability fee will be accrued and kept within SystemDebtEngine. As it is the debtor, therefore SystemDebtEngine should be the holder of the surplus and use it to settle the bad debt.
+*/
+contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ISystemDebtEngine, ICagable, IPausable {
+    IBookKeeper public bookKeeper; // CDP Engine
+    uint256 public override surplusBuffer; // Surplus buffer         [rad]
+    uint256 public live; // Active Flag
+
+    event LogSetSurplusBuffer(address indexed _caller, uint256 _data);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -65,6 +62,14 @@ contract SystemDebtEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         _;
     }
 
+    function initialize(address _bookKeeper) external initializer {
+        PausableUpgradeable.__Pausable_init();
+        ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
+
+        bookKeeper = IBookKeeper(_bookKeeper);
+        live = 1;
+    }
+
     function withdrawCollateralSurplus(
         bytes32 _collateralPoolId,
         IGenericTokenAdapter _adapter,
@@ -80,8 +85,6 @@ contract SystemDebtEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(sub(bookKeeper.stablecoin(address(this)), _value) >= surplusBuffer, "SystemDebtEngine/insufficient-surplus");
         bookKeeper.moveStablecoin(address(this), _to, _value);
     }
-
-    event LogSetSurplusBuffer(address indexed _caller, uint256 _data);
 
     function setSurplusBuffer(uint256 _data) external whenNotPaused onlyOwner {
         surplusBuffer = _data;
@@ -99,10 +102,11 @@ contract SystemDebtEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     }
 
     function cage() external override onlyOwnerOrShowStopper {
-        require(live == 1, "SystemDebtEngine/not-live");
-        live = 0;
-        bookKeeper.settleSystemBadDebt(min(bookKeeper.stablecoin(address(this)), bookKeeper.systemBadDebt(address(this))));
-        emit LogCage();
+        if (live == 1) {
+            live = 0;
+            bookKeeper.settleSystemBadDebt(min(bookKeeper.stablecoin(address(this)), bookKeeper.systemBadDebt(address(this))));
+            emit LogCage();
+        }
     }
 
     function uncage() external override onlyOwnerOrShowStopper {
@@ -111,11 +115,11 @@ contract SystemDebtEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogUncage();
     }
 
-    function pause() external onlyOwnerOrGov {
+    function pause() external override onlyOwnerOrGov {
         _pause();
     }
 
-    function unpause() external onlyOwnerOrGov {
+    function unpause() external override onlyOwnerOrGov {
         _unpause();
     }
 }

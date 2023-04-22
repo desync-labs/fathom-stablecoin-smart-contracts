@@ -2,7 +2,9 @@
 pragma solidity 0.8.17;
 
 interface IProxyRegistry {
+    function build(address) external returns (address);
+
     function proxies(address) external view returns (address);
 
-    function build(address) external returns (address);
+    function isProxy(address) external view returns (bool);
 }

@@ -13,36 +13,32 @@ import "../../interfaces/IAccessControlConfig.sol";
 contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig {
     using SafeMathUpgradeable for uint256;
 
-    uint256 constant RAY = 10 ** 27;
+    uint256 internal constant RAY = 10 ** 27;
 
-    event LogSetPriceWithSafetyMargin(address indexed _caller, bytes32 _collateralPoolId, uint256 _priceWithSafetyMargin);
-    event LogSetDebtCeiling(address indexed _caller, bytes32 _collateralPoolId, uint256 _debtCeiling);
-    event LogSetDebtFloor(address indexed _caller, bytes32 _collateralPoolId, uint256 _debtFloor);
-    event LogSetPriceFeed(address indexed _caller, bytes32 _poolId, address _priceFeed);
-    event LogSetLiquidationRatio(address indexed _caller, bytes32 _poolId, uint256 _data);
-    event LogSetStabilityFeeRate(address indexed _caller, bytes32 _poolId, uint256 _data);
-    event LogSetAdapter(address indexed _caller, bytes32 _collateralPoolId, address _adapter);
-    event LogSetCloseFactorBps(address indexed _caller, bytes32 _collateralPoolId, uint256 _closeFactorBps);
-    event LogSetLiquidatorIncentiveBps(address indexed _caller, bytes32 _collateralPoolId, uint256 _liquidatorIncentiveBps);
-    event LogSetTreasuryFeesBps(address indexed _caller, bytes32 _collateralPoolId, uint256 _treasuryFeeBps);
-    event LogSetStrategy(address indexed _caller, bytes32 _collateralPoolId, address strategy);
-    event LogSetTotalDebtShare(address indexed _caller, bytes32 _collateralPoolId, uint256 _totalDebtShare);
-    event LogSetDebtAccumulatedRate(address indexed _caller, bytes32 _collateralPoolId, uint256 _debtAccumulatedRate);
+    mapping(bytes32 => ICollateralPoolConfig.CollateralPool) private _collateralPools;
+    IAccessControlConfig public accessControlConfig;
+
+    event LogSetPriceWithSafetyMargin(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _priceWithSafetyMargin);
+    event LogSetDebtCeiling(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _debtCeiling);
+    event LogSetDebtFloor(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _debtFloor);
+    event LogSetPriceFeed(address indexed _caller, bytes32 indexed _poolId, address _priceFeed);
+    event LogSetLiquidationRatio(address indexed _caller, bytes32 indexed _poolId, uint256 _data);
+    event LogSetStabilityFeeRate(address indexed _caller, bytes32 indexed _poolId, uint256 _data);
+    event LogSetAdapter(address indexed _caller, bytes32 indexed _collateralPoolId, address _adapter);
+    event LogSetCloseFactorBps(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _closeFactorBps);
+    event LogSetLiquidatorIncentiveBps(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _liquidatorIncentiveBps);
+    event LogSetTreasuryFeesBps(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _treasuryFeeBps);
+    event LogSetStrategy(address indexed _caller, bytes32 indexed _collateralPoolId, address strategy);
+    event LogSetTotalDebtShare(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _totalDebtShare);
+    event LogSetDebtAccumulatedRate(address indexed _caller, bytes32 indexed _collateralPoolId, uint256 _debtAccumulatedRate);
     event LogInitCollateralPoolId(
-        bytes32 _collateralPoolId,
+        bytes32 indexed _collateralPoolId,
         uint256 _debtCeiling,
         uint256 _liquidationRatio,
         uint256 _stabilityFeeRate,
         address _adapter
     );
-
-    mapping(bytes32 => ICollateralPoolConfig.CollateralPool) private _collateralPools;
-
-    function collateralPools(bytes32 _collateralPoolId) external view override returns (ICollateralPoolConfig.CollateralPool memory) {
-        return _collateralPools[_collateralPoolId];
-    }
-
-    IAccessControlConfig public accessControlConfig;
+    event LogPositionDebtCeiling(address _messageSender, bytes32 _collateralPoolId, uint256 _positionDebtCeiling);
 
     modifier onlyOwner() {
         require(accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
@@ -61,6 +57,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         bytes32 _collateralPoolId, // v
         uint256 _debtCeiling, // v
         uint256 _debtFloor,
+        uint256 _positionDebtCeiling,
         address _priceFeed,
         uint256 _liquidationRatio, // v
         uint256 _stabilityFeeRate, //v
@@ -74,18 +71,22 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _collateralPools[_collateralPoolId].debtAccumulatedRate = RAY;
         _collateralPools[_collateralPoolId].debtCeiling = _debtCeiling;
         _collateralPools[_collateralPoolId].debtFloor = _debtFloor;
+        _collateralPools[_collateralPoolId].positionDebtCeiling = _positionDebtCeiling;
+
+        require(IPriceFeed(_priceFeed).poolId() == _collateralPoolId, "CollateralPoolConfig/wrong-price-feed-pool");
+        require(IPriceFeed(_priceFeed).isPriceOk(), "CollateralPoolConfig/unhealthy-price-feed");
         IPriceFeed(_priceFeed).peekPrice(); // Sanity Check Call
+
         _collateralPools[_collateralPoolId].priceFeed = _priceFeed;
         require(_liquidationRatio >= RAY, "CollateralPoolConfig/invalid-liquidation-ratio");
         _collateralPools[_collateralPoolId].liquidationRatio = _liquidationRatio;
-        require(_stabilityFeeRate == 0 || _stabilityFeeRate >= RAY, "CollateralPoolConfig/invalid-stability-fee-rate");
+        require(_stabilityFeeRate >= RAY, "CollateralPoolConfig/invalid-stability-fee-rate");
         // Maximum stability fee rate is 50% yearly
         require(_stabilityFeeRate <= 1000000012857214317438491659, "CollateralPoolConfig/stability-fee-rate-too-large");
         _collateralPools[_collateralPoolId].stabilityFeeRate = _stabilityFeeRate;
         _collateralPools[_collateralPoolId].lastAccumulationTime = block.timestamp;
-        IGenericTokenAdapter(_adapter).decimals(); // Sanity Check Call
         _collateralPools[_collateralPoolId].adapter = _adapter;
-        require(_closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
+        require(_closeFactorBps > 0 && _closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
         require(_liquidatorIncentiveBps >= 10000 && _liquidatorIncentiveBps <= 19000, "CollateralPoolConfig/invalid-liquidator-incentive-bps");
         require(_treasuryFeesBps <= 9000, "CollateralPoolConfig/invalid-treasury-fees-bps");
         _collateralPools[_collateralPoolId].closeFactorBps = _closeFactorBps;
@@ -112,14 +113,31 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         emit LogSetDebtFloor(msg.sender, _collateralPoolId, _debtFloor);
     }
 
+    function setPositionDebtCeiling(bytes32 _collateralPoolId, uint256 _positionDebtCeiling) external override onlyOwner {
+        require(
+            _positionDebtCeiling <= _collateralPools[_collateralPoolId].debtCeiling &&
+                _positionDebtCeiling > _collateralPools[_collateralPoolId].debtFloor,
+            "CollateralPoolConfig/invalid-position-ceiling"
+        );
+        _collateralPools[_collateralPoolId].positionDebtCeiling = _positionDebtCeiling;
+        emit LogPositionDebtCeiling(msg.sender, _collateralPoolId, _positionDebtCeiling);
+    }
+
     function setPriceFeed(bytes32 _poolId, address _priceFeed) external onlyOwner {
+        require(_priceFeed != address(0), "CollateralPoolConfig/zero-price-feed");
+        require(IPriceFeed(_priceFeed).poolId() == _poolId, "CollateralPoolConfig/wrong-price-feed-pool");
+        require(IPriceFeed(_priceFeed).isPriceOk(), "CollateralPoolConfig/unhealthy-price-feed");
+
+        IPriceFeed(_priceFeed).peekPrice();
+
         _collateralPools[_poolId].priceFeed = _priceFeed;
         emit LogSetPriceFeed(msg.sender, _poolId, _priceFeed);
     }
 
-    function setLiquidationRatio(bytes32 _poolId, uint256 _data) external onlyOwner {
-        _collateralPools[_poolId].liquidationRatio = _data;
-        emit LogSetLiquidationRatio(msg.sender, _poolId, _data);
+    function setLiquidationRatio(bytes32 _poolId, uint256 _liquidationRatio) external onlyOwner {
+        require(_liquidationRatio >= RAY && _liquidationRatio <= RAY * 100, "CollateralPoolConfig/invalid-liquidation-ratio");
+        _collateralPools[_poolId].liquidationRatio = _liquidationRatio;
+        emit LogSetLiquidationRatio(msg.sender, _poolId, _liquidationRatio);
     }
 
     /** @dev Set the stability fee rate of the collateral pool.
@@ -138,7 +156,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     The above `stabilityFeeRate` will be the value we will use in this contract.
   */
     function setStabilityFeeRate(bytes32 _collateralPool, uint256 _stabilityFeeRate) external onlyOwner {
-        require(_stabilityFeeRate == 0 || _stabilityFeeRate >= RAY, "CollateralPoolConfig/invalid-stability-fee-rate");
+        require(_stabilityFeeRate >= RAY, "CollateralPoolConfig/invalid-stability-fee-rate");
         // Maximum stability fee rate is 50% yearly
         require(_stabilityFeeRate <= 1000000012857214317438491659, "CollateralPoolConfig/stability-fee-rate-too-large");
         _collateralPools[_collateralPool].stabilityFeeRate = _stabilityFeeRate;
@@ -146,12 +164,14 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function setAdapter(bytes32 _collateralPoolId, address _adapter) external onlyOwner {
+        require(_adapter != address(0), "CollateralPoolConfig/setAdapter-zero-address");
+        require(IGenericTokenAdapter(_adapter).collateralPoolId() == _collateralPoolId, "CollateralPoolConfig/setAdapter-wrongPoolId");
         _collateralPools[_collateralPoolId].adapter = _adapter;
         emit LogSetAdapter(msg.sender, _collateralPoolId, _adapter);
     }
 
     function setCloseFactorBps(bytes32 _collateralPoolId, uint256 _closeFactorBps) external onlyOwner {
-        require(_closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
+        require(_closeFactorBps > 0 && _closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
         _collateralPools[_collateralPoolId].closeFactorBps = _closeFactorBps;
         emit LogSetCloseFactorBps(msg.sender, _collateralPoolId, _closeFactorBps);
     }
@@ -176,6 +196,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
 
     function setDebtAccumulatedRate(bytes32 _collateralPoolId, uint256 _debtAccumulatedRate) external override {
         require(accessControlConfig.hasRole(accessControlConfig.BOOK_KEEPER_ROLE(), msg.sender), "!bookKeeperRole");
+        require(_debtAccumulatedRate >= RAY, "CollateralPoolConfig/invalid-debt-accumulated-rate");
         _collateralPools[_collateralPoolId].debtAccumulatedRate = _debtAccumulatedRate;
         emit LogSetDebtAccumulatedRate(msg.sender, _collateralPoolId, _debtAccumulatedRate);
     }
@@ -188,6 +209,10 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     function updateLastAccumulationTime(bytes32 _collateralPoolId) external override {
         require(accessControlConfig.hasRole(accessControlConfig.STABILITY_FEE_COLLECTOR_ROLE(), msg.sender), "!stabilityFeeCollectorRole");
         _collateralPools[_collateralPoolId].lastAccumulationTime = block.timestamp;
+    }
+
+    function collateralPools(bytes32 _collateralPoolId) external view override returns (ICollateralPoolConfig.CollateralPool memory) {
+        return _collateralPools[_collateralPoolId];
     }
 
     function getTotalDebtShare(bytes32 _collateralPoolId) external view override returns (uint256) {
@@ -204,6 +229,10 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
 
     function getDebtCeiling(bytes32 _collateralPoolId) external view override returns (uint256) {
         return _collateralPools[_collateralPoolId].debtCeiling;
+    }
+
+    function getPositionDebtCeiling(bytes32 _collateralPoolId) external view override returns (uint256) {
+        return _collateralPools[_collateralPoolId].positionDebtCeiling;
     }
 
     function getDebtFloor(bytes32 _collateralPoolId) external view override returns (uint256) {
@@ -252,5 +281,6 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _info.debtCeiling = _collateralPools[_collateralPoolId].debtCeiling;
         _info.priceWithSafetyMargin = _collateralPools[_collateralPoolId].priceWithSafetyMargin;
         _info.debtFloor = _collateralPools[_collateralPoolId].debtFloor;
+        _info.positionDebtCeiling = _collateralPools[_collateralPoolId].positionDebtCeiling;
     }
 }

@@ -8,7 +8,7 @@ chai.use(solidity);
 const { One } = ethers.constants;
 
 const { formatBytes32BigNumber } = require("../../helper/format");
-const { WeiPerRay } = require("../../helper/unit");
+const { WeiPerRay, WeiPerRad } = require("../../helper/unit");
 const { DeployerAddress, AliceAddress, AddressZero } = require("../../helper/address");
 const { getContract, createMock } = require("../../helper/contracts");
 const { loadFixture } = require("../../helper/fixtures");
@@ -22,6 +22,7 @@ const loadFixtureHandler = async () => {
     const mockedPriceFeed = await createMock("SimplePriceFeed")
 
     await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+    await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
     await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
     await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
     await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))
@@ -91,6 +92,8 @@ describe("PriceOracle", () => {
             liquidatorIncentiveBps: 10250,
             treasuryFeesBps: 5000,
             strategy: AddressZero,
+            positionDebtCeiling: WeiPerRad.mul(1000000)
+
           })
           await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
@@ -99,89 +102,7 @@ describe("PriceOracle", () => {
           ).returns()
           await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
             .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(formatBytes32String("WXDC"), formatBytes32BigNumber(One), 0, One)
-        })
-      })
-
-      context("and price with safety margin is 10^43", () => {
-        it("should be success", async () => {
-          await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
-          await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
-          await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-          await mockedPriceFeed.mock.peekPrice.returns(formatBytes32BigNumber(One), true)
-
-          await mockedCollateralPoolConfig.mock.getLiquidationRatio.returns(10 ** 10)
-          await mockedCollateralPoolConfig.mock.collateralPools.returns({
-            totalDebtShare: 0,
-            debtAccumulatedRate: WeiPerRay,
-            priceWithSafetyMargin: WeiPerRay,
-            debtCeiling: 0,
-            debtFloor: 0,
-            priceFeed: mockedPriceFeed.address,
-            liquidationRatio: 10 ** 10,
-            stabilityFeeRate: WeiPerRay,
-            lastAccumulationTime: 0,
-            adapter: AddressZero,
-            closeFactorBps: 5000,
-            liquidatorIncentiveBps: 10250,
-            treasuryFeesBps: 5000,
-            strategy: AddressZero,
-          })
-
-          await priceOracle.setStableCoinReferencePrice(10 ** 10)
-
-          await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("WXDC"),
-            BigNumber.from("10").pow("43")
-          ).returns()
-          await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
-            .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(formatBytes32String("WXDC"), formatBytes32BigNumber(One), BigNumber.from("10").pow("43"), One)
-        })
-      })
-
-      context("and price with safety margin is 9.31322574615478515625 * 10^53", () => {
-        it("should be success", async () => {
-          await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
-          await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
-          await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-          await mockedCollateralPoolConfig.mock.getLiquidationRatio.returns(4 ** 10)
-
-          await mockedPriceFeed.mock.peekPrice.returns(formatBytes32BigNumber(One), true)
-
-          await mockedCollateralPoolConfig.mock.collateralPools.returns({
-            totalDebtShare: 0,
-            debtAccumulatedRate: WeiPerRay,
-            priceWithSafetyMargin: WeiPerRay,
-            debtCeiling: 0,
-            debtFloor: 0,
-            priceFeed: mockedPriceFeed.address,
-            liquidationRatio: 4 ** 10,
-            stabilityFeeRate: WeiPerRay,
-            lastAccumulationTime: 0,
-            adapter: AddressZero,
-            closeFactorBps: 5000,
-            liquidatorIncentiveBps: 10250,
-            treasuryFeesBps: 5000,
-            strategy: AddressZero,
-          })
-
-          await priceOracle.setStableCoinReferencePrice(2 ** 10)
-
-          await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("WXDC"),
-            BigNumber.from("931322574615478515625").mul(BigNumber.from("10").pow("33"))
-          ).returns()
-          await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
-            .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(
-              formatBytes32String("WXDC"),
-              formatBytes32BigNumber(One),
-              BigNumber.from("931322574615478515625").mul(BigNumber.from("10").pow("33")),
-              One
-            )
+            .withArgs(formatBytes32String("WXDC"), One, 0)
         })
       })
     })
@@ -208,6 +129,7 @@ describe("PriceOracle", () => {
             liquidatorIncentiveBps: 10250,
             treasuryFeesBps: 5000,
             strategy: AddressZero,
+            positionDebtCeiling: WeiPerRad.mul(1000000)
           })
 
           await mockedPriceFeed.mock.peekPrice.returns(
@@ -221,55 +143,7 @@ describe("PriceOracle", () => {
           ).returns()
           await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
             .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(formatBytes32String("WXDC"), formatBytes32BigNumber(BigNumber.from("700000000000")), 0, BigNumber.from("700000000000"))
-        })
-      })
-
-      context("and price with safety margin is 7 * 10^54", () => {
-        it("should be success", async () => {
-          await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
-          await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
-          await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-          await mockedCollateralPoolConfig.mock.getLiquidationRatio.returns(10 ** 10)
-
-          await mockedPriceFeed.mock.peekPrice.returns(
-            formatBytes32BigNumber(BigNumber.from("700000000000")),
-            true,
-          )
-
-          await mockedCollateralPoolConfig.mock.collateralPools.returns({
-            totalDebtShare: 0,
-            debtAccumulatedRate: WeiPerRay,
-            priceWithSafetyMargin: WeiPerRay,
-            debtCeiling: 0,
-            debtFloor: 0,
-            priceFeed: mockedPriceFeed.address,
-            liquidationRatio: 10 ** 10,
-            stabilityFeeRate: WeiPerRay,
-            lastAccumulationTime: 0,
-            adapter: AddressZero,
-            closeFactorBps: 5000,
-            liquidatorIncentiveBps: 10250,
-            treasuryFeesBps: 5000,
-            strategy: AddressZero,
-          })
-
-          await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("WXDC"),
-            BigNumber.from("7").mul(BigNumber.from("10").pow("54"))
-          ).returns()
-
-          await priceOracle.setStableCoinReferencePrice(10 ** 10)
-
-          await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
-            .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(
-              formatBytes32String("WXDC"),
-              formatBytes32BigNumber(BigNumber.from("700000000000")),
-              BigNumber.from("7").mul(BigNumber.from("10").pow("54")),
-              BigNumber.from("700000000000"),
-            )
+            .withArgs(formatBytes32String("WXDC"), BigNumber.from("700000000000"), 0)
         })
       })
     })
@@ -293,13 +167,35 @@ describe("PriceOracle", () => {
           await expect(priceOracle.setStableCoinReferencePrice(10 ** 10)).to.be.revertedWith("PriceOracle/not-live")
         })
       })
-      context("when priceOracle is live", () => {
-        it("should be able to call setStableCoinReferencePrice", async () => {
+      context("new price is 0", () => {
+        it("should revert", async () => {
           await mockedAccessControlConfig.mock.hasRole.returns(true)
 
-          await expect(priceOracle.setStableCoinReferencePrice(10 ** 10))
+          await expect(priceOracle.setStableCoinReferencePrice(0)).to.be.revertedWith("PriceOracle/zero-reference-price")
+        })
+      })
+      context("new price is lower than min", () => {
+        it("should revert", async () => {
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+          await expect(priceOracle.setStableCoinReferencePrice(WeiPerRay.div(1005))).to.be.revertedWith("PriceOracle/invalid-reference-price")
+        })
+      })
+      context("new price is greater than max", () => {
+        it("should revert", async () => {
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+          await expect(priceOracle.setStableCoinReferencePrice(WeiPerRay.mul(3))).to.be.revertedWith("PriceOracle/invalid-reference-price")
+        })
+      })
+      context("when priceOracle is live", () => {
+        it("should be able to call setStableCoinReferencePrice", async () => {
+          const referencePrice = WeiPerRay.mul(11).div(10)
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+          await expect(priceOracle.setStableCoinReferencePrice(referencePrice))
             .to.emit(priceOracle, "LogSetStableCoinReferencePrice")
-            .withArgs(DeployerAddress, 10 ** 10)
+            .withArgs(DeployerAddress, referencePrice)
         })
       })
     })
@@ -350,6 +246,7 @@ describe("PriceOracle", () => {
           liquidatorIncentiveBps: 10250,
           treasuryFeesBps: 5000,
           strategy: AddressZero,
+          positionDebtCeiling: WeiPerRad.mul(1000000)
         })
 
         await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.returns()
@@ -410,6 +307,7 @@ describe("PriceOracle", () => {
           liquidatorIncentiveBps: 10250,
           treasuryFeesBps: 5000,
           strategy: AddressZero,
+          positionDebtCeiling: WeiPerRad.mul(1000000)
         })
 
         await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
@@ -419,7 +317,7 @@ describe("PriceOracle", () => {
 
         await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
           .to.emit(priceOracle, "LogSetPrice")
-          .withArgs(formatBytes32String("WXDC"), formatBytes32BigNumber(One), 0, One)
+          .withArgs(formatBytes32String("WXDC"), One, 0)
       })
     })
   })

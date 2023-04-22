@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "../interfaces/IAuthTokenAdapter.sol";
 import "../interfaces/IStablecoinAdapter.sol";
 
 interface IStableSwapModule {
-    function swapTokenToStablecoin(address usr, uint256 tokenAmount) external;
+    function swapTokenToStablecoin(address _usr, uint256 _tokenAmount) external;
 
-    function swapStablecoinToToken(address usr, uint256 tokenAmount) external;
+    function swapStablecoinToToken(address _usr, uint256 _tokenAmount) external;
 
-    function authTokenAdapter() external view returns (IAuthTokenAdapter);
+    function depositToken(address _token, uint256 _amount) external;
 
-    function stablecoinAdapter() external view returns (IStablecoinAdapter);
+    function withdrawFees(address _account) external;
+
+    function emergencyWithdraw(address _account) external;
 }

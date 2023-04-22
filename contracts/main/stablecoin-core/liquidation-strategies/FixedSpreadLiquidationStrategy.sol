@@ -15,9 +15,27 @@ import "../../interfaces/ISystemDebtEngine.sol";
 import "../../interfaces/IFlashLendingCallee.sol";
 import "../../interfaces/IGenericTokenAdapter.sol";
 import "../../interfaces/IManager.sol";
+import "../../interfaces/IStablecoinAdapter.sol";
+import "../../interfaces/IERC165.sol";
+import "../../utils/SafeToken.sol";
 
-contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
+contract FixedSpreadLiquidationStrategyMath {
+    uint256 internal constant BLN = 10 ** 9;
+    uint256 internal constant RAY = 10 ** 27;
+
+    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require(y == 0 || (z = x * y) / y == x);
+    }
+
+    function rdiv(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require(y > 0, "FixedSpreadLiquidationStrategy/zero-divisor");
+        z = mul(x, RAY) / y;
+    }
+}
+
+contract FixedSpreadLiquidationStrategy is FixedSpreadLiquidationStrategyMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
     using SafeMathUpgradeable for uint256;
+    using SafeToken for address;
 
     struct LiquidationInfo {
         uint256 positionDebtShare; // [wad]
@@ -43,8 +61,11 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
     ILiquidationEngine public liquidationEngine; // Liquidation module
     ISystemDebtEngine public systemDebtEngine; // Recipient of FUSD raised in auctions
     IPriceOracle public priceOracle; // Collateral price module
+    IStablecoinAdapter public stablecoinAdapter; //StablecoinAdapter to deposit FXD to bookKeeper
 
     uint256 public flashLendingEnabled;
+
+    bytes4 internal constant FLASH_LENDING_ID = 0xaf7bd142;
 
     event LogFixedSpreadLiquidate(
         bytes32 indexed _collateralPoolId,
@@ -72,34 +93,47 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         _;
     }
 
-    function initialize(address _bookKeeper, address _priceOracle, address _liquidationEngine, address _systemDebtEngine) external initializer {
+    modifier onlyOwner() {
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
+        _;
+    }
+
+    function initialize(
+        address _bookKeeper,
+        address _priceOracle,
+        address _liquidationEngine,
+        address _systemDebtEngine,
+        address _stablecoinAdapter
+    ) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
-        IBookKeeper(_bookKeeper).totalStablecoinIssued(); // Sanity Check Call
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
 
-        IPriceOracle(_priceOracle).stableCoinReferencePrice(); // Sanity Check Call
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "FixedSpreadLiquidationStrategy/invalid-priceOracle"); // Sanity Check Call
         priceOracle = IPriceOracle(_priceOracle);
 
-        ILiquidationEngine(_liquidationEngine).live(); // Sanity Check Call
+        require(ILiquidationEngine(_liquidationEngine).live() == 1, "FixedSpreadLiquidationStrategy/liquidationEngine-not-live"); // Sanity Check Call
         liquidationEngine = ILiquidationEngine(_liquidationEngine);
 
-        ISystemDebtEngine(_systemDebtEngine).surplusBuffer(); // Sanity Check Call
+        require(ISystemDebtEngine(_systemDebtEngine).surplusBuffer() >= 0, "FixedSpreadLiquidationStrategy/invalid-systemDebtEngine"); // Sanity Check Call
         systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
+
+        require(
+            address(IStablecoinAdapter(_stablecoinAdapter).stablecoin()) != address(0),
+            "FixedSpreadLiquidationStrategy/invalid-stablecoinAdapter"
+        ); // Sanity Check Call
+        stablecoinAdapter = IStablecoinAdapter(_stablecoinAdapter); //StablecoinAdapter to deposit FXD to bookKeeper
     }
 
-    uint256 constant BLN = 10 ** 9;
-    uint256 constant WAD = 10 ** 18;
-    uint256 constant RAY = 10 ** 27;
-
-    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require(y == 0 || (z = x * y) / y == x);
+    function pause() external onlyOwnerOrGov {
+        _pause();
     }
 
-    function rdiv(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require(y > 0, "FixedSpreadLiquidationStrategy/zero-divisor");
-        z = mul(x, RAY) / y;
+    function unpause() external onlyOwnerOrGov {
+        _unpause();
     }
 
     function setFlashLendingEnabled(uint256 _flashLendingEnabled) external onlyOwnerOrGov {
@@ -107,15 +141,145 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         emit LogSetFlashLendingEnabled(msg.sender, _flashLendingEnabled);
     }
 
+    // solhint-disable function-max-lines
+    function execute(
+        bytes32 _collateralPoolId,
+        uint256 _positionDebtShare, // Debt Value                  [rad]
+        uint256 _positionCollateralAmount, // Collateral Amount           [wad]
+        address _positionAddress, // Address that will receive any leftover collateral
+        uint256 _debtShareToBeLiquidated, // The value of debt to be liquidated as specified by the liquidator [rad]
+        uint256 _maxDebtShareToBeLiquidated, // The maximum value of debt to be liquidated as specified by the liquidator in case of full liquidation for slippage control [rad]
+        address _liquidatorAddress,
+        address _collateralRecipient,
+        bytes calldata _data // Data to pass in external call; if length 0, no call is done
+    ) external override nonReentrant whenNotPaused {
+        require(
+            IAccessControlConfig(bookKeeper.accessControlConfig()).hasRole(
+                IAccessControlConfig(bookKeeper.accessControlConfig()).LIQUIDATION_ENGINE_ROLE(),
+                msg.sender
+            ),
+            "!liquidationEngingRole"
+        );
+
+        require(_positionDebtShare > 0, "FixedSpreadLiquidationStrategy/zero-debt");
+        require(_positionCollateralAmount > 0, "FixedSpreadLiquidationStrategy/zero-collateral-amount");
+        require(_positionAddress != address(0), "FixedSpreadLiquidationStrategy/zero-position-address");
+
+        uint256 _currentCollateralPrice = getFeedPrice(_collateralPoolId); // [ray]
+        require(_currentCollateralPrice > 0, "FixedSpreadLiquidationStrategy/zero-collateral-price");
+
+        LiquidationInfo memory info = _calculateLiquidationInfo(
+            _collateralPoolId,
+            _debtShareToBeLiquidated,
+            _currentCollateralPrice,
+            _positionCollateralAmount,
+            _positionDebtShare
+        );
+
+        require(
+            info.actualDebtShareToBeLiquidated <= _maxDebtShareToBeLiquidated,
+            "FixedSpreadLiquidationStrategy/exceed-max-debt-value-to-be-liquidated"
+        );
+        require(
+            info.collateralAmountToBeLiquidated < 2 ** 255 && info.actualDebtShareToBeLiquidated < 2 ** 255,
+            "FixedSpreadLiquidationStrategy/overflow"
+        );
+
+        bookKeeper.confiscatePosition(
+            _collateralPoolId,
+            _positionAddress,
+            address(this),
+            address(systemDebtEngine),
+            -int256(info.collateralAmountToBeLiquidated),
+            -int256(info.actualDebtShareToBeLiquidated)
+        );
+        IGenericTokenAdapter _adapter = IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId));
+
+        _adapter.onMoveCollateral(_positionAddress, address(this), info.collateralAmountToBeLiquidated, abi.encode(0));
+
+        if (info.treasuryFees > 0) {
+            bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
+            _adapter.onMoveCollateral(address(this), address(systemDebtEngine), info.treasuryFees, abi.encode(0));
+        }
+
+        if (
+            flashLendingEnabled == 1 &&
+            _data.length > 0 &&
+            _collateralRecipient != address(bookKeeper) &&
+            _collateralRecipient != address(liquidationEngine) &&
+            IERC165(_collateralRecipient).supportsInterface(FLASH_LENDING_ID)
+        ) {
+            //there should be ERC165 function selector check added to above condition
+            bookKeeper.moveCollateral(
+                _collateralPoolId,
+                address(this),
+                _collateralRecipient,
+                info.collateralAmountToBeLiquidated.sub(info.treasuryFees)
+            );
+            _adapter.onMoveCollateral(address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
+            IFlashLendingCallee(_collateralRecipient).flashLendingCall(
+                msg.sender,
+                info.actualDebtValueToBeLiquidated,
+                info.collateralAmountToBeLiquidated.sub(info.treasuryFees),
+                _data
+            );
+        } else {
+            _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
+            address _stablecoin = address(stablecoinAdapter.stablecoin());
+            _stablecoin.safeTransferFrom(_liquidatorAddress, address(this), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
+            _stablecoin.safeApprove(address(stablecoinAdapter), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
+            stablecoinAdapter.depositRAD(_liquidatorAddress, info.actualDebtValueToBeLiquidated, abi.encode(0));
+        }
+
+        bookKeeper.moveStablecoin(_liquidatorAddress, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
+
+        info.positionDebtShare = _positionDebtShare;
+        info.positionCollateralAmount = _positionCollateralAmount;
+        info.debtShareToBeLiquidated = _debtShareToBeLiquidated;
+        info.maxDebtShareToBeLiquidated = _maxDebtShareToBeLiquidated;
+        emit LogFixedSpreadLiquidate(
+            _collateralPoolId,
+            info.positionDebtShare,
+            info.positionCollateralAmount,
+            _positionAddress,
+            info.debtShareToBeLiquidated,
+            info.maxDebtShareToBeLiquidated,
+            _liquidatorAddress,
+            _collateralRecipient,
+            info.actualDebtShareToBeLiquidated,
+            info.actualDebtValueToBeLiquidated,
+            info.collateralAmountToBeLiquidated,
+            info.treasuryFees
+        );
+    }
+
+    // solhint-enable function-max-lines
+
+    function setPriceOracle(address _priceOracle) external onlyOwner {
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "FixedSpreadLiquidationStrategy/invalid-priceOracle"); // Sanity Check Call
+        priceOracle = IPriceOracle(_priceOracle);
+    }
+
+    function setBookKeeper(address _bookKeeper) external onlyOwner {
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
+        bookKeeper = IBookKeeper(_bookKeeper);
+    }
+
+    function setLiquidationEngine(address _liquidationEngine) external onlyOwner {
+        require(ILiquidationEngine(_liquidationEngine).live() == 1, "FixedSpreadLiquidationStrategy/liquidationEngine-not-live"); // Sanity Check Call
+        liquidationEngine = ILiquidationEngine(_liquidationEngine);
+    }
+
     function getFeedPrice(bytes32 collateralPoolId) internal returns (uint256 feedPrice) {
         address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(collateralPoolId);
         IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);
-        (bytes32 price, bool priceOk) = _priceFeed.peekPrice();
+        (uint256 price, bool priceOk) = _priceFeed.peekPrice();
         require(priceOk, "FixedSpreadLiquidationStrategy/invalid-price");
         // (price [wad] * BLN [10 ** 9] ) [ray] / priceOracle.stableCoinReferencePrice [ray]
-        feedPrice = rdiv(mul(uint256(price), BLN), priceOracle.stableCoinReferencePrice()); // [ray]
+        feedPrice = rdiv(mul(price, BLN), priceOracle.stableCoinReferencePrice()); // [ray]
     }
 
+    // solhint-disable function-max-lines
     function _calculateLiquidationInfo(
         bytes32 _collateralPoolId,
         uint256 _debtShareToBeLiquidated,
@@ -177,106 +341,5 @@ contract FixedSpreadLiquidationStrategy is PausableUpgradeable, ReentrancyGuardU
         // 0.047619048 * 5000 / 10000
         info.treasuryFees = liquidatorIncentiveCollectedFromPosition.mul(_vars.treasuryFeesBps).div(10000); // [wad]
     }
-
-    function execute(
-        bytes32 _collateralPoolId,
-        uint256 _positionDebtShare, // Debt Value                  [rad]
-        uint256 _positionCollateralAmount, // Collateral Amount           [wad]
-        address _positionAddress, // Address that will receive any leftover collateral
-        uint256 _debtShareToBeLiquidated, // The value of debt to be liquidated as specified by the liquidator [rad]
-        uint256 _maxDebtShareToBeLiquidated, // The maximum value of debt to be liquidated as specified by the liquidator in case of full liquidation for slippage control [rad]
-        address _liquidatorAddress,
-        address _collateralRecipient,
-        bytes calldata _data // Data to pass in external call; if length 0, no call is done
-    ) external override nonReentrant whenNotPaused {
-        require(
-            IAccessControlConfig(bookKeeper.accessControlConfig()).hasRole(keccak256("LIQUIDATION_ENGINE_ROLE"), msg.sender),
-            "!liquidationEngingRole"
-        );
-
-        require(_positionDebtShare > 0, "FixedSpreadLiquidationStrategy/zero-debt");
-        require(_positionCollateralAmount > 0, "FixedSpreadLiquidationStrategy/zero-collateral-amount");
-        require(_positionAddress != address(0), "FixedSpreadLiquidationStrategy/zero-position-address");
-
-        uint256 _currentCollateralPrice = getFeedPrice(_collateralPoolId); // [ray]
-        require(_currentCollateralPrice > 0, "FixedSpreadLiquidationStrategy/zero-collateral-price");
-
-        LiquidationInfo memory info = _calculateLiquidationInfo(
-            _collateralPoolId,
-            _debtShareToBeLiquidated,
-            _currentCollateralPrice,
-            _positionCollateralAmount,
-            _positionDebtShare
-        );
-
-        require(
-            info.actualDebtShareToBeLiquidated <= _maxDebtShareToBeLiquidated,
-            "FixedSpreadLiquidationStrategy/exceed-max-debt-value-to-be-liquidated"
-        );
-        require(
-            info.collateralAmountToBeLiquidated < 2 ** 255 && info.actualDebtShareToBeLiquidated < 2 ** 255,
-            "FixedSpreadLiquidationStrategy/overflow"
-        );
-        bookKeeper.confiscatePosition(
-            _collateralPoolId,
-            _positionAddress,
-            address(this),
-            address(systemDebtEngine),
-            -int256(info.collateralAmountToBeLiquidated),
-            -int256(info.actualDebtShareToBeLiquidated)
-        );
-        IGenericTokenAdapter _adapter = IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId));
-        _adapter.onMoveCollateral(_positionAddress, address(this), info.collateralAmountToBeLiquidated, abi.encode(0));
-
-        bookKeeper.moveCollateral(_collateralPoolId, address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees));
-        _adapter.onMoveCollateral(address(this), _collateralRecipient, info.collateralAmountToBeLiquidated.sub(info.treasuryFees), abi.encode(0));
-
-        if (info.treasuryFees > 0) {
-            bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
-            _adapter.onMoveCollateral(address(this), address(systemDebtEngine), info.treasuryFees, abi.encode(0));
-        }
-
-        if (
-            flashLendingEnabled == 1 &&
-            _data.length > 0 &&
-            _collateralRecipient != address(bookKeeper) &&
-            _collateralRecipient != address(liquidationEngine)
-        ) {
-            IFlashLendingCallee(_collateralRecipient).flashLendingCall(
-                msg.sender,
-                info.actualDebtValueToBeLiquidated,
-                info.collateralAmountToBeLiquidated.sub(info.treasuryFees),
-                _data
-            );
-        }
-
-        bookKeeper.moveStablecoin(_liquidatorAddress, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
-
-        info.positionDebtShare = _positionDebtShare;
-        info.positionCollateralAmount = _positionCollateralAmount;
-        info.debtShareToBeLiquidated = _debtShareToBeLiquidated;
-        info.maxDebtShareToBeLiquidated = _maxDebtShareToBeLiquidated;
-        emit LogFixedSpreadLiquidate(
-            _collateralPoolId,
-            info.positionDebtShare,
-            info.positionCollateralAmount,
-            _positionAddress,
-            info.debtShareToBeLiquidated,
-            info.maxDebtShareToBeLiquidated,
-            _liquidatorAddress,
-            _collateralRecipient,
-            info.actualDebtShareToBeLiquidated,
-            info.actualDebtValueToBeLiquidated,
-            info.collateralAmountToBeLiquidated,
-            info.treasuryFees
-        );
-    }
-
-    function pause() external onlyOwnerOrGov {
-        _pause();
-    }
-
-    function unpause() external onlyOwnerOrGov {
-        _unpause();
-    }
+    // solhint-enable function-max-lines
 }
