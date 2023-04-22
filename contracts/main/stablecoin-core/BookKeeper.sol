@@ -312,6 +312,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         require(either(_debtShare >= 0, _wish(_stablecoinOwner, msg.sender)), "BookKeeper/not-allowed-stablecoin-owner");
 
         require(either(position.debtShare == 0, _positionDebtValue >= _vars.debtFloor), "BookKeeper/debt-floor");
+        require(_positionDebtValue <= _vars.positionDebtCeiling, "BookKeeper/position-debt-ceiling-exceeded");
         collateralToken[_collateralPoolId][_collateralOwner] = sub(collateralToken[_collateralPoolId][_collateralOwner], _collateralValue);
         stablecoin[_stablecoinOwner] = add(stablecoin[_stablecoinOwner], _debtValue);
 

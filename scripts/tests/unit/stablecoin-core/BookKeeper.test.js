@@ -283,6 +283,7 @@ describe("BookKeeper", () => {
                     debtCeiling: 0,
                     priceWithSafetyMargin: 0,
                     debtFloor: 0,
+                    positionDebtCeiling: WeiPerRad.mul(1000000)
                 })
 
                 await expect(
@@ -317,6 +318,7 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10000),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: 0,
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         await expect(
@@ -377,6 +379,7 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10000),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: 0,
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
 
                                 // add collateral to bob 10 WXDC
@@ -447,6 +450,7 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10000),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // add collateral to bob 10 WXDC
@@ -517,6 +521,7 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10000),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // add collateral to alice 10 WXDC
@@ -605,6 +610,7 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10000),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // add collateral to alice 10 WXDC
@@ -665,6 +671,7 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad,
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // set total debt ceiling 10 rad
@@ -700,6 +707,7 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // set total debt ceiling 1 rad
@@ -736,6 +744,7 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: 0,
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
@@ -772,6 +781,7 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // set total debt ceiling 10 rad
@@ -821,6 +831,7 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: 0,
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
 
                                 // set total debt ceiling 10 rad
@@ -884,6 +895,7 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: 0,
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // set total debt ceiling 10 rad
@@ -941,6 +953,7 @@ describe("BookKeeper", () => {
                                 debtCeiling: WeiPerRad.mul(10),
                                 priceWithSafetyMargin: WeiPerRay,
                                 debtFloor: WeiPerRad.mul(20),
+                                positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
                             // set total debt ceiling 10 rad
@@ -990,6 +1003,7 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: WeiPerRad.mul(1),
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
 
                                 // set total debt ceiling 10 rad
@@ -1031,6 +1045,7 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: WeiPerRad.mul(1),
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
                                 // alice wipe
                                 await bookKeeperAsAlice.adjustPosition(
@@ -1065,6 +1080,7 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: WeiPerRad.mul(5),
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
 
                                 // set total debt ceiling 10 rad
@@ -1101,6 +1117,7 @@ describe("BookKeeper", () => {
                                     debtCeiling: WeiPerRad.mul(10),
                                     priceWithSafetyMargin: WeiPerRay,
                                     debtFloor: WeiPerRad.mul(5),
+                                    positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
                                 // alice wipe
                                 await expect(
@@ -1138,6 +1155,7 @@ describe("BookKeeper", () => {
                         debtCeiling: WeiPerRad.mul(10),
                         priceWithSafetyMargin: WeiPerRay,
                         debtFloor: WeiPerRad.mul(1),
+                        positionDebtCeiling: WeiPerRad.mul(1000000)
                     })
 
                     // set total debt ceiling 10 rad
@@ -1184,6 +1202,7 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
@@ -1232,6 +1251,7 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
@@ -1280,6 +1300,7 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(2),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
@@ -1328,6 +1349,7 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(2),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
@@ -1376,6 +1398,7 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
@@ -1462,6 +1485,7 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 1 rad
@@ -1501,6 +1525,7 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
                         // confiscate position
                         await bookKeeper.confiscatePosition(
@@ -1545,6 +1570,7 @@ describe("BookKeeper", () => {
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
                             debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
 
                         // set total debt ceiling 10 rad
@@ -1581,7 +1607,8 @@ describe("BookKeeper", () => {
                             totalDebtShare: WeiPerWad.mul(2),
                             debtCeiling: WeiPerRad.mul(10),
                             priceWithSafetyMargin: WeiPerRay,
-                            debtFloor: WeiPerRad.mul(1)
+                            debtFloor: WeiPerRad.mul(1),
+                            positionDebtCeiling: WeiPerRad.mul(1000000)
                         })
                         // confiscate position
                         await bookKeeper.confiscatePosition(
@@ -1721,6 +1748,7 @@ describe("BookKeeper", () => {
                         debtCeiling: WeiPerRad.mul(10),
                         priceWithSafetyMargin: WeiPerRay,
                         debtFloor: WeiPerRad.mul(1),
+                        positionDebtCeiling: WeiPerRad.mul(1000000)
                     })
 
                     // set total debt ceiling 1 rad
@@ -1753,6 +1781,7 @@ describe("BookKeeper", () => {
                         debtCeiling: WeiPerRad.mul(10),
                         priceWithSafetyMargin: WeiPerRay,
                         debtFloor: WeiPerRad.mul(1),
+                        positionDebtCeiling: WeiPerRad.mul(1000000)
                     })
 
                     await bookKeeper.accrueStabilityFee(COLLATERAL_POOL_ID, DeployerAddress, WeiPerRay, { gasLimit: 1000000 })

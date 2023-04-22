@@ -8,7 +8,7 @@ chai.use(solidity);
 const { One } = ethers.constants;
 
 const { formatBytes32BigNumber } = require("../../helper/format");
-const { WeiPerRay } = require("../../helper/unit");
+const { WeiPerRay, WeiPerRad } = require("../../helper/unit");
 const { DeployerAddress, AliceAddress, AddressZero } = require("../../helper/address");
 const { getContract, createMock } = require("../../helper/contracts");
 const { loadFixture } = require("../../helper/fixtures");
@@ -92,6 +92,8 @@ describe("PriceOracle", () => {
             liquidatorIncentiveBps: 10250,
             treasuryFeesBps: 5000,
             strategy: AddressZero,
+            positionDebtCeiling: WeiPerRad.mul(1000000)
+
           })
           await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
@@ -127,6 +129,7 @@ describe("PriceOracle", () => {
             liquidatorIncentiveBps: 10250,
             treasuryFeesBps: 5000,
             strategy: AddressZero,
+            positionDebtCeiling: WeiPerRad.mul(1000000)
           })
 
           await mockedPriceFeed.mock.peekPrice.returns(
@@ -243,6 +246,7 @@ describe("PriceOracle", () => {
           liquidatorIncentiveBps: 10250,
           treasuryFeesBps: 5000,
           strategy: AddressZero,
+          positionDebtCeiling: WeiPerRad.mul(1000000)
         })
 
         await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.returns()
@@ -303,6 +307,7 @@ describe("PriceOracle", () => {
           liquidatorIncentiveBps: 10250,
           treasuryFeesBps: 5000,
           strategy: AddressZero,
+          positionDebtCeiling: WeiPerRad.mul(1000000)
         })
 
         await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
