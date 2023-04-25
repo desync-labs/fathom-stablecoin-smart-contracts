@@ -91,7 +91,7 @@ module.exports = async function (deployer) {
         ),
         proxyActionsStorage.initialize(fathomStablecoinProxyActions.address, bookKeeper.address, { gasLimit: 1000000 }),
         proxyWalletFactory.initialize(proxyActionsStorage.address, { gasLimit: 1000000 }),
-        proxyWalletRegistry.initialize(proxyWalletFactory.address, { gasLimit: 1000000 }),
+        proxyWalletRegistry.initialize(proxyWalletFactory.address, bookKeeper.address, { gasLimit: 1000000 }),
         flashMintModule.initialize(
             stablecoinAdapter.address,
             systemDebtEngine.address,
