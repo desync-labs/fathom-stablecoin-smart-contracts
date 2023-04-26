@@ -39,6 +39,8 @@ const setup = async () => {
     const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
     const priceOracle = await getProxy(proxyFactory, "PriceOracle");
+    const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
+    await proxyWalletRegistry.setDecentralizedMode(true);
 
     const liquidationEngine = getContractAt("LiquidationEngine", liquidationEngineAsAdmin.address, BobAddress)
 
