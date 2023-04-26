@@ -27,6 +27,8 @@ const setup = async () => {
     const showStopper = await getProxy(proxyFactory, "ShowStopper");
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
+    const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
+    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
 
 
     ({
@@ -49,6 +51,8 @@ const setup = async () => {
         positionManager,
         aliceProxyWallet,
         bobProxyWallet,
+        collateralTokenAdapter,
+        WXDC
     }
 }
 
@@ -82,7 +86,9 @@ describe("ShowStopper", () => {
             accessControlConfig,
             positionManager,
             aliceProxyWallet,
-            bobProxyWallet
+            bobProxyWallet,
+            collateralTokenAdapter,
+            WXDC
         } = await loadFixture(setup));
     })
 
@@ -493,11 +499,9 @@ describe("ShowStopper", () => {
                 // withdraw collateral from the Vault
                 // it's either through proxyActions || directly calling collateralTokenAdapter
                 //
-                const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
-
-                await collateralTokenAdapter.cage();
-                await collateralTokenAdapter.withdraw(AliceAddress, WeiPerWad.mul(5));
-                const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
+                console.log("stakedAmount for Alice after emergency shutdown is" + stakeAmountAlice);
+                // 2023 April 25th Tue, Now I realized that I should have added emergencyWithdraw function to collateralTokenAdapter.
+                await collateralTokenAdapter.emergencyWithdraw(AliceAddress, WeiPerWad.mul(5), "0x");
                 expect(await WXDC.balanceOf(AliceAddress)).to.be.equal(
                     "2500000000000000000"
                 )

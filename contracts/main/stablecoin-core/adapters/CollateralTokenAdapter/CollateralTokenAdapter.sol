@@ -98,12 +98,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
     }
 
     modifier onlyProxyWalletOrWhiteListed() {
-        if(
-            live == 0
-        ) {
             require(IProxyRegistry(proxyWalletFactory).isProxy(msg.sender) || whiteListed[msg.sender], "!ProxyOrWhiteList");
-        }
-        _;
     }
 
     modifier onlyOwnerOrGov() {
