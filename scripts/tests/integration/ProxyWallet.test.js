@@ -11,7 +11,8 @@ const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
-
+    await proxyWalletRegistry.setDecentralizedMode(true);
+    
     return { proxyWalletRegistry }
 }
 

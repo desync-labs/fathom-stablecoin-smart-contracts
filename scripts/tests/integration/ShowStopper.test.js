@@ -27,7 +27,9 @@ const setup = async () => {
     const showStopper = await getProxy(proxyFactory, "ShowStopper");
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
-
+    const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
+    await proxyWalletRegistry.setDecentralizedMode(true);
+    
     ({
         proxyWallets: [aliceProxyWallet, bobProxyWallet],
     } = await createProxyWallets([AliceAddress, BobAddress]));

@@ -22,7 +22,7 @@ const setup = async () => {
     return { dexPriceOracle, mockedFactory, mockedPair, mockedStablecoin, mockedUSD }
 }
 
-describe("SlidingWindowDexOracle", () => {
+describe("DexPriceOracle", () => {
     // Contract
     let dexPriceOracle
     let mockedPair

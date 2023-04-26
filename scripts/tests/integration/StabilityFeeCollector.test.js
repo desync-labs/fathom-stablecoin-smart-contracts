@@ -23,6 +23,9 @@ const setup = async () => {
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
+    
+    const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
+    await proxyWalletRegistry.setDecentralizedMode(true);
 
     ({
         proxyWallets: [aliceProxyWallet],

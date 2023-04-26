@@ -27,6 +27,8 @@ const setup = async () => {
     const priceOracle = await getProxy(proxyFactory, "PriceOracle");
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
+    const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
+    await proxyWalletRegistry.setDecentralizedMode(true);
 
     ({
         proxyWallets: [aliceProxyWallet, bobProxyWallet],
