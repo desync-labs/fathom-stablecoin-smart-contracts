@@ -98,7 +98,8 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
     }
 
     modifier onlyProxyWalletOrWhiteListed() {
-            require(IProxyRegistry(proxyWalletFactory).isProxy(msg.sender) || whiteListed[msg.sender], "!ProxyOrWhiteList");
+        require(IProxyRegistry(proxyWalletFactory).isProxy(msg.sender) || whiteListed[msg.sender], "!ProxyOrWhiteList");
+        _;
     }
 
     modifier onlyOwnerOrGov() {
@@ -308,4 +309,23 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         );
         emit LogMoveStake(_source, _destination, _share);
     }
+
+  /// @dev EMERGENCY WHEN COLLATERAL TOKEN ADAPTER CAGED ONLY. Withdraw COLLATERAL from VAULT A after redeemStablecoin
+  function emergencyWithdraw(address _to) external nonReentrant {
+    if (live == 0) {
+        uint256 _amount = bookKeeper.collateralToken(collateralPoolId, msg.sender);
+        require(_amount < 2**255, "CollateralTokenAdapter/collateral-overflow");
+        //deduct totalShare
+        uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
+        totalShare = sub(totalShare, _share);
+    
+        //deduct emergency withdrawl amount of FXD
+        bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
+        //withdraw WXDC from Vault
+        vault.withdraw(_amount);
+        //Transfer WXDC to msg.sender
+        address(collateralToken).safeTransfer(_to, _amount);
+        emit LogEmergencyWithdraw(msg.sender, _to);
+    }
+}
 }

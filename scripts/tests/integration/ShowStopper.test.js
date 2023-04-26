@@ -29,6 +29,7 @@ const setup = async () => {
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
+    const MockCollateralTokenAdapter = await artifacts.initializeInterfaceAt("MockCollateralTokenAdapter", "MockCollateralTokenAdapter");
 
 
     ({
@@ -52,7 +53,8 @@ const setup = async () => {
         aliceProxyWallet,
         bobProxyWallet,
         collateralTokenAdapter,
-        WXDC
+        WXDC,
+        MockCollateralTokenAdapter
     }
 }
 
@@ -88,7 +90,8 @@ describe("ShowStopper", () => {
             aliceProxyWallet,
             bobProxyWallet,
             collateralTokenAdapter,
-            WXDC
+            WXDC,
+            MockCollateralTokenAdapter
         } = await loadFixture(setup));
     })
 
@@ -495,16 +498,17 @@ describe("ShowStopper", () => {
                     "2500000000000000000"
                 )
 
-                //, 2023 4/13 11:57 PM, then how to withdraw collateral?
-                // withdraw collateral from the Vault
-                // it's either through proxyActions || directly calling collateralTokenAdapter
-                //
-                console.log("stakedAmount for Alice after emergency shutdown is" + stakeAmountAlice);
-                // 2023 April 25th Tue, Now I realized that I should have added emergencyWithdraw function to collateralTokenAdapter.
-                await collateralTokenAdapter.emergencyWithdraw(AliceAddress, WeiPerWad.mul(5), "0x");
+                await collateralTokenAdapter.cage();
+                await collateralTokenAdapter.emergencyWithdraw(AliceAddress, { from: AliceAddress });
                 expect(await WXDC.balanceOf(AliceAddress)).to.be.equal(
                     "2500000000000000000"
                 )
+                await MockCollateralTokenAdapter.cage();
+                await MockCollateralTokenAdapter.emergencyWithdraw(AliceAddress, { from: AliceAddress });
+                expect(await WXDC.balanceOf(AliceAddress)).to.be.equal(
+                    "5000000000000000000"
+                )
+
             })
         })
     })
