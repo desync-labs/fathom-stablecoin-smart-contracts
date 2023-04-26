@@ -350,7 +350,6 @@ describe("ShowStopper", () => {
                 // badDebtAccumulator / totalDebt = 10000000000000000000000000000000000000000000000 / 10000000000000000000 = 1000000000000000000000000000
                 expect(await showStopper.finalCashPrice(pools.XDC)).to.be.equal("1000000000000000000000000000")
 
-                //, 2023 APR 13 11:50 AM
                 // accumulate stablecoin
                 await stablecoinAdapter.deposit(
                     AliceAddress,
@@ -364,14 +363,11 @@ describe("ShowStopper", () => {
                 await showStopper.accumulateStablecoin(WeiPerWad.mul(5), { from: AliceAddress })
 
                 // redeem stablecoin
-                //, 2023 4/13 12:01 PM, how is this col withdrawl accounting for each col being done? 
                 //, 
                 await showStopper.redeemStablecoin(pools.XDC, WeiPerWad.mul(5), { from: AliceAddress })
                 expect(await bookKeeper.collateralToken(pools.XDC, AliceAddress)).to.be.equal(
                     "5000000000000000000"
                 )
-
-                //, 2023 4/13 11:57 PM, then how to withdraw collateral?
             })
         })
         context("when redeem stablecoin with two col types", () => {
@@ -474,7 +470,6 @@ describe("ShowStopper", () => {
 
                 expect(await showStopper.finalCashPrice(pools.WXDC)).to.be.equal("500000000000000000000000000")
 
-                //, 2023 APR 13 11:50 AM
                 // accumulate stablecoin
                 await stablecoinAdapter.deposit(
                     AliceAddress,

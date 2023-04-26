@@ -387,7 +387,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         ICollateralPoolConfig.CollateralPoolInfo memory _vars = ICollateralPoolConfig(collateralPoolConfig).getCollateralPoolInfo(_collateralPoolId);
         // -- col from postion
         position.lockedCollateral = add(position.lockedCollateral, _collateralAmount);
-        //@sanjun -- debt from position
+        // -- debt from position
         position.debtShare = add(position.debtShare, _debtShare);
         _vars.totalDebtShare = add(_vars.totalDebtShare, _debtShare);
         ICollateralPoolConfig(collateralPoolConfig).setTotalDebtShare(_collateralPoolId, _vars.totalDebtShare);
@@ -408,7 +408,6 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
       By executing this function, the SystemDebtEngine must have enough stablecoin which will come from the Surplus of the protocol.
       A successful `settleSystemBadDebt` would remove the bad debt from the system.
     */
-    // 2023 apr 03:09 PM, but I don't see any modifier that restricts only systemDebtEngine's involvement
     function settleSystemBadDebt(uint256 _value) external override nonReentrant whenNotPaused {
         systemBadDebt[msg.sender] = sub(systemBadDebt[msg.sender], _value);
         stablecoin[msg.sender] = sub(stablecoin[msg.sender], _value);
