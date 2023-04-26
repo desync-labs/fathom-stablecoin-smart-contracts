@@ -12,6 +12,8 @@ const UnitHelpers = require("../../helper/unit");
 const { getContract, createMock } = require("../../helper/contracts");
 const { loadFixture } = require("../../helper/fixtures");
 
+const LIQUIDATION_ENGINE_ROLE = '0x73cc1824a5ac1764c2e141cf3615a9dcb73677c4e5be5154addc88d3e0cc1480'
+
 const loadFixtureHandler = async () => {
     const mockedCollateralTokenAdapter = await createMock("TokenAdapter");
     const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
@@ -33,6 +35,8 @@ const loadFixtureHandler = async () => {
     await mockedSystemDebtEngine.mock.surplusBuffer.returns(BigNumber.from("0"))
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(BigNumber.from("0"))
     await mockedAccessControlConfig.mock.hasRole.returns(true)
+    
+    await mockedAccessControlConfig.mock.LIQUIDATION_ENGINE_ROLE.returns(LIQUIDATION_ENGINE_ROLE) //keccak256 of LIQUIDATION_ENGINE_ROLE
     await mockedStablecoinAdapter.mock.stablecoin.returns(DeployerAddress);
 
     const fixedSpreadLiquidationStrategy = getContract("FixedSpreadLiquidationStrategy", DeployerAddress)

@@ -5,8 +5,9 @@ import "../../main/apis/interfaces/IPluginInvokeOracle.sol";
 
 contract PluginOracleMock is IPluginInvokeOracle {
     uint256 public price;
+    uint256 public requestId;
 
-    constructor(uint256 _price){
+    constructor(uint256 _price) {
         price = _price;
     }
 
@@ -14,11 +15,35 @@ contract PluginOracleMock is IPluginInvokeOracle {
         price = _price;
     }
 
-    function showPrice() external override view returns(uint256){
-        return price;
+    function requestData(address) external override returns (uint256) {
+        return ++requestId;
     }
 
-    function latestTimestamp() external override view returns (uint256){
+    function showPrice(uint256) external view override returns (uint256, uint256) {
+        return (price, block.timestamp);
+    }
+
+    function latestAnswer() external view override returns (int256) {
+        return int256(price);
+    }
+
+    function latestTimestamp() external view override returns (uint256) {
         return block.timestamp;
+    }
+
+    function latestRound() external view override returns (uint256) {
+        return requestId;
+    }
+
+    function getAnswer(uint256) external view override returns (int256) {
+        return int256(price);
+    }
+
+    function getTimestamp(uint256) external view override returns (uint256) {
+        return block.timestamp;
+    }
+
+    function depositPLI(uint256) external pure returns (bool) {
+        return true;
     }
 }

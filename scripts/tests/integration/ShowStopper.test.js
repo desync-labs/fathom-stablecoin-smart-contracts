@@ -30,8 +30,9 @@ const setup = async () => {
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
     const MockCollateralTokenAdapter = await artifacts.initializeInterfaceAt("MockCollateralTokenAdapter", "MockCollateralTokenAdapter");
-
-
+    const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
+    await proxyWalletRegistry.setDecentralizedMode(true);
+    
     ({
         proxyWallets: [aliceProxyWallet, bobProxyWallet],
     } = await createProxyWallets([AliceAddress, BobAddress]));

@@ -3,7 +3,6 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IPriceFeed.sol";
@@ -11,6 +10,7 @@ import "../interfaces/IPriceOracle.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IPausable.sol";
+import "../interfaces/ISetPrice.sol";
 
 contract PriceOracleMath {
     uint256 internal constant ONE = 10 ** 27;
@@ -27,7 +27,7 @@ contract PriceOracleMath {
 /** @notice A contract which is the price oracle of the BookKeeper to keep all collateral pools updated with the latest price of the collateral.
     The price oracle is important in reflecting the current state of the market price.
 */
-contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IPriceOracle, ICagable, IPausable {
+contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
     struct CollateralPool {
         IPriceFeed priceFeed; // Price Feed
         uint256 liquidationRatio; // Liquidation ratio or Collateral ratio [ray]
@@ -43,9 +43,8 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpg
 
     event LogSetPrice(
         bytes32 indexed _poolId,
-        bytes32 _rawPrice, // Raw price from price feed [wad]
-        uint256 _priceWithSafetyMargin, // Price with safety margin [ray]
-        uint256 _rawPriceUint // Raw price from price feed in uint256
+        uint256 _rawPrice, // Raw price from price feed [wad]
+        uint256 _priceWithSafetyMargin // Price with safety margin [ray]
     );
 
     event LogSetStableCoinReferencePrice(address indexed _caller, uint256 _data);
@@ -83,8 +82,6 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpg
 
     function initialize(address _bookKeeper) external initializer {
         PausableUpgradeable.__Pausable_init();
-        ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
-
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         stableCoinReferencePrice = ONE;
@@ -103,15 +100,14 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, ReentrancyGuardUpg
         emit LogSetStableCoinReferencePrice(msg.sender, _referencePrice);
     }
 
-    function setPrice(bytes32 _collateralPoolId) external whenNotPaused isLive {
+    function setPrice(bytes32 _collateralPoolId) external override whenNotPaused isLive {
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).collateralPools(_collateralPoolId).priceFeed);
         uint256 _liquidationRatio = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLiquidationRatio(_collateralPoolId);
-        (bytes32 _rawPrice, bool _hasPrice) = _priceFeed.peekPrice();
-        uint256 _priceWithSafetyMargin = _hasPrice ? rdiv(rdiv(mul(uint256(_rawPrice), 10 ** 9), stableCoinReferencePrice), _liquidationRatio) : 0;
+        (uint256 _rawPrice, bool _hasPrice) = _priceFeed.peekPrice();
+        uint256 _priceWithSafetyMargin = _hasPrice ? rdiv(rdiv(mul(_rawPrice, 10 ** 9), stableCoinReferencePrice), _liquidationRatio) : 0;
         address _collateralPoolConfig = address(bookKeeper.collateralPoolConfig());
         ICollateralPoolConfig(_collateralPoolConfig).setPriceWithSafetyMargin(_collateralPoolId, _priceWithSafetyMargin);
-        uint256 _rawPriceInUint = uint256(_rawPrice);
-        emit LogSetPrice(_collateralPoolId, _rawPrice, _priceWithSafetyMargin, _rawPriceInUint);
+        emit LogSetPrice(_collateralPoolId, _rawPrice, _priceWithSafetyMargin);
     }
 
     function cage() external override onlyOwnerOrShowStopper {

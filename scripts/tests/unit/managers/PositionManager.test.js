@@ -43,6 +43,7 @@ const loadFixtureHandler = async () => {
         liquidatorIncentiveBps: 10250,
         treasuryFeesBps: 5000,
         strategy: AddressZero,
+        positionDebtCeiling: WeiPerRay.mul(10000)
     })
 
     const positionManager = getContract("PositionManager", DeployerAddress)

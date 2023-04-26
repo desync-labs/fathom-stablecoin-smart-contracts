@@ -40,9 +40,9 @@ contract FathomStablecoinProxyActionsMath {
     }
 }
 
-/// @notice WARNING: These functions meant to be used as a a library for a Proxy.
+/// @notice WARNING: These functions meant to be used as a library for a Proxy.
 /// @notice DO NOT CALL ANY FUNCTION IN THIS CONTRACT DIRECTLY.
-/// @notice Hence, it shouldn't has any state vairables. Some are unsafe if you call them directly.
+/// @notice Hence, it shouldn't has any state variables. Some are unsafe if you call them directly.
 contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
     using SafeToken for address;
 

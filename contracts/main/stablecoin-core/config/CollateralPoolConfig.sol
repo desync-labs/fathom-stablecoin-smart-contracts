@@ -38,6 +38,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         uint256 _stabilityFeeRate,
         address _adapter
     );
+    event LogPositionDebtCeiling(address _messageSender, bytes32 _collateralPoolId, uint256 _positionDebtCeiling);
 
     modifier onlyOwner() {
         require(accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
@@ -56,6 +57,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         bytes32 _collateralPoolId, // v
         uint256 _debtCeiling, // v
         uint256 _debtFloor,
+        uint256 _positionDebtCeiling,
         address _priceFeed,
         uint256 _liquidationRatio, // v
         uint256 _stabilityFeeRate, //v
@@ -69,6 +71,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _collateralPools[_collateralPoolId].debtAccumulatedRate = RAY;
         _collateralPools[_collateralPoolId].debtCeiling = _debtCeiling;
         _collateralPools[_collateralPoolId].debtFloor = _debtFloor;
+        _collateralPools[_collateralPoolId].positionDebtCeiling = _positionDebtCeiling;
 
         require(IPriceFeed(_priceFeed).poolId() == _collateralPoolId, "CollateralPoolConfig/wrong-price-feed-pool");
         require(IPriceFeed(_priceFeed).isPriceOk(), "CollateralPoolConfig/unhealthy-price-feed");
@@ -108,6 +111,16 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     function setDebtFloor(bytes32 _collateralPoolId, uint256 _debtFloor) external onlyOwner {
         _collateralPools[_collateralPoolId].debtFloor = _debtFloor;
         emit LogSetDebtFloor(msg.sender, _collateralPoolId, _debtFloor);
+    }
+
+    function setPositionDebtCeiling(bytes32 _collateralPoolId, uint256 _positionDebtCeiling) external override onlyOwner {
+        require(
+            _positionDebtCeiling <= _collateralPools[_collateralPoolId].debtCeiling &&
+                _positionDebtCeiling > _collateralPools[_collateralPoolId].debtFloor,
+            "CollateralPoolConfig/invalid-position-ceiling"
+        );
+        _collateralPools[_collateralPoolId].positionDebtCeiling = _positionDebtCeiling;
+        emit LogPositionDebtCeiling(msg.sender, _collateralPoolId, _positionDebtCeiling);
     }
 
     function setPriceFeed(bytes32 _poolId, address _priceFeed) external onlyOwner {
@@ -218,6 +231,10 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         return _collateralPools[_collateralPoolId].debtCeiling;
     }
 
+    function getPositionDebtCeiling(bytes32 _collateralPoolId) external view override returns (uint256) {
+        return _collateralPools[_collateralPoolId].positionDebtCeiling;
+    }
+
     function getDebtFloor(bytes32 _collateralPoolId) external view override returns (uint256) {
         return _collateralPools[_collateralPoolId].debtFloor;
     }
@@ -264,5 +281,6 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _info.debtCeiling = _collateralPools[_collateralPoolId].debtCeiling;
         _info.priceWithSafetyMargin = _collateralPools[_collateralPoolId].priceWithSafetyMargin;
         _info.debtFloor = _collateralPools[_collateralPoolId].debtFloor;
+        _info.positionDebtCeiling = _collateralPools[_collateralPoolId].positionDebtCeiling;
     }
 }

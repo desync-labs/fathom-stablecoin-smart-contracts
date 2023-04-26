@@ -21,7 +21,7 @@ contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpg
     // solhint-disable-next-line const-name-snakecase
     string public constant version = "1";
     // solhint-disable-next-line const-name-snakecase
-    uint8 public constant override decimals = 18;
+    uint8 public constant decimals = 18;
 
     string public name; // Fathom USD Stablecoin
     string public symbol; // FUSD
@@ -29,10 +29,6 @@ contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpg
 
     mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
-    mapping(address => uint256) public nonces;
-
-    event Approval(address indexed src, address indexed guy, uint256 wad);
-    event Transfer(address indexed src, address indexed dst, uint256 wad);
 
     function initialize(string memory _name, string memory _symbol) external initializer {
         AccessControlUpgradeable.__AccessControl_init();

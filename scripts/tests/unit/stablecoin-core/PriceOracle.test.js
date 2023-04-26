@@ -8,7 +8,7 @@ chai.use(solidity);
 const { One } = ethers.constants;
 
 const { formatBytes32BigNumber } = require("../../helper/format");
-const { WeiPerRay } = require("../../helper/unit");
+const { WeiPerRay, WeiPerRad } = require("../../helper/unit");
 const { DeployerAddress, AliceAddress, AddressZero } = require("../../helper/address");
 const { getContract, createMock } = require("../../helper/contracts");
 const { loadFixture } = require("../../helper/fixtures");
@@ -92,6 +92,8 @@ describe("PriceOracle", () => {
             liquidatorIncentiveBps: 10250,
             treasuryFeesBps: 5000,
             strategy: AddressZero,
+            positionDebtCeiling: WeiPerRad.mul(1000000)
+
           })
           await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
@@ -100,7 +102,7 @@ describe("PriceOracle", () => {
           ).returns()
           await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
             .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(formatBytes32String("WXDC"), formatBytes32BigNumber(One), 0, One)
+            .withArgs(formatBytes32String("WXDC"), One, 0)
         })
       })
     })
@@ -127,6 +129,7 @@ describe("PriceOracle", () => {
             liquidatorIncentiveBps: 10250,
             treasuryFeesBps: 5000,
             strategy: AddressZero,
+            positionDebtCeiling: WeiPerRad.mul(1000000)
           })
 
           await mockedPriceFeed.mock.peekPrice.returns(
@@ -140,7 +143,7 @@ describe("PriceOracle", () => {
           ).returns()
           await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
             .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(formatBytes32String("WXDC"), formatBytes32BigNumber(BigNumber.from("700000000000")), 0, BigNumber.from("700000000000"))
+            .withArgs(formatBytes32String("WXDC"), BigNumber.from("700000000000"), 0)
         })
       })
     })
@@ -243,6 +246,7 @@ describe("PriceOracle", () => {
           liquidatorIncentiveBps: 10250,
           treasuryFeesBps: 5000,
           strategy: AddressZero,
+          positionDebtCeiling: WeiPerRad.mul(1000000)
         })
 
         await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.returns()
@@ -303,6 +307,7 @@ describe("PriceOracle", () => {
           liquidatorIncentiveBps: 10250,
           treasuryFeesBps: 5000,
           strategy: AddressZero,
+          positionDebtCeiling: WeiPerRad.mul(1000000)
         })
 
         await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
@@ -312,7 +317,7 @@ describe("PriceOracle", () => {
 
         await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
           .to.emit(priceOracle, "LogSetPrice")
-          .withArgs(formatBytes32String("WXDC"), formatBytes32BigNumber(One), 0, One)
+          .withArgs(formatBytes32String("WXDC"), One, 0)
       })
     })
   })

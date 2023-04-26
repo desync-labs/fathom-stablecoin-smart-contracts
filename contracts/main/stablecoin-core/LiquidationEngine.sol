@@ -186,7 +186,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         );
     }
 
-    function setPriceOracle(address _priceOracle) external onlyOwnerOrShowStopper isLive {
+    function setPriceOracle(address _priceOracle) external onlyOwnerOrGov isLive {
         require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "LiquidationEngine/invalid-priceOracle"); // Sanity Check Call
         priceOracle = _priceOracle;
     }
@@ -302,8 +302,6 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
                 -int256(_vars.newPositionDebtShare)
             );
         }
-
-        ISetPrice(priceOracle).setPrice(_collateralPoolId);
     }
 
     // solhint-enable function-max-lines

@@ -214,6 +214,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         int256 /* debtShare */,
         bytes calldata _data
     ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
+        require(_collateralValue > -2 ** 255, "CollateralTokenAdapter/tooSmallCollateralValue");
         uint256 _unsignedCollateralValue = _collateralValue < 0 ? uint256(-_collateralValue) : uint256(_collateralValue);
         _moveStake(_source, _destination, _unsignedCollateralValue, _data);
     }
@@ -266,7 +267,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         emit LogDeposit(_amount); // wxdc
     }
 
-    /// @dev   /// withdraw collateral tokens from staking contract, and update BookKeeper and update BookKeeper
+    /// @dev withdraw collateral tokens from staking contract, and update BookKeeper
     /// @param _usr The position address to be updated
     /// @param _amount The amount to be deposited
     function _withdraw(address _usr, uint256 _amount) private {

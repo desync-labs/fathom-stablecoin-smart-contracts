@@ -3,7 +3,6 @@ const fs = require('fs');
 const pools = require("../../common/collateral");
 const { getAddresses } = require("../../common/addresses");
 const { getProxy } = require("../../common/proxies");
-const { ethers } = require("ethers");
 
 const FathomStablecoinProxyActions = artifacts.require('FathomStablecoinProxyActions.sol');
 
@@ -92,7 +91,7 @@ module.exports = async function (deployer) {
         ),
         proxyActionsStorage.initialize(fathomStablecoinProxyActions.address, bookKeeper.address, { gasLimit: 1000000 }),
         proxyWalletFactory.initialize(proxyActionsStorage.address, { gasLimit: 1000000 }),
-        proxyWalletRegistry.initialize(proxyWalletFactory.address, { gasLimit: 1000000 }),
+        proxyWalletRegistry.initialize(proxyWalletFactory.address, bookKeeper.address, { gasLimit: 1000000 }),
         flashMintModule.initialize(
             stablecoinAdapter.address,
             systemDebtEngine.address,
@@ -122,8 +121,8 @@ module.exports = async function (deployer) {
 
         delayFathomOraclePriceFeed.initialize(
             dexPriceOracle.address,
-            addresses.USD,
             addresses.WXDC,
+            addresses.USD,
             accessControlConfig.address,
             pools.XDC
         ),

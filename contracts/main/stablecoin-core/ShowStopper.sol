@@ -150,7 +150,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId);
         IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);
         totalDebtShare[_collateralPoolId] = _totalDebtShare;
-        cagePrice[_collateralPoolId] = wdiv(priceOracle.stableCoinReferencePrice(), uint256(_priceFeed.readPrice()));
+        cagePrice[_collateralPoolId] = wdiv(priceOracle.stableCoinReferencePrice(), _priceFeed.readPrice());
         emit LogCageCollateralPool(_collateralPoolId);
     }
 
@@ -211,9 +211,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         ); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
 
-        finalCashPrice[_collateralPoolId] =
-            mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) /
-            (debt / RAY);
+        finalCashPrice[_collateralPoolId] = mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) / (debt / RAY);
 
         emit LogFinalizeCashPrice(_collateralPoolId);
     }
