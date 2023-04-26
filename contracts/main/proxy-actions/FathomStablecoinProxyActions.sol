@@ -315,7 +315,6 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
 
         xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data);
-
         adjustPosition(
             _manager,
             _positionId,

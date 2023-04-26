@@ -18,5 +18,6 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/test/pre-deployment'],
     ['execute', '--path', 'scripts/migrations/deployment'],
     ['execute', '--path', 'scripts/migrations/test/configuration'],
+    ['execute', '--path', 'scripts/migrations/test/post-deployment'],
   ],
 }

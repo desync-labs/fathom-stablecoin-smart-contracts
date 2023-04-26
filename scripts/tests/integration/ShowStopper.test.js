@@ -27,6 +27,9 @@ const setup = async () => {
     const showStopper = await getProxy(proxyFactory, "ShowStopper");
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
+    const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
+    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
+    const MockCollateralTokenAdapter = await artifacts.initializeInterfaceAt("MockCollateralTokenAdapter", "MockCollateralTokenAdapter");
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
     await proxyWalletRegistry.setDecentralizedMode(true);
     
@@ -50,6 +53,9 @@ const setup = async () => {
         positionManager,
         aliceProxyWallet,
         bobProxyWallet,
+        collateralTokenAdapter,
+        WXDC,
+        MockCollateralTokenAdapter
     }
 }
 
@@ -83,7 +89,10 @@ describe("ShowStopper", () => {
             accessControlConfig,
             positionManager,
             aliceProxyWallet,
-            bobProxyWallet
+            bobProxyWallet,
+            collateralTokenAdapter,
+            WXDC,
+            MockCollateralTokenAdapter
         } = await loadFixture(setup));
     })
 
@@ -293,7 +302,7 @@ describe("ShowStopper", () => {
             it("should be able to accumulateStablecoin, redeemStablecoin", async () => {
                 // alice's position #1
                 //  a. open a new position
-                //  b. lock WXDC
+                //  b. lock XDC
                 //  c. mint FXD
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
                 await advanceBlock()
@@ -302,7 +311,7 @@ describe("ShowStopper", () => {
 
                 // bob's position #2
                 //  a. open a new position
-                //  b. lock WXDC
+                //  b. lock XDC
                 //  c. mint FXD
                 await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
                 await advanceBlock()
@@ -337,7 +346,7 @@ describe("ShowStopper", () => {
                 await showStopper.finalizeDebt()
                 expect(await showStopper.debt()).to.be.equal(WeiPerRad.mul(10))
 
-                // finalize cash price WXDC
+                // finalize cash price XDC
                 await showStopper.finalizeCashPrice(pools.XDC)
                 // badDebtAccumulator / totalDebt = 10000000000000000000000000000000000000000000000 / 10000000000000000000 = 1000000000000000000000000000
                 expect(await showStopper.finalCashPrice(pools.XDC)).to.be.equal("1000000000000000000000000000")
@@ -355,10 +364,147 @@ describe("ShowStopper", () => {
                 await showStopper.accumulateStablecoin(WeiPerWad.mul(5), { from: AliceAddress })
 
                 // redeem stablecoin
+                //, 
                 await showStopper.redeemStablecoin(pools.XDC, WeiPerWad.mul(5), { from: AliceAddress })
                 expect(await bookKeeper.collateralToken(pools.XDC, AliceAddress)).to.be.equal(
                     "5000000000000000000"
                 )
+            })
+        })
+        context("when redeem stablecoin with two col types", () => {
+            it("should be able to accumulateStablecoin, redeemStablecoin", async () => {
+                // alice's position #1
+                //  a. open a new position
+                //  b. lock XDC
+                //  c. mint FXD
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
+                await advanceBlock()
+                const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
+                const positionAddress = await positionManager.positions(positionId)
+
+                
+                // bob's position #2
+                //  a. open a new position
+                //  b. lock XDC
+                //  c. mint FXD
+                await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
+                await advanceBlock()
+                const positionId2 = await positionManager.ownerLastPositionId(bobProxyWallet.address)
+                const positionAddress2 = await positionManager.positions(positionId2)
+
+                // alice's position #3
+                //  a. open a new position
+                //  b. lock WXDC
+                //  c. mint FXD
+                await PositionHelper.openXDCPositionAndDrawMock(aliceProxyWallet, AliceAddress, pools.WXDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
+                await advanceBlock()
+                const positionId3 = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
+                const positionAddress3 = await positionManager.positions(positionId3)
+
+                
+                // bob's position #4
+                //  a. open a new position
+                //  b. lock WXDC
+                //  c. mint FXD
+                await PositionHelper.openXDCPositionAndDrawMock(bobProxyWallet, BobAddress, pools.WXDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
+                await advanceBlock()
+                const positionId4 = await positionManager.ownerLastPositionId(bobProxyWallet.address)
+                const positionAddress4 = await positionManager.positions(positionId4)
+
+                await showStopper.cage()
+
+                await showStopper.cagePool(pools.XDC)
+
+                await showStopper.cagePool(pools.WXDC)
+
+                // accumulate bad debt posiion #1
+                await showStopper.accumulateBadDebt(pools.XDC, positionAddress)
+                const position1 = await bookKeeper.positions(pools.XDC, positionAddress)
+                expect(position1.lockedCollateral).to.be.equal(WeiPerWad.mul(5))
+                expect(position1.debtShare).to.be.equal(0)
+                expect(await bookKeeper.collateralToken(pools.XDC, showStopper.address)).to.be.equal(
+                    WeiPerWad.mul(5)
+                )
+                expect(await bookKeeper.systemBadDebt(systemDebtEngine.address)).to.be.equal(WeiPerRad.mul(5))
+
+                // accumulate bad debt posiion #2
+                await showStopper.accumulateBadDebt(pools.XDC, positionAddress2)
+                const position2 = await bookKeeper.positions(pools.XDC, positionAddress2)
+                expect(position2.lockedCollateral).to.be.equal(WeiPerWad.mul(5))
+                expect(position2.debtShare).to.be.equal(0)
+                expect(await bookKeeper.collateralToken(pools.XDC, showStopper.address)).to.be.equal(
+                    WeiPerWad.mul(10)
+                )
+                expect(await bookKeeper.systemBadDebt(systemDebtEngine.address)).to.be.equal(WeiPerRad.mul(10))
+
+                // accumulate bad debt posiion #3
+                await showStopper.accumulateBadDebt(pools.WXDC, positionAddress3)
+                const position3 = await bookKeeper.positions(pools.WXDC, positionAddress3)
+                expect(position3.lockedCollateral).to.be.equal(WeiPerWad.mul(5))
+                expect(position3.debtShare).to.be.equal(0)
+                expect(await bookKeeper.collateralToken(pools.WXDC, showStopper.address)).to.be.equal(
+                    WeiPerWad.mul(5)
+                )
+                expect(await bookKeeper.systemBadDebt(systemDebtEngine.address)).to.be.equal(WeiPerRad.mul(15))
+
+                // accumulate bad debt posiion #4
+                await showStopper.accumulateBadDebt(pools.WXDC, positionAddress4)
+                const position4 = await bookKeeper.positions(pools.WXDC, positionAddress4)
+                expect(position4.lockedCollateral).to.be.equal(WeiPerWad.mul(5))
+                expect(position4.debtShare).to.be.equal(0)
+                expect(await bookKeeper.collateralToken(pools.WXDC, showStopper.address)).to.be.equal(
+                    WeiPerWad.mul(10)
+                )
+                expect(await bookKeeper.systemBadDebt(systemDebtEngine.address)).to.be.equal(WeiPerRad.mul(20))
+
+                // finalize debt
+                await showStopper.finalizeDebt()
+                expect(await showStopper.debt()).to.be.equal(WeiPerRad.mul(20))
+
+                // finalize cash price XDC
+                await showStopper.finalizeCashPrice(pools.XDC)
+
+                expect(await showStopper.finalCashPrice(pools.XDC)).to.be.equal("500000000000000000000000000")
+
+                // finalize cash price WXDC
+                await showStopper.finalizeCashPrice(pools.WXDC)
+
+                expect(await showStopper.finalCashPrice(pools.WXDC)).to.be.equal("500000000000000000000000000")
+
+                // accumulate stablecoin
+                await stablecoinAdapter.deposit(
+                    AliceAddress,
+                    WeiPerWad.mul(5),
+                    ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
+                    { from: AliceAddress, gasLimit: 1000000 }
+                )
+
+                await bookKeeper.whitelist(showStopper.address, { from: AliceAddress })
+
+                await showStopper.accumulateStablecoin(WeiPerWad.mul(5), { from: AliceAddress })
+
+
+                await showStopper.redeemStablecoin(pools.XDC, WeiPerWad.mul(5), { from: AliceAddress })
+                expect(await bookKeeper.collateralToken(pools.XDC, AliceAddress)).to.be.equal(
+                    "2500000000000000000"
+                )
+
+                await showStopper.redeemStablecoin(pools.WXDC, WeiPerWad.mul(5), { from: AliceAddress })
+                expect(await bookKeeper.collateralToken(pools.WXDC, AliceAddress)).to.be.equal(
+                    "2500000000000000000"
+                )
+
+                await collateralTokenAdapter.cage();
+                await collateralTokenAdapter.emergencyWithdraw(AliceAddress, { from: AliceAddress });
+                expect(await WXDC.balanceOf(AliceAddress)).to.be.equal(
+                    "2500000000000000000"
+                )
+                await MockCollateralTokenAdapter.cage();
+                await MockCollateralTokenAdapter.emergencyWithdraw(AliceAddress, { from: AliceAddress });
+                expect(await WXDC.balanceOf(AliceAddress)).to.be.equal(
+                    "5000000000000000000"
+                )
+
             })
         })
     })

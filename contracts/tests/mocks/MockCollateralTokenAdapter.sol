@@ -5,15 +5,15 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../../../interfaces/IBookKeeper.sol";
-import "../../../interfaces/ICollateralAdapter.sol";
-import "../../../interfaces/ICagable.sol";
-import "../../../interfaces/IManager.sol";
-import "../../../interfaces/IProxyRegistry.sol";
-import "../../../utils/SafeToken.sol";
-import "../../../interfaces/IVault.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/ICollateralAdapter.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/interfaces/IManager.sol";
+import "../../main/interfaces/IProxyRegistry.sol";
+import "../../main/utils/SafeToken.sol";
+import "../../main/interfaces/IVault.sol";
 
-contract CollateralTokenAdapterMath {
+contract MockCollateralTokenAdapterMath {
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAY = 10 ** 27;
 
@@ -64,7 +64,7 @@ contract CollateralTokenAdapterMath {
 }
 
 /// @dev receives WXDC from users and deposit in Vault.
-contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
 
     uint256 public live;
@@ -214,7 +214,6 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         int256 /* debtShare */,
         bytes calldata _data
     ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
-        require(_collateralValue > -2 ** 255, "CollateralTokenAdapter/tooSmallCollateralValue");
         uint256 _unsignedCollateralValue = _collateralValue < 0 ? uint256(-_collateralValue) : uint256(_collateralValue);
         _moveStake(_source, _destination, _unsignedCollateralValue, _data);
     }
@@ -267,7 +266,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         emit LogDeposit(_amount); // wxdc
     }
 
-    /// @dev withdraw collateral tokens from staking contract, and update BookKeeper
+    /// @dev   /// withdraw collateral tokens from staking contract, and update BookKeeper and update BookKeeper
     /// @param _usr The position address to be updated
     /// @param _amount The amount to be deposited
     function _withdraw(address _usr, uint256 _amount) private {
@@ -310,16 +309,15 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         );
         emit LogMoveStake(_source, _destination, _share);
     }
-
-  /// @dev EMERGENCY WHEN COLLATERAL TOKEN ADAPTER CAGED ONLY. Withdraw COLLATERAL from VAULT A after redeemStablecoin
-  function emergencyWithdraw(address _to) external nonReentrant {
-    if (live == 0) {
+        /// @dev EMERGENCY WHEN COLLATERAL TOKEN ADAPTER CAGED ONLY. Withdraw COLLATERAL from VAULT A after redeemStablecoin
+    function emergencyWithdraw(address _to) external nonReentrant {
+        if (live == 0) {
         uint256 _amount = bookKeeper.collateralToken(collateralPoolId, msg.sender);
         require(_amount < 2**255, "CollateralTokenAdapter/collateral-overflow");
         //deduct totalShare
         uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
         totalShare = sub(totalShare, _share);
-    
+
         //deduct emergency withdrawl amount of FXD
         bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
         //withdraw WXDC from Vault
@@ -327,6 +325,6 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         //Transfer WXDC to msg.sender
         address(collateralToken).safeTransfer(_to, _amount);
         emit LogEmergencyWithdraw(msg.sender, _to);
+        }
     }
-}
 }
