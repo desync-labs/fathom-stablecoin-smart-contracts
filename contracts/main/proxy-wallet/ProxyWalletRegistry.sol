@@ -16,7 +16,9 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
 
     event LogAddToWhitelist(address indexed user);
     event LogRemoveFromWhitelist(address indexed user);
-    event LogSetDecentralizedMode(bool oldValue, bool newValue);
+    event LogSetDecentralizedMode(bool newValue);
+    event LogProxyWalletCreation(address owner, address proxyWallet);
+
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
@@ -54,7 +56,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
 
     function setDecentralizedMode(bool isOn) external onlyOwner {
         isDecentralizedMode = isOn;
-
+        emit LogSetDecentralizedMode(isOn);
     }
 
     // --- pause ---
@@ -87,5 +89,6 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
         require(proxies[_owner] == ProxyWallet(payable(address(0)))); // Not allow new proxy if the user already has one
         _proxy = factory.build(_owner);
         proxies[_owner] = ProxyWallet(_proxy);
+        emit LogProxyWalletCreation(_owner, _proxy);
     }
 }
