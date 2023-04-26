@@ -110,4 +110,25 @@ describe("ProxyWallet", () => {
             })
         })
     })
+
+    describe("Should fail for empty data", async() => {
+        context("Should not be able to execute empty data", async() => {
+            it("Should revert for empty data", async() => {
+                await proxyWalletRegistry.build(AliceAddress, { from: AliceAddress, gasLimit: 2000000 })
+                const proxyWalletAliceAddress = await proxyWalletRegistry.proxies(AliceAddress)
+                expect(proxyWalletAliceAddress).to.be.not.equal(AddressZero)
+                const proxyWalletAsAlice = await artifacts.initializeInterfaceAt("ProxyWallet", proxyWalletAliceAddress);
+                expect(await proxyWalletAsAlice.owner({ from: AliceAddress })).to.be.equal(AliceAddress)
+                await expect(
+                    proxyWalletAsAlice.execute(
+                        [],//EMPTY DATA
+                        {
+                            from: AliceAddress
+                        }
+                    )
+                ).to.be.revertedWith("proxy-wallet-data-required")
+
+            })
+        })
+    })
 })
