@@ -38,6 +38,6 @@ contract DexPriceOracle is Initializable, IFathomDEXOracle {
             : (r0 * (10 ** (decimals1 - decimals0)), r1);
 
         uint price = (normalized0 * 1e18) / normalized1;
-        return (price, uint64(block.timestamp));
+        return (price, block.timestamp);
     }
 }
