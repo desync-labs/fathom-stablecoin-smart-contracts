@@ -269,7 +269,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
 
     /// @dev withdraw collateral tokens from staking contract, and update BookKeeper
     /// @param _usr The position address to be updated
-    /// @param _amount The amount to be deposited
+    /// @param _amount The amount to be withdrawn
     function _withdraw(address _usr, uint256 _amount) private {
         if (_amount > 0) {
             uint256 _share = wdivup(_amount, netAssetPerShare()); // [wad]
