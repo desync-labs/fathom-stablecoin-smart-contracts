@@ -11,7 +11,8 @@ const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
-
+    await proxyWalletRegistry.setDecentralizedMode(true);
+    
     return { proxyWalletRegistry }
 }
 
@@ -106,6 +107,27 @@ describe("ProxyWallet", () => {
                 await proxyWalletRegistry.setOwner(BobAddress, { from: AliceAddress })
                 expect(await proxyWalletRegistry.proxies(BobAddress)).to.be.equal(proxyWalletAliceAddress)
                 expect(await proxyWalletRegistry.proxies(AliceAddress)).to.be.equal(AddressZero)
+            })
+        })
+    })
+
+    describe("Should fail for empty data", async() => {
+        context("Should not be able to execute empty data", async() => {
+            it("Should revert for empty data", async() => {
+                await proxyWalletRegistry.build(AliceAddress, { from: AliceAddress, gasLimit: 2000000 })
+                const proxyWalletAliceAddress = await proxyWalletRegistry.proxies(AliceAddress)
+                expect(proxyWalletAliceAddress).to.be.not.equal(AddressZero)
+                const proxyWalletAsAlice = await artifacts.initializeInterfaceAt("ProxyWallet", proxyWalletAliceAddress);
+                expect(await proxyWalletAsAlice.owner({ from: AliceAddress })).to.be.equal(AliceAddress)
+                await expect(
+                    proxyWalletAsAlice.execute(
+                        [],//EMPTY DATA
+                        {
+                            from: AliceAddress
+                        }
+                    )
+                ).to.be.revertedWith("proxy-wallet-data-required")
+
             })
         })
     })

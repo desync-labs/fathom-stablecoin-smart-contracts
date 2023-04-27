@@ -382,8 +382,9 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
     ) external override nonReentrant whenNotPaused onlyLiquidationEngine {
         Position storage position = positions[_collateralPoolId][_positionAddress];
         ICollateralPoolConfig.CollateralPoolInfo memory _vars = ICollateralPoolConfig(collateralPoolConfig).getCollateralPoolInfo(_collateralPoolId);
-
+        // -- col from postion
         position.lockedCollateral = add(position.lockedCollateral, _collateralAmount);
+        // -- debt from position
         position.debtShare = add(position.debtShare, _debtShare);
         _vars.totalDebtShare = add(_vars.totalDebtShare, _debtShare);
         ICollateralPoolConfig(collateralPoolConfig).setTotalDebtShare(_collateralPoolId, _vars.totalDebtShare);
@@ -392,8 +393,9 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
 
         uint256 _poolStablecoinAmount = poolStablecoinIssued[_collateralPoolId];
         poolStablecoinIssued[_collateralPoolId] = add(_poolStablecoinAmount, _debtValue);
-
+        // ++ col to _collateralCreditor(showStopper in case of skim/accumulateBadDebt)
         collateralToken[_collateralPoolId][_collateralCreditor] = sub(collateralToken[_collateralPoolId][_collateralCreditor], _collateralAmount);
+        // ++ debt to systemDebyEngine
         systemBadDebt[_stablecoinDebtor] = sub(systemBadDebt[_stablecoinDebtor], _debtValue);
         totalUnbackedStablecoin = sub(totalUnbackedStablecoin, _debtValue);
     }

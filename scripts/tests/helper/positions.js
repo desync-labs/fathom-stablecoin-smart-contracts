@@ -55,6 +55,32 @@ const openXDCPositionAndDraw = async (proxyWallet, from, collateral_pool_id, col
     await proxyWallet.execute(call, {  value: collateral,  from: from})
 }
 
+const openXDCPositionAndDrawMock = async (proxyWallet, from, collateral_pool_id, collateral, stablecoin) => {
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const positionManager = await getProxy(proxyFactory, "PositionManager");
+    const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
+    const mockCollateralTokenAdapter = await artifacts.initializeInterfaceAt("MockCollateralTokenAdapter", "MockCollateralTokenAdapter");
+    const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
+    const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
+
+    const abi = [
+        "function openLockXDCAndDraw(address _manager, address _stabilityFeeCollector, address _xdcAdapter, address _stablecoinAdapter, bytes32 _collateralPoolId, uint256 _stablecoinAmount, bytes calldata _data)"
+    ];
+
+    const iFace = new ethers.utils.Interface(abi);
+    const call = iFace.encodeFunctionData("openLockXDCAndDraw", [
+        positionManager.address,
+        stabilityFeeCollector.address,
+        mockCollateralTokenAdapter.address,
+        stablecoinAdapter.address,
+        collateral_pool_id,
+        stablecoin,
+        "0x00",
+    ])
+    await proxyWallet.execute(call, {  value: collateral,  from: from})
+}
+
+
 const openPosition = async (proxyWallet, from, collateral_pool_id) => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
@@ -396,6 +422,7 @@ const importPosition = async (proxyWallet, from, source, positionId) => {
 module.exports = {
     openPositionAndDraw,
     openXDCPositionAndDraw,
+    openXDCPositionAndDrawMock,
     openPosition,
     wipeAndUnlockToken,
     wipeAndUnlockXDC,
