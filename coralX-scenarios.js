@@ -8,8 +8,8 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/configuration', '--network', 'apothem']
   ],
   deployMainNet: [
-    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'apothem'],
-    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'apothem']
+    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'mainnet'],
+    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'mainnet']
   ],
   deployTokensLocal: [
     ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'development']

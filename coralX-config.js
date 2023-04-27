@@ -13,6 +13,11 @@ module.exports = {
       private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },
+    mainnet: {
+      host: "https://rpc.xinfin.network/",
+      private_key: fs.readFileSync("./privateKey").toString(),
+      gasPrice: '0x3b9aca00',
+    },
     fromEnv: {
       host: process.env.ETH_HOST, // export ETH_HOST=...
       private_key: process.env.ETH_PK, // export ETH_PK=...
