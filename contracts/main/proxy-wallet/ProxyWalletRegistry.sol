@@ -19,7 +19,6 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     event LogSetDecentralizedMode(bool newValue);
     event LogProxyWalletCreation(address owner, address proxyWallet);
 
-
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
         require(
