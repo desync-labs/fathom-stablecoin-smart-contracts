@@ -43,7 +43,7 @@ module.exports = async function (deployer) {
             poolId,
             debtCeilingSetUp,
             0,
-            WeiPerRad.mul(50000),
+            WeiPerRad.mul(45),
             priceFeed,
             liquidationRatio,
             STABILITY_FEE,
