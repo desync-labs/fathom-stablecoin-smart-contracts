@@ -48,7 +48,7 @@ module.exports = async function (deployer) {
             liquidationRatio,
             STABILITY_FEE,
             adapter,
-            CLOSE_FACTOR_BPS.mul(2),
+            CLOSE_FACTOR_BPS,
             LIQUIDATOR_INCENTIVE_BPS,
             TREASURY_FEE_BPS,
             fixedSpreadLiquidationStrategy.address,
