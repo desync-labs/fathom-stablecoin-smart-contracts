@@ -60,43 +60,6 @@ describe("StabilityFeeCollector", () => {
         } = await loadFixture(loadFixtureHandler))
     })
 
-    describe("#collect", () => {
-        context("when call collect", async () => {
-            // skiped due to lack of getCall function. will be enabled after workaround will be found
-            xit("should be rate to ~ 1%", async () => {
-                await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
-                await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
-
-                // rate ~ 1% annually
-                // r^31536000 = 1.01
-                // r =~ 1000000000315522921573372069...
-                await mockedCollateralPoolConfig.mock.getStabilityFeeRate.returns(
-                    BigNumber.from("1000000000315522921573372069")
-                )
-
-                // time increase 1 year
-                await mockedCollateralPoolConfig.mock.getLastAccumulationTime.returns(await TimeHelpers.latest())
-                await TimeHelpers.increase(TimeHelpers.duration.seconds(ethers.BigNumber.from("31536000")))
-                // mock bookeeper
-                // set debtAccumulatedRate = 1 ray
-                await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(UnitHelpers.WeiPerRay)
-
-                // rate ~ 0.01 ray ~ 1%
-                await mockedBookKeeper.mock.accrueStabilityFee.returns()
-                await stabilityFeeCollectorAsAlice.collect(formatBytes32String("WXDC"), { gasLimit: 2000000 })
-
-                var call = mockedBookKeeper.mock.accrueStabilityFee.getCall(0);
-                expect(call.args._collateralPoolId).to.be.equal()
-                expect(call.args._stabilityFeeRecipient).to.be.equal()
-                // rate ~ 0.01 ray ~ 1%
-                AssertHelpers.assertAlmostEqual(
-                    call.args._debtAccumulatedRate.toString(),
-                    BigNumber.from("10000000000000000000000000").toString()
-                )
-            })
-        })
-    })
-
     describe("#setSystemDebtEngine", () => {
         context("when the caller is not the owner", async () => {
             it("should revert", async () => {

@@ -756,7 +756,8 @@ describe("PositionManager", () => {
 
     describe("#redeemLockedCollateral()", () => {
         context("when caller has no access to the position (or have no allowance)", () => {
-            xit("should revert", async () => {
+            //check
+            it("should revert", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 await expect(
                     positionManager.redeemLockedCollateral(1, mockedTokenAdapter.address, AliceAddress, "0x")
@@ -764,7 +765,8 @@ describe("PositionManager", () => {
             })
         })
         context("when parameters are valid", () => {
-            xit("should be able to redeemLockedCollateral", async () => {
+            //check
+            it("should be able to redeemLockedCollateral", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 const position1Address = await positionManager.positions(1)
                 await mockedShowStopper.mock.redeemLockedCollateral.withArgs(

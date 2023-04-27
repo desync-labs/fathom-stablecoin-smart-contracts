@@ -246,7 +246,8 @@ describe("ShowStopper", () => {
     context("when setting collateral pool is active", () => {
       context("pool is inactive", () => {
         context("and debtShare is more than 0", () => {
-          xit("should revert", async () => {
+          
+          it("should revert", async () => {
             await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
             await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
             await mockedAccessControlConfig.mock.hasRole.returns(true)
@@ -268,7 +269,8 @@ describe("ShowStopper", () => {
         })
 
         context("and lockedCollateral is overflow (> MaxInt256)", () => {
-          xit("should revert", async () => {
+          
+          it("should revert", async () => {
             await setup()
 
             await mockedBookKeeper.mock.positions.returns(ethers.constants.MaxUint256, BigNumber.from("0"))
@@ -286,7 +288,8 @@ describe("ShowStopper", () => {
         })
 
         context("when the caller has no access to the position", () => {
-          xit("should revert", async () => {
+          
+          it("should revert", async () => {
             await setup()
 
             await mockedBookKeeper.mock.positions.returns(WeiPerRay, BigNumber.from("0"))
@@ -303,7 +306,8 @@ describe("ShowStopper", () => {
         })
 
         context("and debtShare is 0 and lockedCollateral is 1 ray", () => {
-          xit("should be success", async () => {
+          
+          it("should be success", async () => {
             await setup()
 
             await mockedBookKeeper.mock.positions.withArgs(
@@ -336,7 +340,8 @@ describe("ShowStopper", () => {
         context(
           "and debtShare is 0 and lockedCollateral is 1 ray, but the caller does not have access to the position",
           () => {
-            xit("should be success", async () => {
+            
+            it("should be success", async () => {
               await setup()
 
               await mockedBookKeeper.mock.positions.returns(WeiPerRay, BigNumber.from("0"))
@@ -358,7 +363,8 @@ describe("ShowStopper", () => {
         context(
           "and debtShare is 0 and lockedCollateral is 1 ray, the caller is not the owner of the address but has access to",
           () => {
-            xit("should be success", async () => {
+            
+            it("should be success", async () => {
               await setup()
 
               await mockedAccessControlConfig.mock.hasRole.returns(false)
@@ -397,7 +403,8 @@ describe("ShowStopper", () => {
       })
 
       context("pool is active", () => {
-        xit("should revert", async () => {
+        
+        it("should revert", async () => {
           await expect(
             showStopper.redeemLockedCollateral(
               formatBytes32String("XDC"),
