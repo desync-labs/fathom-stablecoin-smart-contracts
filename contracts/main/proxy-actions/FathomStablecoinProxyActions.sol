@@ -447,7 +447,6 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _collateralAmount, // [token decimal]
         bytes calldata _data
     ) public {
-        // address _bookKeeper = IManager(_manager).bookKeeper();
         address _positionAddress = IManager(_manager).positions(_positionId);
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
         (, uint256 _debtShare) = IBookKeeper(IManager(_manager).bookKeeper()).positions(_collateralPoolId, _positionAddress);
