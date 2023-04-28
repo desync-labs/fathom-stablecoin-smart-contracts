@@ -16,6 +16,7 @@
     "migrate-reset": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run migrateAndConfigureForTests",
     "migrate-reset-local": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployLocal",
     "migrate-reset-apothem": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployApothem",
+    "migrate-reset-mainnet": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployMainNet",
     "deploy-tokens-local": "coralX scenario --run deployTokensLocal",
     "deploy-tokens-apothem": "coralX scenario --run deployTokensApothem"
   },

@@ -9,13 +9,20 @@ import "./ProxyWallet.sol";
 contract ProxyWalletFactory is OwnableUpgradeable {
     mapping(address => bool) public isProxy;
     address public proxyActionStorage;
+    address public proxyWalletRegistry;
 
     event LogCreated(address indexed _sender, address indexed _owner, address _proxy);
 
-    function initialize(address _proxyActionStorage) external initializer {
+    modifier onlyRegistry() {
+        require(msg.sender == proxyWalletRegistry, "!proxyWalletRegistry");
+        _;
+    }
+
+    function initialize(address _proxyActionStorage, address _proxyWalletRegistry) external initializer {
         OwnableUpgradeable.__Ownable_init();
 
         proxyActionStorage = _proxyActionStorage;
+        proxyWalletRegistry = _proxyWalletRegistry;
     }
 
     /// @dev Deploys a new proxy instance and sets owner of proxy to caller
@@ -24,7 +31,7 @@ contract ProxyWalletFactory is OwnableUpgradeable {
     }
 
     /// @dev Deploys a new proxy instance and sets custom owner of proxy
-    function build(address _owner) public returns (address payable _proxy) {
+    function build(address _owner) public onlyRegistry returns (address payable _proxy) {
         _proxy = payable(address(new ProxyWallet(proxyActionStorage)));
         emit LogCreated(msg.sender, _owner, address(_proxy));
         ProxyWallet(_proxy).setOwner(_owner);
