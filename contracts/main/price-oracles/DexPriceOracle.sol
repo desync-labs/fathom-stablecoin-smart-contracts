@@ -20,15 +20,9 @@ contract DexPriceOracle is Initializable, IFathomDEXOracle {
         require(token0 != token1, "DexPriceOracle/same-tokens");
 
         address pair = FathomSwapLibrary.pairFor(dexFactory, token0, token1);
-
-        uint256 r0;
-        uint256 r1;
         (address tokenA, ) = FathomSwapLibrary.sortTokens(token0, token1);
-        if (token0 == tokenA) {
-            (r0, r1, ) = IFathomSwapPair(pair).getReserves();
-        } else {
-            (r1, r0, ) = IFathomSwapPair(pair).getReserves();
-        }
+        
+        (uint256 r0, uint256 r1, ) = IFathomSwapPair(pair).getReserves();
 
         uint256 decimals0 = IToken(token0).decimals();
         uint256 decimals1 = IToken(token1).decimals();
@@ -37,7 +31,9 @@ contract DexPriceOracle is Initializable, IFathomDEXOracle {
             ? (r0, r1 * (10 ** (decimals0 - decimals1)))
             : (r0 * (10 ** (decimals1 - decimals0)), r1);
 
-        uint price = (normalized0 * 1e18) / normalized1;
+        uint price = (token0 == tokenA)
+            ? (normalized1 * 1e18) / normalized0
+            : (normalized0 * 1e18) / normalized1;
         return (price, block.timestamp);
     }
 }
