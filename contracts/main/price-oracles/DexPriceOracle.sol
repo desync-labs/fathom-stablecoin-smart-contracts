@@ -21,7 +21,6 @@ contract DexPriceOracle is Initializable, IFathomDEXOracle {
 
         address pair = FathomSwapLibrary.pairFor(dexFactory, token0, token1);
         (address tokenA, ) = FathomSwapLibrary.sortTokens(token0, token1);
-        
 
         uint256 r0;
         uint256 r1;

@@ -86,14 +86,14 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
 
         (uint256 price0Cumulative, uint256 price1Cumulative) = currentCumulativePrice(pair);
         (address token0, ) = FathomSwapLibrary.sortTokens(tokenA, tokenB);
-        
+
         uint256 decimalsA = IToken(tokenA).decimals();
         uint256 decimalsB = IToken(tokenB).decimals();
         uint256 rawPrice = tokenA == token0
             ? ((price0Cumulative - firstObservation.price0Cumulative) / timeElapsed)
             : ((price1Cumulative - firstObservation.price1Cumulative) / timeElapsed);
 
-        price = (_toDecimals18(rawPrice * (10**decimalsA), decimalsB)) >> RESOLUTION;
+        price = (_toDecimals18(rawPrice * (10 ** decimalsA), decimalsB)) >> RESOLUTION;
         blockTimestampLast = block.timestamp;
     }
 
@@ -129,8 +129,6 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
     }
 
     function _toDecimals18(uint256 _amount, uint _fromDecimals) private pure returns (uint256 result) {
-        result = _fromDecimals < 18
-            ? _amount * (10 ** (18 - _fromDecimals)) 
-            : _amount / (10 ** (_fromDecimals - 18));
+        result = _fromDecimals < 18 ? _amount * (10 ** (18 - _fromDecimals)) : _amount / (10 ** (_fromDecimals - 18));
     }
 }
