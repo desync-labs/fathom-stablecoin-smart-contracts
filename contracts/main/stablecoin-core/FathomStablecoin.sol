@@ -112,7 +112,6 @@ contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpg
         return true;
     }
 
-
     function _approve(address _owner, address _spender, uint256 _amount) internal {
         require(_owner != address(0), "FathomStablecoin/approve-from-zero-address");
         require(_spender != address(0), "FathomStablecoin/approve-to-zero-address");
