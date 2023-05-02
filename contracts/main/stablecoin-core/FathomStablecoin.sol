@@ -92,6 +92,12 @@ contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpg
         transferFrom(_src, _dst, _wad);
     }
 
+    function rename(string memory _name) external override {
+        require(hasRole(OWNER_ROLE, msg.sender), "!OWNER_ROLE");
+        name = _name;
+        emit Rename(_name);
+    }
+
     function transferFrom(address _src, address _dst, uint256 _wad) public override returns (bool) {
         require(_wad > 0, "FathomStablecoin/zero-amount");
         uint256 currentAllowance = allowance[_src][msg.sender];
@@ -104,13 +110,6 @@ contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpg
         balanceOf[_dst] = add(balanceOf[_dst], _wad);
         emit Transfer(_src, _dst, _wad);
         return true;
-    }
-
-    function rename(string memory _name, string memory _symbol) external {
-        require(hasRole(OWNER_ROLE, msg.sender), "!OWNER_ROLE");
-
-        name = _name;
-        symbol = _symbol;
     }
 
 
