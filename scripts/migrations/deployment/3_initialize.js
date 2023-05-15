@@ -8,6 +8,7 @@ const FathomStablecoinProxyActions = artifacts.require('FathomStablecoinProxyAct
 
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const proxyAdmin = await artifacts.initializeInterfaceAt("FathomProxyAdmin", "FathomProxyAdmin");
 
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
@@ -147,6 +148,7 @@ module.exports = async function (deployer) {
 
     const newAddresses = {
         proxyFactory: proxyFactory.address,
+        proxyAdmin: proxyAdmin.address,
         fixedSpreadLiquidationStrategy: fixedSpreadLiquidationStrategy.address,
         proxyWalletRegistry: proxyWalletRegistry.address,
         stabilityFeeCollector: stabilityFeeCollector.address,
