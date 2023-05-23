@@ -163,7 +163,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         emit LogStableSwapWrapperPauseState(false);
     }
 
-    function __transferToTheContract(address _token, uint256 _amount) internal {
+    function _transferToTheContract(address _token, uint256 _amount) internal {
         uint256 tokenBalanceBefore = _token.balanceOf(address(this));
         _token.safeTransferFrom(msg.sender, address(this), _amount);
         uint256 tokenBalanceAfter = _token.balanceOf(address(this));
@@ -173,8 +173,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     function _depositToStableSwap(address _token, uint256 _amount) internal {
         uint256 tokenBalanceBefore = token.balanceOf(address(this));
         _token.safeApprove(stableSwapModule, 0);
-        _token.safeApprove(stableSwapModule, _amount6decimals);
-        IStableSwapModule(stableSwapModule).depositToken(_token, _amount6decimals);
+        _token.safeApprove(stableSwapModule, _amount);
+        IStableSwapModule(stableSwapModule).depositToken(_token, _amount);
         uint256 tokenBalanceAfter = _token.balanceOf(address(this));
         require(tokenBalanceBefore - tokenBalanceAfter == _amount, "depositToStableSwap/amount-mismatch");
     }
