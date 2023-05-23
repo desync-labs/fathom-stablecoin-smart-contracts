@@ -21,6 +21,7 @@ import "../interfaces/IStableSwapModuleWrapper.sol";
 // An optional fee is charged for incoming and outgoing transfers
 contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModuleWrapper{
     using SafeToken for address;
+    uint256 internal constant WAD = 10 ** 18;
 
     IBookKeeper public bookKeeper;
 
@@ -31,6 +32,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     address public stableSwapModule;
     bool public isDecentralizedState;
     uint256 public totalValueDeposited;
+    
 
     mapping(address => uint256) public depositTracker;
     mapping(address => bool) public whiteListed;
@@ -97,17 +99,15 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         require(isDecentralizedState || usersWhitelist[msg.sender], "depositTokens/user-not-whitelisted");
         require(IToken(token).balanceOf(msg.sender) >= _amount, "depositTokens/token-not-enough");
         require(IToken(stablecoin).balanceOf(msg.sender) >= _amount, "depositTokens/FXD-not-enough");
+        
         uint256 _amount6decimals = _convertDecimals(_amount, 18, IToken(token).decimals());
-
-        token.safeTransferFrom(msg.sender, address(this), _amount6decimals);
-        IToken(token).approve(stableSwapModule, _amount6decimals);
-        IStableSwapModule(stableSwapModule).depositToken(token, _amount6decimals);
         
-        stablecoin.safeTransferFrom(msg.sender, address(this), _amount);
-        IToken(stablecoin).approve(stableSwapModule, _amount);
-        IStableSwapModule(stableSwapModule).depositToken(stablecoin, _amount);
+        _transferToTheContract(token, _amount6decimals);
+        _depositToStableSwap(token, _amount6decimals);
         
-
+        _transferToTheContract(stablecoin, _amount);
+        _depositToStableSwap(stablecoin, _amount);
+        
         //then call deposit fn for stablecoin
         //deposit tracker is saving only half of total token amount, later when
         //withdrawl happens
@@ -116,41 +116,39 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         // ( depositTracker * 2 ) * ratioOfToken in SSM 
         //need to be sent to withdrawer, of course, for token withdrawl, conversion
         //of decimals will be done
-        depositTracker[msg.sender] += _amount;
-        totalValueDeposited += _amount;
-
+        depositTracker[msg.sender] += 2 * _amount;
+        totalValueDeposited += 2 * _amount;
         emit LogDepositTokens(msg.sender, _amount);
     }
     function withdrawTokens(uint256 _amount) external override nonReentrant whenNotPaused onlyWhitelistedIfNotDecentralized{
         require(_amount != 0, "depositStablecoin/amount-zero");
         require(isDecentralizedState || usersWhitelist[msg.sender], "depositTokens/user-not-whitelisted");
-        require(depositTracker[msg.sender]>=_amount, "withdrawTokens/amount-exceeds-deposit");
+        require(depositTracker[msg.sender] >= _amount, "withdrawTokens/amount-exceeds-deposit");
         require(totalTokenDeposited >= _amount * 2, "withdrawTokens/amount-exceeds-total-deposit");
         
-        uint256 stablecoinAmountInStableswap18Decimals = IStableSwapRetriever(stableSwapModule).tokenBalance(stablecoin);
-        uint256 tokenAmountInStableswap6Decimals = IStableSwapRetriever(stableSwapModule).tokenBalance(token);
-        uint256 stablecoinAmountInStableswap6decimals = _convertDecimals(stablecoinAmountInStableswap18Decimals, 18, IToken(stablecoin).decimals());
-        uint256 tokenAmountInStableswap18decimals = _convertDecimals(stablecoinAmountInStableswap6decimals, IToken(token).decimals(), 18);
-        
-        uint256 _amount6decimals = _convertDecimals(_amount, 18, IToken(token).decimals());
-        
-        uint256 withdrawableStablecoinAmount = 
-                    depositTracker[msg.sender] * 
-                    _amount * 
-                    stablecoinAmountInStableswap18Decimals 
-                    / tokenAmountInStableswap18decimals / depositTracker[msg.sender];
+        uint256 stablecoinBalanceStableSwap18Decimals = IStableSwapRetriever(stableSwapModule).tokenBalance(stablecoin);
+        uint256 tokenBalanceStableSwap6Decimals = IStableSwapRetriever(stableSwapModule).tokenBalance(token);
+        uint256 tokenBalanceStableSwap18Decimals = _convertDecimals(tokenBalanceStableSwap6Decimals, IToken(token).decimals(), 18);
+       
+        uint256 stablecoinAmountToWithdraw = 
+                    _amount * WAD * stablecoinBalanceStableSwap18Decimals
+                    /(stablecoinBalanceStableSwap18Decimals + tokenBalanceStableSwap18Decimals) 
+                    / WAD;
 
-        uint256 withdrawableTokenAmount = 
-                    depositTracker[msg.sender] * 
-                    _amount6decimals * 
-                    tokenAmountInStableswap6Decimals 
-                    / stablecoinAmountInStableswap6decimals / depositTracker[msg.sender];
 
+        uint256 tokenAmountToWithdraw = 
+                    _amount * WAD * tokenBalanceStableSwap18Decimals
+                    /(stablecoinBalanceStableSwap18Decimals + tokenBalanceStableSwap18Decimals)
+                    /WAD;
+
+        require(stablecoinAmountToWithdraw + tokenAmountToWithdraw == _amount, "withdrawTokens/amount-mismatch");
+
+        uint256 tokenAmountToWithdraw6Decimals = _convertDecimals(tokenAmountToWithdraw, 18, IToken(token).decimals());
         
         depositTracker[msg.sender] -= _amount;
         totalValueDeposited -= _amount;
-        token.safeTransferFrom(address(this), msg.sender, withdrawableTokenAmount);
-        stablecoin.safeTransferFrom(address(this), msg.sender, withdrawableStablecoinAmount);
+        token.safeTransferFrom(address(this), msg.sender, tokenAmountToWithdraw6Decimals);
+        stablecoin.safeTransferFrom(address(this), msg.sender, stablecoinAmountToWithdraw);
 
         emit LogWithdrawTokens(msg.sender, _amount);
     }
@@ -163,6 +161,22 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     function unpause() external onlyOwnerOrGov {
         _unpause();
         emit LogStableSwapWrapperPauseState(false);
+    }
+
+    function __transferToTheContract(address _token, uint256 _amount) internal {
+        uint256 tokenBalanceBefore = _token.balanceOf(address(this));
+        _token.safeTransferFrom(msg.sender, address(this), _amount);
+        uint256 tokenBalanceAfter = _token.balanceOf(address(this));
+        require(tokenBalanceAfter - tokenBalanceBefore == _amount, "transferToTheContract/amount-mismatch");
+    }
+
+    function _depositToStableSwap(address _token, uint256 _amount) internal {
+        uint256 tokenBalanceBefore = token.balanceOf(address(this));
+        _token.safeApprove(stableSwapModule, 0);
+        _token.safeApprove(stableSwapModule, _amount6decimals);
+        IStableSwapModule(stableSwapModule).depositToken(_token, _amount6decimals);
+        uint256 tokenBalanceAfter = _token.balanceOf(address(this));
+        require(tokenBalanceBefore - tokenBalanceAfter == _amount, "depositToStableSwap/amount-mismatch");
     }
 
     function _convertDecimals(uint256 _amount, uint8 _fromDecimals, uint8 _toDecimals) internal pure returns (uint256 result) {

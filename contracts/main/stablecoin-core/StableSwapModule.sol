@@ -259,6 +259,16 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogWithdrawFees(_destination, pendingFXDBalance, pendingTokenBalance);
     }
 
+    function withdrawToken(address _token, uint256 _amount) external override nonReentrant onlyStableswapWrapper {
+        require(_token == token || _token == stablecoin, "withdrawToken/invalid-token");
+        require(_amount != 0, "withdrawToken/amount-zero");
+        require(tokenBalance[_token] >= _amount, "withdrawToken/not-enough-balance");
+        tokenBalance[_token] -= _amount;
+        _token.safeTransfer(msg.sender, _amount);
+        totalValueDeposited -= _convertDecimals(_amount, IToken(_token).decimals(), 18);
+        emit LogWithdrawToken(msg.sender, _token, _amount);
+    }
+
     function pause() external onlyOwnerOrGov {
         _pause();
         emit LogStableSwapPauseState(true);
