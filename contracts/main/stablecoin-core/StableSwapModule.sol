@@ -69,6 +69,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     event LogRemoveFromWhitelist(address indexed user);
     event LogNumberOfSwapsLimitPerUserUpdate(uint256 _newNumberOfSwapsLimitPerUser, uint256 _oldNumberOfSwapsLimitPerUser);
     event LogBlocksPerLimitUpdate(uint256 _newBlocksPerLimit, uint256 _oldBlocksPerLimit);
+    event LogWithdrawToken(address _account, address _token, uint256 _amount);
+
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -259,7 +261,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogWithdrawFees(_destination, pendingFXDBalance, pendingTokenBalance);
     }
 
-    function withdrawToken(address _token, uint256 _amount) external override nonReentrant onlyStableswapWrapper {
+    function withdrawToken(address _token, uint256 _amount) external override nonReentrant onlyOwnerOrGov //onlyStableSwapWrapper
+    {
         require(_token == token || _token == stablecoin, "withdrawToken/invalid-token");
         require(_amount != 0, "withdrawToken/amount-zero");
         require(tokenBalance[_token] >= _amount, "withdrawToken/not-enough-balance");
