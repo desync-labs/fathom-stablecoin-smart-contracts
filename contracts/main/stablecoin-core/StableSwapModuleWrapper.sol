@@ -146,12 +146,12 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
                     tokenAmountInStableswap6Decimals 
                     / stablecoinAmountInStableswap6decimals / depositTracker[msg.sender];
 
+        
         depositTracker[msg.sender] -= _amount;
-
-        token.safeTransferFrom(address(this), msg.sender, withdrawableStablecoinAmount);
-        stablecoin.safeTransferFrom(address(this), msg.sender, withdrawableTokenAmount);
-
         totalValueDeposited -= _amount;
+        token.safeTransferFrom(address(this), msg.sender, withdrawableTokenAmount);
+        stablecoin.safeTransferFrom(address(this), msg.sender, withdrawableStablecoinAmount);
+
         emit LogWithdrawTokens(msg.sender, _amount);
     }
 
