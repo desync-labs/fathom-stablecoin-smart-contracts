@@ -34,6 +34,7 @@ module.exports = async function (deployer) {
     const adminControls = await getProxy(proxyFactory, "AdminControls");
     const pluginPriceOracle = await getProxy(proxyFactory, "PluginPriceOracle");
     const centralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed");
+    const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const addresses = getAddresses(deployer.networkId())
@@ -140,7 +141,12 @@ module.exports = async function (deployer) {
             stablecoinAdapter.address
         ),
         pluginPriceOracle.initialize(accessControlConfig.address, addresses.PluginOracle),
-        centralizedOraclePriceFeed.initialize(pluginPriceOracle.address, accessControlConfig.address, pools.XDC)
+        centralizedOraclePriceFeed.initialize(pluginPriceOracle.address, accessControlConfig.address, pools.XDC),
+        stableSwapModuleWrapper.initialize(
+            addresses.USD,
+            fathomStablecoin.address, 
+            bookKeeper.address, 
+            stableSwapModule.address)
     ];
 
     await Promise.all(promises);

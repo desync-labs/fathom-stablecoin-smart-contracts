@@ -24,19 +24,19 @@ const setup = async () => {
 
     const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
+    const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
     
 
     const usdtAddr = await stableSwapModule.token()
     const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
 
-    await USDT.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
-    await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
+    await USDT.approve(stableSwapModuleWrapper.address, MaxUint256, { gasLimit: 1000000 })
+    await fathomStablecoin.approve(stableSwapModuleWrapper.address, MaxUint256, { gasLimit: 1000000 })
     
     await USDT.mint(DeployerAddress, TO_DEPOSIT, { gasLimit: 1000000 })
     await fathomStablecoin.mint(DeployerAddress, TO_DEPOSIT, { gasLimit: 1000000 })
 
-    await stableSwapModule.depositToken(USDT.address,TO_DEPOSIT,{ gasLimit: 1000000 })
-    await stableSwapModule.depositToken(fathomStablecoin.address,TO_DEPOSIT,{ gasLimit: 1000000 })
+    await stableSwapModuleWrapper.depositTokens(TO_DEPOSIT,{ gasLimit: 1000000 })
 
     await USDT.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000})
     await fathomStablecoin.approve(stableSwapModule.address, MaxUint256, { gasLimit: 1000000 })
@@ -47,7 +47,8 @@ const setup = async () => {
         USDT,
         stableSwapModule,
         fathomStablecoin,
-        stableswapMultipleSwapsMock
+        stableswapMultipleSwapsMock,
+        stableSwapModuleWrapper
     }
 }
 
@@ -56,7 +57,7 @@ describe("StableSwapModule", () => {
     let USDT
     let stableSwapModule
     let fathomStablecoin
-
+    let stableSwapModuleWrapper
     let stableswapMultipleSwapsMock
 
     before(async () => {
@@ -68,7 +69,8 @@ describe("StableSwapModule", () => {
             USDT,
             stableSwapModule,
             fathomStablecoin,
-            stableswapMultipleSwapsMock
+            stableswapMultipleSwapsMock,
+            stableSwapModuleWrapper
         } = await loadFixture(setup));
     })
 
@@ -239,8 +241,7 @@ describe("StableSwapModule", () => {
             it("Should update dailyLimit on depositing more token", async() => {
                 await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })    
-                await stableSwapModule.depositToken(USDT.address,TO_DEPOSIT,{ gasLimit: 1000000 })
-                await stableSwapModule.depositToken(fathomStablecoin.address,TO_DEPOSIT,{ gasLimit: 1000000 })
+                await stableSwapModuleWrapper.depositTokens(TO_DEPOSIT,{ gasLimit: 1000000 })
                 //Why GreaterThanOrEqual? Because there is one swap already done which incurs fee so total pool has increased
                 const remainingDailySwapAmount = await stableSwapModule.remainingDailySwapAmount() 
                 expect(remainingDailySwapAmount).to.be.gte(FOURTY_PERCENT_OF_TO_DEPOSIT);
@@ -250,6 +251,7 @@ describe("StableSwapModule", () => {
         context("check for daily limit - setDailySwapLimitNumerator", async() => {
             it("Should update dailyLimit on depositing more token", async() => {
                 await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
+                await stableSwapModuleWrapper.depositTokens(TO_DEPOSIT,{ gasLimit: 1000000 })
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })    
                 await stableSwapModule.setDailySwapLimitNumerator(3000,{gasLimit: 8000000})
                 //Why GreaterThanOrEqual? Because there is one swap already done which incurs fee so total pool has increased
@@ -449,5 +451,19 @@ describe("StableSwapModule", () => {
             expect(isUserWhitelisted).to.be.equal(false)
             })
         })
+    })
+
+    describe('withdrawTokens from Stableswap with stableswapWrapper', async() => {
+        context("Should withdraw tokens from stableswap as per the ratio", () => {
+            it("Should withdraw", async () => {
+                await stableSwapModuleWrapper.withdrawTokens(
+                    WeiPerWad,
+                    {
+                        from: DeployerAddress,
+                        gasLimit: 8000000
+                    }
+                )
+            })
+          })
     })
 })
