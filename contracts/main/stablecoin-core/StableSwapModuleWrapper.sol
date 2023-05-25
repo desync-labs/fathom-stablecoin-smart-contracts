@@ -138,7 +138,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
                     /WAD;
 
         //TODO: below line too risky of due to precision loss?
-        require(stablecoinAmountToWithdraw + tokenAmountToWithdraw == _amount, "withdrawTokens/amount-mismatch");
+        require(stablecoinAmountToWithdraw + tokenAmountToWithdraw <= _amount, "withdrawTokens/amount-mismatch");
         
         uint256 tokenAmountToWithdraw6Decimals = _convertDecimals(tokenAmountToWithdraw, 18, IToken(token).decimals());
         
