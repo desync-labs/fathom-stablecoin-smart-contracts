@@ -36,12 +36,16 @@ const loadFixtureHandler = async () => {
   await mockFathomStablecoin.mock.transfer.returns(true)
   await mockUSD.mock.transferFrom.returns(true)
   await mockUSD.mock.transfer.returns(true)
+  await mockUSD.mock.balanceOf.returns(WeiPerWad.mul(50000))
+  await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad.mul(50000))
 
   await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
   await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
 
   stableSwapModule = getContract("StableSwapModule", DeployerAddress)
   stableSwapModuleAsAlice = getContract("StableSwapModule", AliceAddress)
+  stableSwapModuleWrapper = getContract("StableSwapModuleWrapper", DeployerAddress)
+
   await stableSwapModule.initialize(
     mockBookKeeper.address,
     mockUSD.address,
@@ -52,13 +56,23 @@ const loadFixtureHandler = async () => {
     blocksPerLimit
   )
 
+  await stableSwapModuleWrapper.initialize(
+    mockUSD.address,
+    mockFathomStablecoin.address,
+    mockBookKeeper.address,
+    stableSwapModule.address
+  )
+
   await stableSwapModule.addToWhitelist(DeployerAddress)
+  await stableSwapModuleWrapper.addToWhitelist(DeployerAddress)
+  await stableSwapModule.setStableSwapWrapper(stableSwapModuleWrapper.address)
 
   return {
     stableSwapModule,
     mockUSD,
     mockedAccessControlConfig,
-    mockFathomStablecoin
+    mockFathomStablecoin,
+    stableSwapModuleWrapper
   }
 }
 describe("StableSwapModule", () => {
@@ -67,6 +81,7 @@ describe("StableSwapModule", () => {
   let mockUSD
   let stableSwapModule
   let mockFathomStablecoin
+  let stableSwapModuleWrapper
 
   before(async () => {
     await snapshot.revertToSnapshot();
@@ -77,7 +92,8 @@ describe("StableSwapModule", () => {
       stableSwapModule,
       mockUSD,
       mockedAccessControlConfig,
-      mockFathomStablecoin
+      mockFathomStablecoin,
+      stableSwapModuleWrapper
     } = await loadFixture(loadFixtureHandler))
   })
 
@@ -328,7 +344,7 @@ describe("StableSwapModule", () => {
     context("not authorized", () => {
       it("should revert", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(false)
-        await expect(stableSwapModule.depositToken(mockUSD.address, WeiPerWad)).to.be.revertedWith("!(ownerRole or govRole)")
+        await expect(stableSwapModule.depositToken(mockUSD.address, WeiPerWad)).to.be.revertedWith("only-stableswap-wrapper")
       })
     })
     context("paused contract", () => {
@@ -346,7 +362,7 @@ describe("StableSwapModule", () => {
 
         await expect(
           stableSwapModule.depositToken(mockToken.address, WeiPerWad)
-        ).to.be.revertedWith("depositStablecoin/invalid-token")
+        ).to.be.revertedWith("only-stableswap-wrapper")
       })
     })
     context("zero amount", () => {
@@ -354,7 +370,7 @@ describe("StableSwapModule", () => {
         await mockUSD.mock.balanceOf.returns(WeiPerWad)
         await expect(
           stableSwapModule.depositToken(mockUSD.address, BigNumber.from("0"))
-        ).to.be.revertedWith("depositStablecoin/amount-zero")
+        ).to.be.revertedWith("only-stableswap-wrapper")
       })
     })
     context("not enough balance", () => {
@@ -362,18 +378,7 @@ describe("StableSwapModule", () => {
         await mockUSD.mock.balanceOf.returns(WeiPerWad.div(2))
         await expect(
           stableSwapModule.depositToken(mockUSD.address, WeiPerWad)
-        ).to.be.revertedWith("depositStablecoin/not-enough-balance")
-      })
-    })
-    context("deposit token", () => {
-      it("should emit event and save balance", async () => {
-        await mockUSD.mock.balanceOf.returns(WeiPerWad)
-
-        await expect(
-          stableSwapModule.depositToken(mockUSD.address, WeiPerWad)
-        ).to.be.emit(stableSwapModule, "LogDepositToken")
-          .withArgs(DeployerAddress, mockUSD.address, WeiPerWad)
-        expect(await stableSwapModule.tokenBalance(mockUSD.address)).to.be.equal(WeiPerWad)
+        ).to.be.revertedWith("only-stableswap-wrapper")
       })
     })
   })
@@ -406,7 +411,8 @@ describe("StableSwapModule", () => {
       it("should revert after setting decentralized state - single swap limit", async () => {
         const bigMoney = WeiPerWad.mul(1000000);
         await mockFathomStablecoin.mock.balanceOf.returns(bigMoney)
-        await stableSwapModule.depositToken(mockFathomStablecoin.address, bigMoney)
+        await mockUSD.mock.balanceOf.returns(bigMoney)
+        await stableSwapModuleWrapper.depositTokens(bigMoney)
         await stableSwapModule.setDecentralizedStatesStatus(true)
         await expect(
           stableSwapModule.swapTokenToStablecoin(DeployerAddress, bigMoney)
@@ -419,7 +425,8 @@ describe("StableSwapModule", () => {
         const swapMoney = WeiPerWad.mul(1);
         const bigMoney = WeiPerWad.mul(1000000);
         await mockFathomStablecoin.mock.balanceOf.returns(bigMoney)
-        await stableSwapModule.depositToken(mockFathomStablecoin.address, bigMoney)
+        await mockUSD.mock.balanceOf.returns(bigMoney)
+        await stableSwapModuleWrapper.depositTokens(bigMoney)
         await stableSwapModule.setDecentralizedStatesStatus(true)
         await stableSwapModule.swapTokenToStablecoin(DeployerAddress, swapMoney)
         await expect(
@@ -431,8 +438,9 @@ describe("StableSwapModule", () => {
     context("swap token to stablecoin", () => {
       it("should swap and emit event", async () => {
         await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad)
-        await mockUSD.mock.balanceOf.returns(WeiPerWad.mul(2))
-        await stableSwapModule.depositToken(mockFathomStablecoin.address, WeiPerWad)
+        await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad)
+        await mockUSD.mock.balanceOf.returns(WeiPerWad)
+        await stableSwapModuleWrapper.depositTokens(WeiPerWad)
         await stableSwapModule.setFeeIn(WeiPerWad.div(10))
         await expect(
           stableSwapModule.swapTokenToStablecoin(DeployerAddress, WeiPerWad)
@@ -471,7 +479,8 @@ describe("StableSwapModule", () => {
       it("should revert after setting decentralized state - single swap limit", async () => {
         const bigMoney = WeiPerWad.mul(1000000);
         await mockUSD.mock.balanceOf.returns(bigMoney)
-        await stableSwapModule.depositToken(mockUSD.address, bigMoney)
+        await mockFathomStablecoin.mock.balanceOf.returns(bigMoney)
+        await stableSwapModuleWrapper.depositTokens(bigMoney)
         await stableSwapModule.setDecentralizedStatesStatus(true)
         await expect(
           stableSwapModule.swapStablecoinToToken(DeployerAddress, bigMoney)
@@ -484,7 +493,8 @@ describe("StableSwapModule", () => {
         const bigMoney = WeiPerWad.mul(1000000);
         const swapMoney = WeiPerWad.mul(1);
         await mockUSD.mock.balanceOf.returns(bigMoney)
-        await stableSwapModule.depositToken(mockUSD.address, bigMoney)
+        await mockFathomStablecoin.mock.balanceOf.returns(bigMoney)
+        await stableSwapModuleWrapper.depositTokens(bigMoney)
         await stableSwapModule.setDecentralizedStatesStatus(true)
         await stableSwapModule.swapStablecoinToToken(DeployerAddress, swapMoney)
         await expect(
@@ -496,7 +506,7 @@ describe("StableSwapModule", () => {
       it("should swap and emit event", async () => {
         await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad.mul(2))
         await mockUSD.mock.balanceOf.returns(WeiPerWad)
-        await stableSwapModule.depositToken(mockUSD.address, WeiPerWad)
+        await stableSwapModuleWrapper.depositTokens(WeiPerWad)
         await stableSwapModule.setFeeOut(WeiPerWad.div(10))
         await expect(
           stableSwapModule.swapStablecoinToToken(DeployerAddress, WeiPerWad)
@@ -509,7 +519,7 @@ describe("StableSwapModule", () => {
         await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad.mul(2))
         await mockUSD.mock.balanceOf.returns(WeiPerWad)
         await mockUSD.mock.decimals.returns(10)
-        await stableSwapModule.depositToken(mockUSD.address, WeiPerWad)
+        await stableSwapModule.depositToken(WeiPerWad)
         await stableSwapModule.setFeeOut(WeiPerWad.div(10))
         await expect(
           stableSwapModule.swapStablecoinToToken(DeployerAddress, WeiPerWad)
@@ -545,7 +555,7 @@ describe("StableSwapModule", () => {
       it("should emit event", async () => {
         await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad.mul(2))
         await mockUSD.mock.balanceOf.returns(WeiPerWad)
-        await stableSwapModule.depositToken(mockUSD.address, WeiPerWad)
+        await stableSwapModuleWrapper.depositTokens(WeiPerWad)
         await stableSwapModule.setFeeOut(WeiPerWad.div(10))
         await stableSwapModule.swapStablecoinToToken(DeployerAddress, WeiPerWad)
         await expect(
