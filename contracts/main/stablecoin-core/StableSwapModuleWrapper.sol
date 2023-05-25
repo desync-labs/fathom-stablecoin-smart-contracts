@@ -138,7 +138,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
                     _amount * WAD * tokenBalanceStableSwap18Decimals
                     /(stablecoinBalanceStableSwap18Decimals + tokenBalanceStableSwap18Decimals)
                     /WAD;
-
+                    
         uint256 tokenAmountToWithdrawScaled = _convertDecimals(tokenAmountToWithdraw, 18, IToken(token).decimals());
         
         depositTracker[msg.sender] -= _amount;
