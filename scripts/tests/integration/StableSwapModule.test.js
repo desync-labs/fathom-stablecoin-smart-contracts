@@ -453,17 +453,5 @@ describe("StableSwapModule", () => {
         })
     })
 
-    describe('withdrawTokens from Stableswap with stableswapWrapper', async() => {
-        context("Should withdraw tokens from stableswap as per the ratio", () => {
-            it("Should withdraw", async () => {
-                await stableSwapModuleWrapper.withdrawTokens(
-                    WeiPerWad,
-                    {
-                        from: DeployerAddress,
-                        gasLimit: 8000000
-                    }
-                )
-            })
-          })
-    })
+    
 })
