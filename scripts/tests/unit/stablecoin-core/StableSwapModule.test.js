@@ -412,6 +412,8 @@ describe("StableSwapModule", () => {
         const bigMoney = WeiPerWad.mul(1000000);
         await mockFathomStablecoin.mock.balanceOf.returns(bigMoney)
         await mockUSD.mock.balanceOf.returns(bigMoney)
+        await mockUSD.mock.balanceOf.returns(WeiPerWad.mul(50000))
+        
         await stableSwapModuleWrapper.depositTokens(bigMoney)
         await stableSwapModule.setDecentralizedStatesStatus(true)
         await expect(

@@ -241,7 +241,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
     function depositToken(address _token, uint256 _amount) external override nonReentrant whenNotPaused onlyStableswapWrapper {
         require(_token == token || _token == stablecoin, "depositStablecoin/invalid-token");
-        require(_amount != 0, "depositStablecoin/amount-zero");
+        require(_amount != 0, "stableswap-depositStablecoin/amount-zero");
         require(_token.balanceOf(msg.sender) >= _amount, "depositStablecoin/not-enough-balance");
         tokenBalance[_token] += _amount;
         _token.safeTransferFrom(msg.sender, address(this), _amount);

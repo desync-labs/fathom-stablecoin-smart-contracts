@@ -8,7 +8,7 @@ const FathomStablecoinProxyActions = artifacts.require('FathomStablecoinProxyAct
 
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
-
+    
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
     const proxyWalletFactory = await getProxy(proxyFactory, "ProxyWalletFactory");
@@ -105,7 +105,7 @@ module.exports = async function (deployer) {
 
         stableSwapModule.initialize(
             bookKeeper.address,
-            addresses.USD,
+            addresses.USDSTABLE,
             fathomStablecoin.address,
             dailyLimitNumerator,
             singleSwapLimitNumerator,
@@ -143,7 +143,7 @@ module.exports = async function (deployer) {
         pluginPriceOracle.initialize(accessControlConfig.address, addresses.PluginOracle),
         centralizedOraclePriceFeed.initialize(pluginPriceOracle.address, accessControlConfig.address, pools.XDC),
         stableSwapModuleWrapper.initialize(
-            addresses.USD,
+            addresses.USDSTABLE,
             fathomStablecoin.address, 
             bookKeeper.address, 
             stableSwapModule.address)

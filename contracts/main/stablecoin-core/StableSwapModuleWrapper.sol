@@ -15,8 +15,6 @@ import "../utils/SafeToken.sol";
 import "../interfaces/IStableSwapRetriever.sol";
 import "../interfaces/IStableSwapModuleWrapper.sol";
  
-
-
 contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModuleWrapper{
     using SafeToken for address;
     uint256 internal constant WAD = 10 ** 18;
@@ -99,12 +97,11 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
      * @dev so, the total deposit is twice the _amount    
      */
     function depositTokens(uint256 _amount) external override nonReentrant whenNotPaused onlyWhitelistedIfNotDecentralized{
-        require(_amount != 0, "depositTokens/amount-zero");
-        require(IToken(token).balanceOf(msg.sender) >= _amount, "depositTokens/token-not-enough");
+        require(_amount != 0, "wrapper-depositTokens/amount-zero");
+        uint256 _amountScaled = _convertDecimals(_amount, 18, IToken(token).decimals());
+        require(IToken(token).balanceOf(msg.sender) >= _amountScaled, "depositTokens/token-not-enough");
         require(IToken(stablecoin).balanceOf(msg.sender) >= _amount, "depositTokens/FXD-not-enough");
         
-        uint256 _amountScaled = _convertDecimals(_amount, 18, IToken(token).decimals());
-
         depositTracker[msg.sender] += 2 * _amount;
         totalValueDeposited += 2 * _amount;
 
@@ -119,7 +116,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     function withdrawTokens(uint256 _amount) external override nonReentrant whenNotPaused onlyWhitelistedIfNotDecentralized{
         require(_amount != 0, "depositStablecoin/amount-zero");
         require(depositTracker[msg.sender] >= 2 * _amount, "withdrawTokens/amount-exceeds-users-deposit");
-        require(totalValueDeposited >= _amount * 2, "withdrawTokens/amount-exceeds-total-deposit");
+        require(totalValueDeposited >= 2 * _amount , "withdrawTokens/amount-exceeds-total-deposit");
         
         uint256 stablecoinBalanceStableSwap18Decimals = IStableSwapRetriever(stableSwapModule).tokenBalance(stablecoin);
         uint256 tokenBalanceStableSwapScaled = IStableSwapRetriever(stableSwapModule).tokenBalance(token);
@@ -138,7 +135,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
                     _amount * WAD * tokenBalanceStableSwap18Decimals
                     /(stablecoinBalanceStableSwap18Decimals + tokenBalanceStableSwap18Decimals)
                     /WAD;
-                    
+
+        require(stablecoinAmountToWithdraw + tokenAmountToWithdraw <= _amount, "withdrawTokens/total-amount-from-stableswap-exceeds-amount");
         uint256 tokenAmountToWithdrawScaled = _convertDecimals(tokenAmountToWithdraw, 18, IToken(token).decimals());
         
         depositTracker[msg.sender] -= _amount;
