@@ -22,14 +22,12 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
     address public stablecoin;
     address public token;
-    uint256 public totalStablecoinDeposited;
     address public stableSwapModule;
     bool public isDecentralizedState;
     uint256 public totalValueDeposited;
     
 
     mapping(address => uint256) public depositTracker;
-    mapping(address => bool) public whiteListed;
     mapping(address => bool) public usersWhitelist;
     
     event LogDepositTokens(address indexed _depositor, uint256 _amount);
