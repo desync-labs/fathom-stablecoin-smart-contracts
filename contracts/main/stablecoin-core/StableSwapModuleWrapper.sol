@@ -120,8 +120,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         require(depositTracker[msg.sender] >= _amount, "withdrawTokens/amount-exceeds-users-deposit");
         require(totalValueDeposited >= _amount , "withdrawTokens/amount-exceeds-total-deposit");
         
-        uint256 stablecoinBalanceStableSwap18Decimals = IStableSwapRetriever(stableSwapModule).tokenBalance(stablecoin);
-        uint256 tokenBalanceStableSwapScaled = IStableSwapRetriever(stableSwapModule).tokenBalance(token);
+        uint256 stablecoinBalanceStableSwap18Decimals = IStableSwapModule(stableSwapModule).tokenBalance(stablecoin);
+        uint256 tokenBalanceStableSwapScaled = IStableSwapModule(stableSwapModule).tokenBalance(token);
         uint256 tokenBalanceStableSwap18Decimals = _convertDecimals(tokenBalanceStableSwapScaled, IToken(token).decimals(), 18);
        
         require(stablecoinBalanceStableSwap18Decimals + tokenBalanceStableSwap18Decimals >= _amount, 
@@ -154,7 +154,6 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         emit LogWithdrawTokens(msg.sender, _amount);
     }
 
-    
     function pause() external onlyOwnerOrGov {
         _pause();
         emit LogStableSwapWrapperPauseState(true);
