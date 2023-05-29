@@ -92,8 +92,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         emit LogUpdateIsDecentralizedState(isDecentralizedState);
     }
 
-    //@Dev _amount arg should be in 18 decimals
     /**
+     * @dev _amount arg should be in 18 decimals
      * @dev when you deposit tokens, you are depositing _amount of token and Stablecoin
      * @dev so, the total deposit is twice the _amount    
      */
@@ -108,7 +108,6 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
         depositTracker[msg.sender] += 2 * _amount;
         totalValueDeposited += 2 * _amount;
-
         
         _depositToStableSwap(stablecoin, _amount);
         _depositToStableSwap(token, _amountScaled);
@@ -118,8 +117,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
     function withdrawTokens(uint256 _amount) external override nonReentrant whenNotPaused onlyWhitelistedIfNotDecentralized{
         require(_amount != 0, "depositStablecoin/amount-zero");
-        require(depositTracker[msg.sender] >= 2 * _amount, "withdrawTokens/amount-exceeds-users-deposit");
-        require(totalValueDeposited >= 2 * _amount , "withdrawTokens/amount-exceeds-total-deposit");
+        require(depositTracker[msg.sender] >= _amount, "withdrawTokens/amount-exceeds-users-deposit");
+        require(totalValueDeposited >= _amount , "withdrawTokens/amount-exceeds-total-deposit");
         
         uint256 stablecoinBalanceStableSwap18Decimals = IStableSwapRetriever(stableSwapModule).tokenBalance(stablecoin);
         uint256 tokenBalanceStableSwapScaled = IStableSwapRetriever(stableSwapModule).tokenBalance(token);
