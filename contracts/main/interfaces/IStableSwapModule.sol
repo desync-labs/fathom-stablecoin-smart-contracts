@@ -10,4 +10,7 @@ interface IStableSwapModule {
     function withdrawFees(address _account) external;
     function emergencyWithdraw(address _account) external;
     function withdrawToken(address _token, uint256 _amount) external;
+    function stablecoin() external view returns (address);
+    function token() external view returns (address);
+    function tokenBalance(address) external view returns (uint256);
 }
