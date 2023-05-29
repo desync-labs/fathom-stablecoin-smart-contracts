@@ -396,9 +396,6 @@ describe("StableSwapModuleWrapper", () => {
         })
     })
 
-    //TODO: decentralized state testing
-    //TODO: more withdraw tokens testing
-
     describe("#depositTokens", async () => {
         context("deposit USDT and FXD as not whiteListed account", async () => {
             it("should fail", async () => {
@@ -415,6 +412,34 @@ describe("StableSwapModuleWrapper", () => {
                 await stableSwapModuleWrapper.depositTokens(TO_DEPOSIT, {gasLimit: 8000000})
                 const depositTracker1 = await stableSwapModuleWrapper.depositTracker(DeployerAddress);
                 expect(depositTracker1).to.be.equal(TO_DEPOSIT.mul(4))
+            })
+        })
+    })
+
+    describe('#amountGetters', async() => {
+        context('#getAmounts', async() => {
+            it('should return the correct amount of tokens', async() => {
+                const amounts = await stableSwapModuleWrapper.getAmounts(TO_DEPOSIT)
+                expect(amounts[0]).to.be.equal(TO_DEPOSIT.div(2))
+                expect(amounts[1]).to.be.equal(TO_DEPOSIT.div(2))
+            })
+        })
+
+        context('#getAmounts', async() => {
+            it('should return the correct amount of tokens after swap', async() => {
+                await stableSwapModule.swapTokenToStablecoin(DeployerAddress
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                const amounts = await stableSwapModuleWrapper.getAmounts(TO_DEPOSIT)
+                expect(amounts[0]).to.be.lte(TO_DEPOSIT.div(2))
+                expect(amounts[1]).to.be.gte(TO_DEPOSIT.div(2))
+            })
+        })
+
+        context('#getActualLiquidityAvailablePerUser', async() => {
+            it('should return the correct amount of tokens', async() => {
+                const amounts = await stableSwapModuleWrapper.getActualLiquidityAvailablePerUser()
+                expect(amounts[0]).to.be.equal(TO_DEPOSIT.div(2))
+                expect(amounts[1]).to.be.equal(TO_DEPOSIT.div(2))
             })
         })
     })
