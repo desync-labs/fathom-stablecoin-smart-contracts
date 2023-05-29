@@ -31,7 +31,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     mapping(address => uint256) public depositTracker;
     mapping(address => bool) public whiteListed;
     mapping(address => bool) public usersWhitelist;
-
+    
     event LogDepositTokens(address indexed _depositor, uint256 _amount);
     event LogWithdrawTokens(address indexed _depositor, uint256 _amount);
     event LogAddToWhitelist(address indexed user);
@@ -116,7 +116,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     }
 
     function withdrawTokens(uint256 _amount) external override nonReentrant whenNotPaused onlyWhitelistedIfNotDecentralized{
-        require(_amount != 0, "depositStablecoin/amount-zero");
+        require(_amount != 0, "withdrawTokens/amount-zero");
         require(depositTracker[msg.sender] >= _amount, "withdrawTokens/amount-exceeds-users-deposit");
         require(totalValueDeposited >= _amount , "withdrawTokens/amount-exceeds-total-deposit");
         
@@ -165,6 +165,10 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     }
 
     function getAmounts(uint256 _amount) external override view returns(uint256, uint256) {
+        require(_amount != 0, "getAmounts/amount-zero");
+        require(depositTracker[msg.sender] >= _amount, "getAmounts/amount-exceeds-users-deposit");
+        require(totalValueDeposited >= _amount , "getAmounts/amount-exceeds-total-deposit");
+
         uint256 stablecoinBalanceStableSwap18Decimals = IStableSwapModule(stableSwapModule).tokenBalance(stablecoin);
         uint256 tokenBalanceStableSwapScaled = IStableSwapModule(stableSwapModule).tokenBalance(token);
         uint256 tokenBalanceStableSwap18Decimals = _convertDecimals(tokenBalanceStableSwapScaled, IToken(token).decimals(), 18);
@@ -179,10 +183,27 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
                     /(stablecoinBalanceStableSwap18Decimals + tokenBalanceStableSwap18Decimals)
                     /WAD;
 
-        uint256 tokenAmountToWithdrawScaled = _convertDecimals(tokenAmountToWithdraw, 18, IToken(token).decimals());
-        return (stablecoinAmountToWithdraw, tokenAmountToWithdrawScaled);
+        return (stablecoinAmountToWithdraw, tokenAmountToWithdraw);
     }
 
+    function getActualLiquidityAvailablePerUser() external override view returns(uint256, uint256) {
+        uint256 _amount = depositTracker[msg.sender] / 2;
+        uint256 stablecoinBalanceStableSwap18Decimals = IStableSwapModule(stableSwapModule).tokenBalance(stablecoin);
+        uint256 tokenBalanceStableSwapScaled = IStableSwapModule(stableSwapModule).tokenBalance(token);
+        uint256 tokenBalanceStableSwap18Decimals = _convertDecimals(tokenBalanceStableSwapScaled, IToken(token).decimals(), 18);
+       
+        uint256 stablecoinAmountToWithdraw = 
+                    _amount * WAD * stablecoinBalanceStableSwap18Decimals
+                    /(stablecoinBalanceStableSwap18Decimals + tokenBalanceStableSwap18Decimals) 
+                    / WAD;
+
+        uint256 tokenAmountToWithdraw = 
+                    _amount * WAD * tokenBalanceStableSwap18Decimals
+                    /(stablecoinBalanceStableSwap18Decimals + tokenBalanceStableSwap18Decimals)
+                    /WAD;
+
+        return (stablecoinAmountToWithdraw, tokenAmountToWithdraw);
+    }
 
     function _depositToStableSwap(address _token, uint256 _amount) internal {
         uint256 tokenBalanceBefore = _token.balanceOf(address(this));
