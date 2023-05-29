@@ -24,10 +24,10 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     uint256 internal constant WAD = 10 ** 18;
 
     IBookKeeper public bookKeeper;
-    address public stablecoin;
-    address public token;
+    address public override stablecoin;
+    address public override token;
     bool public isDecentralizedState;
-    mapping(address => uint256) public tokenBalance;
+    mapping(address => uint256) public override tokenBalance;
 
     uint256 public feeIn; // fee in [wad]
     uint256 public feeOut; // fee out [wad]

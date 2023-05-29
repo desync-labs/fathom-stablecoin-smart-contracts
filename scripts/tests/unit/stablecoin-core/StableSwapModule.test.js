@@ -57,8 +57,6 @@ const loadFixtureHandler = async () => {
   )
 
   await stableSwapModuleWrapper.initialize(
-    mockUSD.address,
-    mockFathomStablecoin.address,
     mockBookKeeper.address,
     stableSwapModule.address
   )

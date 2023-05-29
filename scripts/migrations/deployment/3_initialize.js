@@ -143,8 +143,6 @@ module.exports = async function (deployer) {
         pluginPriceOracle.initialize(accessControlConfig.address, addresses.PluginOracle),
         centralizedOraclePriceFeed.initialize(pluginPriceOracle.address, accessControlConfig.address, pools.XDC),
         stableSwapModuleWrapper.initialize(
-            addresses.USDSTABLE,
-            fathomStablecoin.address, 
             bookKeeper.address, 
             stableSwapModule.address)
     ];
