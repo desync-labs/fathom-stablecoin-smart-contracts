@@ -92,7 +92,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
     /**
      * @dev _amount arg should be in 18 decimals
-     * @dev when you deposit tokens, you are depositing _amount of token and Stablecoin
+     * @dev when you deposit tokens, you are depositing _amount of Stablecoin and Token each
      * @dev so, the total deposit is twice the _amount    
      */
     function depositTokens(uint256 _amount) external override nonReentrant whenNotPaused onlyWhitelistedIfNotDecentralized{
@@ -113,6 +113,11 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         emit LogDepositTokens(msg.sender, _amount);
     }
 
+    /**
+     * @dev _amount arg should be in 18 decimals
+     * @dev when you withdraw tokens, you are withdrawing _amount of total tokens , ie half of stablecoin and half of token
+     * @dev please consider that the withdraw of each token is not exactly half but depends upon ratio of tokens in the stableswap
+     */
     function withdrawTokens(uint256 _amount) external override nonReentrant whenNotPaused onlyWhitelistedIfNotDecentralized{
         require(_amount != 0, "withdrawTokens/amount-zero");
         require(depositTracker[msg.sender] >= _amount, "withdrawTokens/amount-exceeds-users-deposit");
@@ -184,8 +189,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         return (stablecoinAmountToWithdraw, tokenAmountToWithdraw);
     }
 
-    function getActualLiquidityAvailablePerUser() external override view returns(uint256, uint256) {
-        uint256 _amount = depositTracker[msg.sender] / 2;
+    function getActualLiquidityAvailablePerUser(address account) external override view returns(uint256, uint256) {
+        uint256 _amount = depositTracker[account];
         uint256 stablecoinBalanceStableSwap18Decimals = IStableSwapModule(stableSwapModule).tokenBalance(stablecoin);
         uint256 tokenBalanceStableSwapScaled = IStableSwapModule(stableSwapModule).tokenBalance(token);
         uint256 tokenBalanceStableSwap18Decimals = _convertDecimals(tokenBalanceStableSwapScaled, IToken(token).decimals(), 18);

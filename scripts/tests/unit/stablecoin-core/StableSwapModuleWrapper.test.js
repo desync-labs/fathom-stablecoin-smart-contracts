@@ -7,7 +7,7 @@ const { formatBytes32String } = ethers.utils
 
 const { DeployerAddress, AliceAddress, AddressZero } = require("../../helper/address");
 const { getContract, createMock } = require("../../helper/contracts");
-const { WeiPerRay, WeiPerWad } = require("../../helper/unit")
+const { WeiPerRay, WeiPerWad, WeiPerRad } = require("../../helper/unit")
 const { loadFixture } = require("../../helper/fixtures");
 const dailyLimitNumerator = 2000//on denomination of 10000th, 2000/10000 = 20%
 const singleSwapLimitNumerator = 100 ///on denomination of 10000th, 100/10000 = 1%
@@ -245,4 +245,19 @@ describe("StableSwapModule", () => {
       })
     })
   })
+
+  describe("#getters", () => {
+    context("zero deposit - getActualLiquidityAvailablePerUser", () => {
+      it("should revert for zero deposit - get amounts", () => {
+        expect(stableSwapModuleWrapper.getAmounts(0)).to.be.revertedWith("getAmounts/amount-zero")
+      })
+    })
+    context("zero deposit - getActualLiquidityAvailablePerUser", () => {
+      it("should revert for no deposit for the user - get amounts", () => {
+        expect(stableSwapModuleWrapper.getAmounts(WeiPerRad)).to.be.revertedWith("getAmounts/amount-exceeds-users-deposit")
+      })
+    })
+  })
+
+  
 })
