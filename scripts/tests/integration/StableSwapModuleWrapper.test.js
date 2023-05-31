@@ -437,9 +437,9 @@ describe("StableSwapModuleWrapper", () => {
 
         context('#getActualLiquidityAvailablePerUser', async() => {
             it('should return the correct amount of tokens', async() => {
-                const amounts = await stableSwapModuleWrapper.getActualLiquidityAvailablePerUser()
-                expect(amounts[0]).to.be.equal(TO_DEPOSIT.div(2))
-                expect(amounts[1]).to.be.equal(TO_DEPOSIT.div(2))
+                const amounts = await stableSwapModuleWrapper.getActualLiquidityAvailablePerUser(DeployerAddress)
+                expect(amounts[0]).to.be.equal(TO_DEPOSIT)
+                expect(amounts[1]).to.be.equal(TO_DEPOSIT)
             })
         })
     })
