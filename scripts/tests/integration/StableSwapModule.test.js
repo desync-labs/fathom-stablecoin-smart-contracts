@@ -467,5 +467,23 @@ describe("StableSwapModule", () => {
         })
     })
 
+    describe('#unitTests',async() => {
+        context("exceed single swap limit", () => {
+            it("should revert after setting decentralized state - single swap limit - swapStablecoinToToken", async () => {
+                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
+                await expect(stableSwapModule.swapStablecoinToToken(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT.add(1), { gasLimit: 1000000 })).to.be.revertedWith('_checkSingleSwapLimit/single-swap-exceeds-limit')
+            })
+          })
+
+          context("exceed single swap limit", () => {
+            it("should revert after setting decentralized state - single swap limit - swapTokenToStablecoin", async () => {
+                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
+                await expect(stableSwapModule.swapTokenToStablecoin(DeployerAddress
+                    ,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.add(1), { gasLimit: 1000000 })).to.be.revertedWith('_checkSingleSwapLimit/single-swap-exceeds-limit')
+            })
+          })
+    })
+
     
 })
