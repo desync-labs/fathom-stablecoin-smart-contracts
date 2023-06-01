@@ -13,6 +13,7 @@ import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IStableSwapModule.sol";
 import "../utils/SafeToken.sol";
 import "../interfaces/IStableSwapModuleWrapper.sol";
+import "../interfaces/IStableSwapRetriever.sol";
  
 contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModuleWrapper{
     using SafeToken for address;
@@ -29,6 +30,11 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
     mapping(address => uint256) public depositTracker;
     mapping(address => bool) public usersWhitelist;
+
+    //storage variables after upgrade - 1
+    mapping(address => uint256) public checkpointFXDFee;
+    mapping(address => uint256) public checkpointTokenFee;
+
     
     event LogDepositTokens(address indexed _depositor, uint256 _amount);
     event LogWithdrawTokens(address indexed _depositor, uint256 _amount);
@@ -106,11 +112,14 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
         depositTracker[msg.sender] += 2 * _amount;
         totalValueDeposited += 2 * _amount;
+
+        checkpointFXDFee[msg.sender] = _totalFXDFeeBalance();
+        checkpointTokenFee[msg.sender] = _totalTokenFeeBalance();
         
         _depositToStableSwap(stablecoin, _amount);
         _depositToStableSwap(token, _amountScaled);
-        
-        emit LogDepositTokens(msg.sender, _amount);
+
+            emit LogDepositTokens(msg.sender, _amount);
     }
 
     /**
@@ -151,11 +160,33 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         depositTracker[msg.sender] -= _amount;
         totalValueDeposited -= _amount;
 
+        checkpointFXDFee[msg.sender] = _totalFXDFeeBalance();
+        checkpointTokenFee[msg.sender] = _totalTokenFeeBalance();
+
         _transferToUser(stablecoin, stablecoinAmountToWithdraw);
         _transferToUser(token, tokenAmountToWithdrawScaled);
 
         emit LogWithdrawTokens(msg.sender, _amount);
     }
+
+    function claimRewards() external {
+        uint256 totalLiquidity = IStableSwapRetriever(stableSwapModule).totalValueLocked();
+        uint256 providerLiquidity = depositTracker[msg.sender]/2;
+
+        uint256 newFeesForFXD = _totalFXDFeeBalance() - checkpointFXDFee[msg.sender];
+        uint256 newFeesForToken = _totalTokenFeeBalance()- checkpointTokenFee[msg.sender];
+
+        uint256 rewardsFXD = (newFeesForFXD * providerLiquidity) / totalLiquidity;
+        uint256 rewardsToken = (newFeesForToken * providerLiquidity) / totalLiquidity;
+
+        checkpointFXDFee[msg.sender] = _totalFXDFeeBalance();
+        checkpointTokenFee[msg.sender] = _totalTokenFeeBalance();
+
+        // Transfer `rewards` to msg.sender.
+        _withdrawFeesFromStableswap(rewardsFXD);
+        _withdrawFeesFromStableswap(rewardsToken);
+    }
+
 
     function pause() external onlyOwnerOrGov {
         _pause();
@@ -224,11 +255,23 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         require(tokenBalanceAfter - tokenBalanceBefore == _amount, "withdrawFromStableSwap/amount-mismatch");
     }
 
+    function _withdrawFeesFromStableswap(uint256 _amount) internal {
+        //TODO
+    }
+
     function _transferToTheContract(address _token, uint256 _amount) internal {
         _token.safeTransferFrom(msg.sender, address(this), _amount);
     }
     function _transferToUser(address _token, uint256 _amount) internal {
         _token.safeTransfer(msg.sender, _amount);
+    }
+
+    function _totalFXDFeeBalance() internal view returns(uint256) {
+        return IStableSwapRetriever(stableSwapModule).totalFXDFeeBalance();
+    }
+
+    function _totalTokenFeeBalance() internal view returns(uint256) {
+        return IStableSwapRetriever(stableSwapModule).totalTokenFeeBalance();
     }
 
     function _convertDecimals(uint256 _amount, uint8 _fromDecimals, uint8 _toDecimals) internal pure returns (uint256 result) {

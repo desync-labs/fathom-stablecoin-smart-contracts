@@ -254,7 +254,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         emit LogDepositToken(msg.sender, _token, _amount);
     }
-
+    //@note: TODO: Total Fee Balance should only be increasing - never should it be set to zero for proper fee calculation in wrapper
     function withdrawFees(address _destination) external override nonReentrant onlyOwnerOrGov {
         require(_destination != address(0), "withdrawFees/wrong-destination");
         require(totalFXDFeeBalance != 0 || totalTokenFeeBalance != 0, "withdrawFees/no-fee-balance");
