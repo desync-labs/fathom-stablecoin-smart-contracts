@@ -113,13 +113,12 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         depositTracker[msg.sender] += 2 * _amount;
         totalValueDeposited += 2 * _amount;
 
-        checkpointFXDFee[msg.sender] = _totalFXDFeeBalance();
-        checkpointTokenFee[msg.sender] = _totalTokenFeeBalance();
+        _updateCheckpoint();
         
         _depositToStableSwap(stablecoin, _amount);
         _depositToStableSwap(token, _amountScaled);
 
-            emit LogDepositTokens(msg.sender, _amount);
+        emit LogDepositTokens(msg.sender, _amount);
     }
 
     /**
@@ -160,8 +159,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         depositTracker[msg.sender] -= _amount;
         totalValueDeposited -= _amount;
 
-        checkpointFXDFee[msg.sender] = _totalFXDFeeBalance();
-        checkpointTokenFee[msg.sender] = _totalTokenFeeBalance();
+        _updateCheckpoint();
 
         _transferToUser(stablecoin, stablecoinAmountToWithdraw);
         _transferToUser(token, tokenAmountToWithdrawScaled);
@@ -169,18 +167,19 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         emit LogWithdrawTokens(msg.sender, _amount);
     }
 
+    //TODO: Add more validation
     function claimRewards() external {
-        uint256 totalLiquidity = IStableSwapRetriever(stableSwapModule).totalValueLocked();
+        uint256 totalFXDLiquidity = IStableSwapModule(stableSwapModule).tokenBalance(stablecoin);
+        uint256 totalStablecoinLiquidity = IStableSwapModule(stableSwapModule).tokenBalance(token);
         uint256 providerLiquidity = depositTracker[msg.sender]/2;
-
+        
         uint256 newFeesForFXD = _totalFXDFeeBalance() - checkpointFXDFee[msg.sender];
         uint256 newFeesForToken = _totalTokenFeeBalance()- checkpointTokenFee[msg.sender];
 
-        uint256 rewardsFXD = (newFeesForFXD * providerLiquidity) / totalLiquidity;
-        uint256 rewardsToken = (newFeesForToken * providerLiquidity) / totalLiquidity;
+        uint256 rewardsFXD = (newFeesForFXD * providerLiquidity) / totalFXDLiquidity;
+        uint256 rewardsToken = (newFeesForToken * providerLiquidity) / totalStablecoinLiquidity;
 
-        checkpointFXDFee[msg.sender] = _totalFXDFeeBalance();
-        checkpointTokenFee[msg.sender] = _totalTokenFeeBalance();
+        _updateCheckpoint();
 
         // Transfer `rewards` to msg.sender.
         _withdrawFeesFromStableswap(rewardsFXD);
@@ -258,6 +257,12 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     function _withdrawFeesFromStableswap(uint256 _amount) internal {
         //TODO
     }
+
+    function _updateCheckpoint() internal {
+        checkpointFXDFee[msg.sender] = _totalFXDFeeBalance();
+        checkpointTokenFee[msg.sender] = _totalTokenFeeBalance();
+    }
+
 
     function _transferToTheContract(address _token, uint256 _amount) internal {
         _token.safeTransferFrom(msg.sender, address(this), _amount);
