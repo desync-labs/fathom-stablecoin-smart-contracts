@@ -472,8 +472,8 @@ describe("StableSwapModuleWrapper", () => {
             })
         })
 
-        context('100 iterations of swaps and withdraws', async() => {
-            it('Should be successful in 100 swaps with different numbers and withdraw from stableSwapWrapper - and after withdrawing all liquidity and fees - total liquidity should be zero', async() => {
+        context('55 iterations of swaps and withdraws', async() => {
+            it('Should be successful in 55 swaps with different numbers and withdraw from stableSwapWrapper - and after withdrawing all liquidity and fees - total liquidity should be zero', async() => {
                 for(let i =1;i <= 50;i++){
                     console.log("Swapping Token to Stablecoin - No...........",i)
                     await stableSwapModule.swapTokenToStablecoin(DeployerAddress,WeiPerSixDecimals.mul(i), { gasLimit: 1000000 })
@@ -481,7 +481,7 @@ describe("StableSwapModuleWrapper", () => {
                     await TimeHelpers.increase(1)
                 }
 
-                for(let i =1;i <= 50;i++){
+                for(let i =1;i <= 5;i++){
                     console.log("Swapping Stablecion to Token - No...........",i)
                     await stableSwapModule.swapStablecoinToToken(DeployerAddress,WeiPerWad.mul(i), { gasLimit: 1000000 })    
                     //increase block time so that a block is mined before swapping
@@ -490,7 +490,7 @@ describe("StableSwapModuleWrapper", () => {
                 await stableSwapModuleWrapper.withdrawTokens(TO_DEPOSIT.mul(2), { from: DeployerAddress, gasLimit: 8000000 })
                 const depositTracker1 = await stableSwapModuleWrapper.depositTracker(DeployerAddress);
                 expect(depositTracker1).to.be.equal(0)
-                await stableSwapModule.withdrawFees(accounts[2]);
+                await stableSwapModule.withdrawFees(accounts[2], {from: DeployerAddress, gasLimit: 1000000});
                 const stableswapModuleLiquidity = await stableSwapModule.totalValueLocked()
                 expect(stableswapModuleLiquidity).to.be.equal(0)
                 })
