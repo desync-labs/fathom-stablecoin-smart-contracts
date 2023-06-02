@@ -207,7 +207,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
             _updateAndCheckNumberOfSwapsInBlocksPerLimit();
         }
 
-        tokenBalance[stablecoin] -= stablecoinAmount;
+        tokenBalance[stablecoin] -= tokenAmount18;
         tokenBalance[token] += _amount;
         totalFXDFeeBalance += fee;
 
@@ -220,6 +220,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_amount != 0, "StableSwapModule/amount-zero");
 
         uint256 fee = (_amount * feeOut) / WAD;
+        uint256 _amountScaled = _convertDecimals(_amount, 18, IToken(token).decimals());
         uint256 tokenAmount = _convertDecimals(_amount - fee, 18, IToken(token).decimals());
 
         require(tokenBalance[token] >= tokenAmount, "swapStablecoinToToken/not-enough-token-balance");
@@ -230,7 +231,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
             _updateAndCheckNumberOfSwapsInBlocksPerLimit();
         }
 
-        tokenBalance[token] -= tokenAmount;
+        tokenBalance[token] -= _amountScaled;
         tokenBalance[stablecoin] += _amount;
         totalTokenFeeBalance += _convertDecimals(fee, 18, IToken(token).decimals());
 
@@ -259,18 +260,18 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_destination != address(0), "withdrawFees/wrong-destination");
         require(totalFXDFeeBalance != 0 || totalTokenFeeBalance != 0, "withdrawFees/no-fee-balance");
         uint256 pendingFXDBalance = totalFXDFeeBalance;
+
         if (pendingFXDBalance != 0) {
             totalFXDFeeBalance = 0;
-            tokenBalance[stablecoin] -= pendingFXDBalance;
             stablecoin.safeTransfer(_destination, pendingFXDBalance);
         }
+
         uint256 pendingTokenBalance = totalTokenFeeBalance;
+        
         if (pendingTokenBalance != 0) {
             totalTokenFeeBalance = 0;
-            tokenBalance[token] -= pendingTokenBalance;
             token.safeTransfer(_destination, pendingTokenBalance);
         }
-
         emit LogWithdrawFees(_destination, pendingFXDBalance, pendingTokenBalance);
     }
 
