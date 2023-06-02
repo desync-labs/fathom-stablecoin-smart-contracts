@@ -2,5 +2,5 @@
 pragma solidity 0.8.17;
 
 interface IStableSwapRetriever {
-    function tokenBalance(address) external view returns(uint256);
+    function tokenBalance(address) external view returns (uint256);
 }
