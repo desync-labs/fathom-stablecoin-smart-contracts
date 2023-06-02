@@ -8,7 +8,7 @@ const FathomStablecoinProxyActions = artifacts.require('FathomStablecoinProxyAct
 
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
-
+    
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
     const proxyWalletFactory = await getProxy(proxyFactory, "ProxyWalletFactory");
@@ -34,6 +34,7 @@ module.exports = async function (deployer) {
     const adminControls = await getProxy(proxyFactory, "AdminControls");
     const pluginPriceOracle = await getProxy(proxyFactory, "PluginPriceOracle");
     const centralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed");
+    const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const addresses = getAddresses(deployer.networkId())
@@ -104,7 +105,7 @@ module.exports = async function (deployer) {
 
         stableSwapModule.initialize(
             bookKeeper.address,
-            addresses.USD,
+            addresses.USDSTABLE,
             fathomStablecoin.address,
             dailyLimitNumerator,
             singleSwapLimitNumerator,
@@ -140,7 +141,10 @@ module.exports = async function (deployer) {
             stablecoinAdapter.address
         ),
         pluginPriceOracle.initialize(accessControlConfig.address, addresses.PluginOracle),
-        centralizedOraclePriceFeed.initialize(pluginPriceOracle.address, accessControlConfig.address, pools.XDC)
+        centralizedOraclePriceFeed.initialize(pluginPriceOracle.address, accessControlConfig.address, pools.XDC),
+        stableSwapModuleWrapper.initialize(
+            bookKeeper.address, 
+            stableSwapModule.address)
     ];
 
     await Promise.all(promises);

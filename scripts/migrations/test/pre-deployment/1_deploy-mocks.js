@@ -30,6 +30,7 @@ module.exports =  async function(deployer) {
 
   const chainId = deployer.networkId(ERC20.address);
   addresses[chainId].USD = ERC20.address;
+  addresses[chainId].USDSTABLE = ERC20Stable.address;
 
   await deployer.deploy(WXDC, { gas: 3050000 }),
   addresses[chainId].WXDC = WXDC.address;
