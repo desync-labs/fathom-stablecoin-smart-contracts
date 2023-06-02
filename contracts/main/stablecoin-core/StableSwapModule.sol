@@ -74,7 +74,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     event LogBlocksPerLimitUpdate(uint256 _newBlocksPerLimit, uint256 _oldBlocksPerLimit);
     event LogWithdrawToken(address _account, address _token, uint256 _amount);
 
-
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
@@ -267,7 +266,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         }
 
         uint256 pendingTokenBalance = totalTokenFeeBalance;
-        
+
         if (pendingTokenBalance != 0) {
             totalTokenFeeBalance = 0;
             token.safeTransfer(_destination, pendingTokenBalance);
@@ -275,15 +274,15 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogWithdrawFees(_destination, pendingFXDBalance, pendingTokenBalance);
     }
 
-    function withdrawToken(address _token, uint256 _amount) external override nonReentrant onlyStableswapWrapper{
+    function withdrawToken(address _token, uint256 _amount) external override nonReentrant onlyStableswapWrapper {
         require(_token == token || _token == stablecoin, "withdrawToken/invalid-token");
         require(_amount != 0, "withdrawToken/amount-zero");
         require(tokenBalance[_token] >= _amount, "withdrawToken/not-enough-balance");
-        
+
         tokenBalance[_token] -= _amount;
         _token.safeTransfer(msg.sender, _amount);
         totalValueDeposited -= _convertDecimals(_amount, IToken(_token).decimals(), 18);
-        
+
         emit LogWithdrawToken(msg.sender, _token, _amount);
     }
 
