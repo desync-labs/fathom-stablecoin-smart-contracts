@@ -270,6 +270,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     }
     //@note: TODO: Total Fee Balance should only be increasing - never should it be set to zero for proper fee calculation in wrapper
     function withdrawFees(address _destination, uint256 _amountFXDFee, uint256 _amountTokenFee) external override nonReentrant onlyOwnerOrGov {
+        require(_amountFXDFee != 0 || _amountTokenFee != 0, "withdrawFees/amount-zero");
         require(remainingFXDFeeBalance >= _amountFXDFee, "withdrawFees/not-enough-fxd-fee-balance");
         require(remainingTokenFeeBalance >= _amountTokenFee, "withdrawFees/not-enough-token-fee-balance");
 
@@ -287,7 +288,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         tokenBalance[_token] -= _amount;
         _token.safeTransfer(msg.sender, _amount);
         totalValueDeposited -= _convertDecimals(_amount, IToken(_token).decimals(), 18);
-        
+         
         emit LogWithdrawToken(msg.sender, _token, _amount);
     }
 

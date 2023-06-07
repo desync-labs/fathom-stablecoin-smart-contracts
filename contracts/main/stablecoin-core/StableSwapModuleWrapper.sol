@@ -14,7 +14,8 @@ import "../interfaces/IStableSwapModule.sol";
 import "../utils/SafeToken.sol";
 import "../interfaces/IStableSwapModuleWrapper.sol";
 import "../interfaces/IStableSwapRetriever.sol";
- 
+
+
 contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModuleWrapper{
     using SafeToken for address;
     uint256 internal constant WAD = 10 ** 18;
@@ -34,6 +35,10 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     //storage variables after upgrade - 1
     mapping(address => uint256) public checkpointFXDFee;
     mapping(address => uint256) public checkpointTokenFee;
+    mapping(address => uint256) public claimedFXDFeeRewards;
+    mapping(address => uint256) public claimedTokenFeeRewards;
+
+
 
     
     event LogDepositTokens(address indexed _depositor, uint256 _amount);
@@ -107,13 +112,13 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         require(IToken(token).balanceOf(msg.sender) >= _amountScaled, "depositTokens/token-not-enough");
         require(IToken(stablecoin).balanceOf(msg.sender) >= _amount, "depositTokens/FXD-not-enough");
         
+        claimFeesRewards();
+        
         _transferToTheContract(stablecoin, _amount);
         _transferToTheContract(token, _amountScaled);
 
         depositTracker[msg.sender] += 2 * _amount;
         totalValueDeposited += 2 * _amount;
-
-        _updateCheckpoint();
         
         _depositToStableSwap(stablecoin, _amount);
         _depositToStableSwap(token, _amountScaled);
@@ -130,6 +135,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         require(_amount != 0, "withdrawTokens/amount-zero");
         require(depositTracker[msg.sender] >= _amount, "withdrawTokens/amount-exceeds-users-deposit");
         require(totalValueDeposited >= _amount , "withdrawTokens/amount-exceeds-total-deposit");
+        
+        claimFeesRewards();
         
         uint256 stablecoinBalanceStableSwap18Decimals = IStableSwapModule(stableSwapModule).tokenBalance(stablecoin);
         uint256 tokenBalanceStableSwapScaled = IStableSwapModule(stableSwapModule).tokenBalance(token);
@@ -159,31 +166,10 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         depositTracker[msg.sender] -= _amount;
         totalValueDeposited -= _amount;
 
-        _updateCheckpoint();
-
         _transferToUser(stablecoin, stablecoinAmountToWithdraw);
         _transferToUser(token, tokenAmountToWithdrawScaled);
 
         emit LogWithdrawTokens(msg.sender, _amount);
-    }
-
-    //TODO: Add more validation
-    function claimRewards() external {
-        uint256 totalFXDLiquidity = IStableSwapModule(stableSwapModule).tokenBalance(stablecoin);
-        uint256 totalStablecoinLiquidity = IStableSwapModule(stableSwapModule).tokenBalance(token);
-        uint256 providerLiquidity = depositTracker[msg.sender]/2;
-        
-        uint256 newFeesForFXD = _totalFXDFeeBalance() - checkpointFXDFee[msg.sender];
-        uint256 newFeesForToken = _totalTokenFeeBalance()- checkpointTokenFee[msg.sender];
-
-        uint256 rewardsFXD = (newFeesForFXD * providerLiquidity) / totalFXDLiquidity;
-        uint256 rewardsToken = (newFeesForToken * providerLiquidity) / totalStablecoinLiquidity;
-
-        _updateCheckpoint();
-
-        // Transfer `rewards` to msg.sender.
-        _withdrawFeesFromStableswap(rewardsFXD);
-        _withdrawFeesFromStableswap(rewardsToken);
     }
 
 
@@ -238,6 +224,35 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         return (stablecoinAmountToWithdraw, tokenAmountToWithdraw);
     }
 
+    function claimFeesRewards() public override whenNotPaused {
+        uint256 totalFXDLiquidity = IStableSwapModule(stableSwapModule).tokenBalance(stablecoin);
+        uint256 totalStablecoinLiquidity = IStableSwapModule(stableSwapModule).tokenBalance(token);
+        require(totalFXDLiquidity > 0, "claimFeesRewards/totalFXDLiquidity-zero");
+        require(totalStablecoinLiquidity > 0, "claimFeesRewards,totalStablecoinLiquidity-zero");
+        
+        uint256 providerLiquidity = depositTracker[msg.sender]/2;
+        require(providerLiquidity > 0, "claimFeesRewards/no-user-liquidity");
+        
+        uint256 unclaimedFXDFees = _totalFXDFeeBalance() - checkpointFXDFee[msg.sender];
+        uint256 unclaimedTokenFees = _totalTokenFeeBalance()- checkpointTokenFee[msg.sender];
+        require(unclaimedFXDFees > 0 || unclaimedTokenFees > 0, "claimFeesRewards/no-unclaimed-fees");
+
+        uint256 newFeeRewardsForFXD = (unclaimedFXDFees * providerLiquidity) / totalFXDLiquidity;
+        uint256 newFeesRewardsForToken = (unclaimedTokenFees * providerLiquidity) / totalStablecoinLiquidity;
+
+        claimedFXDFeeRewards[msg.sender] += newFeeRewardsForFXD;
+        claimedTokenFeeRewards[msg.sender] += newFeesRewardsForToken;
+
+        _updateCheckpoint();
+    }
+
+    function withdrawClaimedFees() public override nonReentrant whenNotPaused {
+        require(claimedFXDFeeRewards[msg.sender] != 0 || claimedTokenFeeRewards[msg.sender] != 0, "withdrawClaimedFees/amount-zero");
+        _withdrawFeesFromStableswap(msg.sender,claimedFXDFeeRewards[msg.sender],claimedFXDFeeRewards[msg.sender]);
+        claimedFXDFeeRewards[msg.sender] = 0;
+        claimedFXDFeeRewards[msg.sender] = 0;
+    }
+
     function _depositToStableSwap(address _token, uint256 _amount) internal {
         uint256 tokenBalanceBefore = _token.balanceOf(address(this));
         _token.safeApprove(stableSwapModule, 0);
@@ -254,8 +269,14 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         require(tokenBalanceAfter - tokenBalanceBefore == _amount, "withdrawFromStableSwap/amount-mismatch");
     }
 
-    function _withdrawFeesFromStableswap(uint256 _amount) internal {
-        //TODO
+    function _withdrawFeesFromStableswap(address _destination,uint256 _amountFXDFee, uint256 _amountTokenFee) internal {
+        uint256 stablecoinBalanceOfUserBeforeWithdraw = stablecoin.balanceOf(_destination);
+        uint256 tokenBalanceOfUserBeforeWithdraw = token.balanceOf(_destination);
+        IStableSwapModule(stableSwapModule).withdrawFees(_destination,_amountFXDFee, _amountTokenFee);
+        uint256 stablecoinBalanceOfUserAfterWithdraw = stablecoin.balanceOf(_destination);
+        uint256 tokenBalanceOfUserAfterWithdraw = token.balanceOf(_destination);
+        require(stablecoinBalanceOfUserAfterWithdraw - stablecoinBalanceOfUserBeforeWithdraw == _amountFXDFee, "withdrawFeesFromStableswap/stablecoin-amount-mismatch");
+        require(tokenBalanceOfUserAfterWithdraw - tokenBalanceOfUserBeforeWithdraw == _amountTokenFee, "withdrawFeesFromStableswap/token-amount-mismatch");
     }
 
     function _updateCheckpoint() internal {
