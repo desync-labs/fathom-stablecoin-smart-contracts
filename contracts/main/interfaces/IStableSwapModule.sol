@@ -13,4 +13,6 @@ interface IStableSwapModule {
     function stablecoin() external view returns (address);
     function token() external view returns (address);
     function tokenBalance(address) external view returns (uint256);
+    function remainingFXDFeeBalance() external view returns (uint256);
+    function remainingTokenFeeBalance() external view returns (uint256);
 }

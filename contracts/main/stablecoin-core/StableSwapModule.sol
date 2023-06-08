@@ -56,8 +56,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     //storage variables after upgrade
     address public stableswapWrapper;
     //storage variables after upgrade - 2
-    uint256 public remainingFXDFeeBalance;
-    uint256 public remainingTokenFeeBalance;
+    uint256 public override remainingFXDFeeBalance;
+    uint256 public override remainingTokenFeeBalance;
     bool public upgradeInitialized;
 
     event LogSetFeeIn(address indexed _caller, uint256 _feeIn);
@@ -131,8 +131,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         numberOfSwapsLimitPerUser = _numberOfSwapsLimitPerUser;
         blocksPerLimit = _blocksPerLimit;
     }
-    //TODO: override 
-    function initializeFeesAfterUpgrade() external {
+
+    function initializeFeesAfterUpgrade() external onlyOwner{
         require(upgradeInitialized != true, "StableSwapModule/already-initialized");
         upgradeInitialized = true;
         remainingFXDFeeBalance = totalFXDFeeBalance;
@@ -220,6 +220,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         tokenBalance[stablecoin] -= tokenAmount18;
         tokenBalance[token] += _amount;
+        
         totalFXDFeeBalance += fee;
         remainingFXDFeeBalance += fee;
 
@@ -269,15 +270,20 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogDepositToken(msg.sender, _token, _amount);
     }
     //@note: TODO: Total Fee Balance should only be increasing - never should it be set to zero for proper fee calculation in wrapper
-    function withdrawFees(address _destination, uint256 _amountFXDFee, uint256 _amountTokenFee) external override nonReentrant onlyOwnerOrGov {
+    function withdrawFees(address _destination, uint256 _amountFXDFee, uint256 _amountTokenFee) external override nonReentrant onlyStableswapWrapper {
         require(_amountFXDFee != 0 || _amountTokenFee != 0, "withdrawFees/amount-zero");
         require(remainingFXDFeeBalance >= _amountFXDFee, "withdrawFees/not-enough-fxd-fee-balance");
         require(remainingTokenFeeBalance >= _amountTokenFee, "withdrawFees/not-enough-token-fee-balance");
 
         remainingFXDFeeBalance -= _amountFXDFee;
         remainingTokenFeeBalance -= _amountTokenFee;
-        stablecoin.safeTransfer(_destination, pendingFXDBalance);
-        token.safeTransfer(_destination, pendingTokenBalance);
+        
+        if(_amountFXDFee > 0) {
+            stablecoin.safeTransfer(_destination, _amountFXDFee);
+        }
+        if(_amountTokenFee > 0) {
+            token.safeTransfer(_destination, _amountTokenFee);
+        }
     }
 
     function withdrawToken(address _token, uint256 _amount) external override nonReentrant onlyStableswapWrapper{
