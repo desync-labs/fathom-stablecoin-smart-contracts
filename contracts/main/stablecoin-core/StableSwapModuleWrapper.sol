@@ -14,7 +14,6 @@ import "../interfaces/IStableSwapModule.sol";
 import "../utils/SafeToken.sol";
 import "../interfaces/IStableSwapModuleWrapper.sol";
 import "../interfaces/IStableSwapRetriever.sol";
-import "../utils/FullMath.sol";
 
 contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModuleWrapper{
     using SafeToken for address;
@@ -38,13 +37,6 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
     mapping(address => uint256) public claimedFXDFeeRewards;
     mapping(address => uint256) public claimedTokenFeeRewards;
-
-    mapping(address => uint256) public checkpointTotalStablecoinLiquidity;
-    mapping(address => uint256) public checkpointTotalTokenLiquidity;
-
-    mapping(address => uint256) public stablecoinDepositedPerProvider;
-    mapping(address => uint256) public tokenDepositedPerProvider;
-
     
     event LogDepositTokens(address indexed _depositor, uint256 _amount);
     event LogWithdrawTokens(address indexed _depositor, uint256 _amount);

@@ -269,7 +269,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         emit LogDepositToken(msg.sender, _token, _amount);
     }
-    //@note: TODO: Total Fee Balance should only be increasing - never should it be set to zero for proper fee calculation in wrapper
+    
     function withdrawFees(address _destination, uint256 _amountFXDFee, uint256 _amountTokenFee) external override nonReentrant onlyStableswapWrapper {
         require(_amountFXDFee != 0 || _amountTokenFee != 0, "withdrawFees/amount-zero");
         require(remainingFXDFeeBalance >= _amountFXDFee, "withdrawFees/not-enough-fxd-fee-balance");
