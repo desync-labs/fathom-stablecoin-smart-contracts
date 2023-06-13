@@ -467,6 +467,17 @@ describe("StableSwapModule", () => {
         })
     })
 
+    describe("#totalValueDeposited", async() => {
+        context("update total value deposited after upgrade", async() => {
+            it("totalValueDeposited: should be same before and after upgrade", async() => {
+                const totalValueDepositedBeforeUpdate = await stableSwapModule.totalValueDeposited();
+                await stableSwapModule.udpateTotalValueDepositedAfterUpgrade()
+                const totalValueDepositedAfterUpdate = await stableSwapModule.totalValueDeposited();
+                expect(totalValueDepositedAfterUpdate).to.be.equal(totalValueDepositedBeforeUpdate)
+            })
+        })
+    })
+
     describe('#unitTests',async() => {
         context("exceed single swap limit", () => {
             it("should revert after setting decentralized state - single swap limit - swapStablecoinToToken", async () => {
