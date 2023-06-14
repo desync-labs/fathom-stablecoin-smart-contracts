@@ -132,8 +132,9 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
      * @notice the function is to only mitigate the bad storage after upgrade.
      * @notice this needs to be removed after its job is done    
      */
-    function udpateTotalValueDepositedAfterUpgrade() external onlyOwner {
-        totalValueDeposited = IStableSwapModuleWrapperRetriever(stableswapWrapper).totalValueDeposited();
+    function udpateTotalValueDeposited() external onlyOwner {
+        uint256 newTotalValueDeposited = IStableSwapModuleWrapperRetriever(stableswapWrapper).totalValueDeposited();
+        totalValueDeposited = newTotalValueDeposited;
     }
 
     function setStableSwapWrapper(address newStableSwapWrapper) external onlyOwner {
