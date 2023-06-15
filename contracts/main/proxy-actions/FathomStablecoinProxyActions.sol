@@ -25,7 +25,8 @@ contract FathomStablecoinProxyActionsMath {
     function convertTo18(address _tokenAdapter, uint256 _amt) internal returns (uint256 _wad) {
         // For those collaterals that have less than 18 decimals precision we need to do the conversion before passing to adjustPosition function
         // Adapters will automatically handle the difference of precision
-        _wad = _safeMul(_amt, 10 ** (18 - IGenericTokenAdapter(_tokenAdapter).decimals()));
+        uint256 decimals = IToken(IGenericTokenAdapter(_tokenAdapter).collateralToken()).decimals();
+        _wad = decimals < 18 ? _amt * (10 ** (18 - decimals)) : _amt / (10 ** (decimals - 18));
     }
 
     function _safeSub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
