@@ -6,5 +6,5 @@ In the function [`setPriceLife`](https://github.com/Into-the-Fathom/fathom-stabl
 `peekPrice` function call was added to the `setPriceLife` function in the `DelayPriceFeedBase` contract.
 
 ##### Updagrading contracts
-1. update `upgrade-price-feeds.js` script with actual addresses.
-2. run `coralx execute --network {network} --path scripts/upgrades/0_062023/setPriceLife-fix/upgrade-contracts.js`
+1. update `upgrade-contracts.js` script with actual addresses.
+2. run `coralx execute --network {network} --path scripts/upgrades/0_062023/0_setPriceLife-fix/upgrade-contracts.js`

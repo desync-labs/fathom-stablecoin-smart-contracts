@@ -198,18 +198,17 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
     /// @param _positionId The position id to be adjusted
     /// @param _collateralValue The collateralValue to be adjusted
     /// @param _debtShare The debtShare to be adjusted
-    /// @param _adapter The adapter to be called once the position is adjusted
     /// @param _data The extra data for adapter
     function adjustPosition(
         uint256 _positionId,
         int256 _collateralValue,
         int256 _debtShare,
-        address _adapter,
         bytes calldata _data
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
         bytes32 _collateralPoolId = collateralPools[_positionId];
         _requireHealthyPrice(_collateralPoolId);
 
+        address _adapter = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getAdapter(_collateralPoolId);
         address _positionAddress = positions[_positionId];
         IBookKeeper(bookKeeper).adjustPosition(
             collateralPools[_positionId],
@@ -228,17 +227,17 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
     /// @param _positionId The position id to move collateral from
     /// @param _destination The destination to received collateral
     /// @param _wad The amount in wad to be moved
-    /// @param _adapter The adapter to be called when collateral has been moved
     /// @param _data The extra data for the adapter
     function moveCollateral(
         uint256 _positionId,
         address _destination,
         uint256 _wad,
-        address _adapter,
         bytes calldata _data
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
         bytes32 _collateralPoolId = collateralPools[_positionId];
         _requireHealthyPrice(_collateralPoolId);
+
+        address _adapter = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getAdapter(_collateralPoolId);
 
         IBookKeeper(bookKeeper).moveCollateral(collateralPools[_positionId], positions[_positionId], _destination, _wad);
         IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
@@ -250,17 +249,17 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
     /// @param _positionId The position id to move collateral from
     /// @param _destination The destination to recevied collateral
     /// @param _wad The amount in wad to be moved
-    /// @param _adapter The adapter to be called once collateral is moved
     /// @param _data The extra datat to be passed to the adapter
     function moveCollateral(
         bytes32 _collateralPoolId,
         uint256 _positionId,
         address _destination,
         uint256 _wad,
-        address _adapter,
         bytes calldata _data
     ) external whenNotPaused onlyOwnerAllowed(_positionId) {
         _requireHealthyPrice(_collateralPoolId);
+
+        address _adapter = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getAdapter(_collateralPoolId);
 
         IBookKeeper(bookKeeper).moveCollateral(_collateralPoolId, positions[_positionId], _destination, _wad);
         IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
@@ -344,18 +343,18 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
 
     /// @dev Redeem locked collateral from a position when emergency shutdown is activated
     /// @param _posId The position id to be adjusted
-    /// @param _adapter The adapter to be called once the position is adjusted
     /// @param _data The extra data for adapter
     function redeemLockedCollateral(
         uint256 _posId,
-        address _adapter,
         address _collateralReceiver,
         bytes calldata _data
     ) external override whenNotPaused onlyOwnerAllowed(_posId) {
+        ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
+        IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_posId]));
         address _positionAddress = positions[_posId];
         IShowStopper(showStopper).redeemLockedCollateral(
             collateralPools[_posId],
-            IGenericTokenAdapter(_adapter),
+            _tokenAdapter,
             _positionAddress,
             _collateralReceiver,
             _data

@@ -276,7 +276,7 @@ describe("PositionManager", () => {
             it("should revert", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 await expect(
-                    positionManager.adjustPosition(1, parseEther("1"), parseEther("50"), mockedTokenAdapter.address, "0x")
+                    positionManager.adjustPosition(1, parseEther("1"), parseEther("50"), "0x")
                 ).to.be.revertedWith("owner not allowed")
             })
         })
@@ -304,7 +304,7 @@ describe("PositionManager", () => {
                 ).returns()
 
                 await expect(
-                    positionManagerAsAlice.adjustPosition(1, parseEther("1"), parseEther("50"), mockedTokenAdapter.address, "0x")
+                    positionManagerAsAlice.adjustPosition(1, parseEther("1"), parseEther("50"), "0x")
                 ).to.be.revertedWith("PositionManager/price-is-not-healthy")
             })
         })
@@ -334,23 +334,21 @@ describe("PositionManager", () => {
                     1,
                     parseEther("1"),
                     parseEther("50"),
-                    await mockedTokenAdapter.address,
                     "0x"
                 )
             })
         })
     })
 
-    describe("#moveCollateral(uint256,address,uint256,address,bytes)", () => {
+    describe("#moveCollateral(uint256,address,uint256,bytes)", () => {
         context("when caller has no access to the position", () => {
             it("should revert", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 await expect(
-                    positionManager["moveCollateral(uint256,address,uint256,address,bytes)"](
+                    positionManager["moveCollateral(uint256,address,uint256,bytes)"](
                         1,
                         AliceAddress,
                         parseEther("50"),
-                        await mockedTokenAdapter.address,
                         "0x"
                     )
                 ).to.be.revertedWith("owner not allowed")
@@ -377,18 +375,17 @@ describe("PositionManager", () => {
                 ).returns()
 
                 await expect(
-                    positionManagerAsAlice["moveCollateral(uint256,address,uint256,address,bytes)"](
+                    positionManagerAsAlice["moveCollateral(uint256,address,uint256,bytes)"](
                         1,
                         AliceAddress,
                         parseEther("50"),
-                        await mockedTokenAdapter.address,
                         "0x"
                     )
                 ).to.be.revertedWith("PositionManager/price-is-not-healthy")
             })
         })
         context("when parameters are valid", async () => {
-            it("should be able to call moveCollateral(uint256,address,uint256,address,bytes)", async () => {
+            it("should be able to call moveCollateral(uint256,address,uint256,bytes)", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 const positionAddress = await positionManager.positions(1)
 
@@ -406,11 +403,10 @@ describe("PositionManager", () => {
                     "0x"
                 ).returns()
 
-                await positionManagerAsAlice["moveCollateral(uint256,address,uint256,address,bytes)"](
+                await positionManagerAsAlice["moveCollateral(uint256,address,uint256,bytes)"](
                     1,
                     BobAddress,
                     parseEther("1"),
-                    await mockedTokenAdapter.address,
                     "0x"
                 )
             })
@@ -423,12 +419,11 @@ describe("PositionManager", () => {
             it("should revert", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 await expect(
-                    positionManager["moveCollateral(bytes32,uint256,address,uint256,address,bytes)"](
+                    positionManager["moveCollateral(bytes32,uint256,address,uint256,bytes)"](
                         formatBytes32String("WXDC"),
                         1,
                         AliceAddress,
                         parseEther("50"),
-                        await mockedTokenAdapter.address,
                         "0x"
                     )
                 ).to.be.revertedWith("owner not allowed")
@@ -455,19 +450,18 @@ describe("PositionManager", () => {
                 ).returns()
 
                 await expect(
-                    positionManagerAsAlice["moveCollateral(bytes32,uint256,address,uint256,address,bytes)"](
+                    positionManagerAsAlice["moveCollateral(bytes32,uint256,address,uint256,bytes)"](
                         formatBytes32String("WXDC"),
                         1,
                         AliceAddress,
                         parseEther("50"),
-                        await mockedTokenAdapter.address,
                         "0x"
                     )
                 ).to.be.revertedWith("PositionManager/price-is-not-healthy")
             })
         })
         context("when parameters are valid", async () => {
-            it("should be able to call moveCollateral(bytes32,uint256,address,uint256,address,bytes)", async () => {
+            it("should be able to call moveCollateral(bytes32,uint256,address,uint256,bytes)", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 const positionAddress = await positionManager.positions(1)
 
@@ -485,12 +479,11 @@ describe("PositionManager", () => {
                     "0x"
                 ).returns()
 
-                await positionManagerAsAlice["moveCollateral(bytes32,uint256,address,uint256,address,bytes)"](
+                await positionManagerAsAlice["moveCollateral(bytes32,uint256,address,uint256,bytes)"](
                     formatBytes32String("WXDC"),
                     1,
                     BobAddress,
                     parseEther("1"),
-                    await mockedTokenAdapter.address,
                     "0x"
                 )
 
@@ -759,7 +752,7 @@ describe("PositionManager", () => {
             xit("should revert", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 await expect(
-                    positionManager.redeemLockedCollateral(1, mockedTokenAdapter.address, AliceAddress, "0x")
+                    positionManager.redeemLockedCollateral(1, AliceAddress, "0x")
                 ).to.be.revertedWith("owner not allowed")
             })
         })
@@ -774,7 +767,7 @@ describe("PositionManager", () => {
                     AliceAddress,
                     "0x"
                 ).returns()
-                await positionManagerAsAlice.redeemLockedCollateral(1, mockedTokenAdapter.address, AliceAddress, "0x")
+                await positionManagerAsAlice.redeemLockedCollateral(1, AliceAddress, "0x")
             })
         })
     })
