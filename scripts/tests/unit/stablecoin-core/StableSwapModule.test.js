@@ -36,12 +36,16 @@ const loadFixtureHandler = async () => {
   await mockFathomStablecoin.mock.transfer.returns(true)
   await mockUSD.mock.transferFrom.returns(true)
   await mockUSD.mock.transfer.returns(true)
+  await mockUSD.mock.balanceOf.returns(WeiPerWad.mul(50000))
+  await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad.mul(50000))
 
   await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
   await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
 
   stableSwapModule = getContract("StableSwapModule", DeployerAddress)
   stableSwapModuleAsAlice = getContract("StableSwapModule", AliceAddress)
+  stableSwapModuleWrapper = getContract("StableSwapModuleWrapper", DeployerAddress)
+
   await stableSwapModule.initialize(
     mockBookKeeper.address,
     mockUSD.address,
@@ -52,13 +56,21 @@ const loadFixtureHandler = async () => {
     blocksPerLimit
   )
 
+  await stableSwapModuleWrapper.initialize(
+    mockBookKeeper.address,
+    stableSwapModule.address
+  )
+
   await stableSwapModule.addToWhitelist(DeployerAddress)
+  await stableSwapModuleWrapper.addToWhitelist(DeployerAddress)
+  await stableSwapModule.setStableSwapWrapper(stableSwapModuleWrapper.address)
 
   return {
     stableSwapModule,
     mockUSD,
     mockedAccessControlConfig,
-    mockFathomStablecoin
+    mockFathomStablecoin,
+    stableSwapModuleWrapper
   }
 }
 describe("StableSwapModule", () => {
@@ -67,6 +79,7 @@ describe("StableSwapModule", () => {
   let mockUSD
   let stableSwapModule
   let mockFathomStablecoin
+  let stableSwapModuleWrapper
 
   before(async () => {
     await snapshot.revertToSnapshot();
@@ -77,7 +90,8 @@ describe("StableSwapModule", () => {
       stableSwapModule,
       mockUSD,
       mockedAccessControlConfig,
-      mockFathomStablecoin
+      mockFathomStablecoin,
+      stableSwapModuleWrapper
     } = await loadFixture(loadFixtureHandler))
   })
 
@@ -172,7 +186,7 @@ describe("StableSwapModule", () => {
         ).to.be.revertedWith("StableSwapModule/less-than-minimum-single-swap-limit")
       })
     })
-    
+
     context("valid number of Swaps limit per user", () => {
       it("should set the number of swaps limit per user and emit an event", async () => {
         const oldLimit = await stableSwapModule.numberOfSwapsLimitPerUser();
@@ -203,7 +217,7 @@ describe("StableSwapModule", () => {
         ).to.be.revertedWith("StableSwapModule/less-than-minimum-blocks-per-limit")
       })
     })
-    
+
     context("valid number of blocks per limit", () => {
       it("should set the valid number of blocks per limit and emit an event", async () => {
         const oldLimit = await stableSwapModule.blocksPerLimit();
@@ -218,7 +232,7 @@ describe("StableSwapModule", () => {
     })
   })
 
-  
+
 
   describe("#setFeeIn", () => {
     context("not owner", () => {
@@ -288,8 +302,8 @@ describe("StableSwapModule", () => {
     })
     context("valid deployer", () => {
       it("should set status and emit an event", async () => {
-          await expect(stableSwapModule.setDecentralizedStatesStatus(true)).to.be.emit(stableSwapModule,"LogDecentralizedStateStatus")
-          expect(await stableSwapModule.isDecentralizedState()).to.be.equal(true)
+        await expect(stableSwapModule.setDecentralizedStatesStatus(true)).to.be.emit(stableSwapModule, "LogDecentralizedStateStatus")
+        expect(await stableSwapModule.isDecentralizedState()).to.be.equal(true)
       })
     })
   })
@@ -303,8 +317,8 @@ describe("StableSwapModule", () => {
     })
     context("valid deployer", () => {
       it("should add to whitelist and emit an event", async () => {
-        await expect(stableSwapModule.addToWhitelist(DeployerAddress)).to.be.emit(stableSwapModule,"LogAddToWhitelist")
-            
+        await expect(stableSwapModule.addToWhitelist(DeployerAddress)).to.be.emit(stableSwapModule, "LogAddToWhitelist")
+
       })
     })
   })
@@ -318,7 +332,7 @@ describe("StableSwapModule", () => {
     })
     context("valid deployer", () => {
       it("should remove from whitelist and emit an event", async () => {
-        await expect(stableSwapModule.removeFromWhitelist(DeployerAddress)).to.be.emit(stableSwapModule,"LogRemoveFromWhitelist")
+        await expect(stableSwapModule.removeFromWhitelist(DeployerAddress)).to.be.emit(stableSwapModule, "LogRemoveFromWhitelist")
       })
     })
   })
@@ -328,7 +342,7 @@ describe("StableSwapModule", () => {
     context("not authorized", () => {
       it("should revert", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(false)
-        await expect(stableSwapModule.depositToken(mockUSD.address, WeiPerWad)).to.be.revertedWith("!(ownerRole or govRole)")
+        await expect(stableSwapModule.depositToken(mockUSD.address, WeiPerWad)).to.be.revertedWith("only-stableswap-wrapper")
       })
     })
     context("paused contract", () => {
@@ -340,21 +354,12 @@ describe("StableSwapModule", () => {
         ).to.be.revertedWith("Pausable: paused")
       })
     })
-    context("invalid token", () => {
-      it("should revert", async () => {
-        const mockToken = await createMock("ERC20Mintable");
-
-        await expect(
-          stableSwapModule.depositToken(mockToken.address, WeiPerWad)
-        ).to.be.revertedWith("depositStablecoin/invalid-token")
-      })
-    })
     context("zero amount", () => {
       it("should revert", async () => {
         await mockUSD.mock.balanceOf.returns(WeiPerWad)
         await expect(
           stableSwapModule.depositToken(mockUSD.address, BigNumber.from("0"))
-        ).to.be.revertedWith("depositStablecoin/amount-zero")
+        ).to.be.revertedWith("only-stableswap-wrapper")
       })
     })
     context("not enough balance", () => {
@@ -362,18 +367,7 @@ describe("StableSwapModule", () => {
         await mockUSD.mock.balanceOf.returns(WeiPerWad.div(2))
         await expect(
           stableSwapModule.depositToken(mockUSD.address, WeiPerWad)
-        ).to.be.revertedWith("depositStablecoin/not-enough-balance")
-      })
-    })
-    context("deposit token", () => {
-      it("should emit event and save balance", async () => {
-        await mockUSD.mock.balanceOf.returns(WeiPerWad)
-
-        await expect(
-          stableSwapModule.depositToken(mockUSD.address, WeiPerWad)
-        ).to.be.emit(stableSwapModule, "LogDepositToken")
-          .withArgs(DeployerAddress, mockUSD.address, WeiPerWad)
-        expect(await stableSwapModule.tokenBalance(mockUSD.address)).to.be.equal(WeiPerWad)
+        ).to.be.revertedWith("only-stableswap-wrapper")
       })
     })
   })
@@ -402,233 +396,132 @@ describe("StableSwapModule", () => {
         ).to.be.revertedWith("swapTokenToStablecoin/not-enough-stablecoin-balance")
       })
     })
-    context("exceed single swap limit", () => {
-      it("should revert after setting decentralized state - single swap limit", async () => {
-        const bigMoney = WeiPerWad.mul(1000000);
-        await mockFathomStablecoin.mock.balanceOf.returns(bigMoney)
-        await stableSwapModule.depositToken(mockFathomStablecoin.address, bigMoney)
-        await stableSwapModule.setDecentralizedStatesStatus(true)
-        await expect(
-          stableSwapModule.swapTokenToStablecoin(DeployerAddress, bigMoney)
-        ).to.be.revertedWith("_checkSingleSwapLimit/single-swap-exceeds-limit")
+
+
+    describe("#swapStablecoinToToken", () => {
+      context("paused contract", () => {
+        it("should revert", async () => {
+          await stableSwapModule.pause();
+
+          await expect(
+            stableSwapModule.swapStablecoinToToken(DeployerAddress, WeiPerWad)
+          ).to.be.revertedWith("Pausable: paused")
+        })
+      })
+      context("zero amount", () => {
+        it("should revert", async () => {
+          await expect(
+            stableSwapModule.swapStablecoinToToken(DeployerAddress, BigNumber.from("0"))
+          ).to.be.revertedWith("StableSwapModule/amount-zero")
+        })
+      })
+      context("not enough stablecoin", () => {
+        it("should revert", async () => {
+          await expect(
+            stableSwapModule.swapStablecoinToToken(DeployerAddress, WeiPerWad)
+          ).to.be.revertedWith("swapStablecoinToToken/not-enough-token-balance")
+        })
       })
     })
 
-    context("multiple swaps in one block", () => {
-      it("should revert after setting decentralized state - one transaction per block", async () => {
-        const swapMoney = WeiPerWad.mul(1);
-        const bigMoney = WeiPerWad.mul(1000000);
-        await mockFathomStablecoin.mock.balanceOf.returns(bigMoney)
-        await stableSwapModule.depositToken(mockFathomStablecoin.address, bigMoney)
-        await stableSwapModule.setDecentralizedStatesStatus(true)
-        await stableSwapModule.swapTokenToStablecoin(DeployerAddress, swapMoney)
-        await expect(
-          stableSwapModule.swapTokenToStablecoin(DeployerAddress, swapMoney)
-        ).to.be.revertedWith("_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded")
+    describe("#withdrawFees", () => {
+      context("not authorized", () => {
+        it("should revert", async () => {
+          await mockedAccessControlConfig.mock.hasRole.returns(false)
+
+          await expect(stableSwapModule.withdrawFees(DeployerAddress)).to.be.revertedWith("!(ownerRole or govRole)")
+        })
+      })
+      context("zero balance", () => {
+        it("should revert", async () => {
+          await expect(
+            stableSwapModule.withdrawFees(DeployerAddress)
+          ).to.be.revertedWith("withdrawFees/no-fee-balance")
+        })
+      })
+      context("zero address", () => {
+        it("should revert", async () => {
+          await expect(
+            stableSwapModule.withdrawFees(AddressZero)
+          ).to.be.revertedWith("withdrawFees/wrong-destination")
+        })
       })
     })
 
-    context("swap token to stablecoin", () => {
-      it("should swap and emit event", async () => {
-        await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad)
-        await mockUSD.mock.balanceOf.returns(WeiPerWad.mul(2))
-        await stableSwapModule.depositToken(mockFathomStablecoin.address, WeiPerWad)
-        await stableSwapModule.setFeeIn(WeiPerWad.div(10))
-        await expect(
-          stableSwapModule.swapTokenToStablecoin(DeployerAddress, WeiPerWad)
-        ).to.be.emit(stableSwapModule, "LogSwapTokenToStablecoin")
-          .withArgs(DeployerAddress, WeiPerWad, WeiPerWad.div(10))
+    describe("#emergencyWithdraw", () => {
+      context("not authorized", () => {
+        it("should revert", async () => {
+          await mockedAccessControlConfig.mock.hasRole.returns(false)
+          await expect(stableSwapModule.emergencyWithdraw(DeployerAddress)).to.be.revertedWith("!(ownerRole or govRole)")
+        })
       })
-    })
-  })
+      context("not paused", () => {
+        it("should revert", async () => {
+          await expect(
+            stableSwapModule.emergencyWithdraw(DeployerAddress)
+          ).to.be.revertedWith("Pausable: not paused")
+        })
+      })
+      context("zero address", () => {
+        it("should revert", async () => {
+          await stableSwapModule.pause()
+          await expect(
+            stableSwapModule.emergencyWithdraw(AddressZero)
+          ).to.be.revertedWith("withdrawFees/empty-account")
+        })
+      })
+      context("emergency withdraw", () => {
+        it("should emit event", async () => {
+          await stableSwapModule.pause()
 
-  describe("#swapStablecoinToToken", () => {
-    context("paused contract", () => {
-      it("should revert", async () => {
-        await stableSwapModule.pause();
+          await mockUSD.mock.balanceOf.returns(WeiPerWad)
+          await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad)
 
-        await expect(
-          stableSwapModule.swapStablecoinToToken(DeployerAddress, WeiPerWad)
-        ).to.be.revertedWith("Pausable: paused")
-      })
-    })
-    context("zero amount", () => {
-      it("should revert", async () => {
-        await expect(
-          stableSwapModule.swapStablecoinToToken(DeployerAddress, BigNumber.from("0"))
-        ).to.be.revertedWith("StableSwapModule/amount-zero")
-      })
-    })
-    context("not enough stablecoin", () => {
-      it("should revert", async () => {
-        await expect(
-          stableSwapModule.swapStablecoinToToken(DeployerAddress, WeiPerWad)
-        ).to.be.revertedWith("swapStablecoinToToken/not-enough-token-balance")
+          await expect(
+            stableSwapModule.emergencyWithdraw(DeployerAddress)
+          ).to.be.emit(stableSwapModule, "LogEmergencyWithdraw")
+            .withArgs(DeployerAddress)
+        })
       })
     })
 
-    context("exceed single swap limit", () => {
-      it("should revert after setting decentralized state - single swap limit", async () => {
-        const bigMoney = WeiPerWad.mul(1000000);
-        await mockUSD.mock.balanceOf.returns(bigMoney)
-        await stableSwapModule.depositToken(mockUSD.address, bigMoney)
-        await stableSwapModule.setDecentralizedStatesStatus(true)
-        await expect(
-          stableSwapModule.swapStablecoinToToken(DeployerAddress, bigMoney)
-        ).to.be.revertedWith("_checkSingleSwapLimit/single-swap-exceeds-limit")
+    describe("#pause", () => {
+      context("not authorized", () => {
+        it("should revert", async () => {
+          await mockedAccessControlConfig.mock.hasRole.returns(false)
+          await expect(stableSwapModule.pause()).to.be.revertedWith("!(ownerRole or govRole)")
+        })
       })
-    })
 
-    context("multiple swaps in one block", () => {
-      it("should revert after setting decentralized state -one transaction per block", async () => {
-        const bigMoney = WeiPerWad.mul(1000000);
-        const swapMoney = WeiPerWad.mul(1);
-        await mockUSD.mock.balanceOf.returns(bigMoney)
-        await stableSwapModule.depositToken(mockUSD.address, bigMoney)
-        await stableSwapModule.setDecentralizedStatesStatus(true)
-        await stableSwapModule.swapStablecoinToToken(DeployerAddress, swapMoney)
-        await expect(
-          stableSwapModule.swapStablecoinToToken(DeployerAddress, swapMoney)
-        ).to.be.revertedWith("_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded")
+      context("when role can access", () => {
+        it("should be success", async () => {
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+          await expect(
+            stableSwapModule.pause()
+          ).to.be.emit(stableSwapModule, "LogStableSwapPauseState")
+            .withArgs(true)
+          expect(await stableSwapModule.paused()).to.be.equal(true)
+        })
       })
     })
-    context("swap stablecoin to token", () => {
-      it("should swap and emit event", async () => {
-        await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad.mul(2))
-        await mockUSD.mock.balanceOf.returns(WeiPerWad)
-        await stableSwapModule.depositToken(mockUSD.address, WeiPerWad)
-        await stableSwapModule.setFeeOut(WeiPerWad.div(10))
-        await expect(
-          stableSwapModule.swapStablecoinToToken(DeployerAddress, WeiPerWad)
-        ).to.be.emit(stableSwapModule, "LogSwapStablecoinToToken")
-          .withArgs(DeployerAddress, WeiPerWad, WeiPerWad.div(10))
+    describe("#unpause", () => {
+      context("not authorized", () => {
+        it("should revert", async () => {
+          await mockedAccessControlConfig.mock.hasRole.returns(false)
+          await expect(stableSwapModule.unpause()).to.be.revertedWith("!(ownerRole or govRole)")
+        })
       })
-    })
-    context("token decimals less then 18", () => {
-      it("should swap and emit event", async () => {
-        await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad.mul(2))
-        await mockUSD.mock.balanceOf.returns(WeiPerWad)
-        await mockUSD.mock.decimals.returns(10)
-        await stableSwapModule.depositToken(mockUSD.address, WeiPerWad)
-        await stableSwapModule.setFeeOut(WeiPerWad.div(10))
-        await expect(
-          stableSwapModule.swapStablecoinToToken(DeployerAddress, WeiPerWad)
-        ).to.be.emit(stableSwapModule, "LogSwapStablecoinToToken")
-          .withArgs(DeployerAddress, WeiPerWad, WeiPerWad.div(10))
-      })
-    })
-  })
 
-  describe("#withdrawFees", () => {
-    context("not authorized", () => {
-      it("should revert", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(false)
-
-        await expect(stableSwapModule.withdrawFees(DeployerAddress)).to.be.revertedWith("!(ownerRole or govRole)")
-      })
-    })
-    context("zero balance", () => {
-      it("should revert", async () => {
-        await expect(
-          stableSwapModule.withdrawFees(DeployerAddress)
-        ).to.be.revertedWith("withdrawFees/no-fee-balance")
-      })
-    })
-    context("zero address", () => {
-      it("should revert", async () => {
-        await expect(
-          stableSwapModule.withdrawFees(AddressZero)
-        ).to.be.revertedWith("withdrawFees/wrong-destination")
-      })
-    })
-    context("withdraw fees", () => {
-      it("should emit event", async () => {
-        await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad.mul(2))
-        await mockUSD.mock.balanceOf.returns(WeiPerWad)
-        await stableSwapModule.depositToken(mockUSD.address, WeiPerWad)
-        await stableSwapModule.setFeeOut(WeiPerWad.div(10))
-        await stableSwapModule.swapStablecoinToToken(DeployerAddress, WeiPerWad)
-        await expect(
-          stableSwapModule.withdrawFees(DeployerAddress)
-        ).to.be.emit(stableSwapModule, "LogWithdrawFees")
-          .withArgs(DeployerAddress, 0, WeiPerWad.div(10))
-      })
-    })
-  })
-
-  describe("#emergencyWithdraw", () => {
-    context("not authorized", () => {
-      it("should revert", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(false)
-        await expect(stableSwapModule.emergencyWithdraw(DeployerAddress)).to.be.revertedWith("!(ownerRole or govRole)")
-      })
-    })
-    context("not paused", () => {
-      it("should revert", async () => {
-        await expect(
-          stableSwapModule.emergencyWithdraw(DeployerAddress)
-        ).to.be.revertedWith("Pausable: not paused")
-      })
-    })
-    context("zero address", () => {
-      it("should revert", async () => {
-        await stableSwapModule.pause()
-        await expect(
-          stableSwapModule.emergencyWithdraw(AddressZero)
-        ).to.be.revertedWith("withdrawFees/empty-account")
-      })
-    })
-    context("emergency withdraw", () => {
-      it("should emit event", async () => {
-        await stableSwapModule.pause()
-
-        await mockUSD.mock.balanceOf.returns(WeiPerWad)
-        await mockFathomStablecoin.mock.balanceOf.returns(WeiPerWad)
-
-        await expect(
-          stableSwapModule.emergencyWithdraw(DeployerAddress)
-        ).to.be.emit(stableSwapModule, "LogEmergencyWithdraw")
-          .withArgs(DeployerAddress)
-      })
-    })
-  })
-
-  describe("#pause", () => {
-    context("not authorized", () => {
-      it("should revert", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(false)
-        await expect(stableSwapModule.pause()).to.be.revertedWith("!(ownerRole or govRole)")
-      })
-    })
-
-    context("when role can access", () => {
-      it("should be success", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(true)
-        await expect(
-          stableSwapModule.pause()
-        ).to.be.emit(stableSwapModule, "LogStableSwapPauseState")
-          .withArgs(true)
-        expect(await stableSwapModule.paused()).to.be.equal(true)
-      })
-    })
-  })
-  describe("#unpause", () => {
-    context("not authorized", () => {
-      it("should revert", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(false)
-        await expect(stableSwapModule.unpause()).to.be.revertedWith("!(ownerRole or govRole)")
-      })
-    })
-
-    context("when role can access", () => {
-      it("should be success", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(true)
-        await stableSwapModule.pause();
-        await expect(
-          stableSwapModule.unpause()
-        ).to.be.emit(stableSwapModule, "LogStableSwapPauseState")
-          .withArgs(false)
-        expect(await stableSwapModule.paused()).to.be.equal(false)
+      context("when role can access", () => {
+        it("should be success", async () => {
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+          await stableSwapModule.pause();
+          await expect(
+            stableSwapModule.unpause()
+          ).to.be.emit(stableSwapModule, "LogStableSwapPauseState")
+            .withArgs(false)
+          expect(await stableSwapModule.paused()).to.be.equal(false)
+        })
       })
     })
   })

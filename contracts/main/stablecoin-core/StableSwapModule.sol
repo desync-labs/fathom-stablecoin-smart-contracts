@@ -24,10 +24,10 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     uint256 internal constant WAD = 10 ** 18;
 
     IBookKeeper public bookKeeper;
-    address public stablecoin;
-    address public token;
+    address public override stablecoin;
+    address public override token;
     bool public isDecentralizedState;
-    mapping(address => uint256) public tokenBalance;
+    mapping(address => uint256) public override tokenBalance;
 
     uint256 public feeIn; // fee in [wad]
     uint256 public feeOut; // fee out [wad]
@@ -53,6 +53,9 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     mapping(address => uint256) public numberOfSwapsRemainingPerUserInBlockLimit;
     mapping(address => uint256) public lastSwapBlockNumberPerUser;
 
+    //storage variables after upgrade
+    address public stableswapWrapper;
+
     event LogSetFeeIn(address indexed _caller, uint256 _feeIn);
     event LogSetFeeOut(address indexed _caller, uint256 _feeOut);
     event LogSwapTokenToStablecoin(address indexed _owner, uint256 _value, uint256 _fee);
@@ -69,6 +72,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     event LogRemoveFromWhitelist(address indexed user);
     event LogNumberOfSwapsLimitPerUserUpdate(uint256 _newNumberOfSwapsLimitPerUser, uint256 _oldNumberOfSwapsLimitPerUser);
     event LogBlocksPerLimitUpdate(uint256 _newBlocksPerLimit, uint256 _oldBlocksPerLimit);
+    event LogWithdrawToken(address _account, address _token, uint256 _amount);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -90,6 +94,11 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         if (!isDecentralizedState) {
             require(usersWhitelist[msg.sender], "user-not-whitelisted");
         }
+        _;
+    }
+
+    modifier onlyStableswapWrapper() {
+        require(msg.sender == stableswapWrapper, "only-stableswap-wrapper");
         _;
     }
 
@@ -116,6 +125,11 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         singleSwapLimitNumerator = _singleSwapLimitNumerator;
         numberOfSwapsLimitPerUser = _numberOfSwapsLimitPerUser;
         blocksPerLimit = _blocksPerLimit;
+    }
+
+    function setStableSwapWrapper(address newStableSwapWrapper) external onlyOwner {
+        require(AddressUpgradeable.isContract(newStableSwapWrapper), "StableSwapModule/not-contract");
+        stableswapWrapper = newStableSwapWrapper;
     }
 
     function setDailySwapLimitNumerator(uint256 newdailySwapLimitNumerator) external onlyOwner {
@@ -192,7 +206,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
             _updateAndCheckNumberOfSwapsInBlocksPerLimit();
         }
 
-        tokenBalance[stablecoin] -= stablecoinAmount;
+        tokenBalance[stablecoin] -= tokenAmount18;
         tokenBalance[token] += _amount;
         totalFXDFeeBalance += fee;
 
@@ -205,6 +219,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_amount != 0, "StableSwapModule/amount-zero");
 
         uint256 fee = (_amount * feeOut) / WAD;
+        uint256 _amountScaled = _convertDecimals(_amount, 18, IToken(token).decimals());
         uint256 tokenAmount = _convertDecimals(_amount - fee, 18, IToken(token).decimals());
 
         require(tokenBalance[token] >= tokenAmount, "swapStablecoinToToken/not-enough-token-balance");
@@ -215,7 +230,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
             _updateAndCheckNumberOfSwapsInBlocksPerLimit();
         }
 
-        tokenBalance[token] -= tokenAmount;
+        tokenBalance[token] -= _amountScaled;
         tokenBalance[stablecoin] += _amount;
         totalTokenFeeBalance += _convertDecimals(fee, 18, IToken(token).decimals());
 
@@ -224,9 +239,9 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogSwapStablecoinToToken(_usr, _amount, fee);
     }
 
-    function depositToken(address _token, uint256 _amount) external override nonReentrant whenNotPaused onlyOwnerOrGov {
+    function depositToken(address _token, uint256 _amount) external override nonReentrant whenNotPaused onlyStableswapWrapper {
         require(_token == token || _token == stablecoin, "depositStablecoin/invalid-token");
-        require(_amount != 0, "depositStablecoin/amount-zero");
+        require(_amount != 0, "stableswap-depositStablecoin/amount-zero");
         require(_token.balanceOf(msg.sender) >= _amount, "depositStablecoin/not-enough-balance");
         tokenBalance[_token] += _amount;
         _token.safeTransferFrom(msg.sender, address(this), _amount);
@@ -244,19 +259,31 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_destination != address(0), "withdrawFees/wrong-destination");
         require(totalFXDFeeBalance != 0 || totalTokenFeeBalance != 0, "withdrawFees/no-fee-balance");
         uint256 pendingFXDBalance = totalFXDFeeBalance;
+
         if (pendingFXDBalance != 0) {
             totalFXDFeeBalance = 0;
-            tokenBalance[stablecoin] -= pendingFXDBalance;
             stablecoin.safeTransfer(_destination, pendingFXDBalance);
         }
+
         uint256 pendingTokenBalance = totalTokenFeeBalance;
+
         if (pendingTokenBalance != 0) {
             totalTokenFeeBalance = 0;
-            tokenBalance[token] -= pendingTokenBalance;
             token.safeTransfer(_destination, pendingTokenBalance);
         }
-
         emit LogWithdrawFees(_destination, pendingFXDBalance, pendingTokenBalance);
+    }
+
+    function withdrawToken(address _token, uint256 _amount) external override nonReentrant onlyStableswapWrapper {
+        require(_token == token || _token == stablecoin, "withdrawToken/invalid-token");
+        require(_amount != 0, "withdrawToken/amount-zero");
+        require(tokenBalance[_token] >= _amount, "withdrawToken/not-enough-balance");
+
+        tokenBalance[_token] -= _amount;
+        _token.safeTransfer(msg.sender, _amount);
+        totalValueDeposited -= _convertDecimals(_amount, IToken(_token).decimals(), 18);
+
+        emit LogWithdrawToken(msg.sender, _token, _amount);
     }
 
     function pause() external onlyOwnerOrGov {
