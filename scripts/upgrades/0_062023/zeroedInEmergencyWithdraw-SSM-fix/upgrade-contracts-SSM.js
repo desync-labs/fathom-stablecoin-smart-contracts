@@ -1,7 +1,7 @@
 const StableSwapModule = artifacts.require('StableSwapModule.sol');
 
-const proxyAdminAddress = "0xCE4E8a82BCE85dc8CD7A47C9Ea0bE125f0c5d1B7"
-const stableSwapModuleAddress = "0xA090ad1f8EA173128250626a4111B77Fd27a1858"
+const proxyAdminAddress = "0x0000000000000000000000000000000000000000"
+const stableSwapModuleAddress = "0x0000000000000000000000000000000000000000"
 
 module.exports =  async function(deployer) { 
     let promises = [
