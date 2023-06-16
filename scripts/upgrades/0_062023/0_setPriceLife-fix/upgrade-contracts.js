@@ -14,9 +14,7 @@ module.exports =  async function(deployer) {
     await Promise.all(promises);
 
     const proxyAdmin = await artifacts.initializeInterfaceAt("FathomProxyAdmin", proxyAdminAddress);
-    const delayFathomOraclePriceFeed = await artifacts.initializeInterfaceAt("DelayFathomOraclePriceFeed", delayFathomOraclePriceFeedAddress);
-    const centralizedOraclePriceFeed = await artifacts.initializeInterfaceAt("CentralizedOraclePriceFeed", centralizedOraclePriceFeedAddress);
 
-    await proxyAdmin.upgrade(delayFathomOraclePriceFeed.address, DelayFathomOraclePriceFeed.address, { gas: 8000000 });
-    await proxyAdmin.upgrade(centralizedOraclePriceFeed.address, CentralizedOraclePriceFeed.address, { gas: 8000000 });
+    await proxyAdmin.upgrade(delayFathomOraclePriceFeedAddress, DelayFathomOraclePriceFeed.address, { gas: 8000000 });
+    await proxyAdmin.upgrade(centralizedOraclePriceFeedAddress, CentralizedOraclePriceFeed.address, { gas: 8000000 });
 }

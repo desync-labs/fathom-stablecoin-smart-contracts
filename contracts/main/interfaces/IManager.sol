@@ -10,9 +10,9 @@ interface IManager {
 
     function allowMigratePosition(address, uint256) external;
 
-    function adjustPosition(uint256, int256, int256, address, bytes calldata) external;
+    function adjustPosition(uint256, int256, int256, bytes calldata) external;
 
-    function moveCollateral(uint256, address, uint256, address, bytes calldata) external;
+    function moveCollateral(uint256, address, uint256, bytes calldata) external;
 
     function moveStablecoin(uint256, address, uint256) external;
 
@@ -24,7 +24,7 @@ interface IManager {
 
     function updatePrice(bytes32 _poolId) external;
 
-    function redeemLockedCollateral(uint256 _posId, address _adapter, address _collateralReceiver, bytes calldata _data) external;
+    function redeemLockedCollateral(uint256 _posId, address _collateralReceiver, bytes calldata _data) external;
 
     function mapPositionHandlerToOwner(address) external view returns (address);
 
