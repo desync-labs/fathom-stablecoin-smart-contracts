@@ -296,7 +296,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
             // Also enforces a non-zero wad
             require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
             // require(stake[msg.sender] >= _share, "CollateralTokenAdapter/insufficient staked amount");
-            require(bookKeeper.collateralToken(collateralPoolId, _usr) >= _share, "CollateralTokenAdapter/insufficient collateral amount");
+            require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _share, "CollateralTokenAdapter/insufficient collateral amount");
 
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
             totalShare = sub(totalShare, _share);

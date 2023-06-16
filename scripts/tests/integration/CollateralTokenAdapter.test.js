@@ -507,6 +507,12 @@ describe("CollateralTokenAdapter", () => {
                         { from: AliceAddress, gasLimit: 1000000 }
                     )
                     await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
+                    //checking with Subik-ji
+                    let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
+
+                    expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                    let aliceRich = await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)
+                    console.log(aliceRich);
                     await expect(
                         collateralTokenAdapter.withdraw(
                             AliceAddress,
@@ -514,7 +520,7 @@ describe("CollateralTokenAdapter", () => {
                             ethers.utils.defaultAbiCoder.encode(["address"], [BobAddress]),
                             { from: BobAddress }
                         )
-                    ).to.be.revertedWith("CollateralTokenAdapter/insufficient staked amount")
+                    ).to.be.revertedWith("CollateralTokenAdapter/insufficient collateral amount")
                 })
             })
             context("when bob has collateral", async () => {
