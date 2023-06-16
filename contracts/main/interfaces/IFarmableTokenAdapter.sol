@@ -4,5 +4,5 @@ pragma solidity 0.8.17;
 import "../interfaces/IGenericTokenAdapter.sol";
 
 interface IFarmableTokenAdapter is IGenericTokenAdapter {
-    function moveStake(address, address, uint256, bytes calldata) external;
+    // function moveStake(address, address, uint256, bytes calldata) external;
 }
