@@ -812,7 +812,9 @@ describe("PositionPermissions", () => {
                                     fathomStablecoinBalancefinal,
                                     "Alice should receive 2 FXD from drawing 2 FXD, because Alice drew 2 times"
                                 ).to.be.equal(WeiPerWad.mul(2))
-                                const alicePosition1Stake = await collateralTokenAdapter.stake(alicePositionAddress)
+                                // const alicePosition1Stake = await collateralTokenAdapter.stake(alicePositionAddress)
+                                const alicePosition1Stake = await bookKeeper.collateralToken(pools.XDC, alicePositionAddress)
+
                                 expect(alicePosition1Stake, "Stake must be correctly updated after movePosition").to.be.equal(
                                     WeiPerWad.mul(2)
                                 )
@@ -2399,7 +2401,9 @@ describe("PositionPermissions", () => {
                     alicePositionWalletPositionAfterExport.debtShare,
                     "debtShare should be 0 FXD, because Alice export"
                 ).to.be.equal(0)
-                const AliceAddressStake = await collateralTokenAdapter.stake(AliceAddress)
+                // const AliceAddressStake = await collateralTokenAdapter.stake(AliceAddress)
+                const AliceAddressStake = await bookKeeper.collateralToken(pools.XDC, AliceAddress)
+                
                 expect(AliceAddressStake, "Stake must be correctly updated after exportPosition").to.be.equal(WeiPerWad)
 
                 //6. alice import position back
