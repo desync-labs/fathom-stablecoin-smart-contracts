@@ -40,6 +40,7 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
 
     function setPriceLife(uint256 _second) external onlyOwner {
         require(_second >= timeDelay && _second >= 5 minutes && _second <= 1 days, "DelayPriceFeed/bad-price-life");
+        this.peekPrice();
         priceLife = _second;
         emit LogSetPriceLife(msg.sender, _second);
     }

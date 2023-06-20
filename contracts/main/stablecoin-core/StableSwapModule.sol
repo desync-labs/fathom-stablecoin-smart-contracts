@@ -12,6 +12,7 @@ import "../interfaces/IStablecoin.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IStableSwapModule.sol";
 import "../utils/SafeToken.sol";
+import "../interfaces/IStableSwapModuleWrapperRetriever.sol";
 
 // Stable Swap Module
 // Allows anyone to go between FUSD and the Token by pooling the liquidity
@@ -78,7 +79,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     event LogBlocksPerLimitUpdate(uint256 _newBlocksPerLimit, uint256 _oldBlocksPerLimit);
     event LogWithdrawToken(address _account, address _token, uint256 _amount);
 
-
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
@@ -137,6 +137,14 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         upgradeInitialized = true;
         remainingFXDFeeBalance = totalFXDFeeBalance;
         remainingTokenFeeBalance = totalTokenFeeBalance;
+    }
+    /**
+     * @notice the function is to only mitigate the bad storage after upgrade.
+     * @notice this needs to be removed after its job is done    
+     */
+    function udpateTotalValueDeposited() external onlyOwner {
+        uint256 newTotalValueDeposited = IStableSwapModuleWrapperRetriever(stableswapWrapper).totalValueDeposited();
+        totalValueDeposited = newTotalValueDeposited;
     }
 
     function setStableSwapWrapper(address newStableSwapWrapper) external onlyOwner {
@@ -261,7 +269,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         tokenBalance[_token] += _amount;
         _token.safeTransferFrom(msg.sender, address(this), _amount);
         totalValueDeposited += _convertDecimals(_amount, IToken(_token).decimals(), 18);
-
+    
         if (isDecentralizedState) {
             lastUpdate = block.timestamp;
             remainingDailySwapAmount = _dailySwapLimit();
@@ -286,11 +294,11 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         }
     }
 
-    function withdrawToken(address _token, uint256 _amount) external override nonReentrant onlyStableswapWrapper{
+    function withdrawToken(address _token, uint256 _amount) external override nonReentrant onlyStableswapWrapper {
         require(_token == token || _token == stablecoin, "withdrawToken/invalid-token");
         require(_amount != 0, "withdrawToken/amount-zero");
         require(tokenBalance[_token] >= _amount, "withdrawToken/not-enough-balance");
-        
+
         tokenBalance[_token] -= _amount;
         _token.safeTransfer(msg.sender, _amount);
         totalValueDeposited -= _convertDecimals(_amount, IToken(_token).decimals(), 18);
@@ -308,10 +316,21 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogStableSwapPauseState(false);
     }
 
+    /**
+     * @dev the function withdraws whole balance of both the tokens
+     * @dev Fees is also withdrawn, so once emergencyWithdraw is done, people wont be able to withdraw there fees
+     * @dev All the balances will be reset
+    */
     function emergencyWithdraw(address _account) external override nonReentrant onlyOwnerOrGov whenPaused {
         require(_account != address(0), "withdrawFees/empty-account");
+        
+        totalValueDeposited = 0;
+        totalTokenFeeBalance = 0;
+        totalFXDFeeBalance = 0;
+        
         tokenBalance[token] = 0;
         tokenBalance[stablecoin] = 0;
+        
         token.safeTransfer(_account, token.balanceOf(address(this)));
         stablecoin.safeTransfer(_account, stablecoin.balanceOf(address(this)));
         emit LogEmergencyWithdraw(_account);
