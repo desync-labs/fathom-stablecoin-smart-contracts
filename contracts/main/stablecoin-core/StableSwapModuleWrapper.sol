@@ -183,6 +183,25 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         emit LogStableSwapWrapperPauseState(false);
     }
 
+
+    function claimFeesRewards() external override whenNotPaused {
+        _claimFeesRewards();
+    }
+
+    
+    function withdrawClaimedFees() external override nonReentrant whenNotPaused {
+        require(claimedFXDFeeRewards[msg.sender] != 0 || claimedTokenFeeRewards[msg.sender] != 0, "withdrawClaimedFees/amount-zero");
+        _withdrawClaimedFees();
+    }
+
+    function emergencyWithdraw() external override nonReentrant whenPaused {
+        require(depositTracker[msg.sender] != 0, "emergencyWithdraw/amount-zero");
+        (uint256 stablecoinAmountToWithdraw, uint256 tokenAmountToWithdraw) = this.getActualLiquidityAvailablePerUser(msg.sender);
+        _withdrawFromStableSwap(stablecoin, stablecoinAmountToWithdraw);
+        _withdrawFromStableSwap(token, tokenAmountToWithdraw);
+    }
+    
+
     function getAmounts(uint256 _amount) external override view returns(uint256, uint256) {
         require(_amount != 0, "getAmounts/amount-zero");
         require(depositTracker[msg.sender] >= _amount, "getAmounts/amount-exceeds-users-deposit");
@@ -225,15 +244,6 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     }
     
 
-    function claimFeesRewards() public override whenNotPaused {
-        _claimFeesRewards();
-    }
-
-    
-    function withdrawClaimedFees() public override nonReentrant whenNotPaused {
-        require(claimedFXDFeeRewards[msg.sender] != 0 || claimedTokenFeeRewards[msg.sender] != 0, "withdrawClaimedFees/amount-zero");
-        _withdrawClaimedFees();
-    }
 
     function _claimFeesRewards() internal {
         uint256 totalStablecoinLiquidity = _totalStablecoinBalanceStableswap();

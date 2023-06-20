@@ -10,4 +10,5 @@ interface IStableSwapModuleWrapper {
     function withdrawClaimedFees() external;
     function getAmounts(uint256 _amount) external view returns (uint256,uint256);
     function getActualLiquidityAvailablePerUser(address account) external view returns(uint256, uint256);
+    function emergencyWithdraw() external;
 }
