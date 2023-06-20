@@ -62,7 +62,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     mapping(address => uint256) public stablecoinAccumulator; //    [wad]
     mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
 
-    event LogCage();
+    event LogCage(uint256 _cageCoolDown);
     event LogCageCollateralPool(bytes32 indexed collateralPoolId);
 
     event LogAccumulateBadDebt(bytes32 indexed collateralPoolId, address indexed positionAddress, uint256 amount, uint256 debtShare);
@@ -117,12 +117,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         emit LogSetPriceOracle(msg.sender, _priceOracle);
     }
 
-    function setCageCoolDown(uint256 _cageCoolDown) external onlyOwner {
-        require(live == 1, "ShowStopper/not-live");
-        cageCoolDown = _cageCoolDown;
-        emit LogSetCageCoolDown(msg.sender, _cageCoolDown);
-    }
-
     /** @dev Start the process of emergency shutdown. The following will happen in order:
       - Start a cooldown period of the emergency shutdown
       - BookKeeper will be paused: locking/unlocking collateral and mint/repay Fathom Stablecoin will not be allow for any positions
@@ -130,15 +124,18 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
       - SystemDebtEngine will be paused: no accrual of new debt, no system debt settlement
       - PriceOracle will be paused: no new price update, no liquidation trigger
     */
-    function cage() external onlyOwner {
+    function cage(uint256 _cageCoolDown) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
+        require(_cageCoolDown >= 1 weeks  && _cageCoolDown <= 13 weeks, "ShowStopper/invalid-cool-down" );
+
         live = 0;
+        cageCoolDown = _cageCoolDown;
         cagedTimestamp = block.timestamp;
         ICagable(address(bookKeeper)).cage();
         ICagable(address(liquidationEngine)).cage();
         ICagable(address(systemDebtEngine)).cage();
         ICagable(address(priceOracle)).cage();
-        emit LogCage();
+        emit LogCage(_cageCoolDown);
     }
 
     /// @dev Set the cage price of the collateral pool with the latest price from the price oracle
