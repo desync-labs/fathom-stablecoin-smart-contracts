@@ -15,12 +15,16 @@ As an example, the function [`swapTokenToStablecoin`](https://github.com/Into-th
 Contracts needed to upgrade:
 * FlashMintModule.sol
 * FlashLoanReceiverBase.sol
-* FathomStablecoinProxyActions.sol
 * StableSwapModule.sol
 * StableSwapModuleWrapper.sol
 * CollateralTokenAdapter.sol
 * FixedSpreadLiquidationStrategy.sol
 * BookKeeperFlashMintArbitrager.sol
 * FlashMintArbitrager.sol
-* TokenAdapter.sol
 
+###### Needs to be switched to newer version:
+* FathomStablecoinProxyActions.sol - already done - static adpater
+
+##### Process to upgrade:
+1. update `upgrade-contracts.js` script with actual addresses
+2. run `coralx execute --network {network} --path scripts/upgrades/0_062023/safeToken-fix/upgrade-contracts.js`
