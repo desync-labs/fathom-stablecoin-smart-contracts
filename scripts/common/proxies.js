@@ -6,4 +6,9 @@ async function getProxy(proxyFactory, contract) {
     return await artifacts.initializeInterfaceAt(contract, address);
 }
 
-module.exports = { getProxy }
+async function getProxyById(proxyFactory, contract, proxyId) {
+    const address = await proxyFactory.proxies(proxyId);
+    return await artifacts.initializeInterfaceAt(contract, address);
+}
+
+module.exports = { getProxy, getProxyById }

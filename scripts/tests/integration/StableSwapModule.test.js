@@ -253,10 +253,13 @@ describe("StableSwapModule", () => {
 
         context("check for daily limit - depositToken", async() => {
             it("Should update dailyLimit on depositing more token", async() => {
-                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:8000000})
+                await TimeHelpers.increase(1)
+                await stableSwapModule.setDecentralizedStatesStatus(true,{gasLimit:800000})
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })    
+                await TimeHelpers.increase(1)
                 await stableSwapModuleWrapper.depositTokens(TO_DEPOSIT,{ gasLimit: 1000000 })
                 //Why GreaterThanOrEqual? Because there is one swap already done which incurs fee so total pool has increased
+                await TimeHelpers.increase(1)
                 const remainingDailySwapAmount = await stableSwapModule.remainingDailySwapAmount() 
                 expect(remainingDailySwapAmount).to.be.gte(FOURTY_PERCENT_OF_TO_DEPOSIT);
             })
@@ -463,6 +466,17 @@ describe("StableSwapModule", () => {
         it("should return false", async () => {
             const isUserWhitelisted = await stableSwapModule.isUserWhitelisted(accounts[2])
             expect(isUserWhitelisted).to.be.equal(false)
+            })
+        })
+    })
+
+    describe("#totalValueDeposited", async() => {
+        context("update total value deposited after upgrade", async() => {
+            it("totalValueDeposited: should be same before and after upgrade", async() => {
+                const totalValueDepositedBeforeUpdate = await stableSwapModule.totalValueDeposited();
+                await stableSwapModule.udpateTotalValueDeposited()
+                const totalValueDepositedAfterUpdate = await stableSwapModule.totalValueDeposited();
+                expect(totalValueDepositedAfterUpdate).to.be.equal(totalValueDepositedBeforeUpdate)
             })
         })
     })
