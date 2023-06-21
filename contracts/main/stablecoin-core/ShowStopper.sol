@@ -101,18 +101,24 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
 
     function setLiquidationEngine(address _liquidationEngine) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
+        require(_liquidationEngine != address(0), "ShowStopper/zero-liquidation-engine");
+
         liquidationEngine = ILiquidationEngine(_liquidationEngine);
         emit LogSetLiquidationEngine(msg.sender, _liquidationEngine);
     }
 
     function setSystemDebtEngine(address _systemDebtEngine) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
+        require(_systemDebtEngine != address(0), "ShowStopper/zero-debt-engine");
+
         systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
         emit LogSetSystemDebtEngine(msg.sender, _systemDebtEngine);
     }
 
     function setPriceOracle(address _priceOracle) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
+        require(_priceOracle != address(0), "ShowStopper/zero-price-oracle");
+
         priceOracle = IPriceOracle(_priceOracle);
         emit LogSetPriceOracle(msg.sender, _priceOracle);
     }

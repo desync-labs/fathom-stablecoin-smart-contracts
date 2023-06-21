@@ -66,6 +66,7 @@ contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, Reentran
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
+        require(_bookKeeper != address(0), "SystemDebtEngine/zero-book-keeper");
         bookKeeper = IBookKeeper(_bookKeeper);
         live = 1;
     }
