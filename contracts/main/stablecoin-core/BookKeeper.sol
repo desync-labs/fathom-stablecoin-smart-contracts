@@ -194,11 +194,19 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
+        require(_accessControlConfig.isContract(), "BookKeeper/access-control-config: NOT_CONTRACT_ADDRESS");
+        require(
+            IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender),
+            "BookKeeper/msgsender-not-owner"
+        );
+
         accessControlConfig = _accessControlConfig;
         emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
 
     function setCollateralPoolConfig(address _collateralPoolConfig) external onlyOwner {
+        require(_collateralPoolConfig.isContract(), "BookKeeper/collateral-pool-config: NOT_CONTRACT_ADDRESS");
+
         collateralPoolConfig = _collateralPoolConfig;
         emit LogSetCollateralPoolConfig(msg.sender, _collateralPoolConfig);
     }

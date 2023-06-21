@@ -22,6 +22,10 @@ contract Vault is IVault {
     }
 
     constructor(bytes32 _collateralPoolId, address _collateralToken, address _collateralAdapter) {
+        require(_collateralPoolId != bytes32(0), "Vault/zero-collateral-pool");
+        require(_collateralToken != address(0), "Vault/zero-collateral-token");
+        require(_collateralAdapter != address(0), "Vault/zero-collateral-adapter");
+
         collateralPoolId = _collateralPoolId;
         collateralToken = _collateralToken;
         collateralAdapter = _collateralAdapter;

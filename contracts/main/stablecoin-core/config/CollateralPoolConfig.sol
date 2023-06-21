@@ -85,6 +85,8 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         require(_stabilityFeeRate <= 1000000012857214317438491659, "CollateralPoolConfig/stability-fee-rate-too-large");
         _collateralPools[_collateralPoolId].stabilityFeeRate = _stabilityFeeRate;
         _collateralPools[_collateralPoolId].lastAccumulationTime = block.timestamp;
+
+        require(_adapter != address(0), "CollateralPoolConfig/zero-adapter");
         _collateralPools[_collateralPoolId].adapter = _adapter;
         require(_closeFactorBps > 0 && _closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
         require(_liquidatorIncentiveBps >= 10000 && _liquidatorIncentiveBps <= 19000, "CollateralPoolConfig/invalid-liquidator-incentive-bps");
@@ -104,6 +106,8 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function setDebtCeiling(bytes32 _collateralPoolId, uint256 _debtCeiling) external onlyOwner {
+        require(_debtCeiling > 0 , "CollateralPoolConfig/invalid-debt-ceiling");
+
         _collateralPools[_collateralPoolId].debtCeiling = _debtCeiling;
         emit LogSetDebtCeiling(msg.sender, _collateralPoolId, _debtCeiling);
     }
@@ -202,6 +206,8 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function setStrategy(bytes32 _collateralPoolId, address _strategy) external onlyOwner {
+        require(_strategy != address(0), "CollateralPoolConfig/zero-strategy");
+
         _collateralPools[_collateralPoolId].strategy = _strategy;
         emit LogSetStrategy(msg.sender, _collateralPoolId, address(_strategy));
     }

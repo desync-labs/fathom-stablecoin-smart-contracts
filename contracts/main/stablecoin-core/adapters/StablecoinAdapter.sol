@@ -48,6 +48,9 @@ contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, Reentr
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
+        require(_bookKeeper != address(0), "StablecoinAdapter/zero-book-keeper");
+        require(_stablecoin != address(0), "StablecoinAdapter/zero-stablecoin");
+
         live = 1;
         bookKeeper = IBookKeeper(_bookKeeper);
         stablecoin = IStablecoin(_stablecoin);

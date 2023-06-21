@@ -115,7 +115,9 @@ contract StabilityFeeCollector is StabilityFeeCollectorMath, PausableUpgradeable
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
+        require(_bookKeeper != address(0), "StabilityFeeCollector/zero-book-keeper");
         bookKeeper = IBookKeeper(_bookKeeper);
+        
         require(_systemDebtEngine != address(0), "StabilityFeeCollector/bad-system-debt-engine-address");
         systemDebtEngine = _systemDebtEngine;
     }
