@@ -4,11 +4,11 @@ const CollateralTokenAdapter = artifacts.require('CollateralTokenAdapter.sol');
 const FixedSpreadLiquidationStrategy = artifacts.require('FixedSpreadLiquidationStrategy.sol');
 const BookKeeperFlashMintArbitrager = artifacts.require('BookKeeperFlashMintArbitrager.sol');
 const FlashMintArbitrager = artifacts.require('FlashMintArbitrager.sol');
+const StableSwapModule = artifacts.require('StableSwapModule.sol');
 const StableSwapModuleWrapper = artifacts.require('StableSwapModuleWrapper.sol');
-const { getProxy } = require("../../../common/proxies");
 
-const proxyAdminAddress = "0xcdF2E9a34D7DEe01cbA8420C414737b605256871"
-const proxyFactoryAddress = "0x6890D41e4F70829238F5071B55974e1A8F615d31"
+const { ProxyAdminAddress, ProxyFactoryAddress } = require("./common/addresses");
+const { getProxy } = require("../common/proxies");
 
 module.exports =  async function(deployer) { 
     let promises = [
@@ -18,13 +18,14 @@ module.exports =  async function(deployer) {
         deployer.deploy(FixedSpreadLiquidationStrategy, { gas: 7050000 }),
         deployer.deploy(BookKeeperFlashMintArbitrager, { gas: 7050000 }),
         deployer.deploy(FlashMintArbitrager, { gas: 7050000 }),
+        deployer.deploy(StableSwapModule, { gas: 7050000 }),
         deployer.deploy(StableSwapModuleWrapper, { gas: 7050000 })
     ];
   
     await Promise.all(promises);
 
-    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", proxyFactoryAddress);
-    const proxyAdmin = await artifacts.initializeInterfaceAt("FathomProxyAdmin", proxyAdminAddress);
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", ProxyFactoryAddress);
+    const proxyAdmin = await artifacts.initializeInterfaceAt("FathomProxyAdmin", ProxyAdminAddress);
     
     const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
     const flashLoanReceiverBase = await getProxy(proxyFactory, "FlashLoanReceiverBase");
@@ -33,6 +34,7 @@ module.exports =  async function(deployer) {
     const bookkeeperFlashMintArbitrager = await getProxy(proxyFactory, "BookKeeperFlashMintArbitrager")
     const flashMintArbitrager = await getProxy(proxyFactory, "FlashMintArbitrager")
     const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper")
+    const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule")
 
     await proxyAdmin.upgrade(flashMintModule.address, FlashMintModule.address, { gas: 8000000 });
     await proxyAdmin.upgrade(flashLoanReceiverBase.address, FlashLoanReceiverBase.address, { gas: 8000000 });
@@ -40,5 +42,6 @@ module.exports =  async function(deployer) {
     await proxyAdmin.upgrade(fixedSpreadLiquidationStrategy.address, FixedSpreadLiquidationStrategy.address, { gas: 8000000 });
     await proxyAdmin.upgrade(bookkeeperFlashMintArbitrager.address, BookKeeperFlashMintArbitrager.address, { gas: 8000000 });
     await proxyAdmin.upgrade(flashMintArbitrager.address, FlashMintArbitrager.address, { gas: 8000000 });
+    await proxyAdmin.upgrade(stableSwapModule.address, StableSwapModule.address, { gas: 8000000 });
     await proxyAdmin.upgrade(stableSwapModuleWrapper.address, StableSwapModuleWrapper.address, { gas: 8000000 });
 }
