@@ -255,6 +255,13 @@ describe("CollateralPoolConfig", () => {
         )
       })
     })
+    context("zero value", () => {
+      it("should revert", async () => {
+        await expect(collateralPoolConfigAsAlice.setDebtCeiling(COLLATERAL_POOL_ID, 0)).to.be.revertedWith(
+          "CollateralPoolConfig/invalid-debt-ceiling"
+        )
+      })
+    })
     context("when parameters are valid", () => {
       it("should success", async () => {
         await expect(collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRay))
@@ -603,11 +610,20 @@ describe("CollateralPoolConfig", () => {
         )
       })
     })
+    context("zero address", () => {
+      it("should be revert", async () => {
+        await expect(collateralPoolConfigAsAlice.setStrategy(COLLATERAL_POOL_ID, AddressZero)).to.be.revertedWith(
+          "CollateralPoolConfig/zero-strategy"
+        )
+      })
+    })
     context("when parameters are valid", () => {
       it("should success", async () => {
-        await expect(collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, AddressZero))
+        const randomAddress = "0x0E6C131863690D810c84F920356c20EaF7240F47";
+
+        await expect(collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, randomAddress))
           .to.be.emit(collateralPoolConfig, "LogSetStrategy")
-          .withArgs(DeployerAddress, COLLATERAL_POOL_ID, AddressZero)
+          .withArgs(DeployerAddress, COLLATERAL_POOL_ID, randomAddress)
       })
     })
   })
@@ -766,9 +782,10 @@ describe("CollateralPoolConfig", () => {
   describe("#getStrategy", () => {
     context("when parameters are valid", () => {
       it("should success", async () => {
-        await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, AddressZero)
+        const randomAddress = "0x0E6C131863690D810c84F920356c20EaF7240F47";
+        await collateralPoolConfig.setStrategy(COLLATERAL_POOL_ID, randomAddress)
 
-        expect(await collateralPoolConfig.getStrategy(COLLATERAL_POOL_ID)).to.be.equal(AddressZero)
+        expect(await collateralPoolConfig.getStrategy(COLLATERAL_POOL_ID)).to.be.equal(randomAddress)
       })
     })
   })

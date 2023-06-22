@@ -128,20 +128,24 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         // 1. Initialized all dependencies
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
-        collateralToken = _collateralToken;
+
+        require(_bookKeeper != address(0), "CollateralTokenAdapter/zero-book-keeper");
+        require(_collateralPoolId != bytes32(0), "CollateralTokenAdapter/zero-collateral-pool-id");
+        require(_collateralToken != address(0), "CollateralTokenAdapter/zero-collateral-token");
+        require(_positionManager != address(0), "CollateralTokenAdapter/zero-position-manager");
+        require(_proxyWalletFactory != address(0), "CollateralTokenAdapter/zero-proxy-wallet-factory");
 
         live = 1;
 
-        bookKeeper = IBookKeeper(_bookKeeper);
         collateralPoolId = _collateralPoolId;
-
+        collateralToken = _collateralToken;
+        bookKeeper = IBookKeeper(_bookKeeper);
         positionManager = IManager(_positionManager);
-
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
     }
 
     function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
-        require(toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
+        require(toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
         whiteListed[toBeWhitelisted] = true;
     }
 
@@ -172,6 +176,8 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
 
     function setVault(address _vault) external onlyOwner {
         require(true != flagVault, "CollateralTokenAdapter/Vault-set-already");
+        require(_vault != address(0), "CollateralTokenAdapter/zero-vault");
+
         flagVault = true;
         vault = IVault(_vault);
     }
