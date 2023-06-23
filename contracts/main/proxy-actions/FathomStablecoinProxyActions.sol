@@ -376,6 +376,8 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data);
 
         address _positionAddress = IManager(_manager).positions(_positionId);
+        IManager(_manager).updatePrice(_collateralPoolId);
+        
         emit LogBorrowedAmount(_positionAddress, _stablecoinAmount);
     }
 
