@@ -68,6 +68,12 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         address _strategy
     ) external onlyOwner {
         require(_collateralPools[_collateralPoolId].debtAccumulatedRate == 0, "CollateralPoolConfig/collateral-pool-already-init");
+        require(_debtCeiling > _debtFloor, "CollateralPoolConfig/invalid-ceiliing");
+        require(
+            _positionDebtCeiling <= _debtCeiling && _positionDebtCeiling > _debtFloor, 
+            "CollateralPoolConfig/invalid-position-ceiling"
+        );
+        
         _collateralPools[_collateralPoolId].debtAccumulatedRate = RAY;
         _collateralPools[_collateralPoolId].debtCeiling = _debtCeiling;
         _collateralPools[_collateralPoolId].debtFloor = _debtFloor;
@@ -106,13 +112,17 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function setDebtCeiling(bytes32 _collateralPoolId, uint256 _debtCeiling) external onlyOwner {
-        require(_debtCeiling > 0 , "CollateralPoolConfig/invalid-debt-ceiling");
+        require(
+            _debtCeiling >= _collateralPools[_collateralPoolId].positionDebtCeiling, 
+            "CollateralPoolConfig/invalid-debt-ceiling"
+        );
 
         _collateralPools[_collateralPoolId].debtCeiling = _debtCeiling;
         emit LogSetDebtCeiling(msg.sender, _collateralPoolId, _debtCeiling);
     }
 
     function setDebtFloor(bytes32 _collateralPoolId, uint256 _debtFloor) external onlyOwner {
+        require(_debtFloor < _collateralPools[_collateralPoolId].positionDebtCeiling, "CollateralPoolConfig/invalid-debt-floor");
         _collateralPools[_collateralPoolId].debtFloor = _debtFloor;
         emit LogSetDebtFloor(msg.sender, _collateralPoolId, _debtFloor);
     }
