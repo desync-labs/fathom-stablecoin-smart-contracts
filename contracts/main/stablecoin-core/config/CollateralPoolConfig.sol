@@ -113,7 +113,6 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
 
     function setDebtCeiling(bytes32 _collateralPoolId, uint256 _debtCeiling) external onlyOwner {
         require(
-            _debtCeiling > _collateralPools[_collateralPoolId].debtFloor && 
             _debtCeiling >= _collateralPools[_collateralPoolId].positionDebtCeiling, 
             "CollateralPoolConfig/invalid-debt-ceiling"
         );
