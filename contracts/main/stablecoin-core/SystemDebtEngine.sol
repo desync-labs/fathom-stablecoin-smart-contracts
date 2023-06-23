@@ -88,6 +88,7 @@ contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, Reentran
     }
 
     function setSurplusBuffer(uint256 _data) external whenNotPaused onlyOwner {
+        require(_data >= 10 ** 45, "SystemDebtEngine/invalidSurplusBuffer");
         surplusBuffer = _data;
         emit LogSetSurplusBuffer(msg.sender, _data);
     }

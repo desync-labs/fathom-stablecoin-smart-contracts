@@ -372,6 +372,8 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
 
         require(either(_utab >= _vars.debtFloor, _positionSrc.debtShare == 0), "BookKeeper/debt-floor-src");
         require(either(_vtab >= _vars.debtFloor, _positionDst.debtShare == 0), "BookKeeper/debt-floor-dst");
+
+        require(_vtab <= _vars.positionDebtCeiling, "BookKeeper/position-debt-ceiling-exceeded-dst");
     }
 
     /** @dev Confiscate position from the owner for the position to be liquidated.

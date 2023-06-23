@@ -157,6 +157,75 @@ describe("CollateralPoolConfig", () => {
         ).to.be.revertedWith("CollateralPoolConfig/invalid-stability-fee-rate")
       })
     })
+    context("when debtCeiling is not bigger than debtFloor", () => {
+      it("should be revert", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
+
+        await expect(
+          collateralPoolConfig.initCollateralPool(
+            COLLATERAL_POOL_ID,
+            WeiPerRad.mul(10000),
+            WeiPerRad.mul(10000),
+            WeiPerRad.mul(10000),
+            mockedSimplePriceFeed.address,
+            WeiPerRay,
+            WeiPerWad,
+            mockedCollateralTokenAdapter.address,
+            CLOSE_FACTOR_BPS,
+            LIQUIDATOR_INCENTIVE_BPS,
+            TREASURY_FEE_BPS,
+            AddressZero
+          )
+        ).to.be.revertedWith("CollateralPoolConfig/invalid-ceiliing")
+      })
+    })
+    context("when positionDebtCeiling is not bigger than debtFloor", () => {
+      it("should be revert", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
+
+        await expect(
+          collateralPoolConfig.initCollateralPool(
+            COLLATERAL_POOL_ID,
+            WeiPerRad.mul(100000),
+            WeiPerRad.mul(10000),
+            WeiPerRad.mul(10000),
+            mockedSimplePriceFeed.address,
+            WeiPerRay,
+            WeiPerWad,
+            mockedCollateralTokenAdapter.address,
+            CLOSE_FACTOR_BPS,
+            LIQUIDATOR_INCENTIVE_BPS,
+            TREASURY_FEE_BPS,
+            AddressZero
+          )
+        ).to.be.revertedWith("CollateralPoolConfig/invalid-position-ceiling")
+      })
+    })
+    context("when positionDebtCeiling is not bigger than debtCeiling", () => {
+      it("should be revert", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
+
+        await expect(
+          collateralPoolConfig.initCollateralPool(
+            COLLATERAL_POOL_ID,
+            WeiPerRad.mul(100000),
+            WeiPerRad.mul(10000),
+            WeiPerRad.mul(1000000),
+            mockedSimplePriceFeed.address,
+            WeiPerRay,
+            WeiPerWad,
+            mockedCollateralTokenAdapter.address,
+            CLOSE_FACTOR_BPS,
+            LIQUIDATOR_INCENTIVE_BPS,
+            TREASURY_FEE_BPS,
+            AddressZero
+          )
+        ).to.be.revertedWith("CollateralPoolConfig/invalid-position-ceiling")
+      })
+    })
     context("price feed is not healthy", () => {
       it("should revert", async () => {
         await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
@@ -255,9 +324,12 @@ describe("CollateralPoolConfig", () => {
         )
       })
     })
-    context("zero value", () => {
+    context("not bigger than floor", () => {
       it("should revert", async () => {
-        await expect(collateralPoolConfigAsAlice.setDebtCeiling(COLLATERAL_POOL_ID, 0)).to.be.revertedWith(
+        await collateralPoolConfigAsAlice.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRay)
+        await collateralPoolConfigAsAlice.setPositionDebtCeiling(COLLATERAL_POOL_ID, WeiPerRay)
+        await collateralPoolConfigAsAlice.setDebtFloor(COLLATERAL_POOL_ID, WeiPerRay.div(10))
+        await expect(collateralPoolConfigAsAlice.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRay.div(10))).to.be.revertedWith(
           "CollateralPoolConfig/invalid-debt-ceiling"
         )
       })
@@ -280,29 +352,23 @@ describe("CollateralPoolConfig", () => {
         )
       })
     })
-    context("when parameters are valid", () => {
-      it("should success", async () => {
-        await expect(collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, WeiPerRay))
-          .to.be.emit(collateralPoolConfig, "LogSetDebtFloor")
-          .withArgs(DeployerAddress, COLLATERAL_POOL_ID, WeiPerRay)
-      })
-    })
-  })
-  describe("#setDebtFloor", () => {
-    context("when the caller is not the owner", () => {
+    context("not less than ceiling", () => {
       it("should be revert", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(false)
-
+        await collateralPoolConfig.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRay)
         await expect(collateralPoolConfigAsAlice.setDebtFloor(COLLATERAL_POOL_ID, WeiPerRay)).to.be.revertedWith(
-          "!ownerRole"
+          "CollateralPoolConfig/invalid-debt-floor"
         )
       })
     })
     context("when parameters are valid", () => {
       it("should success", async () => {
-        await expect(collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, WeiPerRay))
+        await collateralPoolConfigAsAlice.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRay)
+        await collateralPoolConfigAsAlice.setPositionDebtCeiling(COLLATERAL_POOL_ID, WeiPerRay)
+        await collateralPoolConfigAsAlice.setDebtFloor(COLLATERAL_POOL_ID, WeiPerRay.div(10))
+
+        await expect(collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, WeiPerRay.div(15)))
           .to.be.emit(collateralPoolConfig, "LogSetDebtFloor")
-          .withArgs(DeployerAddress, COLLATERAL_POOL_ID, WeiPerRay)
+          .withArgs(DeployerAddress, COLLATERAL_POOL_ID, WeiPerRay.div(15))
       })
     })
   })
@@ -692,9 +758,11 @@ describe("CollateralPoolConfig", () => {
   describe("#getDebtFloor", () => {
     context("when parameters are valid", () => {
       it("should success", async () => {
-        await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, WeiPerRay)
+        await collateralPoolConfigAsAlice.setDebtCeiling(COLLATERAL_POOL_ID, WeiPerRay)
+        await collateralPoolConfigAsAlice.setPositionDebtCeiling(COLLATERAL_POOL_ID, WeiPerRay)
+        await collateralPoolConfigAsAlice.setDebtFloor(COLLATERAL_POOL_ID, WeiPerRay.div(20))
 
-        expect(await collateralPoolConfig.getDebtFloor(COLLATERAL_POOL_ID)).to.be.equal(WeiPerRay)
+        expect(await collateralPoolConfig.getDebtFloor(COLLATERAL_POOL_ID)).to.be.equal(WeiPerRay.div(20))
       })
     })
   })
