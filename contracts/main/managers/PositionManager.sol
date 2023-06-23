@@ -106,6 +106,7 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
     /// @param _user The address to be allowed for managing the position
     /// @param _ok Ok flag to allow/disallow. 1 for allow and 0 for disallow.
     function allowManagePosition(uint256 _positionId, address _user, uint256 _ok) external override whenNotPaused onlyOwnerAllowed(_positionId) {
+        require(_ok < 2, "PositionManager/invalid-ok");
         ownerWhitelist[owners[_positionId]][_positionId][_user] = _ok;
         emit LogAllowManagePosition(msg.sender, _positionId, owners[_positionId], _user, _ok);
     }
@@ -114,6 +115,7 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
     /// @param _user The address of user that will be allowed to do such an action to msg.sender
     /// @param _ok Ok flag to allow/disallow
     function allowMigratePosition(address _user, uint256 _ok) external override whenNotPaused {
+        require(_ok < 2, "PositionManager/invalid-ok");
         migrationWhitelist[msg.sender][_user] = _ok;
         emit LogAllowMigratePosition(msg.sender, _user, _ok);
     }
