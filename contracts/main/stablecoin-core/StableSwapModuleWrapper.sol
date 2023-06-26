@@ -185,7 +185,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
     
     function withdrawClaimedFees() external override nonReentrant whenNotPaused {
-        require(claimedFXDFeeRewards[msg.sender] != 0 || claimedTokenFeeRewards[msg.sender] != 0, "withdrawClaimedFees/amount-zero");
+        require(claimedFXDFeeRewards[msg.sender] != 0 || claimedTokenFeeRewards[msg.sender] != 0, "withdrawClaimedFees/no-claimed-fees");
         _withdrawClaimedFees();
     }
 

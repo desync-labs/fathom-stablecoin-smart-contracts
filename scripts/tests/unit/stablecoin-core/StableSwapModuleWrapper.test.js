@@ -259,5 +259,17 @@ describe("StableSwapModule", () => {
     })
   })
 
-  
+  describe("fees", () => {
+    context("withdraw claimed fees", () => {
+      it("should revert - no claimed fees", async () => {
+        await expect(stableSwapModuleWrapper.withdrawClaimedFees()).to.be.revertedWith("withdrawClaimedFees/no-claimed-fees")
+      })
+    })
+
+    context("emergency withdraw", () => {
+      it("should revert - no claimed fees", async () => {
+        await expect(stableSwapModuleWrapper.emergencyWithdraw()).to.be.revertedWith("emergencyWithdraw/amount-zero")
+      })
+    })
+  })
 })
