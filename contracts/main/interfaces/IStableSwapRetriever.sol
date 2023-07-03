@@ -6,4 +6,5 @@ interface IStableSwapRetriever {
     function totalFXDFeeBalance() external view returns(uint256);
     function totalTokenFeeBalance() external view returns(uint256);
     function totalValueLocked() external view returns(uint256);
+    function paused() external view returns(bool);
 }

@@ -190,10 +190,12 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     }
 
     function emergencyWithdraw() external override nonReentrant whenPaused {
+        require(IStableSwapRetriever(stableSwapModule).paused(),"emergencyWithdraw/SSM-not-paused");
         require(depositTracker[msg.sender] != 0, "emergencyWithdraw/amount-zero");
         (uint256 stablecoinAmountToWithdraw, uint256 tokenAmountToWithdraw) = this.getActualLiquidityAvailablePerUser(msg.sender);
         _withdrawFromStableSwap(stablecoin, stablecoinAmountToWithdraw);
-        _withdrawFromStableSwap(token, tokenAmountToWithdraw);
+        uint256 tokenAmountToWithdrawScaled = _convertDecimals(tokenAmountToWithdraw, 18, IToken(token).decimals());
+        _withdrawFromStableSwap(token, tokenAmountToWithdrawScaled);
     }
 
     function getAmounts(uint256 _amount) external override view returns(uint256, uint256) {
