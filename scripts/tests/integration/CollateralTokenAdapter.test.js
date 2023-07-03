@@ -211,7 +211,6 @@ describe("CollateralTokenAdapter", () => {
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
                 let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
-                console.log(collateralPoolIdFromAdapter);
                 // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
                 expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
 
@@ -226,7 +225,7 @@ describe("CollateralTokenAdapter", () => {
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
                 // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
- 
+
                 // expect(await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress).to.be.eq(ethers.utils.parseEther("1")))
                 expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
 
@@ -511,8 +510,7 @@ describe("CollateralTokenAdapter", () => {
                     let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
 
                     expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
-                    let aliceRich = await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)
-                    console.log(aliceRich);
+
                     await expect(
                         collateralTokenAdapter.withdraw(
                             AliceAddress,

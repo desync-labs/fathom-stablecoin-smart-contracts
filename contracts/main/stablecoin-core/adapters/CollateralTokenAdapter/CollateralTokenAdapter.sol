@@ -81,8 +81,8 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
 
-    /// @dev Mapping of user(positionAddress) => collteralTokens that he is staking
-    // mapping(address => uint256) public stake;
+    /// @dev deprecated but needs to be kept to minimize storage layout confusion
+    mapping(address => uint256) stake;
 
     mapping(address => bool) public whiteListed;
 
