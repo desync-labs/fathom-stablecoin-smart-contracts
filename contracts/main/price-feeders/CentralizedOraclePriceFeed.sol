@@ -30,12 +30,8 @@ contract CentralizedOraclePriceFeed is DelayPriceFeedBase {
         this.peekPrice();
     }
 
-    function _retrivePrice() internal view override returns (PriceInfo memory) {
+    function retrivePrice() external view override returns (PriceInfo memory) {
         (uint256 _price, uint256 _lastUpdate) = oracle.getPrice();
-
-        require(_price > 0, "CentralizedOraclePriceFeed/wrong-price");
-        require(_lastUpdate <= block.timestamp, "CentralizedOraclePriceFeed/wrong-lastUpdate");
-
         return PriceInfo(_price, _lastUpdate);
     }
 }
