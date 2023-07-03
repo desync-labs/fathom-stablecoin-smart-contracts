@@ -272,6 +272,30 @@ describe("CollateralPoolConfig", () => {
         ).to.be.revertedWith("CollateralPoolConfig/wrong-price-feed-pool")
       })
     })
+    context("adapter with wrong id", () => {
+      it("should revert", async () => {
+        await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
+        await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
+        await mockedCollateralTokenAdapter.mock.collateralPoolId.returns(formatBytes32String("GOLD"));
+
+        await expect(
+          collateralPoolConfig.initCollateralPool(
+            COLLATERAL_POOL_ID,
+            WeiPerRad.mul(10000000),
+            0,
+            WeiPerRad.mul(10000),
+            mockedSimplePriceFeed.address,
+            WeiPerRay,
+            WeiPerRay,
+            mockedCollateralTokenAdapter.address,
+            CLOSE_FACTOR_BPS,
+            LIQUIDATOR_INCENTIVE_BPS,
+            TREASURY_FEE_BPS,
+            AddressZero
+          )
+        ).to.be.revertedWith("CollateralPoolConfig/wrong-adapter")
+      })
+    })
     context("when parameters are valid", () => {
       it("should success", async () => {
         await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)

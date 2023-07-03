@@ -93,6 +93,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _collateralPools[_collateralPoolId].lastAccumulationTime = block.timestamp;
 
         require(_adapter != address(0), "CollateralPoolConfig/zero-adapter");
+        require(IGenericTokenAdapter(_adapter).collateralPoolId() == _collateralPoolId, "CollateralPoolConfig/wrong-adapter");
         _collateralPools[_collateralPoolId].adapter = _adapter;
         require(_closeFactorBps > 0 && _closeFactorBps <= 10000, "CollateralPoolConfig/invalid-close-factor-bps");
         require(_liquidatorIncentiveBps >= 10000 && _liquidatorIncentiveBps <= 19000, "CollateralPoolConfig/invalid-liquidator-incentive-bps");
