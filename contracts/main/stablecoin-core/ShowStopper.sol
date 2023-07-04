@@ -17,29 +17,16 @@ contract ShowStopperMath {
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAY = 10 ** 27;
 
-    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = _x + _y;
-        require(_z >= _x);
-    }
-
-    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x - _y) <= _x);
-    }
-
-    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y == 0 || (_z = _x * _y) / _y == _x);
-    }
-
     function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         return _x <= _y ? _x : _y;
     }
 
     function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, _y) / RAY;
+        _z = (_x * _y) / RAY;
     }
 
     function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, WAD) / _y;
+        _z = (_x * WAD) / _y;
     }
 }
 
@@ -169,7 +156,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         (uint256 _lockedCollateralAmount, uint256 _debtShare) = bookKeeper.positions(_collateralPoolId, _positionAddress);
         uint256 _debtAmount = rmul(rmul(_debtShare, _debtAccumulatedRate), cagePrice[_collateralPoolId]); // find the amount of debt in the unit of collateralToken
         uint256 _amount = min(_lockedCollateralAmount, _debtAmount); // if debt > lockedCollateralAmount, that's mean bad debt occur
-        badDebtAccumulator[_collateralPoolId] = add(badDebtAccumulator[_collateralPoolId], sub(_debtAmount, _amount)); // accumulate bad debt in badDebtAccumulator (if there is any)
+        badDebtAccumulator[_collateralPoolId] = badDebtAccumulator[_collateralPoolId] + _debtAmount - _amount; // accumulate bad debt in badDebtAccumulator (if there is any)
 
         require(_amount < 2 ** 255 && _debtShare < 2 ** 255, "ShowStopper/overflow");
 
@@ -196,7 +183,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         require(live == 0, "ShowStopper/still-live");
         require(debt == 0, "ShowStopper/debt-not-zero");
         require(bookKeeper.stablecoin(address(systemDebtEngine)) == 0, "ShowStopper/surplus-not-zero");
-        require(block.timestamp >= add(cagedTimestamp, cageCoolDown), "ShowStopper/cage-cool-down-not-finished");
+        require(block.timestamp >= cagedTimestamp + cageCoolDown, "ShowStopper/cage-cool-down-not-finished");
         debt = bookKeeper.totalStablecoinIssued();
         emit LogFinalizeDebt();
     }
@@ -214,7 +201,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         ); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
 
-        finalCashPrice[_collateralPoolId] = mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) / (debt / RAY);
+        finalCashPrice[_collateralPoolId] = ((_wad - badDebtAccumulator[_collateralPoolId]) * RAY) / (debt / RAY);
 
         emit LogFinalizeCashPrice(_collateralPoolId);
     }
@@ -223,8 +210,8 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     function accumulateStablecoin(uint256 _amount) external {
         require(_amount != 0, "ShowStopper/amount-zero");
         require(debt != 0, "ShowStopper/debt-zero");
-        bookKeeper.moveStablecoin(msg.sender, address(systemDebtEngine), mul(_amount, RAY));
-        stablecoinAccumulator[msg.sender] = add(stablecoinAccumulator[msg.sender], _amount);
+        bookKeeper.moveStablecoin(msg.sender, address(systemDebtEngine), _amount * RAY);
+        stablecoinAccumulator[msg.sender] += _amount;
         emit LogAccumulateStablecoin(msg.sender, _amount);
     }
 
@@ -233,7 +220,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         require(_amount != 0, "ShowStopper/amount-zero");
         require(finalCashPrice[_collateralPoolId] != 0, "ShowStopper/final-cash-price-collateral-pool-id-not-defined");
         bookKeeper.moveCollateral(_collateralPoolId, address(this), msg.sender, rmul(_amount, finalCashPrice[_collateralPoolId]));
-        redeemedStablecoinAmount[_collateralPoolId][msg.sender] = add(redeemedStablecoinAmount[_collateralPoolId][msg.sender], _amount);
+        redeemedStablecoinAmount[_collateralPoolId][msg.sender] += _amount;
         require(
             redeemedStablecoinAmount[_collateralPoolId][msg.sender] <= stablecoinAccumulator[msg.sender],
             "ShowStopper/insufficient-stablecoin-accumulator-balance"

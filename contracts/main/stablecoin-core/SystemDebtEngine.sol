@@ -11,14 +11,6 @@ import "../interfaces/ICagable.sol";
 import "../interfaces/IPausable.sol";
 
 contract SystemDebtEngineMath {
-    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x + _y) >= _x);
-    }
-
-    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x - _y) <= _x);
-    }
-
     function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         return _x <= _y ? _x : _y;
     }
@@ -83,7 +75,7 @@ contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, Reentran
 
     function withdrawStablecoinSurplus(address _to, uint256 _value) external onlyOwner {
         require(bookKeeper.systemBadDebt(address(this)) == 0, "SystemDebtEngine/system-bad-debt-remaining");
-        require(sub(bookKeeper.stablecoin(address(this)), _value) >= surplusBuffer, "SystemDebtEngine/insufficient-surplus");
+        require(bookKeeper.stablecoin(address(this)) - _value >= surplusBuffer, "SystemDebtEngine/insufficient-surplus");
         bookKeeper.moveStablecoin(address(this), _to, _value);
     }
 
