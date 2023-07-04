@@ -218,6 +218,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _stablecoinAmount, // [wad]
         bytes calldata _data
     ) public {
+        require(_positionAddress != address(0), "CollateralPoolConfig/zero-position-address");
         address _stablecoin = address(IStablecoinAdapter(_adapter).stablecoin());
         // Gets Fathom Stablecoin from the user's wallet
         _stablecoin.safeTransferFrom(msg.sender, address(this), _stablecoinAmount);
@@ -246,6 +247,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         bool _transferFrom,
         bytes calldata _data
     ) public {
+        require(_positionAddress != address(0), "CollateralPoolConfig/zero-position-address");
         address _collateralToken = address(IGenericTokenAdapter(_adapter).collateralToken());
 
         // Only executes for tokens that have approval/transferFrom implementation
@@ -374,6 +376,8 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data);
 
         address _positionAddress = IManager(_manager).positions(_positionId);
+        IManager(_manager).updatePrice(_collateralPoolId);
+        
         emit LogBorrowedAmount(_positionAddress, _stablecoinAmount);
     }
 

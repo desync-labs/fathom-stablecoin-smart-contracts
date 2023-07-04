@@ -39,6 +39,16 @@ contract AdminControls is OwnableUpgradeable {
         address _flashMintModule,
         address _stablecoinAdapter
     ) external initializer {
+        OwnableUpgradeable.__Ownable_init();
+
+        require(_bookKeeper != address(0), "AdminControls/zero-book-keeper");
+        require(_liquidationEngine != address(0), "AdminControls/zero-liquidation-engine");
+        require(_priceOracle != address(0), "AdminControls/zero-price-oracle");
+        require(_flashMintModule != address(0), "AdminControls/zero-flash-mint-module");
+        require(_systemDebtEngine != address(0), "AdminControls/zero-system-debt-engine");
+        require(_stablecoinAdapter != address(0), "AdminControls/zero-stablecoin-adapter");
+        require(_positionManager != address(0), "AdminControls/zero-position-manager");
+
         bookKeeper = _bookKeeper;
         liquidationEngine = _liquidationEngine;
         priceOracle = _priceOracle;

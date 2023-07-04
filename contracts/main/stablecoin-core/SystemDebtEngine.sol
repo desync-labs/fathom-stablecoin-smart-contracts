@@ -66,6 +66,7 @@ contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, Reentran
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
+        require(_bookKeeper != address(0), "SystemDebtEngine/zero-book-keeper");
         bookKeeper = IBookKeeper(_bookKeeper);
         live = 1;
     }
@@ -87,6 +88,7 @@ contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, Reentran
     }
 
     function setSurplusBuffer(uint256 _data) external whenNotPaused onlyOwner {
+        require(_data >= 10 ** 45, "SystemDebtEngine/invalidSurplusBuffer");
         surplusBuffer = _data;
         emit LogSetSurplusBuffer(msg.sender, _data);
     }

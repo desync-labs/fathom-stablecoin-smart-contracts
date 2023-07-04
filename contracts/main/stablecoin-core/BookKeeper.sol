@@ -194,11 +194,19 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
+        require(_accessControlConfig.isContract(), "BookKeeper/access-control-config: NOT_CONTRACT_ADDRESS");
+        require(
+            IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender),
+            "BookKeeper/msgsender-not-owner"
+        );
+
         accessControlConfig = _accessControlConfig;
         emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
 
     function setCollateralPoolConfig(address _collateralPoolConfig) external onlyOwner {
+        require(_collateralPoolConfig.isContract(), "BookKeeper/collateral-pool-config: NOT_CONTRACT_ADDRESS");
+
         collateralPoolConfig = _collateralPoolConfig;
         emit LogSetCollateralPoolConfig(msg.sender, _collateralPoolConfig);
     }
@@ -364,6 +372,8 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
 
         require(either(_utab >= _vars.debtFloor, _positionSrc.debtShare == 0), "BookKeeper/debt-floor-src");
         require(either(_vtab >= _vars.debtFloor, _positionDst.debtShare == 0), "BookKeeper/debt-floor-dst");
+
+        require(_vtab <= _vars.positionDebtCeiling, "BookKeeper/position-debt-ceiling-exceeded-dst");
     }
 
     /** @dev Confiscate position from the owner for the position to be liquidated.
