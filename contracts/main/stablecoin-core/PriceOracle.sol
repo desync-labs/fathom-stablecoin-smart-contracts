@@ -15,12 +15,8 @@ import "../interfaces/ISetPrice.sol";
 contract PriceOracleMath {
     uint256 internal constant ONE = 10 ** 27;
 
-    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y == 0 || (_z = _x * _y) / _y == _x);
-    }
-
     function rdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, ONE) / _y;
+        _z = (_x * ONE) / _y;
     }
 }
 
@@ -104,7 +100,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICag
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).collateralPools(_collateralPoolId).priceFeed);
         uint256 _liquidationRatio = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLiquidationRatio(_collateralPoolId);
         (uint256 _rawPrice, bool _hasPrice) = _priceFeed.peekPrice();
-        uint256 _priceWithSafetyMargin = _hasPrice ? rdiv(rdiv(mul(_rawPrice, 10 ** 9), stableCoinReferencePrice), _liquidationRatio) : 0;
+        uint256 _priceWithSafetyMargin = _hasPrice ? rdiv(rdiv(_rawPrice * (10 ** 9), stableCoinReferencePrice), _liquidationRatio) : 0;
         address _collateralPoolConfig = address(bookKeeper.collateralPoolConfig());
         ICollateralPoolConfig(_collateralPoolConfig).setPriceWithSafetyMargin(_collateralPoolId, _priceWithSafetyMargin);
         emit LogSetPrice(_collateralPoolId, _rawPrice, _priceWithSafetyMargin);
