@@ -9,10 +9,10 @@ import "../interfaces/IPausable.sol";
 
 contract ProxyActionsStorage is PausableUpgradeable, IPausable {
     address public proxyAction;
-    address public bookKeeper;
+    IBookKeeper public bookKeeper;
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
@@ -22,17 +22,19 @@ contract ProxyActionsStorage is PausableUpgradeable, IPausable {
     }
 
     modifier onlyOwner() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
     }
 
     function initialize(address _proxyAction, address _bookKeeper) external initializer {
         require(_proxyAction != address(0) && _bookKeeper != address(0), "ProxyActionsStorage/zero-address");
+        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ProxyActionsStorage/invalid-bookKeeper"); // Sanity Check Cal
+
         PausableUpgradeable.__Pausable_init();
 
         proxyAction = _proxyAction;
-        bookKeeper = _bookKeeper;
+        bookKeeper = IBookKeeper(_bookKeeper);
     }
 
     function setProxyAction(address _proxyAction) external onlyOwner {
