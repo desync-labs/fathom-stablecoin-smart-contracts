@@ -2,7 +2,6 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
@@ -14,7 +13,6 @@ import "../../interfaces/ILiquidationStrategy.sol";
 import "../../interfaces/ISystemDebtEngine.sol";
 import "../../interfaces/IFlashLendingCallee.sol";
 import "../../interfaces/IGenericTokenAdapter.sol";
-import "../../interfaces/IManager.sol";
 import "../../interfaces/IStablecoinAdapter.sol";
 import "../../interfaces/IERC165.sol";
 import "../../utils/SafeToken.sol";

@@ -2,11 +2,10 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+
 import "../../interfaces/IStablecoin.sol";
 import "../../interfaces/IBookKeeper.sol";
-import "../../interfaces/IToken.sol";
 import "../../interfaces/IStablecoinAdapter.sol";
 import "../../interfaces/ICagable.sol";
 import "../../interfaces/IPausable.sol";
