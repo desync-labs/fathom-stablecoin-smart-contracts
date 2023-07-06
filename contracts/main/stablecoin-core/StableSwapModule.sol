@@ -66,7 +66,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     event LogDepositToken(address indexed _owner, address indexed _token, uint256 _value);
     event LogWithdrawFees(address indexed _destination, uint256 _stablecoinFee, uint256 _tokenFee);
     event LogRemainingDailySwapAmount(uint256 _remainingDailySwapAmount);
-    event LogStableSwapPauseState(bool _pauseState);
     event LogEmergencyWithdraw(address indexed _account);
     event LogDecentralizedStateStatus(bool _oldDecentralizedStateStatus, bool _newDecentralizedStateStatus);
     event LogAddToWhitelist(address indexed user);
@@ -303,12 +302,10 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
     function pause() external onlyOwnerOrGov {
         _pause();
-        emit LogStableSwapPauseState(true);
     }
 
     function unpause() external onlyOwnerOrGov {
         _unpause();
-        emit LogStableSwapPauseState(false);
     }
 
     /**
