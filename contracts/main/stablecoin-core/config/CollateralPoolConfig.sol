@@ -7,7 +7,6 @@ import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "../../interfaces/IPriceFeed.sol";
 import "../../interfaces/IGenericTokenAdapter.sol";
 import "../../interfaces/ICollateralPoolConfig.sol";
-import "../../interfaces/ILiquidationStrategy.sol";
 import "../../interfaces/IAccessControlConfig.sol";
 
 contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig {
