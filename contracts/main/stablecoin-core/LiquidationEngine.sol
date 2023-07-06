@@ -15,6 +15,7 @@ import "../interfaces/ICagable.sol";
 import "../interfaces/ISetPrice.sol";
 import "../interfaces/IPriceOracle.sol";
 import "../interfaces/IPausable.sol";
+import "../interfaces/IPriceFeed.sol";
 
 /// @title LiquidationEngine
 /** @notice A contract which is the manager for all of the liquidations of the protocol.
@@ -306,7 +307,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     // solhint-enable function-max-lines
 
     function _isPriceOk(bytes32 _collateralPoolId) internal view returns (bool) {
-        IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_collateralPoolId));
+        IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId));
         return _priceFeed.isPriceOk();
     }
 }
