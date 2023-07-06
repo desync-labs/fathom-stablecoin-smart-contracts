@@ -38,8 +38,8 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     function initialize(address _factory, address _bookKeeper) external initializer {
         PausableUpgradeable.__Pausable_init();
 
-        require(_factory != address(0), "ProxyWalletFactory/zero-factory");
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ProxyWalletFactory/invalid-bookKeeper"); // Sanity Check Cal
+        require(_factory != address(0), "ProxyWalletRegistry/zero-factory");
+        require(_bookKeeper != address(0), "ProxyWalletRegistry/zero-bookKeeper");
 
         factory = ProxyWalletFactory(_factory);
         bookKeeper = IBookKeeper(_bookKeeper);
