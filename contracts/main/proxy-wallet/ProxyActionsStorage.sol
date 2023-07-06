@@ -1,13 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-
 import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IPausable.sol";
 
-contract ProxyActionsStorage is PausableUpgradeable, IPausable {
+contract ProxyActionsStorage {
     address public proxyAction;
     address public bookKeeper;
 
@@ -29,7 +25,6 @@ contract ProxyActionsStorage is PausableUpgradeable, IPausable {
 
     function initialize(address _proxyAction, address _bookKeeper) external initializer {
         require(_proxyAction != address(0) && _bookKeeper != address(0), "ProxyActionsStorage/zero-address");
-        PausableUpgradeable.__Pausable_init();
 
         proxyAction = _proxyAction;
         bookKeeper = _bookKeeper;
@@ -37,16 +32,5 @@ contract ProxyActionsStorage is PausableUpgradeable, IPausable {
 
     function setProxyAction(address _proxyAction) external onlyOwner {
         proxyAction = _proxyAction;
-    }
-
-    // --- pause ---
-    /// @dev access: OWNER_ROLE, GOV_ROLE
-    function pause() external override onlyOwnerOrGov {
-        _pause();
-    }
-
-    /// @dev access: OWNER_ROLE, GOV_ROLE
-    function unpause() external override onlyOwnerOrGov {
-        _unpause();
     }
 }
