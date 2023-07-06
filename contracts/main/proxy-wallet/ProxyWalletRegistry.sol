@@ -11,7 +11,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     mapping(address => ProxyWallet) public proxies;
     ProxyWalletFactory internal factory;
     mapping(address => bool) public whitelisted;
-    IBookKeeper public bookKeeper;
+    address public bookKeeper;
     bool public isDecentralizedMode;
 
     event LogAddToWhitelist(address indexed user);
@@ -20,7 +20,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     event LogProxyWalletCreation(address owner, address proxyWallet);
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
@@ -30,7 +30,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     }
 
     modifier onlyOwner() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
     }
@@ -39,10 +39,10 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
         PausableUpgradeable.__Pausable_init();
 
         require(_factory != address(0), "ProxyWalletFactory/zero-factory");
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ProxyWalletFactory/invalid-bookKeeper"); // Sanity Check Cal
+        require(_bookKeeper != address(0), "ProxyWalletFactory/zero-book-keeper");
 
         factory = ProxyWalletFactory(_factory);
-        bookKeeper = IBookKeeper(_bookKeeper);
+        bookKeeper = _bookKeeper;
         isDecentralizedMode = false;
     }
 

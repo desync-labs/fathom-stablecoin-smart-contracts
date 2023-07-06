@@ -162,7 +162,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
   */
     function accumulateBadDebt(bytes32 _collateralPoolId, address _positionAddress) external {
         require(cagePrice[_collateralPoolId] != 0, "ShowStopper/cage-price-collateral-pool-id-not-defined");
-        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(
+        uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getDebtAccumulatedRate(
             _collateralPoolId
         ); // [ray]
         (uint256 _lockedCollateralAmount, uint256 _debtShare) = bookKeeper.positions(_collateralPoolId, _positionAddress);
@@ -208,7 +208,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         require(debt != 0, "ShowStopper/debt-zero");
         require(finalCashPrice[_collateralPoolId] == 0, "ShowStopper/final-cash-price-collateral-pool-id-already-defined");
 
-        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(
+        uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getDebtAccumulatedRate(
             _collateralPoolId
         ); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
