@@ -231,7 +231,6 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         uint256 _share,
         bytes calldata _data
     ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
-        _deposit(_source, 0, _data);
         _moveStake(_source, _destination, _share, _data);
     }
 
@@ -288,8 +287,8 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
             address(collateralToken).safeApprove(address(vault), _amount);
             //deposit WXDC to Vault
             vault.deposit(_amount);
+            emit LogDeposit(_amount); // wxdc
         }
-        emit LogDeposit(_amount); // wxdc
     }
 
     /// @dev withdraw collateral tokens from staking contract, and update BookKeeper
