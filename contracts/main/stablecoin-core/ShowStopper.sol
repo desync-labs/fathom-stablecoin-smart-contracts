@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 import "../interfaces/IBookKeeper.sol";
@@ -43,7 +42,7 @@ contract ShowStopperMath {
     }
 }
 
-contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
+contract ShowStopper is ShowStopperMath, IShowStopper {
     IBookKeeper public bookKeeper; // CDP Engine
     ILiquidationEngine public liquidationEngine;
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
@@ -85,8 +84,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     }
 
     function initialize(address _bookKeeper) external initializer {
-        PausableUpgradeable.__Pausable_init();
-
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         live = 1;
