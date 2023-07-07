@@ -2,7 +2,6 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IPriceFeed.sol";
@@ -15,12 +14,8 @@ import "../interfaces/ISetPrice.sol";
 contract PriceOracleMath {
     uint256 internal constant ONE = 10 ** 27;
 
-    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y == 0 || (_z = _x * _y) / _y == _x);
-    }
-
     function rdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, ONE) / _y;
+        _z = (_x * ONE) / _y;
     }
 }
 
@@ -56,7 +51,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICag
     }
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
@@ -66,7 +61,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICag
     }
 
     modifier onlyOwnerOrShowStopper() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.SHOW_STOPPER_ROLE(), msg.sender),
@@ -103,7 +98,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICag
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).collateralPools(_collateralPoolId).priceFeed);
         uint256 _liquidationRatio = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLiquidationRatio(_collateralPoolId);
         (uint256 _rawPrice, bool _hasPrice) = _priceFeed.peekPrice();
-        uint256 _priceWithSafetyMargin = _hasPrice ? rdiv(rdiv(mul(_rawPrice, 10 ** 9), stableCoinReferencePrice), _liquidationRatio) : 0;
+        uint256 _priceWithSafetyMargin = _hasPrice ? rdiv(rdiv(_rawPrice * (10 ** 9), stableCoinReferencePrice), _liquidationRatio) : 0;
         address _collateralPoolConfig = address(bookKeeper.collateralPoolConfig());
         ICollateralPoolConfig(_collateralPoolConfig).setPriceWithSafetyMargin(_collateralPoolId, _priceWithSafetyMargin);
         emit LogSetPrice(_collateralPoolId, _rawPrice, _priceWithSafetyMargin);

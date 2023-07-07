@@ -4,17 +4,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "../interfaces/IStablecoin.sol";
 
-contract FathomStablecoinMath {
-    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x + _y) >= _x);
-    }
-
-    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x - _y) <= _x);
-    }
-}
-
-contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpgradeable {
+contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
     bytes32 public constant OWNER_ROLE = DEFAULT_ADMIN_ROLE;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
@@ -46,8 +36,8 @@ contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpg
     function mint(address _usr, uint256 _wad) external override {
         require(hasRole(MINTER_ROLE, msg.sender), "!minterRole");
 
-        balanceOf[_usr] = add(balanceOf[_usr], _wad);
-        totalSupply = add(totalSupply, _wad);
+        balanceOf[_usr] += _wad;
+        totalSupply += _wad;
         emit Transfer(address(0), _usr, _wad);
     }
 
@@ -55,10 +45,10 @@ contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpg
         require(balanceOf[_usr] >= _wad, "FathomStablecoin/insufficient-balance");
         if (_usr != msg.sender && allowance[_usr][msg.sender] != type(uint).max) {
             require(allowance[_usr][msg.sender] >= _wad, "FathomStablecoin/insufficient-allowance");
-            allowance[_usr][msg.sender] = sub(allowance[_usr][msg.sender], _wad);
+            allowance[_usr][msg.sender] -= _wad;
         }
-        balanceOf[_usr] = sub(balanceOf[_usr], _wad);
-        totalSupply = sub(totalSupply, _wad);
+        balanceOf[_usr] -= _wad;
+        totalSupply -= _wad;
         emit Transfer(_usr, address(0), _wad);
     }
 
@@ -106,8 +96,8 @@ contract FathomStablecoin is IStablecoin, FathomStablecoinMath, AccessControlUpg
             require(currentAllowance >= _wad, "FathomStablecoin/insufficient-allowance");
             _approve(_src, msg.sender, currentAllowance - _wad);
         }
-        balanceOf[_src] = sub(balanceOf[_src], _wad);
-        balanceOf[_dst] = add(balanceOf[_dst], _wad);
+        balanceOf[_src] -= _wad;
+        balanceOf[_dst] += _wad;
         emit Transfer(_src, _dst, _wad);
         return true;
     }
