@@ -237,6 +237,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         totalFXDFeeBalance += fee;
         remainingFXDFeeBalance += fee;
 
+        totalValueDeposited -= fee;
+
         token.safeTransferFrom(msg.sender, address(this), _amount);
         stablecoin.safeTransfer(_usr, stablecoinAmount);
         emit LogSwapTokenToStablecoin(_usr, _amount, fee);
@@ -259,6 +261,9 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         tokenBalance[token] -= _amountScaled;
         tokenBalance[stablecoin] += _amount;
+        
+        totalValueDeposited -= fee;
+        
         totalTokenFeeBalance += _convertDecimals(fee, 18, IToken(token).decimals());
         remainingTokenFeeBalance += _convertDecimals(fee, 18, IToken(token).decimals());
 
@@ -271,8 +276,10 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_token == token || _token == stablecoin, "depositStablecoin/invalid-token");
         require(_amount != 0, "stableswap-depositStablecoin/amount-zero");
         require(_token.balanceOf(msg.sender) >= _amount, "depositStablecoin/not-enough-balance");
+        
         tokenBalance[_token] += _amount;
         _token.safeTransferFrom(msg.sender, address(this), _amount);
+        
         totalValueDeposited += _convertDecimals(_amount, IToken(_token).decimals(), 18);
     
         if (isDecentralizedState) {
@@ -306,8 +313,16 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         tokenBalance[_token] -= _amount;
         _token.safeTransfer(msg.sender, _amount);
-        totalValueDeposited -= _convertDecimals(_amount, IToken(_token).decimals(), 18);
-         
+
+        uint256 amountScaled = _convertDecimals(_amount, IToken(_token).decimals(), 18);
+
+        //to account for precision loss due to convert decimals
+        if(amountScaled > totalValueDeposited) {
+            totalValueDeposited = 0;
+        } else {
+            totalValueDeposited -= amountScaled;
+        }
+        
         emit LogWithdrawToken(msg.sender, _token, _amount);
     }
 

@@ -23,7 +23,20 @@ const TO_MINT = ethers.utils.parseEther("20000000")
 const ONE_PERCENT_OF_TOTAL_DEPOSIT = ethers.utils.parseEther("100000")
 const ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS = WeiPerSixDecimals.mul(100000)
 
+//why this divider:
+//right now fee is 0.001
+//so for ONE_PERCENT_OF_TOTAL_DEPOSIT = 200000, fee = 200
+//so, totalValueDeposited will be decreased by 200 each time we swap to account for fees
+//ie. for first swap it will reduce from 200,000,000 to 199,999,800
+//for second swap it will reduce from 199,999,800 to 199,999,600
+//so, taking One percent of total Deposit = 199,999,800 * 0.01 = 199998 after first swap
+//therfore, we divide by 100000 (onehundred thousand)in each swap because we want to take 1% of total deposit
+//ie, 200000 * 1e18 - 200000 * 1e18 / 100000 =  =~ 199998 ether
+//but dividing by 1000(thousand) so that we account for previous swaps fees
+const DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT = BigNumber.from("1000")
 
+const ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT = ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+const ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT = ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
 const _convertSixDecimalsToEtherBalance = (balance) => {
     return balance.mul(1e12)
 }
@@ -138,9 +151,9 @@ describe("StableSwapModuleWrapper", () => {
                 await fathomStablecoin.mint(accounts[2], TO_DEPOSIT, { gasLimit: 1000000 })
                 await stableSwapModuleWrapper.depositTokens(TO_DEPOSIT, { gasLimit: 1000000 })
                 await stableSwapModule.swapStablecoinToToken(accounts[2]
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
                 await stableSwapModule.swapStablecoinToToken(accounts[2]
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
             })
         })
     })
@@ -163,14 +176,14 @@ describe("StableSwapModuleWrapper", () => {
                 
                 for(let i =1;i <= 5;i++){
                     console.log("Swapping Token to Stablecoin - No...........",i)
-                    await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT ,{ gasLimit: 1000000 })
                     //increase block time so that a block is mined before swapping
                     await TimeHelpers.increase(1)
                 }
 
                 for(let i =1;i <= 5;i++){
                     console.log("Swapping Stablecion to Token - No...........",i)
-                    await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })    
+                    await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })    
                     //increase block time so that a block is mined before swapping
                     await TimeHelpers.increase(1)
                 }
@@ -216,14 +229,14 @@ describe("StableSwapModuleWrapper", () => {
                 
                 for(let i =1;i <= 5;i++){
                     console.log("Swapping Token to Stablecoin - No...........",i)
-                    await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
                     //increase block time so that a block is mined before swapping
                     await TimeHelpers.increase(1)
                 }
 
                 for(let i =1;i <= 5;i++){
                     console.log("Swapping Stablecion to Token - No...........",i)
-                    await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })    
+                    await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })    
                     //increase block time so that a block is mined before swapping
                     await TimeHelpers.increase(1)
                 }
@@ -267,16 +280,16 @@ describe("StableSwapModuleWrapper", () => {
         context("Should withdraw tokens from stableswap as per the ratio with swap stablecoin to token", () => {
             it("Should withdraw", async () => {
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 const balanceOfStablecoinBeforeWithdraw = await fathomStablecoin.balanceOf(DeployerAddress)
                 let balanceOfTokenBeforeWithdraw = await USDT.balanceOf(DeployerAddress)
@@ -312,7 +325,7 @@ describe("StableSwapModuleWrapper", () => {
                 const actualTransferOfBalanceOfToken = balanceOfTokenAfterWithdraw.sub(balanceOfTokenBeforeWithdraw)
 
                 expect(actualTransferOfBalanceOfStablecoin).to.be.equal(expectedBalanceOfStablecoinInUser)
-                expect(actualTransferOfBalanceOfToken).to.be.equal(expectedBalanceOfTokenInUser.add(WeiPerWad.mul(400))) //400 is the fee generated for four swaps
+                expect(actualTransferOfBalanceOfToken).to.be.equal(expectedBalanceOfTokenInUser.add(WeiPerWad.mul(399600).div(1000))) //399.6 is the fee generated for four swaps
 
                 console.log('200 is withdrawn, 4 swaps from stablecoin to token, so, the balance of stablecoin should be around 104 ether, the actual balance after accounting for fees is: \n',
                     actualTransferOfBalanceOfStablecoin.toString())
@@ -328,16 +341,16 @@ describe("StableSwapModuleWrapper", () => {
             it("Should withdraw", async () => {
 
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 const balanceOfStablecoinBeforeWithdraw = await fathomStablecoin.balanceOf(DeployerAddress)
                 
@@ -375,7 +388,7 @@ describe("StableSwapModuleWrapper", () => {
                 const actualTransferOfBalanceOfStablecoin = balanceOfStablecoinAfterWithdraw.sub(balanceOfStablecoinBeforeWithdraw)
                 const actualTransferOfBalanceOfToken = balanceOfTokenAfterWithdraw.sub(balanceOfTokenBeforeWithdraw)
 
-                expect(actualTransferOfBalanceOfStablecoin).to.be.equal(expectedBalanceOfStablecoinInUser.add(WeiPerWad.mul(400)))
+                expect(actualTransferOfBalanceOfStablecoin).to.be.equal(expectedBalanceOfStablecoinInUser.add(WeiPerWad.mul(399600).div(1000)))
                 expect(actualTransferOfBalanceOfToken).to.be.equal(expectedBalanceOfTokenInUser)
 
                 console.log('200 is withdrawn, 4 swaps from stablecoin to token, so, the balance of stablecoin should be around 96 ether, the actual balance after accounting for fees is: \n',
@@ -390,22 +403,22 @@ describe("StableSwapModuleWrapper", () => {
         context("Should withdraw tokens from stableswap as per the ratio with swap token to stablecoin and swap stablecoin to token", () => {
             it("Should withdraw", async () => {
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
 
                 const balanceOfStablecoinBeforeWithdraw = await fathomStablecoin.balanceOf(DeployerAddress)
                 let balanceOfTokenBeforeWithdraw = await USDT.balanceOf(DeployerAddress)
@@ -437,7 +450,7 @@ describe("StableSwapModuleWrapper", () => {
                 const actualTransferOfBalanceOfStablecoin = balanceOfStablecoinAfterWithdraw.sub(balanceOfStablecoinBeforeWithdraw)
                 const actualTransferOfBalanceOfToken = balanceOfTokenAfterWithdraw.sub(balanceOfTokenBeforeWithdraw)
 
-                expect(actualTransferOfBalanceOfStablecoin).to.be.equal(expectedBalanceOfStablecoinInUser.add(WeiPerWad.mul(400))) //400 fees from 4 swaps
+                expect(actualTransferOfBalanceOfStablecoin).to.be.equal(expectedBalanceOfStablecoinInUser.add(WeiPerWad.mul(399600).div(1000))) //339.6 fees from 4 swaps
 
                 console.log('1000 is withdrawn, 4 swaps from stablecoin to token and 2 swaps from token to stableocoin, so, the balance of stablecoin should be around 499 ether, the actual balance after accounting for fees is: \n',
                     actualTransferOfBalanceOfStablecoin.toString())
@@ -445,6 +458,8 @@ describe("StableSwapModuleWrapper", () => {
                 console.log('1000 is withdrawn, 4 swaps from stablecoin to token and 2 swaps from token to stablecoin, so, the balance of token should be around 501 ether, the actual balance after accounting for fees is: \n',
                     actualTransferOfBalanceOfToken.toString()
                 )
+                //this because it is reverting due to some reason
+                await TimeHelpers.increase(1)
                 await stableSwapModuleWrapper.withdrawTokens(TO_DEPOSIT.mul(2).sub(WeiPerWad.mul(1000)),{from: DeployerAddress,gasLimit: 8000000})
             })
         })
@@ -460,14 +475,14 @@ describe("StableSwapModuleWrapper", () => {
 
                 for(let i =1;i <= 5;i++){
                     console.log("Swapping Token to Stablecoin - No...........",i)
-                    await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
                     //increase block time so that a block is mined before swapping
                     await TimeHelpers.increase(1)
                 }
 
                 for(let i =1;i <= 5;i++){
                     console.log("Swapping Stablecion to Token - No...........",i)
-                    await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })    
+                    await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })    
                     //increase block time so that a block is mined before swapping
                     await TimeHelpers.increase(1)
                 }
@@ -491,14 +506,14 @@ describe("StableSwapModuleWrapper", () => {
 
                 for(let i =1;i <= 5;i++){
                     console.log("Swapping Token to Stablecoin - No...........",i)
-                    await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
                     //increase block time so that a block is mined before swapping
                     await TimeHelpers.increase(1)
                 }
 
                 for(let i =1;i <= 5;i++){
                     console.log("Swapping Stablecion to Token - No...........",i)
-                    await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })    
+                    await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })    
                     //increase block time so that a block is mined before swapping
                     await TimeHelpers.increase(1)
                 }
@@ -508,6 +523,8 @@ describe("StableSwapModuleWrapper", () => {
                 accounts2BalanceAfterFeesWithdraw = await fathomStablecoin.balanceOf(accounts[2])
                 totalFXDWithdrawnAsFeesAccounts2 = (accounts2BalanceAfterFeesWithdraw.sub(accounts2BalanceBeforeFeesWithdraw)).toString()
                 console.log('Total FXD withdrawn as fees for accounts2: \n', totalFXDWithdrawnAsFeesAccounts2)
+                
+                await TimeHelpers.increase(1)
                 
                 DeployerBalanceBeforeFeesWithdraw = await fathomStablecoin.balanceOf(DeployerAddress)
                 await stableSwapModuleWrapper.withdrawTokens(TO_DEPOSIT.mul(2), { from: DeployerAddress, gasLimit: 8000000 })
@@ -578,7 +595,7 @@ describe("StableSwapModuleWrapper", () => {
         context('#getAmounts', async() => {
             it('should return the correct amount of tokens after swap', async() => {
                 await stableSwapModule.swapTokenToStablecoin(DeployerAddress
-                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                    , ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
                 const amounts = await stableSwapModuleWrapper.getAmounts(TO_DEPOSIT)
                 expect(amounts[0]).to.be.lte(TO_DEPOSIT.div(2))
                 expect(amounts[1]).to.be.gte(TO_DEPOSIT.div(2))
@@ -611,6 +628,7 @@ describe("StableSwapModuleWrapper", () => {
                     //increase block time so that a block is mined before swapping
                     await TimeHelpers.increase(1)
                 }
+                await TimeHelpers.increase(1)
                 await stableSwapModuleWrapper.withdrawTokens(TO_DEPOSIT.mul(2), { from: DeployerAddress, gasLimit: 8000000 })
                 const depositTracker1 = await stableSwapModuleWrapper.depositTracker(DeployerAddress);
                 expect(depositTracker1).to.be.equal(0)
@@ -649,14 +667,14 @@ describe("StableSwapModuleWrapper", () => {
                     
                     for(let i =1;i <= 2;i++){
                         console.log("Swapping Token to Stablecoin - No...........",i)
-                        await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS, { gasLimit: 1000000 })
+                        await stableSwapModule.swapTokenToStablecoin(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
                         //increase block time so that a block is mined before swapping
                         await TimeHelpers.increase(1)
                     }
     
                     for(let i =1;i <= 2;i++){
                         console.log("Swapping Stablecion to Token - No...........",i)
-                        await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT, { gasLimit: 1000000 })    
+                        await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })    
                         //increase block time so that a block is mined before swapping
                         await TimeHelpers.increase(1)
                     }

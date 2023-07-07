@@ -245,7 +245,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         uint256 tokenProviderLiquidity = _convertDecimals(depositTracker[msg.sender] * 1e18 / 2e18, 18, IToken(token).decimals());
         
         uint256 unclaimedStablecoinFees = _totalFXDFeeBalance() - checkpointFXDFee[msg.sender];
-        uint256 unclaimedTokenFees = _totalTokenFeeBalance()- checkpointTokenFee[msg.sender];
+        uint256 unclaimedTokenFees = _totalTokenFeeBalance() - checkpointTokenFee[msg.sender];
         
         uint256 newFeeRewardsForStablecoin;
         uint256 newFeesRewardsForToken;
@@ -315,7 +315,6 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         require(stablecoinBalanceOfUserAfterWithdraw - stablecoinBalanceOfUserBeforeWithdraw == _amountFXDFee, "withdrawFeesFromStableswap/stablecoin-amount-mismatch");
         require(tokenBalanceOfUserAfterWithdraw - tokenBalanceOfUserBeforeWithdraw == _amountTokenFee, "withdrawFeesFromStableswap/token-amount-mismatch");
     }
-
 
     function _transferToTheContract(address _token, uint256 _amount) internal {
         _token.safeTransferFrom(msg.sender, address(this), _amount);
