@@ -12,10 +12,6 @@ import "../../interfaces/IPausable.sol";
 
 contract StablecoinAdapterMath {
     uint256 internal constant ONE = 10 ** 27;
-
-    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require(y == 0 || (z = x * y) / y == x);
-    }
 }
 
 contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable, IPausable {
@@ -69,7 +65,7 @@ contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, Reentr
     }
 
     function deposit(address usr, uint256 wad, bytes calldata /* data */) external payable override nonReentrant whenNotPaused {
-        bookKeeper.moveStablecoin(address(this), usr, mul(ONE, wad));
+        bookKeeper.moveStablecoin(address(this), usr, wad * ONE);
         stablecoin.burn(msg.sender, wad);
     }
 
@@ -80,7 +76,7 @@ contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, Reentr
 
     function withdraw(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         require(live == 1, "StablecoinAdapter/not-live");
-        bookKeeper.moveStablecoin(msg.sender, address(this), mul(ONE, wad));
+        bookKeeper.moveStablecoin(msg.sender, address(this), wad * ONE);
         stablecoin.mint(usr, wad);
     }
 

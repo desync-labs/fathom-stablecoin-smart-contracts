@@ -16,49 +16,32 @@ contract CollateralTokenAdapterMath {
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAY = 10 ** 27;
 
-    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x + _y) >= _x, "ds-math-add-overflow");
-    }
-
-    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x - _y) <= _x, "ds-math-sub-underflow");
-    }
-
-    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y == 0 || (_z = _x * _y) / _y == _x, "ds-math-mul-overflow");
-    }
-
-    function div(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y > 0, "ds-math-div-by-zero");
-        _z = _x / _y;
-    }
-
     function divup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = add(_x, sub(_y, 1)) / _y;
+        _z = (_x + _y - 1) / _y;
     }
 
     function wmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, _y) / WAD;
+        _z = (_x * _y) / WAD;
     }
 
     function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, WAD) / _y;
+        _z = (_x * WAD) / _y;
     }
 
     function wdivup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = divup(mul(_x, WAD), _y);
+        _z = divup(_x * WAD, _y);
     }
 
     function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, _y) / RAY;
+        _z = (_x * _y) / RAY;
     }
 
     function rmulup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = divup(mul(_x, _y), RAY);
+        _z = divup(_x * _y, RAY);
     }
 
     function rdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, RAY) / _y;
+        _z = (_x * RAY) / _y;
     }
 }
 
@@ -240,7 +223,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
             require(_amount < 2 ** 255, "CollateralTokenAdapter/collateral-overflow");
             //deduct totalShare
             uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
-            totalShare = sub(totalShare, _share);
+            totalShare -= _share;
 
             //deduct emergency withdrawl amount of FXD
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
@@ -279,8 +262,8 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
             //bookKeeping
             bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
-            totalShare = add(totalShare, _share);
-            stake[_positionAddress] = add(stake[_positionAddress], _share);
+            totalShare += _share;
+            stake[_positionAddress] +=_share;
 
             // safeApprove to Vault
             address(collateralToken).safeApprove(address(vault), _amount);
@@ -302,8 +285,8 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
             require(stake[msg.sender] >= _share, "CollateralTokenAdapter/insufficient staked amount");
 
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
-            totalShare = sub(totalShare, _share);
-            stake[msg.sender] = sub(stake[msg.sender], _share);
+            totalShare -= _share;
+            stake[msg.sender] -= _share;
 
             //withdraw WXDC from Vault
             vault.withdraw(_amount);
@@ -318,17 +301,17 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         // 1. Update collateral tokens for source and destination
         require(stake[_source] != 0, "CollateralTokenAdapter/SourceNoStakeValue");
         uint256 _stakedAmount = stake[_source];
-        stake[_source] = sub(_stakedAmount, _share);
-        stake[_destination] = add(stake[_destination], _share);
+        stake[_source] = _stakedAmount - _share;
+        stake[_destination] += _share;
 
         (uint256 _lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _source);
         require(
-            stake[_source] >= add(bookKeeper.collateralToken(collateralPoolId, _source), _lockedCollateral),
+            stake[_source] >= bookKeeper.collateralToken(collateralPoolId, _source) + _lockedCollateral,
             "CollateralTokenAdapter/stake[source] < collateralTokens + lockedCollateral"
         );
         (_lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _destination);
         require(
-            stake[_destination] <= add(bookKeeper.collateralToken(collateralPoolId, _destination), _lockedCollateral),
+            stake[_destination] <= bookKeeper.collateralToken(collateralPoolId, _destination) + _lockedCollateral,
             "CollateralTokenAdapter/stake[destination] > collateralTokens + lockedCollateral"
         );
         emit LogMoveStake(_source, _destination, _share);

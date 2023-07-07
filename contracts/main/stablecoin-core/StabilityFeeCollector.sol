@@ -62,11 +62,6 @@ contract StabilityFeeCollectorMath {
         }
     }
 
-    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = _x + _y;
-        require(_z >= _x);
-    }
-
     function diff(uint256 _x, uint256 _y) internal pure returns (int256 _z) {
         _z = int256(_x) - int256(_y);
         require(int256(_x) >= 0 && int256(_y) >= 0);

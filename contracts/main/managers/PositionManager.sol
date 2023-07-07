@@ -12,22 +12,7 @@ import "../interfaces/ISetPrice.sol";
 import "../interfaces/IPriceFeed.sol";
 import "../interfaces/IPriceOracle.sol";
 
-contract PositionManagerMath {
-    function _safeAdd(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x + _y) >= _x, "add overflow");
-    }
-
-    function _safeSub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x - _y) <= _x, "sub overflow");
-    }
-
-    function _safeToInt(uint256 _x) internal pure returns (int256 _y) {
-        _y = int256(_x);
-        require(_y >= 0, "must not negative");
-    }
-}
-
-contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
+contract PositionManager is PausableUpgradeable, IManager {
     struct List {
         uint256 prev;
         uint256 next;
@@ -129,7 +114,7 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
         );
         require(_debtAccumulatedRate != 0, "PositionManager/collateralPool-not-init");
 
-        lastPositionId = _safeAdd(lastPositionId, 1);
+        lastPositionId += 1;
         positions[lastPositionId] = address(new PositionHandler(bookKeeper));
         owners[lastPositionId] = _user;
         mapPositionHandlerToOwner[positions[lastPositionId]] = _user;
@@ -144,7 +129,7 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
             list[ownerLastPositionId[_user]].next = lastPositionId;
         }
         ownerLastPositionId[_user] = lastPositionId;
-        ownerPositionCount[_user] = _safeAdd(ownerPositionCount[_user], 1);
+        ownerPositionCount[_user] += 1;
 
         emit LogNewPosition(msg.sender, _user, lastPositionId);
 
@@ -176,7 +161,7 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
             // If was the first one update first pointer of the owner
             ownerFirstPositionId[owners[_positionId]] = list[_positionId].next;
         }
-        ownerPositionCount[owners[_positionId]] = _safeSub(ownerPositionCount[owners[_positionId]], 1);
+        ownerPositionCount[owners[_positionId]] -= 1;
 
         // Transfer ownership
         owners[_positionId] = _destination;
@@ -192,7 +177,7 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
             ownerFirstPositionId[_destination] = _positionId;
         }
         ownerLastPositionId[_destination] = _positionId;
-        ownerPositionCount[_destination] = _safeAdd(ownerPositionCount[_destination], 1);
+        ownerPositionCount[_destination] += 1;
     }
 
     /// @dev Adjust the position keeping the generated stablecoin or collateral freed in the positionHandler address.
@@ -287,8 +272,8 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
             collateralPools[_positionId],
             positions[_positionId],
             _destination,
-            _safeToInt(_lockedCollateral),
-            _safeToInt(_debtShare)
+            int256(_lockedCollateral),
+            int256(_debtShare)
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_positionId]));
@@ -310,8 +295,8 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
             collateralPools[_positionId],
             _source,
             positions[_positionId],
-            _safeToInt(_lockedCollateral),
-            _safeToInt(_debtShare)
+            int256(_lockedCollateral),
+            int256(_debtShare)
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_positionId]));
@@ -333,8 +318,8 @@ contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
             collateralPools[_sourceId],
             positions[_sourceId],
             positions[_destinationId],
-            _safeToInt(_lockedCollateral),
-            _safeToInt(_debtShare)
+            int256(_lockedCollateral),
+            int256(_debtShare)
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_sourceId]));
