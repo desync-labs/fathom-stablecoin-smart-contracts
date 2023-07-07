@@ -7,10 +7,10 @@ import "../interfaces/IBookKeeper.sol";
 
 contract ProxyActionsStorage is Initializable {
     address public proxyAction;
-    address public bookKeeper;
+    IBookKeeper public bookKeeper;
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
@@ -20,7 +20,7 @@ contract ProxyActionsStorage is Initializable {
     }
 
     modifier onlyOwner() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
     }
@@ -29,7 +29,7 @@ contract ProxyActionsStorage is Initializable {
         require(_proxyAction != address(0) && _bookKeeper != address(0), "ProxyActionsStorage/zero-address");
 
         proxyAction = _proxyAction;
-        bookKeeper = _bookKeeper;
+        bookKeeper = IBookKeeper(_bookKeeper);
     }
 
     function setProxyAction(address _proxyAction) external onlyOwner {

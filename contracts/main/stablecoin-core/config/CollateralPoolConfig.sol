@@ -2,17 +2,13 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 import "../../interfaces/IPriceFeed.sol";
 import "../../interfaces/IGenericTokenAdapter.sol";
 import "../../interfaces/ICollateralPoolConfig.sol";
-import "../../interfaces/ILiquidationStrategy.sol";
 import "../../interfaces/IAccessControlConfig.sol";
 
 contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig {
-    using SafeMathUpgradeable for uint256;
-
     uint256 internal constant RAY = 10 ** 27;
 
     mapping(bytes32 => ICollateralPoolConfig.CollateralPool) private _collateralPools;

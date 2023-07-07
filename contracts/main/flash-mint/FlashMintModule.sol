@@ -2,7 +2,6 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 import "../interfaces/IERC3156FlashLender.sol";
 import "../interfaces/IERC3156FlashBorrower.sol";
@@ -17,14 +16,6 @@ contract FlashMintModuleMath {
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAY = 10 ** 27;
     uint256 internal constant RAD = 10 ** 45;
-
-    function _add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x + _y) >= _x);
-    }
-
-    function _mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y == 0 || (_z = _x * _y) / _y == _x);
-    }
 }
 
 contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender, IPausable {
@@ -111,9 +102,9 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
         require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
         require(_amount <= max, "FlashMintModule/ceiling-exceeded");
 
-        uint256 _amt = _mul(_amount, RAY);
-        uint256 _fee = _mul(_amount, feeRate) / WAD;
-        uint256 _total = _add(_amount, _fee);
+        uint256 _amt = _amount * RAY;
+        uint256 _fee = (_amount * feeRate) / WAD;
+        uint256 _total = _amount + _fee;
 
         //_amt is in RAD, to calculate internal balance of stablecoin
         bookKeeper.mintUnbackedStablecoin(address(this), address(this), _amt);
@@ -135,10 +126,10 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
         uint256 _amount, // amount to flash loan [rad]
         bytes calldata _data // arbitrary data to pass to the receiver
     ) external override lock whenNotPaused returns (bool) {
-        require(_amount <= _mul(max, RAY), "FlashMintModule/ceiling-exceeded");
+        require(_amount <= max * RAY, "FlashMintModule/ceiling-exceeded");
 
         uint256 _prev = bookKeeper.stablecoin(address(this));
-        uint256 _fee = _mul(_amount, feeRate) / WAD;
+        uint256 _fee = (_amount * feeRate) / WAD;
 
         bookKeeper.mintUnbackedStablecoin(address(this), address(_receiver), _amount);
 
@@ -150,7 +141,7 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
         );
 
         bookKeeper.settleSystemBadDebt(_amount);
-        require(bookKeeper.stablecoin(address(this)) >= _add(_prev, _fee), "FlashMintModule/insufficient-fee");
+        require(bookKeeper.stablecoin(address(this)) >= _prev + _fee, "FlashMintModule/insufficient-fee");
 
         return true;
     }
@@ -178,6 +169,6 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
     function flashFee(address _token, uint256 _amount) external view override returns (uint256) {
         require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
 
-        return _mul(_amount, feeRate) / WAD;
+        return (_amount * feeRate) / WAD;
     }
 }
