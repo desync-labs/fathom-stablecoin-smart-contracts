@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 import "../../interfaces/IPriceFeed.sol";
@@ -10,7 +10,7 @@ import "../../interfaces/ICollateralPoolConfig.sol";
 import "../../interfaces/ILiquidationStrategy.sol";
 import "../../interfaces/IAccessControlConfig.sol";
 
-contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig {
+contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
     using SafeMathUpgradeable for uint256;
 
     uint256 internal constant RAY = 10 ** 27;
@@ -46,11 +46,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function initialize(address _accessControlConfig) external initializer {
-        AccessControlUpgradeable.__AccessControl_init();
-
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
-
-        _setupRole(accessControlConfig.OWNER_ROLE(), msg.sender);
     }
 
     function initCollateralPool(
