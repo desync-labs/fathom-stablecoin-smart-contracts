@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
 import "../interfaces/IBookKeeper.sol";
 
-contract ProxyActionsStorage {
+contract ProxyActionsStorage is Initializable {
     address public proxyAction;
     address public bookKeeper;
 

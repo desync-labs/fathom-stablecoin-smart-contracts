@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IShowStopper.sol";
@@ -42,7 +42,7 @@ contract ShowStopperMath {
     }
 }
 
-contract ShowStopper is ShowStopperMath, IShowStopper {
+contract ShowStopper is ShowStopperMath, IShowStopper, Initializable {
     IBookKeeper public bookKeeper; // CDP Engine
     ILiquidationEngine public liquidationEngine;
     ISystemDebtEngine public systemDebtEngine; // Debt Engine

@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
+import "../interfaces/IPausable.sol";
 import "./ProxyWallet.sol";
 import "./ProxyWalletFactory.sol";
 
