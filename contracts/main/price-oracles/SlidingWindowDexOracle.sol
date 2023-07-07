@@ -113,7 +113,7 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
     }
 
     function currentCumulativePrice(address pair) public view returns (uint256 price0Cumulative, uint256 price1Cumulative) {
-        uint32 blockTimestamp = uint32(block.timestamp);
+        uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
         price0Cumulative = IFathomSwapPair(pair).price0CumulativeLast();
         price1Cumulative = IFathomSwapPair(pair).price1CumulativeLast();
 
