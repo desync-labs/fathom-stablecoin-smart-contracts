@@ -303,6 +303,7 @@ describe("StableSwapModule", () => {
     context("valid deployer", () => {
       it("should set status and emit an event", async () => {
         await expect(stableSwapModule.setDecentralizedStatesStatus(true)).to.be.emit(stableSwapModule, "LogDecentralizedStateStatus")
+          .withArgs(false, true);
         expect(await stableSwapModule.isDecentralizedState()).to.be.equal(true)
       })
     })

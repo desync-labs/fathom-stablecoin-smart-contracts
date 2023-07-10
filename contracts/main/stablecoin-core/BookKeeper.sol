@@ -90,6 +90,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
     );
     event LogAddCollateral(address indexed _caller, address indexed _usr, int256 _amount);
     event LogMoveCollateral(address indexed _caller, bytes32 indexed _collateralPoolId, address _src, address indexed _dst, uint256 _amount);
+    event LogMoveStablecoin(address indexed _caller, address _src, address indexed _dst, uint256 _amount);
 
     event StablecoinIssuedAmount(uint256 _totalStablecoinIssued, bytes32 indexed _collateralPoolId, uint256 _poolStablecoinIssued);
 
@@ -262,6 +263,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         _requireAllowedPositionAdjustment(_src, msg.sender);
         stablecoin[_src] -= _value;
         stablecoin[_dst] += _value;
+        emit LogMoveStablecoin(msg.sender, _src, _dst, _value);
     }
 
     // solhint-disable function-max-lines
