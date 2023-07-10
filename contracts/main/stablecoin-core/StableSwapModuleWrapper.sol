@@ -241,8 +241,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         uint256 totalStablecoinLiquidity = _totalStablecoinBalanceStableswap();
         uint256 totalTokenLiquidity = _totalTokenBalanceStableswap();
         
-        uint256 stablecoinProviderLiquidity = depositTracker[msg.sender] * 1e18 / 2e18;
-        uint256 tokenProviderLiquidity = _convertDecimals(depositTracker[msg.sender] * 1e18 / 2e18, 18, IToken(token).decimals());
+        uint256 stablecoinProviderLiquidity = depositTracker[msg.sender] * WAD / (2 * WAD);
+        uint256 tokenProviderLiquidity = _convertDecimals(depositTracker[msg.sender] * WAD / (2 * WAD), 18, IToken(token).decimals());
         
         uint256 unclaimedStablecoinFees = _totalFXDFeeBalance() - checkpointFXDFee[msg.sender];
         uint256 unclaimedTokenFees = _totalTokenFeeBalance() - checkpointTokenFee[msg.sender];

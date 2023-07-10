@@ -347,6 +347,9 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         totalValueDeposited = 0;
         totalTokenFeeBalance = 0;
         totalFXDFeeBalance = 0;
+
+        remainingFXDFeeBalance = 0;
+        remainingTokenFeeBalance = 0;
         
         tokenBalance[token] = 0;
         tokenBalance[stablecoin] = 0;
