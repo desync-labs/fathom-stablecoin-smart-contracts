@@ -410,7 +410,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
             IManager(_manager).bookKeeper(),
             IBookKeeper(IManager(_manager).bookKeeper()).stablecoin(_positionAddress),
             _positionAddress,
-            IManager(_manager).collateralPools(_positionId)
+            _collateralPoolId
         );
         adjustPosition(_manager, _positionId, -int256(_collateralAmountInWad), _wipeDebtShare, _data);
         if (_collateralAmount > 0) {
