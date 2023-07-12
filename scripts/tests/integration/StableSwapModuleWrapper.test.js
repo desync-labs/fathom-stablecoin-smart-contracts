@@ -163,6 +163,9 @@ describe("StableSwapModuleWrapper", () => {
             it("Should claim and withdraw same fees for each depositor as they have same deposit amount", async () => {
                 const TOTAL_DEPOSIT_FOR_EACH_ACCOUNT = WeiPerWad.mul(1000)
                 const TOTAL_DEPOSIT_FOR_EACH_ACCOUNT_USD = WeiPerSixDecimals.mul(1000)
+                let TOTAL_FXD_BALANCE_AFTER_DEPOSIT = Array.from(Array(5))
+                let TOTAL_TOKEN_BALANCE_AFTER_DEPOSIT = Array.from(Array(5))
+
 
                 for (let i = 1; i < 5; i++) {
                     console.log(`depositing for account [${i}]`)
@@ -171,7 +174,10 @@ describe("StableSwapModuleWrapper", () => {
                     await fathomStablecoin.approve(stableSwapModuleWrapper.address, MaxUint256, { gasLimit: 1000000, from: accounts[i] })
                     await USDT.mint(accounts[i], TOTAL_DEPOSIT_FOR_EACH_ACCOUNT_USD, { gasLimit: 1000000 })
                     await fathomStablecoin.mint(accounts[i], TOTAL_DEPOSIT_FOR_EACH_ACCOUNT, { gasLimit: 1000000 })
+                    
                     await stableSwapModuleWrapper.depositTokens(TOTAL_DEPOSIT_FOR_EACH_ACCOUNT, { gasLimit: 1000000, from: accounts[i] })
+                    TOTAL_FXD_BALANCE_AFTER_DEPOSIT[i] = await fathomStablecoin.balanceOf(accounts[i])
+                    TOTAL_TOKEN_BALANCE_AFTER_DEPOSIT[i] = await USDT.balanceOf(accounts[i])
                 }
 
                 for (let i = 1; i <= 5; i++) {
@@ -189,7 +195,10 @@ describe("StableSwapModuleWrapper", () => {
                 }
 
                 for (let i = 1; i < 5; i++) {
+                    const feesFromGetter = await stableSwapModuleWrapper.getClaimableFeesPerUser(accounts[i])
+                    console.log('Total FXD from getter that can be claimed: ', feesFromGetter[0].toString())
                     console.log(`claiming for account [${i}]`)
+                    
                     await stableSwapModuleWrapper.claimFeesRewards({ from: accounts[i], gasLimit: 8000000 })
                 }
 
@@ -199,7 +208,8 @@ describe("StableSwapModuleWrapper", () => {
                 let totalFXDWithdrawnAsFeesAccounts = (accountsBalanceAfterFeesWithdraw.sub(accountsBalanceBeforeFeesWithdraw)).toString()
                 let currentAccountFXDFeesWithdrawn = totalFXDWithdrawnAsFeesAccounts
                 let previousCurrentAccountFXDFeesWithdrawn
-
+                
+                
                 for (let i = 2; i < 5; i++) {
                     previousCurrentAccountFXDFeesWithdrawn = currentAccountFXDFeesWithdrawn
                     const accountsBalanceBeforeFeesWithdraw = await fathomStablecoin.balanceOf(accounts[i])
@@ -208,6 +218,7 @@ describe("StableSwapModuleWrapper", () => {
                     const totalFXDWithdrawnAsFeesAccounts = (accountsBalanceAfterFeesWithdraw.sub(accountsBalanceBeforeFeesWithdraw)).toString()
                     expect(previousCurrentAccountFXDFeesWithdrawn).to.be.eq(currentAccountFXDFeesWithdrawn)
                     currentAccountFXDFeesWithdrawn = totalFXDWithdrawnAsFeesAccounts
+                    
                     console.log('Total FXD withdrawn as fees for accounts: \n', totalFXDWithdrawnAsFeesAccounts)
                 }
 
@@ -218,10 +229,22 @@ describe("StableSwapModuleWrapper", () => {
                 for(let i = 1; i< 5; i++){
                     console.log(`withdrawing whole liquidity of accounts[${i}]`)
                     await stableSwapModuleWrapper.withdrawTokens(TOTAL_DEPOSIT_FOR_EACH_ACCOUNT.mul(2), { from: accounts[i], gasLimit: 8000000 })
+                    const TOTAL_FXD_BALANCE_AFTER_WITHDRAW = await fathomStablecoin.balanceOf(accounts[i])
+                    const TOTAL_TOKEN_BALANCE_AFTER_WITHDRAW = await USDT.balanceOf(accounts[i])
+                    
+                    const TOTAL_TOKEN_BALANCE_AFTER_WITHDRAW_SCALED = _convertSixDecimalsToEtherBalance(TOTAL_TOKEN_BALANCE_AFTER_WITHDRAW)
+                    const TOTAL_TOKEN_BALANCE_AFTER_DEPOSIT_SCALED = _convertSixDecimalsToEtherBalance(TOTAL_TOKEN_BALANCE_AFTER_DEPOSIT[i])
+                    
+                    const TOTAL_FXD_WITHDRAWN_FROM_SSM_WITH_FEES = TOTAL_FXD_BALANCE_AFTER_WITHDRAW.sub(TOTAL_FXD_BALANCE_AFTER_DEPOSIT[i])
+                    const TOTAL_TOKEN_WITHDRAWN_FROM_SSM_WITH_FEES = TOTAL_TOKEN_BALANCE_AFTER_WITHDRAW_SCALED.sub(TOTAL_TOKEN_BALANCE_AFTER_DEPOSIT_SCALED)
+
+                    expect(TOTAL_FXD_WITHDRAWN_FROM_SSM_WITH_FEES.add(TOTAL_TOKEN_WITHDRAWN_FROM_SSM_WITH_FEES)).to.be.gt(TOTAL_DEPOSIT_FOR_EACH_ACCOUNT.mul(2))
+                    console.log(`total liquidity of accounts[${i}] after withdrawing whole liquidity and with fees: `, TOTAL_FXD_WITHDRAWN_FROM_SSM_WITH_FEES.add(TOTAL_TOKEN_WITHDRAWN_FROM_SSM_WITH_FEES).toString())
                 }
                 
                 const totalValueLockedInStableswap = await stableSwapModule.totalValueLocked();
                 expect(totalValueLockedInStableswap.toString()).to.be.equal("0")
+                
             })
         })
 
@@ -542,6 +565,7 @@ describe("StableSwapModuleWrapper", () => {
                 await stableSwapModuleWrapper.withdrawTokens(TO_DEPOSIT.mul(2), { from: DeployerAddress, gasLimit: 8000000 })
                 DeployerBalanceAfterFeesWithdraw = await fathomStablecoin.balanceOf(DeployerAddress)
                 totalFXDWithdrawnAsFeesDeployer = (DeployerBalanceAfterFeesWithdraw.sub(DeployerBalanceBeforeFeesWithdraw)).toString()
+                
                 console.log('Total FXD withdrawn as fees for deployer: \n', totalFXDWithdrawnAsFeesDeployer)
             })
         })

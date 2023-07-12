@@ -234,6 +234,30 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
         return (stablecoinAmountToWithdraw, tokenAmountToWithdraw);
     }
+
+    function getClaimableFeesPerUser(address account) external view override returns (uint256, uint256) {
+        uint256 totalStablecoinLiquidity = _totalStablecoinBalanceStableswap();
+        uint256 totalTokenLiquidity = _totalTokenBalanceStableswap();
+        
+        uint256 stablecoinProviderLiquidity = depositTracker[account] * WAD / (2 * WAD);
+        uint256 tokenProviderLiquidity = _convertDecimals(depositTracker[account] * WAD / (2 * WAD), 18, IToken(token).decimals());
+        
+        uint256 unclaimedStablecoinFees = _totalFXDFeeBalance() - checkpointFXDFee[account];
+        uint256 unclaimedTokenFees = _totalTokenFeeBalance() - checkpointTokenFee[account];
+        
+        uint256 newFeeRewardsForStablecoin;
+        uint256 newFeesRewardsForToken;
+
+        if(totalStablecoinLiquidity > 0){
+            newFeeRewardsForStablecoin = (unclaimedStablecoinFees * stablecoinProviderLiquidity * WAD) / totalStablecoinLiquidity / WAD;
+        }
+
+        if(totalTokenLiquidity > 0){
+            newFeesRewardsForToken = (unclaimedTokenFees * tokenProviderLiquidity * WAD) / totalTokenLiquidity / WAD;
+        }
+
+        return (newFeeRewardsForStablecoin, newFeesRewardsForToken);
+    }
     
 
 
