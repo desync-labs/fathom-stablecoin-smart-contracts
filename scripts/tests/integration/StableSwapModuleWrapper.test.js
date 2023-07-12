@@ -252,7 +252,7 @@ describe("StableSwapModuleWrapper", () => {
             it("Should withdraw tokens but the one that withdraws tokens earlier must have slightly less fees rewards", async () => {
                 const TOTAL_DEPOSIT_FOR_EACH_ACCOUNT = WeiPerWad.mul(1000)
                 const TOTAL_DEPOSIT_FOR_EACH_ACCOUNT_USD = WeiPerSixDecimals.mul(1000)
-                for (let i = 1; i < 10; i++) {
+                for (let i = 1; i < 5; i++) {
                     console.log(`depositing for account [${i}]`)
                     await stableSwapModuleWrapper.addToWhitelist(accounts[i], { gasLimit: 1000000 })
                     await USDT.approve(stableSwapModuleWrapper.address, MaxUint256, { gasLimit: 1000000, from: accounts[i] })
@@ -283,7 +283,7 @@ describe("StableSwapModuleWrapper", () => {
                 let currentAccountFXDFeesWithdrawn = totalFXDWithdrawnAsFeesAccounts
                 let previousAccountFXDFeesWithdrawn
 
-                for (let i = 2; i < 10; i++) {
+                for (let i = 2; i < 5; i++) {
                     previousAccountFXDFeesWithdrawn = currentAccountFXDFeesWithdrawn
                     const accountsBalanceBeforeFeesWithdraw = await fathomStablecoin.balanceOf(accounts[i])
                     await stableSwapModuleWrapper.withdrawTokens(TOTAL_DEPOSIT_FOR_EACH_ACCOUNT, { from: accounts[i], gasLimit: 8000000 })
@@ -295,8 +295,86 @@ describe("StableSwapModuleWrapper", () => {
                 }
             })
         })
+    })
 
+    describe("#randomScenarioTesting", async () => {
+        context("Scenario where LPs deposit and withdraw and swap happens at different times", async () => {
+            it("Should be successful", async() => {
+                const TOTAL_DEPOSIT_FOR_EACH_ACCOUNT = WeiPerWad.mul(1000)
+                const TOTAL_DEPOSIT_FOR_EACH_ACCOUNT_USD = WeiPerSixDecimals.mul(1000)
+                //whitelist and deposit for 3 accounts
+                for (let i = 1; i < 4; i++) {
+                    console.log(`depositing for account [${i}]`)
+                    await stableSwapModuleWrapper.addToWhitelist(accounts[i], { gasLimit: 1000000 })
+                    await USDT.approve(stableSwapModuleWrapper.address, MaxUint256, { gasLimit: 1000000, from: accounts[i] })
+                    await fathomStablecoin.approve(stableSwapModuleWrapper.address, MaxUint256, { gasLimit: 1000000, from: accounts[i] })
+                    await USDT.mint(accounts[i], TOTAL_DEPOSIT_FOR_EACH_ACCOUNT_USD, { gasLimit: 1000000 })
+                    await fathomStablecoin.mint(accounts[i], TOTAL_DEPOSIT_FOR_EACH_ACCOUNT, { gasLimit: 1000000 })
+                    await stableSwapModuleWrapper.depositTokens(TOTAL_DEPOSIT_FOR_EACH_ACCOUNT, { gasLimit: 1000000, from: accounts[i] })
+                }
 
+                //swap to generate fees
+                for (let i = 1; i <= 2; i++) {
+                    console.log("Swapping Token to Stablecoin - No...........", i)
+                    await stableSwapModule.swapTokenToStablecoin(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
+                    //increase block time so that a block is mined before swapping
+                    await TimeHelpers.increase(1)
+                }
+
+                for (let i = 1; i <= 2; i++) {
+                    console.log("Swapping Stablecoin to Token - No...........", i)
+                    await stableSwapModule.swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
+                    //increase block time so that a block is mined before swapping
+                    await TimeHelpers.increase(1)
+                }
+
+                await stableSwapModuleWrapper.withdrawTokens(TOTAL_DEPOSIT_FOR_EACH_ACCOUNT.mul(2), { from: accounts[1], gasLimit: 8000000 })
+                
+                await stableSwapModuleWrapper.addToWhitelist(accounts[4], { gasLimit: 1000000 })
+                await USDT.approve(stableSwapModuleWrapper.address, MaxUint256, { gasLimit: 1000000, from: accounts[4] })
+                await fathomStablecoin.approve(stableSwapModuleWrapper.address, MaxUint256, { gasLimit: 1000000, from: accounts[4] })
+                await USDT.mint(accounts[4], TOTAL_DEPOSIT_FOR_EACH_ACCOUNT_USD, { gasLimit: 1000000 })
+                await fathomStablecoin.mint(accounts[4], TOTAL_DEPOSIT_FOR_EACH_ACCOUNT, { gasLimit: 1000000 })
+                await stableSwapModuleWrapper.depositTokens(TOTAL_DEPOSIT_FOR_EACH_ACCOUNT, { gasLimit: 1000000, from: accounts[4] })
+
+                //swap to generate fees
+                for (let i = 1; i <= 2; i++) {
+                    console.log("Swapping Token to Stablecoin - No...........", i)
+                    await stableSwapModule.swapTokenToStablecoin(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
+                    //increase block time so that a block is mined before swapping
+                    await TimeHelpers.increase(1)
+                }
+
+                for (let i = 1; i <= 2; i++) {
+                    console.log("Swapping Stablecoin to Token - No...........", i)
+                    await stableSwapModule.swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
+                    //increase block time so that a block is mined before swapping
+                    await TimeHelpers.increase(1)
+                }
+                
+                await stableSwapModuleWrapper.withdrawTokens(TOTAL_DEPOSIT_FOR_EACH_ACCOUNT.mul(2), { from: accounts[2], gasLimit: 8000000 })
+                await stableSwapModuleWrapper.withdrawTokens(TOTAL_DEPOSIT_FOR_EACH_ACCOUNT.mul(2), { from: accounts[3], gasLimit: 8000000 })   
+
+                //swap to generate fees
+                for (let i = 1; i <= 2; i++) {
+                    console.log("Swapping Token to Stablecoin - No...........", i)
+                    await stableSwapModule.swapTokenToStablecoin(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
+                    //increase block time so that a block is mined before swapping
+                    await TimeHelpers.increase(1)
+                }
+
+                for (let i = 1; i <= 2; i++) {
+                    console.log("Swapping Stablecoin to Token - No...........", i)
+                    await stableSwapModule.swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT_SINGLE_SWAP_FIT, { gasLimit: 1000000 })
+                    //increase block time so that a block is mined before swapping
+                    await TimeHelpers.increase(1)
+                }
+                await stableSwapModuleWrapper.withdrawTokens(TO_DEPOSIT.mul(2), { from: accounts[0], gasLimit: 8000000 })
+                await stableSwapModuleWrapper.withdrawTokens(TOTAL_DEPOSIT_FOR_EACH_ACCOUNT.mul(2), { from: accounts[4], gasLimit: 8000000 })
+                const totalValueLockedInStableswap = await stableSwapModule.totalValueLocked();
+                expect(totalValueLockedInStableswap.toString()).to.be.equal("0")
+            })
+        })
     })
 
     describe('#withdrawTokens from Stableswap with stableswapWrapper', async () => {

@@ -56,6 +56,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
     //storage variables after upgrade
     address public stableswapWrapper;
+   
     //storage variables after upgrade - 2
     uint256 public override remainingFXDFeeBalance;
     uint256 public override remainingTokenFeeBalance;
