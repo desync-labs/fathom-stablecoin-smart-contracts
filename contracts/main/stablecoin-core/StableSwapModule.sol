@@ -56,6 +56,11 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
     //storage variables after upgrade
     address public stableswapWrapper;
+   
+    //storage variables after upgrade - 2
+    uint256 public override remainingFXDFeeBalance;
+    uint256 public override remainingTokenFeeBalance;
+    bool public upgradeInitialized;
 
     event LogSetFeeIn(address indexed _caller, uint256 _feeIn);
     event LogSetFeeOut(address indexed _caller, uint256 _feeOut);
@@ -133,6 +138,12 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         blocksPerLimit = _blocksPerLimit;
     }
 
+    function initializeFeesAfterUpgrade() external onlyOwner{
+        require(upgradeInitialized != true, "StableSwapModule/already-initialized");
+        upgradeInitialized = true;
+        remainingFXDFeeBalance = totalFXDFeeBalance;
+        remainingTokenFeeBalance = totalTokenFeeBalance;
+    }
     /**
      * @notice the function is to only mitigate the bad storage after upgrade.
      * @notice this needs to be removed after its job is done    
@@ -223,7 +234,11 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         tokenBalance[stablecoin] -= tokenAmount18;
         tokenBalance[token] += _amount;
+        
         totalFXDFeeBalance += fee;
+        remainingFXDFeeBalance += fee;
+
+        totalValueDeposited -= fee;
 
         token.safeTransferFrom(msg.sender, address(this), _amount);
         stablecoin.safeTransfer(_usr, stablecoinAmount);
@@ -247,7 +262,11 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         tokenBalance[token] -= _amountScaled;
         tokenBalance[stablecoin] += _amount;
+        
+        totalValueDeposited -= fee;
+        
         totalTokenFeeBalance += _convertDecimals(fee, 18, IToken(token).decimals());
+        remainingTokenFeeBalance += _convertDecimals(fee, 18, IToken(token).decimals());
 
         stablecoin.safeTransferFrom(msg.sender, address(this), _amount);
         token.safeTransfer(_usr, tokenAmount);
@@ -258,8 +277,10 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_token == token || _token == stablecoin, "depositStablecoin/invalid-token");
         require(_amount != 0, "stableswap-depositStablecoin/amount-zero");
         require(_token.balanceOf(msg.sender) >= _amount, "depositStablecoin/not-enough-balance");
+        
         tokenBalance[_token] += _amount;
         _token.safeTransferFrom(msg.sender, address(this), _amount);
+        
         totalValueDeposited += _convertDecimals(_amount, IToken(_token).decimals(), 18);
     
         if (isDecentralizedState) {
@@ -269,24 +290,21 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         emit LogDepositToken(msg.sender, _token, _amount);
     }
+    
+    function withdrawFees(address _destination, uint256 _amountFXDFee, uint256 _amountTokenFee) external override nonReentrant onlyStableswapWrapper {
+        require(_amountFXDFee != 0 || _amountTokenFee != 0, "withdrawFees/amount-zero");
+        require(remainingFXDFeeBalance >= _amountFXDFee, "withdrawFees/not-enough-fxd-fee-balance");
+        require(remainingTokenFeeBalance >= _amountTokenFee, "withdrawFees/not-enough-token-fee-balance");
 
-    function withdrawFees(address _destination) external override nonReentrant onlyOwnerOrGov {
-        require(_destination != address(0), "withdrawFees/wrong-destination");
-        require(totalFXDFeeBalance != 0 || totalTokenFeeBalance != 0, "withdrawFees/no-fee-balance");
-        uint256 pendingFXDBalance = totalFXDFeeBalance;
-
-        if (pendingFXDBalance != 0) {
-            totalFXDFeeBalance = 0;
-            stablecoin.safeTransfer(_destination, pendingFXDBalance);
+        remainingFXDFeeBalance -= _amountFXDFee;
+        remainingTokenFeeBalance -= _amountTokenFee;
+        
+        if(_amountFXDFee > 0) {
+            stablecoin.safeTransfer(_destination, _amountFXDFee);
         }
-
-        uint256 pendingTokenBalance = totalTokenFeeBalance;
-
-        if (pendingTokenBalance != 0) {
-            totalTokenFeeBalance = 0;
-            token.safeTransfer(_destination, pendingTokenBalance);
+        if(_amountTokenFee > 0) {
+            token.safeTransfer(_destination, _amountTokenFee);
         }
-        emit LogWithdrawFees(_destination, pendingFXDBalance, pendingTokenBalance);
     }
 
     function withdrawToken(address _token, uint256 _amount) external override nonReentrant onlyStableswapWrapper {
@@ -296,8 +314,16 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         tokenBalance[_token] -= _amount;
         _token.safeTransfer(msg.sender, _amount);
-        totalValueDeposited -= _convertDecimals(_amount, IToken(_token).decimals(), 18);
 
+        uint256 amountScaled = _convertDecimals(_amount, IToken(_token).decimals(), 18);
+
+        //to account for precision loss due to convert decimals
+        if(amountScaled > totalValueDeposited) {
+            totalValueDeposited = 0;
+        } else {
+            totalValueDeposited -= amountScaled;
+        }
+        
         emit LogWithdrawToken(msg.sender, _token, _amount);
     }
 
@@ -322,6 +348,9 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         totalValueDeposited = 0;
         totalTokenFeeBalance = 0;
         totalFXDFeeBalance = 0;
+
+        remainingFXDFeeBalance = 0;
+        remainingTokenFeeBalance = 0;
         
         tokenBalance[token] = 0;
         tokenBalance[stablecoin] = 0;

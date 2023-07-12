@@ -46,7 +46,8 @@ const loadFixtureHandler = async () => {
   stableSwapModuleAsAlice = getContract("StableSwapModule", AliceAddress)
   stableSwapModuleWrapper = getContract("StableSwapModuleWrapper", DeployerAddress)
   stableSwapModuleWrapperAsAlice = getContract("StableSwapModuleWrapper", AliceAddress)
-
+  
+  
   await stableSwapModule.initialize(
     mockBookKeeper.address,
     mockUSD.address,
@@ -74,7 +75,7 @@ const loadFixtureHandler = async () => {
     stableSwapModuleWrapper
   }
 }
-describe("StableSwapModule", () => {
+describe("StableSwapModuleWrapper", () => {
   // Contracts
   let mockedAccessControlConfig
   let mockUSD
@@ -259,5 +260,19 @@ describe("StableSwapModule", () => {
     })
   })
 
-  
+  describe("fees", () => {
+    context("withdraw claimed fees", () => {
+      it("should revert - no claimed fees", async () => {
+        await expect(stableSwapModuleWrapper.withdrawClaimedFees()).to.be.revertedWith("withdrawClaimedFees/no-claimed-fees")
+      })
+    })
+
+    context("emergency withdraw", () => {
+      it("should revert - zero amount", async () => {
+        await stableSwapModuleWrapper.pause();
+        await stableSwapModule.pause();
+        await expect(stableSwapModuleWrapper.emergencyWithdraw()).to.be.revertedWith("emergencyWithdraw/amount-zero")
+      })
+    })
+  })
 })
