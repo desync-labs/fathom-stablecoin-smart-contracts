@@ -70,7 +70,7 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
         emit LogUncage();
     }
 
-    function deposit(address usr, uint256 wad, bytes calldata /* data */) external payable override nonReentrant whenNotPaused {
+    function deposit(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         require(live == 1, "TokenAdapter/not-live");
         require(int256(wad) >= 0, "TokenAdapter/overflow");
         bookKeeper.addCollateral(collateralPoolId, usr, int256(wad));
