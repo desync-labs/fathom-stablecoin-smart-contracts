@@ -5,7 +5,7 @@ const { ProxyAdminAddress, ProxyFactoryAddress } = require("./common/addresses")
 
 module.exports = async function (deployer) {
     let promises = [
-        deployer.deploy(BookKeeper, { gas: 7050000 })
+        deployer.deploy(StableSwapModuleWrapper, { gas: 7050000 })
     ];
 
     await Promise.all(promises);
