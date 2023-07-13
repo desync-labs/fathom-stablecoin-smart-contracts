@@ -59,7 +59,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     //storage variables after upgrade - 2
     uint256 public override remainingFXDFeeBalance;
     uint256 public override remainingTokenFeeBalance;
-    bool public upgradeInitialized;
+    bool public feesUpgradeInitialized;
 
     event LogSetFeeIn(address indexed _caller, uint256 _feeIn);
     event LogSetFeeOut(address indexed _caller, uint256 _feeOut);
@@ -138,8 +138,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     }
 
     function initializeFeesAfterUpgrade() external onlyOwner{
-        require(upgradeInitialized != true, "StableSwapModule/already-initialized");
-        upgradeInitialized = true;
+        require(feesUpgradeInitialized != true, "StableSwapModule/already-initialized");
+        feesUpgradeInitialized = true;
         remainingFXDFeeBalance = totalFXDFeeBalance;
         remainingTokenFeeBalance = totalTokenFeeBalance;
     }
@@ -149,7 +149,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
      */
     function udpateTotalValueDeposited() external onlyOwner {
         uint256 newTotalValueDeposited = IStableSwapModuleWrapperRetriever(stableswapWrapper).totalValueDeposited();
-        totalValueDeposited = newTotalValueDeposited;
+        totalValueDeposited = newTotalValueDeposited - totalFXDFeeBalance - _convertDecimals(totalTokenFeeBalance, IToken(token).decimals(),18);
     }
 
     function setStableSwapWrapper(address newStableSwapWrapper) external onlyOwner {

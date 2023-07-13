@@ -257,6 +257,8 @@ describe("StableSwapModule", () => {
                 //again swap after increasing timestamp
                 //should succeed
                 await stableSwapModule.swapStablecoinToToken(DeployerAddress,ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT), { gasLimit: 1000000 })
+                await stableSwapModule.initializeFeesAfterUpgrade({gasLimit: 8000000})
+                await expect(stableSwapModule.initializeFeesAfterUpgrade({gasLimit: 8000000})).to.be.revertedWith('StableSwapModule/already-initialized')
             })
         })
 
