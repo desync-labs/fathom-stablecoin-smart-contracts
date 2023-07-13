@@ -9,44 +9,12 @@ import "../../../interfaces/ICollateralAdapter.sol";
 import "../../../interfaces/ICagable.sol";
 import "../../../interfaces/IManager.sol";
 import "../../../interfaces/IProxyRegistry.sol";
-import "../../../utils/SafeToken.sol";
 import "../../../interfaces/IVault.sol";
-
-contract CollateralTokenAdapterMath {
-    uint256 internal constant WAD = 10 ** 18;
-    uint256 internal constant RAY = 10 ** 27;
-
-    function divup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x + _y - 1) / _y;
-    }
-
-    function wmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * _y) / WAD;
-    }
-
-    function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * WAD) / _y;
-    }
-
-    function wdivup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = divup(_x * WAD, _y);
-    }
-
-    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * _y) / RAY;
-    }
-
-    function rmulup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = divup(_x * _y, RAY);
-    }
-
-    function rdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * RAY) / _y;
-    }
-}
+import "../../../utils/SafeToken.sol";
+import "../../../utils/CommonMath.sol";
 
 /// @dev receives WXDC from users and deposit in Vault.
-contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
 
     uint256 public live;

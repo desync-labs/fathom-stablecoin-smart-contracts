@@ -10,19 +10,12 @@ import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IPausable.sol";
 import "../interfaces/ISetPrice.sol";
-
-contract PriceOracleMath {
-    uint256 internal constant ONE = 10 ** 27;
-
-    function rdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * ONE) / _y;
-    }
-}
+import "../utils/CommonMath.sol";
 
 /** @notice A contract which is the price oracle of the BookKeeper to keep all collateral pools updated with the latest price of the collateral.
     The price oracle is important in reflecting the current state of the market price.
 */
-contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
+contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
     struct CollateralPool {
         IPriceFeed priceFeed; // Price Feed
         uint256 liquidationRatio; // Liquidation ratio or Collateral ratio [ray]
@@ -79,7 +72,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICag
         PausableUpgradeable.__Pausable_init();
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
-        stableCoinReferencePrice = ONE;
+        stableCoinReferencePrice = RAY;
         live = 1;
     }
 

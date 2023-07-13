@@ -11,14 +11,9 @@ import "../interfaces/IStablecoinAdapter.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IPausable.sol";
 import "../utils/SafeToken.sol";
+import "../utils/CommonMath.sol";
 
-contract FlashMintModuleMath {
-    uint256 internal constant WAD = 10 ** 18;
-    uint256 internal constant RAY = 10 ** 27;
-    uint256 internal constant RAD = 10 ** 45;
-}
-
-contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender, IPausable {
+contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender, IPausable {
     using SafeToken for address;
 
     IBookKeeper public bookKeeper;
