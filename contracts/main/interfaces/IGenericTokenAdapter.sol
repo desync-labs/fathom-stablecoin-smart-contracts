@@ -10,6 +10,10 @@ interface IGenericTokenAdapter {
 
     function withdraw(address positionAddress, uint256 wad, bytes calldata data) external;
 
+    function onAdjustPosition(address src, address dst, int256 collateralValue, int256 debtShare, bytes calldata data) external;
+
+    function onMoveCollateral(address src, address dst, uint256 wad, bytes calldata data) external;
+
     function collateralToken() external returns (address);
 
     function collateralPoolId() external view returns (bytes32);
