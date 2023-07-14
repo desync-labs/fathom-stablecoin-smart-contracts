@@ -4,13 +4,13 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../../../interfaces/IBookKeeper.sol";
-import "../../../interfaces/ICollateralAdapter.sol";
-import "../../../interfaces/ICagable.sol";
-import "../../../interfaces/IManager.sol";
-import "../../../interfaces/IProxyRegistry.sol";
-import "../../../utils/SafeToken.sol";
-import "../../../interfaces/IVault.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/ICollateralAdapter.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/interfaces/IManager.sol";
+import "../../main/interfaces/IProxyRegistry.sol";
+import "../../main/utils/SafeToken.sol";
+import "../../main/interfaces/IVault.sol";
 
 contract MockCollateralTokenAdapterMath {
     uint256 internal constant WAD = 10 ** 18;
@@ -63,7 +63,7 @@ contract MockCollateralTokenAdapterMath {
 }
 
 /// @dev receives WXDC from users and deposit in Vault.
-contract MockCollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
 
     uint256 public live;
@@ -243,7 +243,6 @@ contract MockCollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAd
             //bookKeeping
             bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
             totalShare = add(totalShare, _share);
-            // stake[_positionAddress] = add(stake[_positionAddress], _share);
 
             // safeApprove to Vault
             address(collateralToken).safeApprove(address(vault), _amount);
