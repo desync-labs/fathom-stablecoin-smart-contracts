@@ -2,9 +2,9 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
@@ -34,18 +34,6 @@ contract BookKeeperMath {
         }
         require(int256(x) >= 0);
         require(y == 0 || z / y == int256(x));
-    }
-
-    function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = x + y;
-    }
-
-    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = x - y;
-    }
-
-    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = x * y;
     }
 
     function either(bool _x, bool _y) internal pure returns (bool _z) {
@@ -194,11 +182,19 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
+        require(_accessControlConfig.isContract(), "BookKeeper/access-control-config: NOT_CONTRACT_ADDRESS");
+        require(
+            IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender),
+            "BookKeeper/msgsender-not-owner"
+        );
+
         accessControlConfig = _accessControlConfig;
         emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
 
     function setCollateralPoolConfig(address _collateralPoolConfig) external onlyOwner {
+        require(_collateralPoolConfig.isContract(), "BookKeeper/collateral-pool-config: NOT_CONTRACT_ADDRESS");
+
         collateralPoolConfig = _collateralPoolConfig;
         emit LogSetCollateralPoolConfig(msg.sender, _collateralPoolConfig);
     }
@@ -257,15 +253,15 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         uint256 _amount
     ) external override nonReentrant whenNotPaused onlyCollateralManager {
         _requireAllowedPositionAdjustment(_src, msg.sender);
-        collateralToken[_collateralPoolId][_src] = sub(collateralToken[_collateralPoolId][_src], _amount);
-        collateralToken[_collateralPoolId][_dst] = add(collateralToken[_collateralPoolId][_dst], _amount);
+        collateralToken[_collateralPoolId][_src] -= _amount;
+        collateralToken[_collateralPoolId][_dst] += _amount;
         emit LogMoveCollateral(msg.sender, _collateralPoolId, _src, _dst, _amount);
     }
 
     function moveStablecoin(address _src, address _dst, uint256 _value) external override nonReentrant whenNotPaused {
         _requireAllowedPositionAdjustment(_src, msg.sender);
-        stablecoin[_src] = sub(stablecoin[_src], _value);
-        stablecoin[_dst] = add(stablecoin[_dst], _value);
+        stablecoin[_src] -= _value;
+        stablecoin[_dst] += _value;
     }
 
     // solhint-disable function-max-lines
@@ -289,7 +285,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         ICollateralPoolConfig(collateralPoolConfig).setTotalDebtShare(_collateralPoolId, _vars.totalDebtShare);
 
         int256 _debtValue = mul(_vars.debtAccumulatedRate, _debtShare);
-        uint256 _positionDebtValue = mul(_vars.debtAccumulatedRate, position.debtShare);
+        uint256 _positionDebtValue = _vars.debtAccumulatedRate * position.debtShare;
         totalStablecoinIssued = add(totalStablecoinIssued, _debtValue);
         uint256 _poolStablecoinAmount = poolStablecoinIssued[_collateralPoolId];
         poolStablecoinIssued[_collateralPoolId] = add(_poolStablecoinAmount, _debtValue);
@@ -297,13 +293,13 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         require(
             either(
                 _debtShare <= 0,
-                both(mul(_vars.totalDebtShare, _vars.debtAccumulatedRate) <= _vars.debtCeiling, totalStablecoinIssued <= totalDebtCeiling)
+                both(_vars.totalDebtShare * _vars.debtAccumulatedRate <= _vars.debtCeiling, totalStablecoinIssued <= totalDebtCeiling)
             ),
             "BookKeeper/ceiling-exceeded"
         );
 
         require(
-            either(both(_debtShare <= 0, _collateralValue >= 0), _positionDebtValue <= mul(position.lockedCollateral, _vars.priceWithSafetyMargin)),
+            either(both(_debtShare <= 0, _collateralValue >= 0), _positionDebtValue <= position.lockedCollateral * _vars.priceWithSafetyMargin),
             "BookKeeper/not-safe"
         );
 
@@ -354,16 +350,18 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         _positionDst.lockedCollateral = add(_positionDst.lockedCollateral, _collateralAmount);
         _positionDst.debtShare = add(_positionDst.debtShare, _debtShare);
 
-        uint256 _utab = mul(_positionSrc.debtShare, _vars.debtAccumulatedRate);
-        uint256 _vtab = mul(_positionDst.debtShare, _vars.debtAccumulatedRate);
+        uint256 _utab = _positionSrc.debtShare * _vars.debtAccumulatedRate;
+        uint256 _vtab = _positionDst.debtShare * _vars.debtAccumulatedRate;
 
         require(both(_wish(_src, msg.sender), _wish(_dst, msg.sender)), "BookKeeper/movePosition/not-allowed");
 
-        require(_utab <= mul(_positionSrc.lockedCollateral, _vars.priceWithSafetyMargin), "BookKeeper/not-safe-src");
-        require(_vtab <= mul(_positionDst.lockedCollateral, _vars.priceWithSafetyMargin), "BookKeeper/not-safe-dst");
+        require(_utab <= _positionSrc.lockedCollateral * _vars.priceWithSafetyMargin, "BookKeeper/not-safe-src");
+        require(_vtab <= _positionDst.lockedCollateral * _vars.priceWithSafetyMargin, "BookKeeper/not-safe-dst");
 
         require(either(_utab >= _vars.debtFloor, _positionSrc.debtShare == 0), "BookKeeper/debt-floor-src");
         require(either(_vtab >= _vars.debtFloor, _positionDst.debtShare == 0), "BookKeeper/debt-floor-dst");
+
+        require(_vtab <= _vars.positionDebtCeiling, "BookKeeper/position-debt-ceiling-exceeded-dst");
     }
 
     /** @dev Confiscate position from the owner for the position to be liquidated.
@@ -406,19 +404,19 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
       A successful `settleSystemBadDebt` would remove the bad debt from the system.
     */
     function settleSystemBadDebt(uint256 _value) external override nonReentrant whenNotPaused {
-        systemBadDebt[msg.sender] = sub(systemBadDebt[msg.sender], _value);
-        stablecoin[msg.sender] = sub(stablecoin[msg.sender], _value);
-        totalUnbackedStablecoin = sub(totalUnbackedStablecoin, _value);
-        totalStablecoinIssued = sub(totalStablecoinIssued, _value);
+        systemBadDebt[msg.sender] -= _value;
+        stablecoin[msg.sender] -= _value;
+        totalUnbackedStablecoin -= _value;
+        totalStablecoinIssued -= _value;
     }
 
     function mintUnbackedStablecoin(address _from, address _to, uint256 _value) external override nonReentrant whenNotPaused onlyMintable {
         _requireLive();
 
-        systemBadDebt[_from] = add(systemBadDebt[_from], _value);
-        stablecoin[_to] = add(stablecoin[_to], _value);
-        totalUnbackedStablecoin = add(totalUnbackedStablecoin, _value);
-        totalStablecoinIssued = add(totalStablecoinIssued, _value);
+        systemBadDebt[_from] += _value;
+        stablecoin[_to] += _value;
+        totalUnbackedStablecoin += _value;
+        totalStablecoinIssued += _value;
     }
 
     /** @dev Accrue stability fee or the mint interest rate.

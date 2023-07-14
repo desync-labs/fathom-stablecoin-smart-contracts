@@ -208,6 +208,13 @@ describe("SystemDebtEngine", () => {
           .withArgs(DeployerAddress, UnitHelpers.WeiPerRad)
       })
     })
+    context("when the caller is the owner but the setSurplusBuffer value is less than RAD", async () => {
+      it("should revert", async () => {
+        await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+        await expect(systemDebtEngineAsAlice.setSurplusBuffer(BigNumber.from("100"))).to.be.revertedWith("SystemDebtEngine/invalidSurplusBuffer")
+      })
+    })
   })
 
   describe("#pause", () => {
