@@ -6,7 +6,23 @@ import "../../interfaces/IBookKeeperFlashBorrower.sol";
 import "../../interfaces/IERC3156FlashBorrower.sol";
 import "../../utils/SafeToken.sol";
 
-abstract contract FlashLoanReceiverBase is IBookKeeperFlashBorrower, IERC3156FlashBorrower {
+contract FlashLoanReceiverBaseMath {
+    uint256 internal constant RAY = 10 ** 27;
+
+    function rad(uint256 _wad) internal pure returns (uint256) {
+        return mul(_wad, RAY);
+    }
+
+    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x + _y) >= _x);
+    }
+
+    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require(_y == 0 || (_z = _x * _y) / _y == _x);
+    }
+}
+
+abstract contract FlashLoanReceiverBase is FlashLoanReceiverBaseMath, IBookKeeperFlashBorrower, IERC3156FlashBorrower {
     using SafeToken for address;
 
     FlashMintModule public flash;

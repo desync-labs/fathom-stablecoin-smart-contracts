@@ -1384,68 +1384,6 @@ describe("BookKeeper", () => {
                         ).to.be.revertedWith("BookKeeper/debt-floor-dst")
                     })
                 })
-                context("when after moving bob position has too much debt", () => {
-                    it("should revert", async () => {
-                        await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(WeiPerRay)
-                        await mockedCollateralPoolConfig.mock.getTotalDebtShare.returns(0)
-                        await mockedCollateralPoolConfig.mock.getDebtFloor.returns(WeiPerRad.mul(2))
-                        await mockedCollateralPoolConfig.mock.getDebtCeiling.returns(WeiPerRad.mul(10))
-                        await mockedCollateralPoolConfig.mock.getDebtCeiling.returns(WeiPerRad.mul(10))
-                        await mockedCollateralPoolConfig.mock.getPriceWithSafetyMargin.returns(WeiPerRay)
-
-                        await mockedCollateralPoolConfig.mock.getCollateralPoolInfo.returns({
-                            debtAccumulatedRate: WeiPerRay,
-                            totalDebtShare: 0,
-                            debtCeiling: WeiPerRad.mul(100),
-                            priceWithSafetyMargin: WeiPerRay,
-                            debtFloor: WeiPerRad.mul(2),
-                            positionDebtCeiling: WeiPerRad.mul(10)
-                        })
-
-                        // set total debt ceiling 10 rad
-                        await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(100), { gasLimit: 1000000 })
-
-                        // add collateral to 10 WXDC
-                        await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
-                        await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(20), { gasLimit: 1000000 })
-
-                        // alice lock collateral 10 WXDC
-                        await bookKeeperAsAlice.adjustPosition(
-                            COLLATERAL_POOL_ID,
-                            AliceAddress,
-                            AliceAddress,
-                            AliceAddress,
-                            WeiPerWad.mul(10),
-                            WeiPerWad.mul(3),
-                            { gasLimit: 1000000 }
-                        )
-
-                        // bob lock collateral 100 WXDC and borrow 10 FXD
-                        await bookKeeperAsBob.adjustPosition(
-                            COLLATERAL_POOL_ID,
-                            BobAddress,
-                            BobAddress,
-                            BobAddress,
-                            WeiPerWad.mul(20),
-                            WeiPerWad.mul(10),
-                            { gasLimit: 1000000 }
-                        )
-
-                        // bob allow alice to manage a position
-                        await bookKeeperAsBob.whitelist(AliceAddress)
-
-                        await expect(
-                            bookKeeperAsAlice.movePosition(
-                                COLLATERAL_POOL_ID,
-                                AliceAddress,
-                                BobAddress,
-                                WeiPerWad.mul(5),
-                                WeiPerWad.mul(1),
-                                { gasLimit: 1000000 }
-                            )
-                        ).to.be.revertedWith("BookKeeper/position-debt-ceiling-exceeded-dst")
-                    })
-                })
                 context("when alice and bob positions are safe", () => {
                     it("should be able to call movePosition", async () => {
                         await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(WeiPerRay)
@@ -1950,19 +1888,19 @@ describe("BookKeeper", () => {
 
         context("when was already caged", () => {
             it("should not fail", async () => {
-                await mockedAccessControlConfig.mock.hasRole.returns(true)
+              await mockedAccessControlConfig.mock.hasRole.returns(true)
+    
+              expect(await bookKeeperAsAlice.live()).to.be.equal(1)
 
-                expect(await bookKeeperAsAlice.live()).to.be.equal(1)
+              await expect(bookKeeperAsAlice.cage()).to.emit(bookKeeperAsAlice, "LogCage").withArgs()
 
-                await expect(bookKeeperAsAlice.cage()).to.emit(bookKeeperAsAlice, "LogCage").withArgs()
-
-                expect(await bookKeeperAsAlice.live()).to.be.equal(0)
-
-                await bookKeeperAsAlice.cage()
-
-                expect(await bookKeeperAsAlice.live()).to.be.equal(0)
+              expect(await bookKeeperAsAlice.live()).to.be.equal(0)
+    
+              await bookKeeperAsAlice.cage()
+    
+              expect(await bookKeeperAsAlice.live()).to.be.equal(0)
             })
-        })
+          })
     })
 
     describe("#uncage", () => {

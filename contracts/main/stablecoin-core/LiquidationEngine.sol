@@ -4,7 +4,9 @@ pragma solidity 0.8.17;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ISystemDebtEngine.sol";
@@ -14,7 +16,6 @@ import "../interfaces/ICagable.sol";
 import "../interfaces/ISetPrice.sol";
 import "../interfaces/IPriceOracle.sol";
 import "../interfaces/IPausable.sol";
-import "../interfaces/IPriceFeed.sol";
 
 /// @title LiquidationEngine
 /** @notice A contract which is the manager for all of the liquidations of the protocol.
@@ -22,6 +23,8 @@ import "../interfaces/IPriceFeed.sol";
 */
 
 contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable, ILiquidationEngine, IPausable {
+    using SafeMathUpgradeable for uint256;
+
     struct LocalVars {
         uint256 positionLockedCollateral;
         uint256 positionDebtShare;
@@ -50,7 +53,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     event LiquidationFail(bytes32 _collateralPoolIds, address _positionAddresses, address _liquidator, string reason);
 
     modifier onlyOwnerOrShowStopper() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.SHOW_STOPPER_ROLE(), msg.sender),
@@ -60,7 +63,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     }
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
@@ -70,7 +73,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     }
 
     modifier onlyOwner() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
     }
@@ -253,8 +256,8 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         // (positionDebtShare [wad] * debtAccumulatedRate [ray]) [rad]
         require(
             _collateralPoolLocalVars.priceWithSafetyMargin > 0 &&
-                _vars.positionLockedCollateral * _collateralPoolLocalVars.priceWithSafetyMargin <
-                _vars.positionDebtShare * _collateralPoolLocalVars.debtAccumulatedRate,
+                _vars.positionLockedCollateral.mul(_collateralPoolLocalVars.priceWithSafetyMargin) <
+                _vars.positionDebtShare.mul(_collateralPoolLocalVars.debtAccumulatedRate),
             "LiquidationEngine/position-is-safe"
         );
 
@@ -277,10 +280,11 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
 
         // (positionDebtShare [wad] - newPositionDebtShare [wad]) * debtAccumulatedRate [ray]
 
-        _vars.wantStablecoinValueFromLiquidation =
-            (_vars.positionDebtShare - _vars.newPositionDebtShare) * _collateralPoolLocalVars.debtAccumulatedRate; // [rad]
+        _vars.wantStablecoinValueFromLiquidation = _vars.positionDebtShare.sub(_vars.newPositionDebtShare).mul(
+            _collateralPoolLocalVars.debtAccumulatedRate
+        ); // [rad]
         require(
-            bookKeeper.stablecoin(address(systemDebtEngine)) - _vars.systemDebtEngineStablecoinBefore >= _vars.wantStablecoinValueFromLiquidation,
+            bookKeeper.stablecoin(address(systemDebtEngine)).sub(_vars.systemDebtEngineStablecoinBefore) >= _vars.wantStablecoinValueFromLiquidation,
             "LiquidationEngine/payment-not-received"
         );
 
@@ -303,7 +307,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     // solhint-enable function-max-lines
 
     function _isPriceOk(bytes32 _collateralPoolId) internal view returns (bool) {
-        IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId));
+        IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_collateralPoolId));
         return _priceFeed.isPriceOk();
     }
 }

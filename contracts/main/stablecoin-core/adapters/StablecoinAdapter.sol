@@ -2,16 +2,21 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-
 import "../../interfaces/IStablecoin.sol";
 import "../../interfaces/IBookKeeper.sol";
+import "../../interfaces/IToken.sol";
 import "../../interfaces/IStablecoinAdapter.sol";
 import "../../interfaces/ICagable.sol";
 import "../../interfaces/IPausable.sol";
 
 contract StablecoinAdapterMath {
     uint256 internal constant ONE = 10 ** 27;
+
+    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require(y == 0 || (z = x * y) / y == x);
+    }
 }
 
 contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable, IPausable {
@@ -20,7 +25,7 @@ contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, Reentr
     uint256 public live; // Active Flag
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
@@ -30,7 +35,7 @@ contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, Reentr
     }
 
     modifier onlyOwnerOrShowStopper() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.SHOW_STOPPER_ROLE(), msg.sender),
@@ -42,9 +47,6 @@ contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, Reentr
     function initialize(address _bookKeeper, address _stablecoin) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
-
-        require(_bookKeeper != address(0), "StablecoinAdapter/zero-book-keeper");
-        require(_stablecoin != address(0), "StablecoinAdapter/zero-stablecoin");
 
         live = 1;
         bookKeeper = IBookKeeper(_bookKeeper);
@@ -65,7 +67,7 @@ contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, Reentr
     }
 
     function deposit(address usr, uint256 wad, bytes calldata /* data */) external payable override nonReentrant whenNotPaused {
-        bookKeeper.moveStablecoin(address(this), usr, wad * ONE);
+        bookKeeper.moveStablecoin(address(this), usr, mul(ONE, wad));
         stablecoin.burn(msg.sender, wad);
     }
 
@@ -76,7 +78,7 @@ contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, Reentr
 
     function withdraw(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         require(live == 1, "StablecoinAdapter/not-live");
-        bookKeeper.moveStablecoin(msg.sender, address(this), wad * ONE);
+        bookKeeper.moveStablecoin(msg.sender, address(this), mul(ONE, wad));
         stablecoin.mint(usr, wad);
     }
 

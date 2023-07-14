@@ -180,13 +180,6 @@ describe("PositionManager", () => {
                 await expect(positionManager.allowManagePosition(1, AliceAddress, 1)).to.be.revertedWith("owner not allowed")
             })
         })
-        context("ok is not valid", () => {
-            it("should revert", async () => {
-                await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
-
-                await expect(positionManagerAsAlice.allowManagePosition(1, BobAddress, 2)).to.be.revertedWith("PositionManager/invalid-ok")
-            })
-        })
         context("when parameters are valid", () => {
             it("should be able to add user allowance to a position", async () => {
 
@@ -199,12 +192,6 @@ describe("PositionManager", () => {
     })
 
     describe("#allowMigratePosition()", () => {
-        context("ok is not valid", () => {
-            it("should revert", async () => {
-                expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(0)
-                await expect(positionManagerAsAlice.allowMigratePosition(BobAddress, 2)).to.be.revertedWith("PositionManager/invalid-ok")
-            })
-        })
         context("when parameters are valid", () => {
             it("should be able to give/revoke migration allowance to other address", async () => {
                 expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(0)

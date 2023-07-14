@@ -115,22 +115,16 @@ describe("CentralizedOraclePriceFeed", () => {
     })
 
     describe("#peekPrice()", async () => {
-        context("oracle reverts", async () => {
-            it("should emit event", async () => {
-                await mockedCentralizedPriceOracle.mock.getPrice.revertsWithReason("some-error")
-                await expect(centralizedOraclePriceFeed.peekPrice()).to.emit(centralizedOraclePriceFeed, "LogPeekPriceFailed").withArgs(DeployerAddress, "some-error")
-            })
-        })
         context("zero price", async () => {
             it("should revert", async () => {
                 await mockedCentralizedPriceOracle.mock.getPrice.returns(0, await latest());
-                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("DelayPriceFeed/wrong-price");
+                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("CentralizedOraclePriceFeed/wrong-price");
             })
         })
         context("zero invalid timestamp", async () => {
             it("should revert", async () => {
                 await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad, await latest() + 1);
-                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("DelayPriceFeed/wrong-lastUpdate");
+                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("CentralizedOraclePriceFeed/wrong-lastUpdate");
             })
         })
         context("peek price", async () => {

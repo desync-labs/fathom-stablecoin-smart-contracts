@@ -4,7 +4,7 @@ const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
-const { advanceBlock, increase } = require("../helper/time");
+const { advanceBlock } = require("../helper/time");
 const { createProxyWallets } = require("../helper/proxy-wallets");
 const { AliceAddress, BobAddress } = require("../helper/address");
 const PositionHelper = require("../helper/positions");
@@ -13,8 +13,6 @@ const { getProxy } = require("../../common/proxies");
 const pools = require("../../common/collateral");
 
 const { expect } = chai
-
-const WeekInSeconds = 604800;
 
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
@@ -102,12 +100,12 @@ describe("ShowStopper", () => {
         context("when doesn't grant showStopperRole for showStopper", () => {
             it("should be revert", async () => {
                 await accessControlConfig.revokeRole(await accessControlConfig.SHOW_STOPPER_ROLE(), showStopper.address)
-                await expect(showStopper.cage(WeekInSeconds, { gasLimit: 1000000 })).to.be.revertedWith("!(ownerRole or showStopperRole)")
+                await expect(showStopper.cage(), { gasLimit: 1000000 }).to.be.revertedWith("!(ownerRole or showStopperRole)")
             })
         })
         context("when grant showStopperRole for all contract", () => {
             it("should be able to cage", async () => {
-                await showStopper.cage(WeekInSeconds, { gasLimit: 1000000 });
+                await showStopper.cage({ gasLimit: 1000000 });
 
                 expect(await bookKeeper.live()).to.be.equal(0)
                 expect(await liquidationEngine.live()).to.be.equal(0)
@@ -118,7 +116,7 @@ describe("ShowStopper", () => {
         context("when some contract was already caged", () => {
             it("should be able to cage", async () => {
                 await systemDebtEngine.cage({ gasLimit: 1000000 })
-                await showStopper.cage(WeekInSeconds, { gasLimit: 1000000 });
+                await showStopper.cage({ gasLimit: 1000000 });
 
                 expect(await bookKeeper.live()).to.be.equal(0)
                 expect(await liquidationEngine.live()).to.be.equal(0)
@@ -137,7 +135,7 @@ describe("ShowStopper", () => {
 
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
 
-                await showStopper.cage(WeekInSeconds)
+                await showStopper.cage()
                 await showStopper.cagePool(pools.XDC)
 
                 expect(await showStopper.cagePrice(pools.XDC)).to.be.equal(WeiPerRay)
@@ -149,7 +147,7 @@ describe("ShowStopper", () => {
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
 
                 await bookKeeper.cage()
-                await showStopper.cage(WeekInSeconds)
+                await showStopper.cage()
                 await showStopper.cagePool(pools.XDC)
 
                 expect(await showStopper.cagePrice(pools.XDC)).to.be.equal(WeiPerRay)
@@ -169,7 +167,7 @@ describe("ShowStopper", () => {
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
 
-                await showStopper.cage(WeekInSeconds)
+                await showStopper.cage()
 
                 await showStopper.cagePool(pools.XDC)
 
@@ -196,7 +194,7 @@ describe("ShowStopper", () => {
                 const positionId2 = await positionManager.ownerLastPositionId(bobProxyWallet.address)
                 const positionAddress2 = await positionManager.positions(positionId2)
 
-                await showStopper.cage(WeekInSeconds)
+                await showStopper.cage()
 
                 await showStopper.cagePool(pools.XDC)
 
@@ -263,7 +261,7 @@ describe("ShowStopper", () => {
                 const positionId2 = await positionManager.ownerLastPositionId(bobProxyWallet.address)
                 const positionAddress2 = await positionManager.positions(positionId2)
 
-                await showStopper.cage(WeekInSeconds)
+                await showStopper.cage()
 
                 await showStopper.cagePool(pools.XDC)
 
@@ -288,7 +286,6 @@ describe("ShowStopper", () => {
                 expect(await bookKeeper.systemBadDebt(systemDebtEngine.address)).to.be.equal(WeiPerRad.mul(10))
 
                 // finalize debt
-                await increase(WeekInSeconds);
                 await showStopper.finalizeDebt()
                 // total debt
                 expect(await showStopper.debt()).to.be.equal(WeiPerRad.mul(10))
@@ -321,7 +318,7 @@ describe("ShowStopper", () => {
                 const positionId2 = await positionManager.ownerLastPositionId(bobProxyWallet.address)
                 const positionAddress2 = await positionManager.positions(positionId2)
 
-                await showStopper.cage(WeekInSeconds)
+                await showStopper.cage()
 
                 await showStopper.cagePool(pools.XDC)
 
@@ -346,7 +343,6 @@ describe("ShowStopper", () => {
                 expect(await bookKeeper.systemBadDebt(systemDebtEngine.address)).to.be.equal(WeiPerRad.mul(10))
 
                 // finalize debt
-                await increase(WeekInSeconds);
                 await showStopper.finalizeDebt()
                 expect(await showStopper.debt()).to.be.equal(WeiPerRad.mul(10))
 
@@ -415,7 +411,7 @@ describe("ShowStopper", () => {
                 const positionId4 = await positionManager.ownerLastPositionId(bobProxyWallet.address)
                 const positionAddress4 = await positionManager.positions(positionId4)
 
-                await showStopper.cage(WeekInSeconds, { gasLimit: 1000000 })
+                await showStopper.cage()
 
                 await showStopper.cagePool(pools.XDC)
 
@@ -462,11 +458,10 @@ describe("ShowStopper", () => {
                 expect(await bookKeeper.systemBadDebt(systemDebtEngine.address)).to.be.equal(WeiPerRad.mul(20))
 
                 // finalize debt
-                await increase(WeekInSeconds);
                 await showStopper.finalizeDebt()
                 expect(await showStopper.debt()).to.be.equal(WeiPerRad.mul(20))
 
-                // // finalize cash price XDC
+                // finalize cash price XDC
                 await showStopper.finalizeCashPrice(pools.XDC)
 
                 expect(await showStopper.finalCashPrice(pools.XDC)).to.be.equal("500000000000000000000000000")

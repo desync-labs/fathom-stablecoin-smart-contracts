@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 import "./PositionHandler.sol";
@@ -12,7 +13,22 @@ import "../interfaces/ISetPrice.sol";
 import "../interfaces/IPriceFeed.sol";
 import "../interfaces/IPriceOracle.sol";
 
-contract PositionManager is PausableUpgradeable, IManager {
+contract PositionManagerMath {
+    function _safeAdd(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x + _y) >= _x, "add overflow");
+    }
+
+    function _safeSub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x - _y) <= _x, "sub overflow");
+    }
+
+    function _safeToInt(uint256 _x) internal pure returns (int256 _y) {
+        _y = int256(_x);
+        require(_y >= 0, "must not negative");
+    }
+}
+
+contract PositionManager is PositionManagerMath, PausableUpgradeable, IManager {
     struct List {
         uint256 prev;
         uint256 next;
@@ -90,7 +106,6 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @param _user The address to be allowed for managing the position
     /// @param _ok Ok flag to allow/disallow. 1 for allow and 0 for disallow.
     function allowManagePosition(uint256 _positionId, address _user, uint256 _ok) external override whenNotPaused onlyOwnerAllowed(_positionId) {
-        require(_ok < 2, "PositionManager/invalid-ok");
         ownerWhitelist[owners[_positionId]][_positionId][_user] = _ok;
         emit LogAllowManagePosition(msg.sender, _positionId, owners[_positionId], _user, _ok);
     }
@@ -99,7 +114,6 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @param _user The address of user that will be allowed to do such an action to msg.sender
     /// @param _ok Ok flag to allow/disallow
     function allowMigratePosition(address _user, uint256 _ok) external override whenNotPaused {
-        require(_ok < 2, "PositionManager/invalid-ok");
         migrationWhitelist[msg.sender][_user] = _ok;
         emit LogAllowMigratePosition(msg.sender, _user, _ok);
     }
@@ -114,7 +128,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         require(_debtAccumulatedRate != 0, "PositionManager/collateralPool-not-init");
 
-        lastPositionId += 1;
+        lastPositionId = _safeAdd(lastPositionId, 1);
         positions[lastPositionId] = address(new PositionHandler(bookKeeper));
         owners[lastPositionId] = _user;
         mapPositionHandlerToOwner[positions[lastPositionId]] = _user;
@@ -129,7 +143,7 @@ contract PositionManager is PausableUpgradeable, IManager {
             list[ownerLastPositionId[_user]].next = lastPositionId;
         }
         ownerLastPositionId[_user] = lastPositionId;
-        ownerPositionCount[_user] += 1;
+        ownerPositionCount[_user] = _safeAdd(ownerPositionCount[_user], 1);
 
         emit LogNewPosition(msg.sender, _user, lastPositionId);
 
@@ -161,7 +175,7 @@ contract PositionManager is PausableUpgradeable, IManager {
             // If was the first one update first pointer of the owner
             ownerFirstPositionId[owners[_positionId]] = list[_positionId].next;
         }
-        ownerPositionCount[owners[_positionId]] -= 1;
+        ownerPositionCount[owners[_positionId]] = _safeSub(ownerPositionCount[owners[_positionId]], 1);
 
         // Transfer ownership
         owners[_positionId] = _destination;
@@ -177,7 +191,7 @@ contract PositionManager is PausableUpgradeable, IManager {
             ownerFirstPositionId[_destination] = _positionId;
         }
         ownerLastPositionId[_destination] = _positionId;
-        ownerPositionCount[_destination] += 1;
+        ownerPositionCount[_destination] = _safeAdd(ownerPositionCount[_destination], 1);
     }
 
     /// @dev Adjust the position keeping the generated stablecoin or collateral freed in the positionHandler address.
@@ -268,8 +282,8 @@ contract PositionManager is PausableUpgradeable, IManager {
             collateralPools[_positionId],
             positions[_positionId],
             _destination,
-            int256(_lockedCollateral),
-            int256(_debtShare)
+            _safeToInt(_lockedCollateral),
+            _safeToInt(_debtShare)
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_positionId]));
@@ -290,8 +304,8 @@ contract PositionManager is PausableUpgradeable, IManager {
             collateralPools[_positionId],
             _source,
             positions[_positionId],
-            int256(_lockedCollateral),
-            int256(_debtShare)
+            _safeToInt(_lockedCollateral),
+            _safeToInt(_debtShare)
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_positionId]));
@@ -312,8 +326,8 @@ contract PositionManager is PausableUpgradeable, IManager {
             collateralPools[_sourceId],
             positions[_sourceId],
             positions[_destinationId],
-            int256(_lockedCollateral),
-            int256(_debtShare)
+            _safeToInt(_lockedCollateral),
+            _safeToInt(_debtShare)
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_sourceId]));

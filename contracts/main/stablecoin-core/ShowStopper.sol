@@ -2,6 +2,7 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IShowStopper.sol";
@@ -16,16 +17,29 @@ contract ShowStopperMath {
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAY = 10 ** 27;
 
+    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = _x + _y;
+        require(_z >= _x);
+    }
+
+    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require((_z = _x - _y) <= _x);
+    }
+
+    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require(_y == 0 || (_z = _x * _y) / _y == _x);
+    }
+
     function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
         return _x <= _y ? _x : _y;
     }
 
     function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * _y) / RAY;
+        _z = mul(_x, _y) / RAY;
     }
 
     function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * WAD) / _y;
+        _z = mul(_x, WAD) / _y;
     }
 }
 
@@ -48,7 +62,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     mapping(address => uint256) public stablecoinAccumulator; //    [wad]
     mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
 
-    event LogCage(uint256 _cageCoolDown);
+    event LogCage();
     event LogCageCollateralPool(bytes32 indexed collateralPoolId);
 
     event LogAccumulateBadDebt(bytes32 indexed collateralPoolId, address indexed positionAddress, uint256 amount, uint256 debtShare);
@@ -87,26 +101,26 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
 
     function setLiquidationEngine(address _liquidationEngine) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
-        require(_liquidationEngine != address(0), "ShowStopper/zero-liquidation-engine");
-
         liquidationEngine = ILiquidationEngine(_liquidationEngine);
         emit LogSetLiquidationEngine(msg.sender, _liquidationEngine);
     }
 
     function setSystemDebtEngine(address _systemDebtEngine) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
-        require(_systemDebtEngine != address(0), "ShowStopper/zero-debt-engine");
-
         systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
         emit LogSetSystemDebtEngine(msg.sender, _systemDebtEngine);
     }
 
     function setPriceOracle(address _priceOracle) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
-        require(_priceOracle != address(0), "ShowStopper/zero-price-oracle");
-
         priceOracle = IPriceOracle(_priceOracle);
         emit LogSetPriceOracle(msg.sender, _priceOracle);
+    }
+
+    function setCageCoolDown(uint256 _cageCoolDown) external onlyOwner {
+        require(live == 1, "ShowStopper/not-live");
+        cageCoolDown = _cageCoolDown;
+        emit LogSetCageCoolDown(msg.sender, _cageCoolDown);
     }
 
     /** @dev Start the process of emergency shutdown. The following will happen in order:
@@ -116,18 +130,15 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
       - SystemDebtEngine will be paused: no accrual of new debt, no system debt settlement
       - PriceOracle will be paused: no new price update, no liquidation trigger
     */
-    function cage(uint256 _cageCoolDown) external onlyOwner {
+    function cage() external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
-        require(_cageCoolDown >= 1 weeks  && _cageCoolDown <= 13 weeks, "ShowStopper/invalid-cool-down" );
-
         live = 0;
-        cageCoolDown = _cageCoolDown;
         cagedTimestamp = block.timestamp;
         ICagable(address(bookKeeper)).cage();
         ICagable(address(liquidationEngine)).cage();
         ICagable(address(systemDebtEngine)).cage();
         ICagable(address(priceOracle)).cage();
-        emit LogCage(_cageCoolDown);
+        emit LogCage();
     }
 
     /// @dev Set the cage price of the collateral pool with the latest price from the price oracle
@@ -149,13 +160,13 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
   */
     function accumulateBadDebt(bytes32 _collateralPoolId, address _positionAddress) external {
         require(cagePrice[_collateralPoolId] != 0, "ShowStopper/cage-price-collateral-pool-id-not-defined");
-        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(
+        uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getDebtAccumulatedRate(
             _collateralPoolId
         ); // [ray]
         (uint256 _lockedCollateralAmount, uint256 _debtShare) = bookKeeper.positions(_collateralPoolId, _positionAddress);
         uint256 _debtAmount = rmul(rmul(_debtShare, _debtAccumulatedRate), cagePrice[_collateralPoolId]); // find the amount of debt in the unit of collateralToken
         uint256 _amount = min(_lockedCollateralAmount, _debtAmount); // if debt > lockedCollateralAmount, that's mean bad debt occur
-        badDebtAccumulator[_collateralPoolId] = badDebtAccumulator[_collateralPoolId] + _debtAmount - _amount; // accumulate bad debt in badDebtAccumulator (if there is any)
+        badDebtAccumulator[_collateralPoolId] = add(badDebtAccumulator[_collateralPoolId], sub(_debtAmount, _amount)); // accumulate bad debt in badDebtAccumulator (if there is any)
 
         require(_amount < 2 ** 255 && _debtShare < 2 ** 255, "ShowStopper/overflow");
 
@@ -182,7 +193,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         require(live == 0, "ShowStopper/still-live");
         require(debt == 0, "ShowStopper/debt-not-zero");
         require(bookKeeper.stablecoin(address(systemDebtEngine)) == 0, "ShowStopper/surplus-not-zero");
-        require(block.timestamp >= cagedTimestamp + cageCoolDown, "ShowStopper/cage-cool-down-not-finished");
+        require(block.timestamp >= add(cagedTimestamp, cageCoolDown), "ShowStopper/cage-cool-down-not-finished");
         debt = bookKeeper.totalStablecoinIssued();
         emit LogFinalizeDebt();
     }
@@ -195,12 +206,12 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         require(debt != 0, "ShowStopper/debt-zero");
         require(finalCashPrice[_collateralPoolId] == 0, "ShowStopper/final-cash-price-collateral-pool-id-already-defined");
 
-        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(
+        uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getDebtAccumulatedRate(
             _collateralPoolId
         ); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
 
-        finalCashPrice[_collateralPoolId] = ((_wad - badDebtAccumulator[_collateralPoolId]) * RAY) / (debt / RAY);
+        finalCashPrice[_collateralPoolId] = mul(sub(_wad, badDebtAccumulator[_collateralPoolId]), RAY) / (debt / RAY);
 
         emit LogFinalizeCashPrice(_collateralPoolId);
     }
@@ -209,8 +220,8 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     function accumulateStablecoin(uint256 _amount) external {
         require(_amount != 0, "ShowStopper/amount-zero");
         require(debt != 0, "ShowStopper/debt-zero");
-        bookKeeper.moveStablecoin(msg.sender, address(systemDebtEngine), _amount * RAY);
-        stablecoinAccumulator[msg.sender] += _amount;
+        bookKeeper.moveStablecoin(msg.sender, address(systemDebtEngine), mul(_amount, RAY));
+        stablecoinAccumulator[msg.sender] = add(stablecoinAccumulator[msg.sender], _amount);
         emit LogAccumulateStablecoin(msg.sender, _amount);
     }
 
@@ -219,7 +230,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         require(_amount != 0, "ShowStopper/amount-zero");
         require(finalCashPrice[_collateralPoolId] != 0, "ShowStopper/final-cash-price-collateral-pool-id-not-defined");
         bookKeeper.moveCollateral(_collateralPoolId, address(this), msg.sender, rmul(_amount, finalCashPrice[_collateralPoolId]));
-        redeemedStablecoinAmount[_collateralPoolId][msg.sender] += _amount;
+        redeemedStablecoinAmount[_collateralPoolId][msg.sender] = add(redeemedStablecoinAmount[_collateralPoolId][msg.sender], _amount);
         require(
             redeemedStablecoinAmount[_collateralPoolId][msg.sender] <= stablecoinAccumulator[msg.sender],
             "ShowStopper/insufficient-stablecoin-accumulator-balance"

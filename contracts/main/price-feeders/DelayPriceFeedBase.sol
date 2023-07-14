@@ -67,18 +67,12 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
 
     function peekPrice() external override returns (uint256, bool) {
         if (block.timestamp >= lastUpdateTS + timeDelay || !this.isPriceFresh()) {
-            try this.retrivePrice() returns (PriceInfo memory _priceInfo) {
-                
-                require(_priceInfo.price > 0, "DelayPriceFeed/wrong-price");
-                require(_priceInfo.lastUpdate <= block.timestamp, "DelayPriceFeed/wrong-lastUpdate");
-
-                delayedPrice = delayedPrice.price == 0 ? _priceInfo : latestPrice;
-                latestPrice = _priceInfo;
-                lastUpdateTS = block.timestamp;
-            } catch Error(string memory reason) {
-                emit LogPeekPriceFailed(msg.sender, reason);
-            }
+            PriceInfo memory _priceInfo = _retrivePrice();
+            delayedPrice = delayedPrice.price == 0 ? _priceInfo : latestPrice;
+            latestPrice = _priceInfo;
+            lastUpdateTS = block.timestamp;
         }
+
         return (delayedPrice.price, this.isPriceOk());
     }
 
@@ -98,5 +92,5 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
         return delayedPrice.lastUpdate >= block.timestamp - priceLife;
     }
 
-    function retrivePrice() external view virtual returns (PriceInfo memory);
+    function _retrivePrice() internal view virtual returns (PriceInfo memory);
 }
