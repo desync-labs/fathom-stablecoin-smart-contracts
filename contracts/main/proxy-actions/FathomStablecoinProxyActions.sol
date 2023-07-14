@@ -6,7 +6,6 @@ import "../interfaces/IWXDC.sol";
 import "../interfaces/IToken.sol";
 import "../interfaces/IManager.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
-import "../interfaces/IFarmableTokenAdapter.sol";
 import "../interfaces/IStablecoinAdapter.sol";
 import "../interfaces/IStabilityFeeCollector.sol";
 import "../interfaces/IProxyRegistry.sol";

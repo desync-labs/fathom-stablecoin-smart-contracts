@@ -263,12 +263,10 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
             require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
-            // require(stake[msg.sender] >= _share, "CollateralTokenAdapter/insufficient staked amount");
             require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _share, "CollateralTokenAdapter/insufficient collateral amount");
 
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
             totalShare = sub(totalShare, _share);
-            // stake[msg.sender] = sub(stake[msg.sender], _share);
 
             //withdraw WXDC from Vault
             vault.withdraw(_amount);
