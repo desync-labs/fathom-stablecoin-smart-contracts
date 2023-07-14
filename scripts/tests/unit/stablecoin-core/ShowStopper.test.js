@@ -85,7 +85,6 @@ describe("ShowStopper", () => {
     
     await showStopper.cagePool(formatBytes32String("XDC"))
     await mockedBookKeeper.mock.positionWhitelist.returns(BigNumber.from(0))
-    await mockedTokenAdapter.mock.onMoveCollateral.returns();
     await mockedBookKeeper.mock.stablecoin.returns(0)
   }
 

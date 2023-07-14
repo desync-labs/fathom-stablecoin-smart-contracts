@@ -327,13 +327,6 @@ describe("SystemDebtEngine", () => {
           UnitHelpers.WeiPerWad
         ).returns()
 
-        await mockedCollateralTokenAdapter.mock.onMoveCollateral.withArgs(
-          systemDebtEngine.address,
-          DeployerAddress,
-          UnitHelpers.WeiPerWad,
-          ethers.utils.defaultAbiCoder.encode(["address"], [DeployerAddress])
-        ).returns()
-
         await systemDebtEngine.withdrawCollateralSurplus(
           formatBytes32String("WXDC"),
           mockedCollateralTokenAdapter.address,
