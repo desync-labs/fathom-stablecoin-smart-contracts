@@ -86,16 +86,6 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
         address(collateralToken).safeTransfer(usr, wad);
     }
 
-    function onAdjustPosition(
-        address src,
-        address dst,
-        int256 collateralValue,
-        int256 debtShare,
-        bytes calldata data
-    ) external override nonReentrant {}
-
-    function onMoveCollateral(address src, address dst, uint256 wad, bytes calldata data) external override nonReentrant {}
-
     function pause() external onlyOwnerOrGov {
         _pause();
     }
