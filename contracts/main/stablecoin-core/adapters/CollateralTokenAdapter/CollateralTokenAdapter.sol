@@ -2,7 +2,6 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "../../../interfaces/IBookKeeper.sol";
@@ -17,49 +16,32 @@ contract CollateralTokenAdapterMath {
     uint256 internal constant WAD = 10 ** 18;
     uint256 internal constant RAY = 10 ** 27;
 
-    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x + _y) >= _x, "ds-math-add-overflow");
-    }
-
-    function sub(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require((_z = _x - _y) <= _x, "ds-math-sub-underflow");
-    }
-
-    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y == 0 || (_z = _x * _y) / _y == _x, "ds-math-mul-overflow");
-    }
-
-    function div(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y > 0, "ds-math-div-by-zero");
-        _z = _x / _y;
-    }
-
     function divup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = add(_x, sub(_y, 1)) / _y;
+        _z = (_x + _y - 1) / _y;
     }
 
     function wmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, _y) / WAD;
+        _z = (_x * _y) / WAD;
     }
 
     function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, WAD) / _y;
+        _z = (_x * WAD) / _y;
     }
 
     function wdivup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = divup(mul(_x, WAD), _y);
+        _z = divup(_x * WAD, _y);
     }
 
     function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, _y) / RAY;
+        _z = (_x * _y) / RAY;
     }
 
     function rmulup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = divup(mul(_x, _y), RAY);
+        _z = divup(_x * _y, RAY);
     }
 
     function rdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, RAY) / _y;
+        _z = (_x * RAY) / _y;
     }
 }
 
@@ -127,20 +109,24 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         // 1. Initialized all dependencies
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
-        collateralToken = _collateralToken;
+
+        require(_bookKeeper != address(0), "CollateralTokenAdapter/zero-book-keeper");
+        require(_collateralPoolId != bytes32(0), "CollateralTokenAdapter/zero-collateral-pool-id");
+        require(_collateralToken != address(0), "CollateralTokenAdapter/zero-collateral-token");
+        require(_positionManager != address(0), "CollateralTokenAdapter/zero-position-manager");
+        require(_proxyWalletFactory != address(0), "CollateralTokenAdapter/zero-proxy-wallet-factory");
 
         live = 1;
 
-        bookKeeper = IBookKeeper(_bookKeeper);
         collateralPoolId = _collateralPoolId;
-
+        collateralToken = _collateralToken;
+        bookKeeper = IBookKeeper(_bookKeeper);
         positionManager = IManager(_positionManager);
-
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
     }
 
     function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
-        require(toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
+        require(toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
         whiteListed[toBeWhitelisted] = true;
     }
 
@@ -171,6 +157,8 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
 
     function setVault(address _vault) external onlyOwner {
         require(true != flagVault, "CollateralTokenAdapter/Vault-set-already");
+        require(_vault != address(0), "CollateralTokenAdapter/zero-vault");
+
         flagVault = true;
         vault = IVault(_vault);
     }
@@ -204,7 +192,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
             require(_amount < 2 ** 255, "CollateralTokenAdapter/collateral-overflow");
             //deduct totalShare
             uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
-            totalShare = sub(totalShare, _share);
+            totalShare -= _share;
 
             //deduct emergency withdrawl amount of FXD
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
@@ -243,15 +231,15 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
             //bookKeeping
             bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
-            totalShare = add(totalShare, _share);
-            // stake[_positionAddress] = add(stake[_positionAddress], _share);
+
+            totalShare += _share;
 
             // safeApprove to Vault
             address(collateralToken).safeApprove(address(vault), _amount);
             //deposit WXDC to Vault
             vault.deposit(_amount);
+            emit LogDeposit(_amount); // wxdc
         }
-        emit LogDeposit(_amount); // wxdc
     }
 
     /// @dev withdraw collateral tokens from staking contract, and update BookKeeper
@@ -267,8 +255,8 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
             require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _share, "CollateralTokenAdapter/insufficient collateral amount");
 
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
-            totalShare = sub(totalShare, _share);
-            // stake[msg.sender] = sub(stake[msg.sender], _share);
+
+            totalShare -= _share;
 
             //withdraw WXDC from Vault
             vault.withdraw(_amount);

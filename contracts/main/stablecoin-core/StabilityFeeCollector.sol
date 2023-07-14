@@ -2,7 +2,6 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
 import "../interfaces/IBookKeeper.sol";
@@ -63,11 +62,6 @@ contract StabilityFeeCollectorMath {
         }
     }
 
-    function add(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = _x + _y;
-        require(_z >= _x);
-    }
-
     function diff(uint256 _x, uint256 _y) internal pure returns (int256 _z) {
         _z = int256(_x) - int256(_y);
         require(int256(_x) >= 0 && int256(_y) >= 0);
@@ -102,7 +96,7 @@ contract StabilityFeeCollector is StabilityFeeCollectorMath, PausableUpgradeable
     }
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
@@ -115,7 +109,9 @@ contract StabilityFeeCollector is StabilityFeeCollectorMath, PausableUpgradeable
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
+        require(_bookKeeper != address(0), "StabilityFeeCollector/zero-book-keeper");
         bookKeeper = IBookKeeper(_bookKeeper);
+        
         require(_systemDebtEngine != address(0), "StabilityFeeCollector/bad-system-debt-engine-address");
         systemDebtEngine = _systemDebtEngine;
     }
