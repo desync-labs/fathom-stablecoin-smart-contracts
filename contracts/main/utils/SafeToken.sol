@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
+import "@openzeppelin/contracts/utils/Address.sol";
 interface ERC20Interface {
     function balanceOf(address user) external view returns (uint256);
 }
@@ -15,16 +16,19 @@ library SafeToken {
     }
 
     function safeApprove(address token, address to, uint256 value) internal {
+        require(Address.isContract(token), "safeApprove: non-contract address");
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0x095ea7b3, to, value)); // bytes4(keccak256(bytes('approve(address,uint256)')));
         require(success && (data.length == 0 || abi.decode(data, (bool))), "!safeApprove");
     }
 
     function safeTransfer(address token, address to, uint256 value) internal {
+        require(Address.isContract(token), "safeTransfer: non-contract address");
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0xa9059cbb, to, value)); // bytes4(keccak256(bytes('transfer(address,uint256)')));
         require(success && (data.length == 0 || abi.decode(data, (bool))), "!safeTransfer");
     }
 
     function safeTransferFrom(address token, address from, address to, uint256 value) internal {
+        require(Address.isContract(token), "safeTransferFrom: non-contract address");
         (bool success, bytes memory data) = token.call(abi.encodeWithSelector(0x23b872dd, from, to, value)); // bytes4(keccak256(bytes('transferFrom(address,address,uint256)')));
         require(success && (data.length == 0 || abi.decode(data, (bool))), "!safeTransferFrom");
     }

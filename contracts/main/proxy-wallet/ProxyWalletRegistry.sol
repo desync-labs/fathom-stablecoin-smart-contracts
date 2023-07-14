@@ -11,7 +11,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     mapping(address => ProxyWallet) public proxies;
     ProxyWalletFactory internal factory;
     mapping(address => bool) public whitelisted;
-    address public bookKeeper;
+    IBookKeeper public bookKeeper;
     bool public isDecentralizedMode;
 
     event LogAddToWhitelist(address indexed user);
@@ -20,7 +20,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     event LogProxyWalletCreation(address owner, address proxyWallet);
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
@@ -30,7 +30,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     }
 
     modifier onlyOwner() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
     }
@@ -38,8 +38,11 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     function initialize(address _factory, address _bookKeeper) external initializer {
         PausableUpgradeable.__Pausable_init();
 
+        require(_factory != address(0), "ProxyWalletRegistry/zero-factory");
+        require(_bookKeeper != address(0), "ProxyWalletRegistry/zero-bookKeeper");
+
         factory = ProxyWalletFactory(_factory);
-        bookKeeper = _bookKeeper;
+        bookKeeper = IBookKeeper(_bookKeeper);
         isDecentralizedMode = false;
     }
 
