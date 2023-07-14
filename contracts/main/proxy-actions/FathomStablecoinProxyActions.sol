@@ -214,11 +214,6 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         IStablecoinAdapter(_adapter).deposit(_positionAddress, _stablecoinAmount, _data);
     }
 
-    function transfer(
-        address _collateralToken, address _to, uint256 _amount) external {
-        address(_collateralToken).safeTransfer(_to, _amount);
-    }
-
     function emergencyWithdraw(address _adapter, address _to) external {
         IGenericTokenAdapter(_adapter).emergencyWithdraw(_to);
     }

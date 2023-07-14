@@ -86,6 +86,15 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
         address(collateralToken).safeTransfer(usr, wad);
     }
 
+    function emergencyWithdraw(address _to) external nonReentrant {
+        if (live == 0) {
+            uint256 _amount = bookKeeper.collateralToken(collateralPoolId, msg.sender);
+            bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
+
+            address(collateralToken).safeTransfer(_to, _amount);
+        }
+    }
+
     function pause() external onlyOwnerOrGov {
         _pause();
     }

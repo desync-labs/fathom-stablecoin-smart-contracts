@@ -239,13 +239,18 @@ describe("ShowStopper", () => {
                 expect(await bookKeeper.collateralToken(pools.XDC, bobProxyWallet.address)).to.be.equal(
                     WeiPerWad.mul(5)
                 )
+                await collateralTokenAdapter.cage();
 
                 // emergency withdraw position #1
-                // emergencyWithdraw to AliceAddress EOA
-                await PositionHelper.emergencyWithdraw(aliceProxyWallet, collateralTokenAdapter.address, AliceAddress)
-                const WXDCAmountForAlice = await WXDC.balance(AliceAddress);
-                console.log("WXDC amount after alice's emergnecy withdraw is" + WXDCAmountForAlice);
-                //then check WXDC balance in the EOA with expect
+                await PositionHelper.emergencyWithdraw(aliceProxyWallet, AliceAddress, collateralTokenAdapter.address)
+                expect(await WXDC.balanceOf(AliceAddress)).to.be.equal(
+                    WeiPerWad.mul(5)
+                )
+                // emergency withdraw position #2
+                await PositionHelper.emergencyWithdraw(bobProxyWallet, BobAddress, collateralTokenAdapter.address)
+                expect(await WXDC.balanceOf(AliceAddress)).to.be.equal(
+                    WeiPerWad.mul(5)
+                )
             })
         })
     })
