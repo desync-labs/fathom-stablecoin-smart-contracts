@@ -406,6 +406,31 @@ const importPosition = async (proxyWallet, from, source, positionId) => {
     await proxyWallet.execute(importPositionCall, { from: from })
 }
 
+const transfer = async (proxyWallet, collateralToken, to, amount) => {
+    const transferAbi = [
+        "function transfer(address _collateralToken, address _to, uint256 _amount)"
+    ];
+    const transferIFace = new ethers.utils.Interface(transferAbi);
+    const transferCall = transferIFace.encodeFunctionData("transfer", [
+        collateralToken,
+        to,
+        amount
+    ]);
+    await proxyWallet.execute(transferCall, { from: from })
+}
+
+const emergencyWithdraw = async (proxyWallet, collateralTokenAdapter, to) => {
+    const emergencyWithdrawAbi = [
+        "function emergencyWithdraw(address _adapter, address _to)"
+    ];
+    const emergencyWithdrawIFace = new ethers.utils.Interface(emergencyWithdrawAbi);
+    const emergencyWithdrawCall = emergencyWithdrawIFace.encodeFunctionData("emergencyWithdraw", [
+        collateralTokenAdapter,
+        to,
+    ]);
+    await proxyWallet.execute(emergencyWithdrawCall, { from: from })
+}
+
 module.exports = {
     openPositionAndDraw,
     openXDCPositionAndDraw,
@@ -426,5 +451,7 @@ module.exports = {
     xdcAdapterDeposit,
     redeemLockedCollateral,
     exportPosition,
-    importPosition
+    importPosition,
+    transfer,
+    emergencyWithdraw
 }
