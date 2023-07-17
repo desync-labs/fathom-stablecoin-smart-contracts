@@ -69,9 +69,9 @@ contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, Reentr
         stablecoin.burn(msg.sender, wad);
     }
 
-    function depositRAD(address usr, uint256 ray, bytes calldata /* data */) external payable override nonReentrant whenNotPaused {
-        bookKeeper.moveStablecoin(address(this), usr, ray);
-        stablecoin.burn(msg.sender, (ray / ONE) + 1);
+    function depositRAD(address usr, uint256 rad, bytes calldata /* data */) external payable override nonReentrant whenNotPaused {
+        bookKeeper.moveStablecoin(address(this), usr, rad);
+        stablecoin.burn(msg.sender, (rad / ONE) + 1);
     }
 
     function withdraw(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {

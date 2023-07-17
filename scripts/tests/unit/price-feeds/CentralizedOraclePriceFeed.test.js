@@ -84,8 +84,8 @@ describe("CentralizedOraclePriceFeed", () => {
         context("set price life", async () => {
             it("should succeed", async () => {
                 await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad, await latest());
-                await centralizedOraclePriceFeed.setPriceLife(950);
-                expect(await centralizedOraclePriceFeed.priceLife()).to.be.equal(950);
+                await centralizedOraclePriceFeed.setPriceLife(2000);
+                expect(await centralizedOraclePriceFeed.priceLife()).to.be.equal(2000);
             })
         })
     })

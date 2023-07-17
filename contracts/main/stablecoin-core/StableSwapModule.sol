@@ -20,7 +20,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     using SafeToken for address;
 
     uint256 public constant ONE_DAY = 86400;
-    uint256 public constant MINIMUM_DAILY_SWAP_LIMIT = 1000 * 1e18;
     uint256 internal constant WAD = 10 ** 18;
 
     IBookKeeper public bookKeeper;
@@ -191,8 +190,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     }
 
     function setDecentralizedStatesStatus(bool _status) external onlyOwner {
-        isDecentralizedState = _status;
         emit LogDecentralizedStateStatus(isDecentralizedState, _status);
+        isDecentralizedState = _status;
     }
 
     function addToWhitelist(address _user) external onlyOwner {

@@ -197,7 +197,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         address _adapter = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getAdapter(_collateralPoolId);
         address _positionAddress = positions[_positionId];
         IBookKeeper(bookKeeper).adjustPosition(
-            collateralPools[_positionId],
+            _collateralPoolId,
             _positionAddress,
             _positionAddress,
             _positionAddress,

@@ -44,7 +44,6 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
 
         factory = ProxyWalletFactory(_factory);
         bookKeeper = IBookKeeper(_bookKeeper);
-        isDecentralizedMode = false;
     }
 
     function addToWhitelist(address _usr) external onlyOwner {
