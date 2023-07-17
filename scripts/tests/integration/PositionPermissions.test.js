@@ -810,12 +810,6 @@ describe("PositionPermissions", () => {
                                     fathomStablecoinBalancefinal,
                                     "Alice should receive 2 FXD from drawing 2 FXD, because Alice drew 2 times"
                                 ).to.be.equal(WeiPerWad.mul(2))
-
-                                // stake check no longer needed as it's deprecated
-                                // const alicePosition1Stake = await collateralTokenAdapter.stake(alicePositionAddress) <- oriignal
-                                // expect(alicePosition1Stake, "Stake must be correctly updated after movePosition").to.be.equal(
-                                //     WeiPerWad.mul(2)
-                                // )
                             })
                         }
                     )
@@ -2400,10 +2394,6 @@ describe("PositionPermissions", () => {
                     "debtShare should be 0 FXD, because Alice export"
                 ).to.be.equal(0)
 
-                // stake check no longer needed as it's deprecated
-                // const AliceAddressStake = await collateralTokenAdapter.stake(AliceAddress)
-                // expect(AliceAddressStake, "Stake must be correctly updated after exportPosition").to.be.equal(WeiPerWad)
-
                 //6. alice import position back
                 await PositionHelper.importPosition(aliceProxyWallet, AliceAddress, AliceAddress, 1);
                 const alicePositionAfterImport = await bookKeeper.positions(pools.XDC, AliceAddress)
@@ -2424,11 +2414,6 @@ describe("PositionPermissions", () => {
                     alicePositionWalletPositionAfterImport.debtShare,
                     "debtShare should be 1 FXD, because Alice Import"
                 ).to.be.equal(WeiPerWad)
-
-                // stake value check no longer needed since its'd eleted from collateralTokenAdapter
-                // const alicePositionStake = await collateralTokenAdapter.stake(alicePositionAddress)
-                // expect(alicePositionStake, "Stake must be correctly updated after importPosition").to.be.equal(WeiPerWad)
-
             })
         })
         context("position ceiling", async () => {

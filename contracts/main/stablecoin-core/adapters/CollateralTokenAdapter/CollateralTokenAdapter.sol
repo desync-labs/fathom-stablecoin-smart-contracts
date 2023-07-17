@@ -64,7 +64,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
     uint256 public totalShare;
 
     /// @dev deprecated but needs to be kept to minimize storage layout confusion
-    mapping(address => uint256) deprecated;
+    bytes32 deprecated;
 
     mapping(address => bool) public whiteListed;
 
