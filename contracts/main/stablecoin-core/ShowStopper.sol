@@ -232,10 +232,9 @@ contract ShowStopper is ShowStopperMath, IShowStopper, Initializable {
     */
     function redeemLockedCollateral(
         bytes32 _collateralPoolId,
-        IGenericTokenAdapter _adapter,
         address _positionAddress,
         address _collateralReceiver,
-        bytes calldata _data
+        bytes calldata /* _data */
     ) external override {
         require(live == 0, "ShowStopper/still-live");
         require(_positionAddress == msg.sender || bookKeeper.positionWhitelist(_positionAddress, msg.sender) == 1, "ShowStopper/not-allowed");

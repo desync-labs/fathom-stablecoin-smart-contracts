@@ -65,7 +65,6 @@ contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, Reentran
 
     function withdrawCollateralSurplus(
         bytes32 _collateralPoolId,
-        IGenericTokenAdapter _adapter,
         address _to,
         uint256 _amount // [wad]
     ) external onlyOwner {
