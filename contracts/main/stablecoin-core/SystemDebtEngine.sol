@@ -70,7 +70,6 @@ contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, Reentran
         uint256 _amount // [wad]
     ) external onlyOwner {
         bookKeeper.moveCollateral(_collateralPoolId, address(this), _to, _amount);
-        _adapter.onMoveCollateral(address(this), _to, _amount, abi.encode(_to));
     }
 
     function withdrawStablecoinSurplus(address _to, uint256 _value) external onlyOwner {

@@ -308,14 +308,6 @@ describe("PositionManager", () => {
                     parseEther("50")
                 ).returns()
 
-                await mockedTokenAdapter.mock.onAdjustPosition.withArgs(
-                    positionAddress,
-                    positionAddress,
-                    parseEther("1"),
-                    parseEther("50"),
-                    "0x"
-                ).returns()
-
                 await expect(
                     positionManagerAsAlice.adjustPosition(1, parseEther("1"), parseEther("50"), "0x")
                 ).to.be.revertedWith("PositionManager/price-is-not-healthy")
@@ -335,13 +327,6 @@ describe("PositionManager", () => {
                     parseEther("50")
                 ).returns()
 
-                await mockedTokenAdapter.mock.onAdjustPosition.withArgs(
-                    positionAddress,
-                    positionAddress,
-                    parseEther("1"),
-                    parseEther("50"),
-                    "0x"
-                ).returns()
 
                 await positionManagerAsAlice.adjustPosition(
                     1,
@@ -380,13 +365,6 @@ describe("PositionManager", () => {
                     parseEther("1")
                 ).returns()
 
-                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
-                    positionAddress,
-                    BobAddress,
-                    parseEther("1"),
-                    "0x"
-                ).returns()
-
                 await expect(
                     positionManagerAsAlice["moveCollateral(uint256,address,uint256,bytes)"](
                         1,
@@ -407,13 +385,6 @@ describe("PositionManager", () => {
                     positionAddress,
                     BobAddress,
                     parseEther("1")
-                ).returns()
-
-                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
-                    positionAddress,
-                    BobAddress,
-                    parseEther("1"),
-                    "0x"
                 ).returns()
 
                 await positionManagerAsAlice["moveCollateral(uint256,address,uint256,bytes)"](
@@ -455,13 +426,6 @@ describe("PositionManager", () => {
                     parseEther("1")
                 ).returns()
 
-                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
-                    positionAddress,
-                    BobAddress,
-                    parseEther("1"),
-                    "0x"
-                ).returns()
-
                 await expect(
                     positionManagerAsAlice["moveCollateral(bytes32,uint256,address,uint256,bytes)"](
                         formatBytes32String("WXDC"),
@@ -483,13 +447,6 @@ describe("PositionManager", () => {
                     positionAddress,
                     BobAddress,
                     parseEther("1")
-                ).returns()
-
-                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
-                    positionAddress,
-                    BobAddress,
-                    parseEther("1"),
-                    "0x"
                 ).returns()
 
                 await positionManagerAsAlice["moveCollateral(bytes32,uint256,address,uint256,bytes)"](
@@ -548,12 +505,6 @@ describe("PositionManager", () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 const positionAddress = await positionManager.positions(1)
 
-                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
-                    positionAddress,
-                    AliceAddress,
-                    WeiPerWad.mul(2),
-                    []
-                ).returns()
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
                     positionAddress
@@ -577,12 +528,6 @@ describe("PositionManager", () => {
                 // Alice allows Bob to manage her position#1
                 await positionManagerAsAlice.allowManagePosition(1, BobAddress, 1)
 
-                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
-                    positionAddress,
-                    BobAddress,
-                    WeiPerWad.mul(2),
-                    []
-                ).returns()
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
                     positionAddress
@@ -620,12 +565,7 @@ describe("PositionManager", () => {
             it("should be able to call importPosition()", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 const positionAddress = await positionManager.positions(1)
-                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
-                    AliceAddress,
-                    positionAddress,
-                    WeiPerWad.mul(2),
-                    []
-                ).returns()
+
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
                     AliceAddress
@@ -651,12 +591,6 @@ describe("PositionManager", () => {
                 // Alice gives Bob migration access on her address
                 await positionManagerAsAlice.allowMigratePosition(BobAddress, 1)
 
-                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
-                    BobAddress,
-                    positionAddress,
-                    WeiPerWad.mul(2),
-                    []
-                ).returns()
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
                     BobAddress
@@ -708,12 +642,6 @@ describe("PositionManager", () => {
                 const position1Address = await positionManager.positions(1)
                 const position2Address = await positionManager.positions(2)
 
-                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
-                    position1Address,
-                    position2Address,
-                    WeiPerWad.mul(2),
-                    []
-                ).returns()
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
                     position1Address
@@ -741,12 +669,7 @@ describe("PositionManager", () => {
                     formatBytes32String("WXDC"),
                     position1Address
                 ).returns(WeiPerWad.mul(2), WeiPerWad.mul(1))
-                await mockedTokenAdapter.mock.onMoveCollateral.withArgs(
-                    position1Address,
-                    position2Address,
-                    WeiPerWad.mul(2),
-                    []
-                ).returns()
+
                 await mockedBookKeeper.mock.movePosition.withArgs(
                     formatBytes32String("WXDC"),
                     position1Address,

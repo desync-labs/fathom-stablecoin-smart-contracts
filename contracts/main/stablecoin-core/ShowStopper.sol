@@ -250,7 +250,6 @@ contract ShowStopper is ShowStopperMath, IShowStopper, Initializable {
             -int256(_lockedCollateralAmount),
             0
         );
-        _adapter.onMoveCollateral(_positionAddress, _collateralReceiver, _lockedCollateralAmount, _data);
         emit LogRedeemLockedCollateral(_collateralPoolId, _collateralReceiver, _lockedCollateralAmount);
     }
 }
