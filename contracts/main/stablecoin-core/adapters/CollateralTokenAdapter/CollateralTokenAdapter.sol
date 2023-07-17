@@ -228,6 +228,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
     /// @param _amount The amount to be withdrawn
     function _withdraw(address _usr, uint256 _amount) private {
         if (_amount > 0) {
+            require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _amount, "CollateralTokenAdapter/insufficient collateral amount");
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
             totalShare -= _amount;
 
