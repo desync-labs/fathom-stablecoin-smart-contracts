@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-
 import "../interfaces/IFathomOracle.sol";
 import "../interfaces/IAccessControlConfig.sol";
 import "./DelayPriceFeedBase.sol";
@@ -13,8 +11,6 @@ contract DelayFathomOraclePriceFeed is DelayPriceFeedBase {
     IFathomOracle public fathomOracle;
 
     function initialize(address _fathomOracle, address _token0, address _token1, address _accessControlConfig, bytes32 _poolId) external initializer {
-        PausableUpgradeable.__Pausable_init();
-
         require(_accessControlConfig != address(0), "DelayFathomOraclePriceFeed/zero-access-control");
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
 
