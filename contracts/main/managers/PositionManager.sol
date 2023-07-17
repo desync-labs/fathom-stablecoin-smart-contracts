@@ -204,8 +204,6 @@ contract PositionManager is PausableUpgradeable, IManager {
             _collateralValue,
             _debtShare
         );
-        IGenericTokenAdapter(_adapter).onAdjustPosition(_positionAddress, _positionAddress, _collateralValue, _debtShare, _data);
-
         ISetPrice(priceOracle).setPrice(_collateralPoolId);
     }
 
@@ -226,7 +224,6 @@ contract PositionManager is PausableUpgradeable, IManager {
         address _adapter = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getAdapter(_collateralPoolId);
 
         IBookKeeper(bookKeeper).moveCollateral(collateralPools[_positionId], positions[_positionId], _destination, _wad);
-        IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
     }
 
     /// @dev Transfer wad amount of any type of collateral (collateralPoolId) from the positionHandler address to the destination address
@@ -248,7 +245,6 @@ contract PositionManager is PausableUpgradeable, IManager {
         address _adapter = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getAdapter(_collateralPoolId);
 
         IBookKeeper(bookKeeper).moveCollateral(_collateralPoolId, positions[_positionId], _destination, _wad);
-        IGenericTokenAdapter(_adapter).onMoveCollateral(positions[_positionId], _destination, _wad, _data);
     }
 
     /// @dev Transfer rad amount of stablecoin from the positionHandler address to the destination address
@@ -277,7 +273,6 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_positionId]));
-        _tokenAdapter.onMoveCollateral(positions[_positionId], _destination, _lockedCollateral, abi.encode());
         emit LogExportPosition(_positionId, positions[_positionId], _destination, _lockedCollateral, _debtShare);
     }
 
@@ -300,7 +295,6 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_positionId]));
-        _tokenAdapter.onMoveCollateral(_source, positions[_positionId], _lockedCollateral, abi.encode());
         emit LogImportPosition(_positionId, _source, positions[_positionId], _lockedCollateral, _debtShare);
     }
 
@@ -323,7 +317,6 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig());
         IGenericTokenAdapter _tokenAdapter = IGenericTokenAdapter(_collateralPoolConfig.getAdapter(collateralPools[_sourceId]));
-        _tokenAdapter.onMoveCollateral(positions[_sourceId], positions[_destinationId], _lockedCollateral, abi.encode());
         emit LogMovePosition(_sourceId, _destinationId, _lockedCollateral, _debtShare);
     }
 

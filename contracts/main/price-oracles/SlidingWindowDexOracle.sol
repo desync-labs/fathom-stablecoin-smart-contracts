@@ -4,8 +4,8 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./lib/FathomSwapLibrary.sol";
-import "./lib/IFathomSwapPair.sol";
-import "./lib/IFathomSwapFactory.sol";
+import "../apis/interfaces/IFathomSwapPair.sol";
+import "../apis/interfaces/IFathomSwapFactory.sol";
 import "../interfaces/IFathomDEXOracle.sol";
 import "../interfaces/IToken.sol";
 

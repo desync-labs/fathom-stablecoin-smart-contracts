@@ -239,6 +239,18 @@ describe("ShowStopper", () => {
                 expect(await bookKeeper.collateralToken(pools.XDC, bobProxyWallet.address)).to.be.equal(
                     WeiPerWad.mul(5)
                 )
+                await collateralTokenAdapter.cage();
+
+                // emergency withdraw position #1
+                await PositionHelper.emergencyWithdraw(aliceProxyWallet, AliceAddress, collateralTokenAdapter.address)
+                expect(await WXDC.balanceOf(AliceAddress)).to.be.equal(
+                    WeiPerWad.mul(5)
+                )
+                // emergency withdraw position #2
+                await PositionHelper.emergencyWithdraw(bobProxyWallet, BobAddress, collateralTokenAdapter.address)
+                expect(await WXDC.balanceOf(AliceAddress)).to.be.equal(
+                    WeiPerWad.mul(5)
+                )
             })
         })
     })

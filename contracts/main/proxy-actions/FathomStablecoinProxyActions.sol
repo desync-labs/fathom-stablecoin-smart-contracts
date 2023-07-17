@@ -214,6 +214,10 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         IStablecoinAdapter(_adapter).deposit(_positionAddress, _stablecoinAmount, _data);
     }
 
+    function emergencyWithdraw(address _adapter, address _to) external {
+        IGenericTokenAdapter(_adapter).emergencyWithdraw(_to);
+    }
+
     function xdcAdapterDeposit(address _adapter, address _positionAddress, bytes calldata _data) public payable {
         //##back to Vanilla - Adapter now needs to have collateralToken state variable added
         address _collateralToken = address(IGenericTokenAdapter(_adapter).collateralToken());

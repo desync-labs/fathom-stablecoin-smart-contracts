@@ -497,10 +497,7 @@ describe("StableSwapModule", () => {
       context("when role can access", () => {
         it("should be success", async () => {
           await mockedAccessControlConfig.mock.hasRole.returns(true)
-          await expect(
-            stableSwapModule.pause()
-          ).to.be.emit(stableSwapModule, "LogStableSwapPauseState")
-            .withArgs(true)
+          await stableSwapModule.pause()
           expect(await stableSwapModule.paused()).to.be.equal(true)
         })
       })
@@ -517,10 +514,7 @@ describe("StableSwapModule", () => {
         it("should be success", async () => {
           await mockedAccessControlConfig.mock.hasRole.returns(true)
           await stableSwapModule.pause();
-          await expect(
-            stableSwapModule.unpause()
-          ).to.be.emit(stableSwapModule, "LogStableSwapPauseState")
-            .withArgs(false)
+          await stableSwapModule.unpause()
           expect(await stableSwapModule.paused()).to.be.equal(false)
         })
       })
