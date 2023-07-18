@@ -181,7 +181,7 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
         address _positionAddress,
         uint256 _amount,
         bytes calldata _data
-    ) external payable override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
+    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
         _deposit(_positionAddress, _amount, _data);
     }
 
