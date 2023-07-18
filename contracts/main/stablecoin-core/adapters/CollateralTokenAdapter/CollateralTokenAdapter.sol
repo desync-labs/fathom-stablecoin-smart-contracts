@@ -57,14 +57,16 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
     bytes32 public override collateralPoolId;
 
     IVault public vault;
-    IManager public positionManager;
+    
+    /// @dev deprecated but needs to be kept to minimize storage layout confusion
+    bytes32 internal deprecated2;
     IProxyRegistry public proxyWalletFactory;
 
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
 
     /// @dev deprecated but needs to be kept to minimize storage layout confusion
-    bytes32 deprecated;
+    bytes32 internal deprecated;
 
     mapping(address => bool) public whiteListed;
 
@@ -103,7 +105,6 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         address _bookKeeper,
         bytes32 _collateralPoolId,
         address _collateralToken,
-        address _positionManager,
         address _proxyWalletFactory
     ) external initializer {
         // 1. Initialized all dependencies
@@ -113,7 +114,6 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         require(_bookKeeper != address(0), "CollateralTokenAdapter/zero-book-keeper");
         require(_collateralPoolId != bytes32(0), "CollateralTokenAdapter/zero-collateral-pool-id");
         require(_collateralToken != address(0), "CollateralTokenAdapter/zero-collateral-token");
-        require(_positionManager != address(0), "CollateralTokenAdapter/zero-position-manager");
         require(_proxyWalletFactory != address(0), "CollateralTokenAdapter/zero-proxy-wallet-factory");
 
         live = 1;
@@ -121,7 +121,6 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         collateralPoolId = _collateralPoolId;
         collateralToken = _collateralToken;
         bookKeeper = IBookKeeper(_bookKeeper);
-        positionManager = IManager(_positionManager);
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
     }
 
