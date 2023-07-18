@@ -46,19 +46,6 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         IBookKeeper(_bookKeeper).blacklist(_usr);
     }
 
-    function transferOwnershipToProxy(address _proxyRegistry, address _manager, uint256 _positionId, address _dst) external {
-        address _proxy = IProxyRegistry(_proxyRegistry).proxies(_dst);
-        if (_proxy == address(0) || IProxy(_proxy).owner() != _dst) {
-            uint256 _codeSize;
-            assembly {
-                _codeSize := extcodesize(_dst)
-            }
-            require(_codeSize == 0, "Dst-is-a-contract"); // We want to avoid creating a proxy for a contract address that might not be able to handle proxies, then losing the CDP
-            _proxy = IProxyRegistry(_proxyRegistry).build(_dst); // Creates the proxy for the dst address
-        }
-        transferOwnership(_manager, _positionId, _proxy);
-    }
-
     function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok) external {
         IManager(_manager).allowManagePosition(_positionId, _user, _ok);
     }
