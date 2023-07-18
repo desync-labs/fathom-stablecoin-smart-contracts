@@ -32,7 +32,6 @@ module.exports = async function (deployer) {
             bookKeeper.address,
             poolId,
             config.tokenAddress,
-            positionManager.address,
             proxyWalletFactory.address
         ),
         delayFathomOraclePriceFeed.initialize(

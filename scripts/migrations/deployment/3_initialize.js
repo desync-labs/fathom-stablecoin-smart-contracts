@@ -120,10 +120,8 @@ module.exports = async function (deployer) {
             bookKeeper.address,
             pools.XDC,
             addresses.WXDC,
-            positionManager.address,
             proxyWalletFactory.address
         ),
-
         delayFathomOraclePriceFeed.initialize(
             dexPriceOracle.address,
             addresses.WXDC,

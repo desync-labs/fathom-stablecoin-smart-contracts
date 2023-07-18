@@ -38,15 +38,22 @@ contract FathomStablecoinProxyActionsMath {
 contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
     using SafeToken for address;
 
-    function whitelist(address _bookKeeper, address _usr) external {
+    address immutable internal self = address(this);
+
+    modifier onlyDelegateCall() {
+        require(address(this) != self);
+        _;
+    }
+
+    function whitelist(address _bookKeeper, address _usr) external onlyDelegateCall {
         IBookKeeper(_bookKeeper).whitelist(_usr);
     }
 
-    function blacklist(address _bookKeeper, address _usr) external {
+    function blacklist(address _bookKeeper, address _usr) external onlyDelegateCall {
         IBookKeeper(_bookKeeper).blacklist(_usr);
     }
 
-    function transferOwnershipToProxy(address _proxyRegistry, address _manager, uint256 _positionId, address _dst) external {
+    function transferOwnershipToProxy(address _proxyRegistry, address _manager, uint256 _positionId, address _dst) external onlyDelegateCall {
         address _proxy = IProxyRegistry(_proxyRegistry).proxies(_dst);
         if (_proxy == address(0) || IProxy(_proxy).owner() != _dst) {
             uint256 _codeSize;
@@ -59,27 +66,27 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         transferOwnership(_manager, _positionId, _proxy);
     }
 
-    function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok) external {
+    function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok) external onlyDelegateCall {
         IManager(_manager).allowManagePosition(_positionId, _user, _ok);
     }
 
-    function allowMigratePosition(address _manager, address _user, uint256 _ok) external {
+    function allowMigratePosition(address _manager, address _user, uint256 _ok) external onlyDelegateCall {
         IManager(_manager).allowMigratePosition(_user, _ok);
     }
 
-    function exportPosition(address _manager, uint256 _positionId, address _destination) external {
+    function exportPosition(address _manager, uint256 _positionId, address _destination) external onlyDelegateCall {
         IManager(_manager).exportPosition(_positionId, _destination);
     }
 
-    function importPosition(address _manager, address _source, uint256 _positionId) external {
+    function importPosition(address _manager, address _source, uint256 _positionId) external onlyDelegateCall {
         IManager(_manager).importPosition(_source, _positionId);
     }
 
-    function movePosition(address _manager, uint256 _source, uint256 _destination) external {
+    function movePosition(address _manager, uint256 _source, uint256 _destination) external onlyDelegateCall {
         IManager(_manager).movePosition(_source, _destination);
     }
 
-    function safeLockXDC(address _manager, address _xdcAdapter, uint256 _positionId, address _owner, bytes calldata _data) external payable {
+    function safeLockXDC(address _manager, address _xdcAdapter, uint256 _positionId, address _owner, bytes calldata _data) external payable onlyDelegateCall {
         require(IManager(_manager).owners(_positionId) == _owner, "!owner");
         lockXDC(_manager, _xdcAdapter, _positionId, _data);
     }
@@ -91,7 +98,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _positionId,
         uint256 _amount, // [wad]
         bytes calldata _data
-    ) external {
+    ) external onlyDelegateCall {
         address _positionAddress = IManager(_manager).positions(_positionId);
         address _bookKeeper = IManager(_manager).bookKeeper();
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
@@ -125,7 +132,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         bytes32 _collateralPoolId,
         uint256 _stablecoinAmount, // [wad]
         bytes calldata _data
-    ) external payable returns (uint256 _positionId) {
+    ) external payable onlyDelegateCall returns (uint256 _positionId) {
         _positionId = open(_manager, _collateralPoolId, address(this));
         lockXDCAndDraw(_manager, _stabilityFeeCollector, _xdcAdapter, _stablecoinAdapter, _positionId, _stablecoinAmount, _data);
     }
@@ -138,7 +145,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _collateralAmount, // [wad]
         uint256 _stablecoinAmount, // [wad]
         bytes calldata _data
-    ) external {
+    ) external onlyDelegateCall {
         address _positionAddress = IManager(_manager).positions(_positionId);
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
         stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _stablecoinAmount, _data); // Deposits Fathom Stablecoin amount into the bookKeeper
@@ -168,7 +175,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _positionId,
         uint256 _collateralAmount, // [wad]
         bytes calldata _data
-    ) external {
+    ) external onlyDelegateCall {
         address _bookKeeper = IManager(_manager).bookKeeper();
         address _positionAddress = IManager(_manager).positions(_positionId);
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
@@ -189,8 +196,12 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         emit LogPaidAmount(_positionAddress, _requiredStablecoinAmount);
     }
 
-    function redeemLockedCollateral(address _manager, uint256 _positionId, bytes calldata _data) external {
+    function redeemLockedCollateral(address _manager, uint256 _positionId, bytes calldata _data) external onlyDelegateCall {
         IManager(_manager).redeemLockedCollateral(_positionId, address(this), _data);
+    }
+
+    function emergencyWithdraw(address _adapter, address _to) external onlyDelegateCall {
+        IGenericTokenAdapter(_adapter).emergencyWithdraw(_to);
     }
 
     /// @param _adapter The address of stablecoin adapter
@@ -202,7 +213,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         address _positionAddress,
         uint256 _stablecoinAmount, // [wad]
         bytes calldata _data
-    ) public {
+    ) public onlyDelegateCall {
         require(_positionAddress != address(0), "CollateralPoolConfig/zero-position-address");
         address _stablecoin = address(IStablecoinAdapter(_adapter).stablecoin());
         // Gets Fathom Stablecoin from the user's wallet
@@ -214,11 +225,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         IStablecoinAdapter(_adapter).deposit(_positionAddress, _stablecoinAmount, _data);
     }
 
-    function emergencyWithdraw(address _adapter, address _to) external {
-        IGenericTokenAdapter(_adapter).emergencyWithdraw(_to);
-    }
-
-    function xdcAdapterDeposit(address _adapter, address _positionAddress, bytes calldata _data) public payable {
+    function xdcAdapterDeposit(address _adapter, address _positionAddress, bytes calldata _data) public payable onlyDelegateCall {
         //##back to Vanilla - Adapter now needs to have collateralToken state variable added
         address _collateralToken = address(IGenericTokenAdapter(_adapter).collateralToken());
         // Wraps XDC into WXDC
@@ -235,7 +242,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _amount, // [wad]
         bool _transferFrom,
         bytes calldata _data
-    ) public {
+    ) public onlyDelegateCall {
         require(_positionAddress != address(0), "CollateralPoolConfig/zero-position-address");
         address _collateralToken = address(IGenericTokenAdapter(_adapter).collateralToken());
 
@@ -250,15 +257,15 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         IGenericTokenAdapter(_adapter).deposit(_positionAddress, _amount, _data);
     }
 
-    function transfer(address _collateralToken, address _dst, uint256 _amt) public {
+    function transfer(address _collateralToken, address _dst, uint256 _amt) public onlyDelegateCall {
         address(_collateralToken).safeTransfer(_dst, _amt);
     }
 
-    function open(address _manager, bytes32 _collateralPoolId, address _usr) public returns (uint256 _positionId) {
+    function open(address _manager, bytes32 _collateralPoolId, address _usr) public onlyDelegateCall returns (uint256 _positionId) {
         _positionId = IManager(_manager).open(_collateralPoolId, _usr);
     }
 
-    function transferOwnership(address _manager, uint256 _positionId, address _usr) public {
+    function transferOwnership(address _manager, uint256 _positionId, address _usr) public onlyDelegateCall {
         IManager(_manager).give(_positionId, _usr);
     }
 
@@ -268,7 +275,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         int256 _collateralValue,
         int256 _debtShare, // [wad]
         bytes calldata _data
-    ) public {
+    ) public onlyDelegateCall {
         IManager(_manager).adjustPosition(_positionId, _collateralValue, _debtShare, _data);
     }
 
@@ -278,7 +285,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         address _dst,
         uint256 _collateralAmount,
         bytes calldata _data
-    ) public {
+    ) public onlyDelegateCall {
         IManager(_manager).moveCollateral(_positionId, _dst, _collateralAmount, _data);
     }
 
@@ -287,11 +294,11 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _positionId,
         address _dst,
         uint256 _stablecoinValue // [rad]
-    ) public {
+    ) public onlyDelegateCall {
         IManager(_manager).moveStablecoin(_positionId, _dst, _stablecoinValue);
     }
 
-    function lockXDC(address _manager, address _xdcAdapter, uint256 _positionId, bytes calldata _data) public payable {
+    function lockXDC(address _manager, address _xdcAdapter, uint256 _positionId, bytes calldata _data) public payable onlyDelegateCall {
         address _positionAddress = IManager(_manager).positions(_positionId);
         xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data);
         adjustPosition(_manager, _positionId, int256(msg.value), 0, _data); // Locks XDC amount into the CDP
@@ -305,7 +312,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _positionId,
         uint256 _stablecoinAmount, // [wad]
         bytes calldata _data
-    ) public payable {
+    ) public payable onlyDelegateCall {
         address _positionAddress = IManager(_manager).positions(_positionId);
         address _bookKeeper = IManager(_manager).bookKeeper();
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
@@ -341,7 +348,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _stablecoinAmount, // [wad]
         bool _transferFrom,
         bytes calldata _data
-    ) public {
+    ) public onlyDelegateCall {
         bytes32 _collateralPoolId = _manager.collateralPools(_positionId);
         // Takes token amount from user's wallet and joins into the bookKeeper
         tokenAdapterDeposit(_tokenAdapter, _manager.positions(_positionId), _collateralAmount, _transferFrom, _data);
@@ -380,7 +387,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _stablecoinAmount, // [wad]
         bool _transferFrom,
         bytes calldata _data
-    ) public returns (uint256 _positionId) {
+    ) public onlyDelegateCall returns (uint256 _positionId) {
         _positionId = open(_manager, _collateralPoolId, address(this));
         lockTokenAndDraw(
             IManager(_manager),
@@ -403,7 +410,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _collateralAmount, // [in token decimal]
         uint256 _stablecoinAmount, // [wad]
         bytes calldata _data
-    ) public {
+    ) public onlyDelegateCall {
         address _positionAddress = IManager(_manager).positions(_positionId);
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
         // Deposits Fathom Stablecoin amount into the bookKeeper
@@ -433,7 +440,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _positionId,
         uint256 _collateralAmount, // [token decimal]
         bytes calldata _data
-    ) public {
+    ) public onlyDelegateCall {
         address _positionAddress = IManager(_manager).positions(_positionId);
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
         (, uint256 _debtShare) = IBookKeeper(IManager(_manager).bookKeeper()).positions(_collateralPoolId, _positionAddress);
