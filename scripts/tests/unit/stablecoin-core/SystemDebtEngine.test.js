@@ -309,7 +309,6 @@ describe("SystemDebtEngine", () => {
         await expect(
           systemDebtEngineAsAlice.withdrawCollateralSurplus(
             formatBytes32String("WXDC"),
-            mockedCollateralTokenAdapter.address,
             DeployerAddress,
             UnitHelpers.WeiPerWad
           )
@@ -329,7 +328,6 @@ describe("SystemDebtEngine", () => {
 
         await systemDebtEngine.withdrawCollateralSurplus(
           formatBytes32String("WXDC"),
-          mockedCollateralTokenAdapter.address,
           DeployerAddress,
           UnitHelpers.WeiPerWad
         )
