@@ -82,7 +82,6 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
     }
 
     function setStableCoinReferencePrice(uint256 _referencePrice) external onlyOwner isLive {
-        require(_referencePrice > 0, "PriceOracle/zero-reference-price");
         require(_referencePrice > MIN_REFERENCE_PRICE && _referencePrice < MAX_REFERENCE_PRICE, "PriceOracle/invalid-reference-price");
         stableCoinReferencePrice = _referencePrice;
         emit LogSetStableCoinReferencePrice(msg.sender, _referencePrice);

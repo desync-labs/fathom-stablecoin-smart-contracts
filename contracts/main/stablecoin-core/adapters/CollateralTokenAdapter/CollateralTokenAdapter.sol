@@ -31,15 +31,15 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
 
-    /// @dev Mapping of user(positionAddress) => collteralTokens that he is staking
-    mapping(address => uint256) public stake;
+    /// @dev deprecated but needs to be kept to minimize storage layout confusion
+    bytes32 deprecated;
 
     mapping(address => bool) public whiteListed;
 
     event LogDeposit(uint256 _val);
     event LogWithdraw(uint256 _val);
+    event LogWhitelisted(address indexed user, bool isWhitelisted);
     event LogEmergencyWithdraw(address indexed _caller, address _to);
-    event LogMoveStake(address indexed _src, address indexed _dst, uint256 _wad);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -97,10 +97,13 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
         require(toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
         whiteListed[toBeWhitelisted] = true;
+        emit LogWhitelisted(toBeWhitelisted, true);
     }
 
     function blacklist(address toBeRemoved) external onlyOwnerOrGov {
         whiteListed[toBeRemoved] = false;
+        emit LogWhitelisted(toBeRemoved, false);
+
     }
 
     function cage() external override nonReentrant onlyOwner {
@@ -139,7 +142,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         address _positionAddress,
         uint256 _amount,
         bytes calldata _data
-    ) external payable override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
+    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
         _deposit(_positionAddress, _amount, _data);
     }
 
@@ -154,44 +157,13 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         _withdraw(_usr, _amount);
     }
 
-    function moveStake(
-        address _source,
-        address _destination,
-        uint256 _share,
-        bytes calldata _data
-    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
-        _moveStake(_source, _destination, _share, _data);
-    }
-
-    function onAdjustPosition(
-        address _source,
-        address _destination,
-        int256 _collateralValue,
-        int256 /* debtShare */,
-        bytes calldata _data
-    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
-        require(_collateralValue > -2 ** 255, "CollateralTokenAdapter/tooSmallCollateralValue");
-        uint256 _unsignedCollateralValue = _collateralValue < 0 ? uint256(-_collateralValue) : uint256(_collateralValue);
-        _moveStake(_source, _destination, _unsignedCollateralValue, _data);
-    }
-
-    function onMoveCollateral(
-        address _source,
-        address _destination,
-        uint256 _share,
-        bytes calldata _data
-    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
-        _moveStake(_source, _destination, _share, _data);
-    }
-
     /// @dev EMERGENCY WHEN COLLATERAL TOKEN ADAPTER CAGED ONLY. Withdraw COLLATERAL from VAULT A after redeemStablecoin
     function emergencyWithdraw(address _to) external nonReentrant {
         if (live == 0) {
             uint256 _amount = bookKeeper.collateralToken(collateralPoolId, msg.sender);
             require(_amount < 2 ** 255, "CollateralTokenAdapter/collateral-overflow");
             //deduct totalShare
-            uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
-            totalShare -= _share;
+            totalShare -= _amount;
 
             //deduct emergency withdrawl amount of FXD
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
@@ -203,17 +175,6 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         }
     }
 
-    /// @dev Ignore collateralTokens that have been directly transferred
-    function netAssetValuation() public view returns (uint256) {
-        return totalShare;
-    }
-
-    /// @dev Return Net Assets per Share in wad
-    function netAssetPerShare() public view returns (uint256) {
-        if (totalShare == 0) return WAD;
-        else return wdiv(netAssetValuation(), totalShare);
-    }
-
     /// @dev Lock XDC in the vault
     /// deposit collateral tokens to staking contract, and update BookKeeper
     /// @param _positionAddress The position address to be updated
@@ -222,16 +183,13 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         require(live == 1, "CollateralTokenAdapter/not-live");
 
         if (_amount > 0) {
-            uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
-            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
             //transfer WXDC from proxyWallet to adapter
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
             //bookKeeping
-            bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
-            totalShare += _share;
-            stake[_positionAddress] +=_share;
+            bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_amount));
+            totalShare += _amount;
 
             // safeApprove to Vault
             address(collateralToken).safeApprove(address(vault), _amount);
@@ -246,15 +204,9 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @param _amount The amount to be withdrawn
     function _withdraw(address _usr, uint256 _amount) private {
         if (_amount > 0) {
-            uint256 _share = wdivup(_amount, netAssetPerShare()); // [wad]
-            // Overflow check for int256(wad) cast below
-            // Also enforces a non-zero wad
-            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
-            require(stake[msg.sender] >= _share, "CollateralTokenAdapter/insufficient staked amount");
-
-            bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
-            totalShare -= _share;
-            stake[msg.sender] -= _share;
+            require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _amount, "CollateralTokenAdapter/insufficient collateral amount");
+            bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
+            totalShare -= _amount;
 
             //withdraw WXDC from Vault
             vault.withdraw(_amount);
@@ -262,26 +214,5 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
             address(collateralToken).safeTransfer(_usr, _amount);
         }
         emit LogWithdraw(_amount);
-    }
-
-    /// @dev Move wad amount of staked balance from source to destination. Can only be moved if underlaying assets make sense.
-    function _moveStake(address _source, address _destination, uint256 _share, bytes calldata /* data */) private onlyCollateralManager {
-        // 1. Update collateral tokens for source and destination
-        require(stake[_source] != 0, "CollateralTokenAdapter/SourceNoStakeValue");
-        uint256 _stakedAmount = stake[_source];
-        stake[_source] = _stakedAmount - _share;
-        stake[_destination] += _share;
-
-        (uint256 _lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _source);
-        require(
-            stake[_source] >= bookKeeper.collateralToken(collateralPoolId, _source) + _lockedCollateral,
-            "CollateralTokenAdapter/stake[source] < collateralTokens + lockedCollateral"
-        );
-        (_lockedCollateral, ) = bookKeeper.positions(collateralPoolId, _destination);
-        require(
-            stake[_destination] <= bookKeeper.collateralToken(collateralPoolId, _destination) + _lockedCollateral,
-            "CollateralTokenAdapter/stake[destination] > collateralTokens + lockedCollateral"
-        );
-        emit LogMoveStake(_source, _destination, _share);
     }
 }

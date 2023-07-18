@@ -40,7 +40,7 @@ const setup = async () => {
 
     const gldAddr = await collateralTokenAdapter2.collateralToken();
     const GLD = await artifacts.initializeInterfaceAt("ERC20Mintable", gldAddr);
-    
+
     await GLD.mint(AliceAddress, WeiPerWad.mul(1000), { gasLimit: 1000000 })
     await GLD.approve(aliceProxyWallet.address, WeiPerWad.mul(1000),  { from: AliceAddress, gasLimit: 1000000 })
     await GLD.mint(BobAddress, WeiPerWad.mul(1000), { gasLimit: 1000000 })
@@ -54,8 +54,6 @@ const setup = async () => {
     await TimeHelpers.increase(TimeHelpers.duration.seconds(BigNumber.from("900")))
     await priceOracle.setPrice(pools.GLD, { gasLimit: 1000000})
     await priceOracle.setPrice(pools.XDC);
-
-    console.log(pools.XDC)
 
     return {
         bookKeeper,
@@ -812,10 +810,6 @@ describe("PositionPermissions", () => {
                                     fathomStablecoinBalancefinal,
                                     "Alice should receive 2 FXD from drawing 2 FXD, because Alice drew 2 times"
                                 ).to.be.equal(WeiPerWad.mul(2))
-                                const alicePosition1Stake = await collateralTokenAdapter.stake(alicePositionAddress)
-                                expect(alicePosition1Stake, "Stake must be correctly updated after movePosition").to.be.equal(
-                                    WeiPerWad.mul(2)
-                                )
                             })
                         }
                     )
@@ -2399,8 +2393,6 @@ describe("PositionPermissions", () => {
                     alicePositionWalletPositionAfterExport.debtShare,
                     "debtShare should be 0 FXD, because Alice export"
                 ).to.be.equal(0)
-                const AliceAddressStake = await collateralTokenAdapter.stake(AliceAddress)
-                expect(AliceAddressStake, "Stake must be correctly updated after exportPosition").to.be.equal(WeiPerWad)
 
                 //6. alice import position back
                 await PositionHelper.importPosition(aliceProxyWallet, AliceAddress, AliceAddress, 1);
@@ -2422,9 +2414,6 @@ describe("PositionPermissions", () => {
                     alicePositionWalletPositionAfterImport.debtShare,
                     "debtShare should be 1 FXD, because Alice Import"
                 ).to.be.equal(WeiPerWad)
-                const alicePositionStake = await collateralTokenAdapter.stake(alicePositionAddress)
-                expect(alicePositionStake, "Stake must be correctly updated after importPosition").to.be.equal(WeiPerWad)
-
             })
         })
         context("position ceiling", async () => {

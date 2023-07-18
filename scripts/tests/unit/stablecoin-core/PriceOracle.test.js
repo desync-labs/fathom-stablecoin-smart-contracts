@@ -167,13 +167,6 @@ describe("PriceOracle", () => {
           await expect(priceOracle.setStableCoinReferencePrice(10 ** 10)).to.be.revertedWith("PriceOracle/not-live")
         })
       })
-      context("new price is 0", () => {
-        it("should revert", async () => {
-          await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-          await expect(priceOracle.setStableCoinReferencePrice(0)).to.be.revertedWith("PriceOracle/zero-reference-price")
-        })
-      })
       context("new price is lower than min", () => {
         it("should revert", async () => {
           await mockedAccessControlConfig.mock.hasRole.returns(true)

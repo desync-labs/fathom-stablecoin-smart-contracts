@@ -200,6 +200,10 @@ contract FathomStablecoinProxyActions is CommonMath {
         IStablecoinAdapter(_adapter).deposit(_positionAddress, _stablecoinAmount, _data);
     }
 
+    function emergencyWithdraw(address _adapter, address _to) external {
+        IGenericTokenAdapter(_adapter).emergencyWithdraw(_to);
+    }
+
     function xdcAdapterDeposit(address _adapter, address _positionAddress, bytes calldata _data) public payable {
         //##back to Vanilla - Adapter now needs to have collateralToken state variable added
         address _collateralToken = address(IGenericTokenAdapter(_adapter).collateralToken());
@@ -396,7 +400,7 @@ contract FathomStablecoinProxyActions is CommonMath {
             IManager(_manager).bookKeeper(),
             IBookKeeper(IManager(_manager).bookKeeper()).stablecoin(_positionAddress),
             _positionAddress,
-            IManager(_manager).collateralPools(_positionId)
+            _collateralPoolId
         );
         adjustPosition(_manager, _positionId, -int256(_collateralAmountInWad), _wipeDebtShare, _data);
         if (_collateralAmount > 0) {

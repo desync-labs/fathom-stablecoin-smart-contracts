@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
+import "../interfaces/IPausable.sol";
 import "./ProxyWallet.sol";
 import "./ProxyWalletFactory.sol";
 
@@ -43,7 +44,6 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
 
         factory = ProxyWalletFactory(_factory);
         bookKeeper = IBookKeeper(_bookKeeper);
-        isDecentralizedMode = false;
     }
 
     function addToWhitelist(address _usr) external onlyOwner {
@@ -77,7 +77,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
         _proxy = build(msg.sender);
     }
 
-    function setOwner(address _newOwner) external {
+    function setOwner(address _newOwner) external whenNotPaused {
         require(proxies[_newOwner] == ProxyWallet(payable(address(0))));
         ProxyWallet _proxy = proxies[msg.sender];
         require(_proxy.owner() == _newOwner);
@@ -86,7 +86,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     }
 
     /// @dev Deploys a new proxy instance and sets custom owner of proxy
-    function build(address _owner) public returns (address payable _proxy) {
+    function build(address _owner) public whenNotPaused returns (address payable _proxy) {
         require(whitelisted[_owner] || isDecentralizedMode, "ProxyWalletRegistry/user-is-not-whitelisted");
         require(proxies[_owner] == ProxyWallet(payable(address(0)))); // Not allow new proxy if the user already has one
         _proxy = factory.build(_owner);

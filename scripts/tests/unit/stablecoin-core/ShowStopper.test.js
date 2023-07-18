@@ -85,7 +85,6 @@ describe("ShowStopper", () => {
     
     await showStopper.cagePool(formatBytes32String("XDC"))
     await mockedBookKeeper.mock.positionWhitelist.returns(BigNumber.from(0))
-    await mockedTokenAdapter.mock.onMoveCollateral.returns();
     await mockedBookKeeper.mock.stablecoin.returns(0)
   }
 
@@ -275,7 +274,6 @@ describe("ShowStopper", () => {
             await expect(
               showStopper.redeemLockedCollateral(
                 formatBytes32String("XDC"),
-                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -293,7 +291,6 @@ describe("ShowStopper", () => {
             await expect(
               showStopper.redeemLockedCollateral(
                 formatBytes32String("XDC"),
-                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -310,7 +307,6 @@ describe("ShowStopper", () => {
             await expect(
               showStopperAsAlice.redeemLockedCollateral(
                 formatBytes32String("XDC"),
-                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -339,7 +335,6 @@ describe("ShowStopper", () => {
             await expect(
               showStopper.redeemLockedCollateral(
                 formatBytes32String("XDC"),
-                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -362,7 +357,6 @@ describe("ShowStopper", () => {
               await expect(
                 showStopperAsAlice.redeemLockedCollateral(
                   formatBytes32String("XDC"),
-                  mockedTokenAdapter.address,
                   DeployerAddress,
                   DeployerAddress,
                   "0x"
@@ -400,7 +394,6 @@ describe("ShowStopper", () => {
               await expect(
                 showStopper.redeemLockedCollateral(
                   formatBytes32String("XDC"),
-                  mockedTokenAdapter.address,
                   AliceAddress,
                   AliceAddress,
                   "0x"
@@ -418,7 +411,6 @@ describe("ShowStopper", () => {
           await expect(
             showStopper.redeemLockedCollateral(
               formatBytes32String("XDC"),
-              mockedTokenAdapter.address,
               DeployerAddress,
               DeployerAddress,
               "0x"

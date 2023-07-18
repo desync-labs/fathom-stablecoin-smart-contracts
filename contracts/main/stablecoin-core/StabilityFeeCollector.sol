@@ -75,15 +75,17 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
     }
 
     function _collect(bytes32 _collateralPoolId) internal returns (uint256 _debtAccumulatedRate) {
-        uint256 _previousDebtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(_collateralPoolId);
-        uint256 _stabilityFeeRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getStabilityFeeRate(_collateralPoolId);
-        uint256 _lastAccumulationTime = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLastAccumulationTime(_collateralPoolId);
+        ICollateralPoolConfig _config = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
+        
+        uint256 _previousDebtAccumulatedRate = _config.getDebtAccumulatedRate(_collateralPoolId);
+        uint256 _stabilityFeeRate = _config.getStabilityFeeRate(_collateralPoolId);
+        uint256 _lastAccumulationTime = _config.getLastAccumulationTime(_collateralPoolId);
         require(block.timestamp >= _lastAccumulationTime, "StabilityFeeCollector/invalid-block.timestamp");
         require(systemDebtEngine != address(0), "StabilityFeeCollector/system-debt-engine-not-set");
 
         _debtAccumulatedRate = rmul(rpow(_stabilityFeeRate, block.timestamp - _lastAccumulationTime, RAY), _previousDebtAccumulatedRate);
 
         bookKeeper.accrueStabilityFee(_collateralPoolId, systemDebtEngine, diff(_debtAccumulatedRate, _previousDebtAccumulatedRate));
-        ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).updateLastAccumulationTime(_collateralPoolId);
+        _config.updateLastAccumulationTime(_collateralPoolId);
     }
 }

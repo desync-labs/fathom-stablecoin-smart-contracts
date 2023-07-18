@@ -20,6 +20,14 @@ contract AdminControls is OwnableUpgradeable {
     event LogPauseProtocol();
     event LogUnpauseProtocol();
 
+    event LogSetBookKeeper(address indexed newAddress);
+    event LogSetPositionManager(address indexed newAddress);
+    event LogSetLiquidationEngine(address indexed newAddress);
+    event LogSetSystemDebtEngine(address indexed newAddress);
+    event LogSetFlashMintModule(address indexed newAddress);
+    event LogSetPriceOracle(address indexed newAddress);
+    event LogSetStablecoinAdapter(address indexed newAddress);
+
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
         require(
@@ -83,35 +91,42 @@ contract AdminControls is OwnableUpgradeable {
     function setBookKeeper(address _bookKeeper) external onlyOwnerOrGov {
         require(_bookKeeper != address(0), "AdminControls/zero-address");
         bookKeeper = _bookKeeper;
+        emit LogSetBookKeeper(_bookKeeper);
     }
 
     function setPositionManager(address _positionManager) external onlyOwnerOrGov {
         require(_positionManager != address(0), "AdminControls/zero-address");
         positionManager = _positionManager;
+        emit LogSetPositionManager(_positionManager);
     }
 
     function setLiquidationEngine(address _liquidationEngine) external onlyOwnerOrGov {
         require(_liquidationEngine != address(0), "AdminControls/zero-address");
         liquidationEngine = _liquidationEngine;
+        emit LogSetLiquidationEngine(_liquidationEngine);
     }
 
     function setSystemDebtEngine(address _systemDebtEngine) external onlyOwnerOrGov {
         require(_systemDebtEngine != address(0), "AdminControls/zero-address");
         systemDebtEngine = _systemDebtEngine;
+        emit LogSetSystemDebtEngine(_systemDebtEngine);
     }
 
     function setFlashMintModule(address _flashMintModule) external onlyOwnerOrGov {
         require(_flashMintModule != address(0), "AdminControls/zero-address");
         flashMintModule = _flashMintModule;
+        emit LogSetFlashMintModule(_flashMintModule);
     }
 
     function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
         require(_priceOracle != address(0), "AdminControls/zero-address");
         priceOracle = _priceOracle;
+        emit LogSetPriceOracle(_priceOracle);
     }
 
     function setStablecoinAdapter(address _stablecoinAdapter) external onlyOwnerOrGov {
         require(_stablecoinAdapter != address(0), "AdminControls/zero-address");
         stablecoinAdapter = _stablecoinAdapter;
+        emit LogSetStablecoinAdapter(_stablecoinAdapter);
     }
 }

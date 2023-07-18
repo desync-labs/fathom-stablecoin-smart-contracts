@@ -211,7 +211,9 @@ describe("BookKeeper", () => {
                     await bookKeeperAsAlice.whitelist(BobAddress)
 
                     // bob call move stablecoin from alice to bob
-                    await bookKeeperAsBob.moveStablecoin(AliceAddress, BobAddress, WeiPerRad, { gasLimit: 1000000 })
+                    await expect(bookKeeperAsBob.moveStablecoin(AliceAddress, BobAddress, WeiPerRad, { gasLimit: 1000000 }))
+                        .to.be.emit(bookKeeperAsBob, "LogMoveStablecoin")
+                        .withArgs(BobAddress, AliceAddress, BobAddress, WeiPerRad);
 
                     const stablecoinAliceAfter = await bookKeeper.stablecoin(AliceAddress)
                     expect(stablecoinAliceAfter).to.be.equal(0)
@@ -241,7 +243,9 @@ describe("BookKeeper", () => {
                     expect(stablecoinBobBefore).to.be.equal(0)
 
                     // alice call move stablecoin from alice to bob
-                    await bookKeeperAsAlice.moveStablecoin(AliceAddress, BobAddress, WeiPerRad, { gasLimit: 1000000 })
+                    await expect(bookKeeperAsAlice.moveStablecoin(AliceAddress, BobAddress, WeiPerRad, { gasLimit: 1000000 }))
+                        .to.be.emit(bookKeeperAsAlice, "LogMoveStablecoin")
+                        .withArgs(AliceAddress, AliceAddress, BobAddress, WeiPerRad);
 
                     const stablecoinAliceAfter = await bookKeeper.stablecoin(AliceAddress)
                     expect(stablecoinAliceAfter).to.be.equal(0)

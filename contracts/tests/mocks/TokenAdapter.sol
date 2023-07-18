@@ -70,7 +70,7 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
         emit LogUncage();
     }
 
-    function deposit(address usr, uint256 wad, bytes calldata /* data */) external payable override nonReentrant whenNotPaused {
+    function deposit(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         require(live == 1, "TokenAdapter/not-live");
         require(int256(wad) >= 0, "TokenAdapter/overflow");
         bookKeeper.addCollateral(collateralPoolId, usr, int256(wad));
@@ -86,15 +86,14 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
         address(collateralToken).safeTransfer(usr, wad);
     }
 
-    function onAdjustPosition(
-        address src,
-        address dst,
-        int256 collateralValue,
-        int256 debtShare,
-        bytes calldata data
-    ) external override nonReentrant {}
+    function emergencyWithdraw(address _to) external nonReentrant {
+        if (live == 0) {
+            uint256 _amount = bookKeeper.collateralToken(collateralPoolId, msg.sender);
+            bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
 
-    function onMoveCollateral(address src, address dst, uint256 wad, bytes calldata data) external override nonReentrant {}
+            address(collateralToken).safeTransfer(_to, _amount);
+        }
+    }
 
     function pause() external onlyOwnerOrGov {
         _pause();

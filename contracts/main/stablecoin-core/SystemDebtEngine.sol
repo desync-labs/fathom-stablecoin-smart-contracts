@@ -60,12 +60,10 @@ contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpg
 
     function withdrawCollateralSurplus(
         bytes32 _collateralPoolId,
-        IGenericTokenAdapter _adapter,
         address _to,
         uint256 _amount // [wad]
     ) external onlyOwner {
         bookKeeper.moveCollateral(_collateralPoolId, address(this), _to, _amount);
-        _adapter.onMoveCollateral(address(this), _to, _amount, abi.encode(_to));
     }
 
     function withdrawStablecoinSurplus(address _to, uint256 _value) external onlyOwner {

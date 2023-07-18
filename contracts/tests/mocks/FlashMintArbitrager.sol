@@ -8,7 +8,7 @@ import "../../main/interfaces/IERC3156FlashBorrower.sol";
 import "../../main/interfaces/IStableSwapModule.sol";
 import "../../main/interfaces/IStablecoinAdapter.sol";
 import "../../main/utils/SafeToken.sol";
-import "../../main/price-oracles/lib/IFathomSwapRouter.sol";
+import "../../main/apis/interfaces/IFathomSwapRouter.sol";
 
 contract FlashMintArbitrager is OwnableUpgradeable, IERC3156FlashBorrower {
     using SafeMathUpgradeable for uint256;
