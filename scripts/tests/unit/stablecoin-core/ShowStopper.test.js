@@ -274,6 +274,7 @@ describe("ShowStopper", () => {
             await expect(
               showStopper.redeemLockedCollateral(
                 formatBytes32String("XDC"),
+                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -291,6 +292,7 @@ describe("ShowStopper", () => {
             await expect(
               showStopper.redeemLockedCollateral(
                 formatBytes32String("XDC"),
+                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -307,6 +309,7 @@ describe("ShowStopper", () => {
             await expect(
               showStopperAsAlice.redeemLockedCollateral(
                 formatBytes32String("XDC"),
+                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -335,6 +338,7 @@ describe("ShowStopper", () => {
             await expect(
               showStopper.redeemLockedCollateral(
                 formatBytes32String("XDC"),
+                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -357,6 +361,7 @@ describe("ShowStopper", () => {
               await expect(
                 showStopperAsAlice.redeemLockedCollateral(
                   formatBytes32String("XDC"),
+                  mockedTokenAdapter.address,
                   DeployerAddress,
                   DeployerAddress,
                   "0x"
@@ -394,6 +399,7 @@ describe("ShowStopper", () => {
               await expect(
                 showStopper.redeemLockedCollateral(
                   formatBytes32String("XDC"),
+                  mockedTokenAdapter.address,
                   AliceAddress,
                   AliceAddress,
                   "0x"
@@ -411,6 +417,7 @@ describe("ShowStopper", () => {
           await expect(
             showStopper.redeemLockedCollateral(
               formatBytes32String("XDC"),
+              mockedTokenAdapter.address,
               DeployerAddress,
               DeployerAddress,
               "0x"
