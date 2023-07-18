@@ -80,12 +80,14 @@ describe("ShowStopper", () => {
     await mockedCollateralPoolConfig.mock.getTotalDebtShare.returns(WeiPerWad)
 
     await mockedPriceFeed.mock.readPrice.returns(formatBytes32BigNumber(WeiPerWad))
+    await mockedPriceFeed.mock.isPriceOk.returns(true);
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
     await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRad);
     
     await showStopper.cagePool(formatBytes32String("XDC"))
     await mockedBookKeeper.mock.positionWhitelist.returns(BigNumber.from(0))
     await mockedBookKeeper.mock.stablecoin.returns(0)
+
   }
 
   before(async () => {
@@ -178,6 +180,7 @@ describe("ShowStopper", () => {
           await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
           await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
           await mockedAccessControlConfig.mock.hasRole.returns(true)
+          await mockedPriceFeed.mock.isPriceOk.returns(true);
 
           expect(await showStopper.live()).to.be.equal(1)
 
@@ -220,11 +223,47 @@ describe("ShowStopper", () => {
         })
       })
 
+      context("priceFeed's isPriceOk is false", () => {
+        it("should be revert", async () => {
+          await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+          await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+          expect(await showStopper.live()).to.be.equal(1)
+
+          await mockedBookKeeper.mock.cage.returns()
+          await mockedLiquidationEngine.mock.cage.returns()
+          await mockedSystemDebtEngine.mock.cage.returns()
+          await mockedPriceOracle.mock.cage.returns()
+
+          await showStopper.setBookKeeper(await mockedBookKeeper.address)
+          await showStopper.setLiquidationEngine(mockedLiquidationEngine.address)
+          await showStopper.setSystemDebtEngine(mockedSystemDebtEngine.address)
+          await showStopper.setPriceOracle(mockedPriceOracle.address)
+          await showStopper.cage(WeekInSeconds)
+
+          await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address)
+          await mockedCollateralPoolConfig.mock.getTotalDebtShare.returns(WeiPerWad)
+
+          await mockedPriceFeed.mock.readPrice.returns(formatBytes32BigNumber(WeiPerWad))
+          await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
+          await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRad);
+          await mockedPriceFeed.mock.isPriceOk.returns(false);
+
+          await expect(showStopper.cagePool(formatBytes32String("XDC"))).to.be.revertedWith(
+            "ShowStopper/price-not-ok"
+          )
+
+          expect(await showStopper.live()).to.be.equal(0)
+        })
+      })
+
       context("cage price is already defined", () => {
         it("should be revert", async () => {
           await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
           await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
           await mockedAccessControlConfig.mock.hasRole.returns(true)
+          await mockedPriceFeed.mock.isPriceOk.returns(true);
 
           expect(await showStopper.live()).to.be.equal(1)
 

@@ -137,6 +137,7 @@ contract ShowStopper is ShowStopperMath, IShowStopper, Initializable {
         address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId);
         IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);
         totalDebtShare[_collateralPoolId] = _totalDebtShare;
+        require(_priceFeed.isPriceOk() == true, "ShowStopper/price-not-ok");
         cagePrice[_collateralPoolId] = wdiv(priceOracle.stableCoinReferencePrice(), _priceFeed.readPrice());
         emit LogCageCollateralPool(_collateralPoolId);
     }
