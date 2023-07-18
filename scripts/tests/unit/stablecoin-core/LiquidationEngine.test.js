@@ -19,7 +19,6 @@ const loadFixtureHandler = async () => {
   const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
   const mockedBookKeeper = await createMock("BookKeeper");
   const mockedSystemDebtEngine = await createMock("SystemDebtEngine");
-  const mockedPriceOracle = await createMock("PriceOracle");
   const mockedFixedSpreadLiquidationStrategy = await createMock("FixedSpreadLiquidationStrategy");
   const mockedPriceFeed = await createMock("SimplePriceFeed");
 
@@ -31,8 +30,6 @@ const loadFixtureHandler = async () => {
   await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))
   await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
   await mockedAccessControlConfig.mock.hasRole.returns(true)
-  await mockedPriceOracle.mock.setPrice.returns()
-  await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
 
   await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address);
   await mockedPriceFeed.mock.isPriceOk.returns(true);
@@ -41,7 +38,7 @@ const loadFixtureHandler = async () => {
   liquidationEngineAsAlice = getContract("LiquidationEngine", AliceAddress)
   liquidationEngineAsBob = getContract("LiquidationEngine", BobAddress)
 
-  await liquidationEngine.initialize(mockedBookKeeper.address, mockedSystemDebtEngine.address, mockedPriceOracle.address);
+  await liquidationEngine.initialize(mockedBookKeeper.address, mockedSystemDebtEngine.address);
   await liquidationEngine.whitelist(DeployerAddress);
   await liquidationEngine.whitelist(AliceAddress);
 
