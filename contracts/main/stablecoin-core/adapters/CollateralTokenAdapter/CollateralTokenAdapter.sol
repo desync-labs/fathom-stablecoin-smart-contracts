@@ -9,44 +9,12 @@ import "../../../interfaces/ICollateralAdapter.sol";
 import "../../../interfaces/ICagable.sol";
 import "../../../interfaces/IManager.sol";
 import "../../../interfaces/IProxyRegistry.sol";
-import "../../../utils/SafeToken.sol";
 import "../../../interfaces/IVault.sol";
-
-contract CollateralTokenAdapterMath {
-    uint256 internal constant WAD = 10 ** 18;
-    uint256 internal constant RAY = 10 ** 27;
-
-    function divup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x + _y - 1) / _y;
-    }
-
-    function wmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * _y) / WAD;
-    }
-
-    function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * WAD) / _y;
-    }
-
-    function wdivup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = divup(_x * WAD, _y);
-    }
-
-    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * _y) / RAY;
-    }
-
-    function rmulup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = divup(_x * _y, RAY);
-    }
-
-    function rdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * RAY) / _y;
-    }
-}
+import "../../../utils/SafeToken.sol";
+import "../../../utils/CommonMath.sol";
 
 /// @dev receives WXDC from users and deposit in Vault.
-contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
 
     uint256 public live;
@@ -57,19 +25,22 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
     bytes32 public override collateralPoolId;
 
     IVault public vault;
-    IManager public positionManager;
+    
+    /// @dev deprecated but needs to be kept to minimize storage layout confusion
+    bytes32 internal deprecated2;
     IProxyRegistry public proxyWalletFactory;
 
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
 
     /// @dev deprecated but needs to be kept to minimize storage layout confusion
-    bytes32 deprecated;
+    bytes32 internal deprecated;
 
     mapping(address => bool) public whiteListed;
 
     event LogDeposit(uint256 _val);
     event LogWithdraw(uint256 _val);
+    event LogWhitelisted(address indexed user, bool isWhitelisted);
     event LogEmergencyWithdraw(address indexed _caller, address _to);
 
     modifier onlyOwner() {
@@ -103,7 +74,6 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         address _bookKeeper,
         bytes32 _collateralPoolId,
         address _collateralToken,
-        address _positionManager,
         address _proxyWalletFactory
     ) external initializer {
         // 1. Initialized all dependencies
@@ -113,7 +83,6 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         require(_bookKeeper != address(0), "CollateralTokenAdapter/zero-book-keeper");
         require(_collateralPoolId != bytes32(0), "CollateralTokenAdapter/zero-collateral-pool-id");
         require(_collateralToken != address(0), "CollateralTokenAdapter/zero-collateral-token");
-        require(_positionManager != address(0), "CollateralTokenAdapter/zero-position-manager");
         require(_proxyWalletFactory != address(0), "CollateralTokenAdapter/zero-proxy-wallet-factory");
 
         live = 1;
@@ -121,17 +90,19 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         collateralPoolId = _collateralPoolId;
         collateralToken = _collateralToken;
         bookKeeper = IBookKeeper(_bookKeeper);
-        positionManager = IManager(_positionManager);
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
     }
 
     function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
         require(toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
         whiteListed[toBeWhitelisted] = true;
+        emit LogWhitelisted(toBeWhitelisted, true);
     }
 
     function blacklist(address toBeRemoved) external onlyOwnerOrGov {
         whiteListed[toBeRemoved] = false;
+        emit LogWhitelisted(toBeRemoved, false);
+
     }
 
     function cage() external override nonReentrant onlyOwner {
@@ -170,7 +141,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         address _positionAddress,
         uint256 _amount,
         bytes calldata _data
-    ) external payable override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
+    ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
         _deposit(_positionAddress, _amount, _data);
     }
 
@@ -191,8 +162,7 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
             uint256 _amount = bookKeeper.collateralToken(collateralPoolId, msg.sender);
             require(_amount < 2 ** 255, "CollateralTokenAdapter/collateral-overflow");
             //deduct totalShare
-            uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
-            totalShare -= _share;
+            totalShare -= _amount;
 
             //deduct emergency withdrawl amount of FXD
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
@@ -204,17 +174,6 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         }
     }
 
-    /// @dev Ignore collateralTokens that have been directly transferred
-    function netAssetValuation() public view returns (uint256) {
-        return totalShare;
-    }
-
-    /// @dev Return Net Assets per Share in wad
-    function netAssetPerShare() public view returns (uint256) {
-        if (totalShare == 0) return WAD;
-        else return wdiv(netAssetValuation(), totalShare);
-    }
-
     /// @dev Lock XDC in the vault
     /// deposit collateral tokens to staking contract, and update BookKeeper
     /// @param _positionAddress The position address to be updated
@@ -223,16 +182,13 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
         require(live == 1, "CollateralTokenAdapter/not-live");
 
         if (_amount > 0) {
-            uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
-            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
             //transfer WXDC from proxyWallet to adapter
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
             //bookKeeping
-            bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
-
-            totalShare += _share;
+            bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_amount));
+            totalShare += _amount;
 
             // safeApprove to Vault
             address(collateralToken).safeApprove(address(vault), _amount);
@@ -247,16 +203,9 @@ contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapte
     /// @param _amount The amount to be withdrawn
     function _withdraw(address _usr, uint256 _amount) private {
         if (_amount > 0) {
-            uint256 _share = wdivup(_amount, netAssetPerShare()); // [wad]
-            // Overflow check for int256(wad) cast below
-            // Also enforces a non-zero wad
-            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
-            require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _share, "CollateralTokenAdapter/insufficient collateral amount");
-
-            bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
-
-
-            totalShare -= _share;
+            require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _amount, "CollateralTokenAdapter/insufficient collateral amount");
+            bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
+            totalShare -= _amount;
 
             //withdraw WXDC from Vault
             vault.withdraw(_amount);

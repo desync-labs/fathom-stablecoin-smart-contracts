@@ -10,11 +10,7 @@ const { DeployerAddress, AliceAddress, BobAddress, TreasuryAddress } = require("
 const { loadFixture } = require("../helper/fixtures");
 const { getProxy } = require("../../common/proxies");
 
-const { formatBytes32String } = require("ethers/lib/utils");
-
 const { expect } = chai
-
-const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
@@ -56,7 +52,7 @@ describe("CollateralTokenAdapter", () => {
             bookKeeper
         } = await loadFixture(setup));
     })
-    describe("#netAssetValuation", async () => {
+    describe("#totalShare", async () => {
         context("when all collateral tokens are deposited by deposit function", async () => {
             it("should return the correct net asset valuation", async () => {
                 //Alice wraps XDC to WXDC
@@ -71,7 +67,7 @@ describe("CollateralTokenAdapter", () => {
                     { from: AliceAddress, gasLimit: 2000000 }
                 )
 
-                expect(await collateralTokenAdapter.netAssetValuation()).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
 
                 await collateralTokenAdapter.withdraw(
                     AliceAddress,
@@ -79,7 +75,7 @@ describe("CollateralTokenAdapter", () => {
                     ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
                     { from: AliceAddress, gasLimit: 1000000 }
                 )
-                expect(await collateralTokenAdapter.netAssetValuation()).to.be.eq(0)
+                expect(await collateralTokenAdapter.totalShare()).to.be.eq(0)
             })
         })
 
@@ -101,7 +97,7 @@ describe("CollateralTokenAdapter", () => {
                 await WXDC.transfer(collateralTokenAdapter.address, ethers.utils.parseEther("88"), { from: BobAddress })
 
                 expect(await WXDC.balanceOf(collateralTokenAdapter.address)).to.be.eq(ethers.utils.parseEther("88"))
-                expect(await collateralTokenAdapter.netAssetValuation()).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
 
                 await collateralTokenAdapter.withdraw(
                     AliceAddress,
@@ -111,69 +107,7 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await WXDC.balanceOf(collateralTokenAdapter.address)).to.be.eq(ethers.utils.parseEther("88"))
-                expect(await collateralTokenAdapter.netAssetValuation()).to.be.eq(0)
-            })
-        })
-    })
-
-    describe("#netAssetPerShare", async () => {
-        context("when all collateral tokens are deposited by deposit function", async () => {
-            it("should return the correct net asset per share", async () => {
-                //Alice wraps XDC to WXDC
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
-                //Alice is whiteListed to directly call deposit function on CollateralTokenAdapter
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
-                await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
-                await collateralTokenAdapter.deposit(
-                    AliceAddress,
-                    ethers.utils.parseEther("1"),
-                    ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
-                    { from: AliceAddress, gasLimit: 1000000 }
-                )
-
-                // Expect netAssetPerShare = 1 as share = asset
-                expect(await collateralTokenAdapter.netAssetPerShare()).to.be.eq(ethers.utils.parseEther("1"))
-
-                await collateralTokenAdapter.withdraw(
-                    AliceAddress,
-                    ethers.utils.parseEther("1"),
-                    ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
-                    { from: AliceAddress, gasLimit: 1000000 }
-                )
-
-                // If total share = 0, the net asset per share = WAD
-                expect(await collateralTokenAdapter.netAssetPerShare()).to.be.eq(ethers.utils.parseEther("1"))
-            })
-        })
-
-        context("when some one directly transfer collateral tokens to CollateralTokenAdapter", async () => {
-            it("should only recognized collateral tokens from deposit function", async () => {
-                //Alice wraps XDC to WXDC
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
-                //Alice is whiteListed to directly call deposit function on CollateralTokenAdapter
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
-                await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
-                await collateralTokenAdapter.deposit(
-                    AliceAddress,
-                    ethers.utils.parseEther("1"),
-                    ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
-                    { from: AliceAddress, gasLimit: 1000000 }
-                )
-                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(89),  gasLimit: 1000000})
-                await WXDC.transfer(collateralTokenAdapter.address, ethers.utils.parseEther("88"), { from: BobAddress })
-
-                expect(await WXDC.balanceOf(collateralTokenAdapter.address)).to.be.eq(ethers.utils.parseEther("88"))
-                expect(await collateralTokenAdapter.netAssetPerShare()).to.be.eq(ethers.utils.parseEther("1"))
-
-                await collateralTokenAdapter.withdraw(
-                    AliceAddress,
-                    ethers.utils.parseEther("1"),
-                    ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
-                    { from: AliceAddress, gasLimit: 1000000 }
-                )
-                expect(await WXDC.balanceOf(collateralTokenAdapter.address)).to.be.eq(ethers.utils.parseEther("88"))
-                // If total share = 0, the net asset per share = WAD
-                expect(await collateralTokenAdapter.netAssetPerShare()).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await collateralTokenAdapter.totalShare()).to.be.eq(0)
             })
         })
     })

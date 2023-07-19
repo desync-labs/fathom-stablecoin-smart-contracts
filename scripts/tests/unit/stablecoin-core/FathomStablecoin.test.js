@@ -48,6 +48,13 @@ describe("FathomStablecoin", () => {
                     ).to.be.revertedWith("FathomStablecoin/zero-amount")
                 })
             })
+            context("destination is zero", () => {
+                it("should revert", async () => {
+                    await expect(
+                        fathomStablecoinAsAlice.transferFrom(AliceAddress, AddressZero, 20)
+                    ).to.be.revertedWith("FathomStablecoin/zero-destination")
+                })
+            })
             context("when alice has enough token", () => {
                 context("when the caller is not the owner", async () => {
                     it("should revert", async () => {
