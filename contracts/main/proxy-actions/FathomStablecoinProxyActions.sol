@@ -144,6 +144,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _positionId,
         uint256 _collateralAmount, // [wad]
         uint256 _stablecoinAmount, // [wad]
+        address _stabilityFeeCollector,
         bytes calldata _data
     ) external onlyDelegateCall {
         address _positionAddress = IManager(_manager).positions(_positionId);
@@ -154,7 +155,8 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
             IManager(_manager).bookKeeper(),
             IBookKeeper(IManager(_manager).bookKeeper()).stablecoin(_positionAddress),
             _positionAddress,
-            _collateralPoolId
+            _collateralPoolId,
+            _stabilityFeeCollector
         ); // [wad]
         adjustPosition(_manager, _positionId, -int256(_collateralAmount), _wipeDebtShare, _data);
         if (_collateralAmount > 0) {
@@ -174,6 +176,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         address _stablecoinAdapter,
         uint256 _positionId,
         uint256 _collateralAmount, // [wad]
+        address _stabilityFeeCollector,
         bytes calldata _data
     ) external onlyDelegateCall {
         address _bookKeeper = IManager(_manager).bookKeeper();
@@ -181,7 +184,13 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
         (, uint256 _debtShare) = IBookKeeper(_bookKeeper).positions(_collateralPoolId, _positionAddress); // [wad]
 
-        uint256 _requiredStablecoinAmount = _getWipeAllStablecoinAmount(_bookKeeper, _positionAddress, _positionAddress, _collateralPoolId);
+        uint256 _requiredStablecoinAmount = _getWipeAllStablecoinAmount(
+            _bookKeeper, 
+            _positionAddress, 
+            _positionAddress, 
+            _collateralPoolId, 
+            _stabilityFeeCollector
+        );
         // Deposits Fathom Stablecoin amount into the bookKeeper
         stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _requiredStablecoinAmount, _data);
         adjustPosition(_manager, _positionId, -int256(_collateralAmount), -int256(_debtShare), _data); // Paybacks debt to the CDP and unlocks WXDC amount from it
@@ -409,6 +418,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         uint256 _positionId,
         uint256 _collateralAmount, // [in token decimal]
         uint256 _stablecoinAmount, // [wad]
+        address _stabilityFeeCollector,
         bytes calldata _data
     ) public onlyDelegateCall {
         address _positionAddress = IManager(_manager).positions(_positionId);
@@ -421,7 +431,8 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
             IManager(_manager).bookKeeper(),
             IBookKeeper(IManager(_manager).bookKeeper()).stablecoin(_positionAddress),
             _positionAddress,
-            _collateralPoolId
+            _collateralPoolId,
+            _stabilityFeeCollector
         );
         adjustPosition(_manager, _positionId, -int256(_collateralAmountInWad), _wipeDebtShare, _data);
         if (_collateralAmount > 0) {
@@ -439,6 +450,7 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         address _stablecoinAdapter,
         uint256 _positionId,
         uint256 _collateralAmount, // [token decimal]
+        address _stabilityFeeCollector,
         bytes calldata _data
     ) public onlyDelegateCall {
         address _positionAddress = IManager(_manager).positions(_positionId);
@@ -449,7 +461,8 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
             IManager(_manager).bookKeeper(),
             _positionAddress,
             _positionAddress,
-            _collateralPoolId
+            _collateralPoolId,
+            _stabilityFeeCollector
         );
         // Deposits Fathom Stablecoin amount into the bookKeeper
         stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _requiredStablecoinAmount, _data);
@@ -490,11 +503,10 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         address _bookKeeper,
         uint256 _stablecoinValue, // [rad]
         address _positionAddress,
-        bytes32 _collateralPoolId
-    ) internal view returns (int256 _resultDebtShare) {
-        uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(_bookKeeper).collateralPoolConfig()).getDebtAccumulatedRate(
-            _collateralPoolId
-        ); // [ray]. // Gets actual rate from the bookKeeper
+        bytes32 _collateralPoolId,
+        address _stabilityFeeCollector
+    ) internal returns (int256 _resultDebtShare) {
+        uint256 _debtAccumulatedRate = IStabilityFeeCollector(_stabilityFeeCollector).collect(_collateralPoolId); // [ray]. Updates stability fee rate
         (, uint256 _debtShare) = IBookKeeper(_bookKeeper).positions(_collateralPoolId, _positionAddress); // [wad]. // Gets actual debtShare value of the positionAddress
 
         _resultDebtShare = int256(_stablecoinValue / _debtAccumulatedRate); // [wad]. // Uses the whole stablecoin balance in the bookKeeper to reduce the debt
@@ -506,11 +518,10 @@ contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
         address _bookKeeper,
         address _usr,
         address _positionAddress,
-        bytes32 _collateralPoolId
-    ) internal view returns (uint256 _requiredStablecoinAmount) {
-        uint256 _debtAccumulatedRate = ICollateralPoolConfig(IBookKeeper(_bookKeeper).collateralPoolConfig()).getDebtAccumulatedRate(
-            _collateralPoolId
-        ); // [ray]. Gets actual rate from the bookKeeper
+        bytes32 _collateralPoolId,
+        address _stabilityFeeCollector
+    ) internal returns (uint256 _requiredStablecoinAmount) {
+        uint256 _debtAccumulatedRate = IStabilityFeeCollector(_stabilityFeeCollector).collect(_collateralPoolId); // [ray]. Updates stability fee rate
         (, uint256 _debtShare) = IBookKeeper(_bookKeeper).positions(_collateralPoolId, _positionAddress); // [wad]. Gets actual debtShare value of the positionAddress
         uint256 _stablecoinValue = IBookKeeper(_bookKeeper).stablecoin(_usr); // [rad]. Gets actual stablecoin amount in the usr
 
