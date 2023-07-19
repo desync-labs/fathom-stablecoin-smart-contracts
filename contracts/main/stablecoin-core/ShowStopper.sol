@@ -196,7 +196,7 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         emit LogAccumulateStablecoin(msg.sender, _amount);
     }
 
-    /// @dev Redeem all the stablecoin in the stablecoinAccumulator of the caller into the corresponding collateral token
+    /// @dev Redeem stablecoin in the stablecoinAccumulator of the caller into the corresponding collateral token
     function redeemStablecoin(bytes32 _collateralPoolId, uint256 _amount) external {
         require(_amount != 0, "ShowStopper/amount-zero");
         require(finalCashPrice[_collateralPoolId] != 0, "ShowStopper/final-cash-price-collateral-pool-id-not-defined");

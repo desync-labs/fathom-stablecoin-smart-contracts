@@ -10,8 +10,8 @@ contract Vault is IVault {
     using SafeERC20 for IERC20;
 
     bytes32 public collateralPoolId;
-    address public collateralToken;
-    address public collateralAdapter;
+    address public immutable collateralToken;
+    address public immutable collateralAdapter;
 
     event Deposit(uint256 amount);
     event Withdraw(uint256 amount);

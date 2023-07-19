@@ -11,7 +11,6 @@ import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/ILiquidationStrategy.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ISetPrice.sol";
-import "../interfaces/IPriceOracle.sol";
 import "../interfaces/IPausable.sol";
 import "../interfaces/IPriceFeed.sol";
 
@@ -39,7 +38,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     // --- Math ---
     uint256 internal constant WAD = 10 ** 18;
 
-    address public priceOracle;
+    bytes32 internal deprecated;
 
     IBookKeeper public bookKeeper; // CDP Engine
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
@@ -85,15 +84,13 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     }
 
     // --- Init ---
-    function initialize(address _bookKeeper, address _systemDebtEngine, address _priceOracle) external initializer {
+    function initialize(address _bookKeeper, address _systemDebtEngine) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "LiquidationEngine/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         require(ISystemDebtEngine(_systemDebtEngine).surplusBuffer() >= 0, "LiquidationEngine/invalid-systemDebtEngine"); // Sanity Check Call
         systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
-        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "LiquidationEngine/invalid-priceOracle"); // Sanity Check Call
-        priceOracle = _priceOracle;
 
         live = 1;
     }
@@ -180,11 +177,6 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
             _data,
             msg.sender
         );
-    }
-
-    function setPriceOracle(address _priceOracle) external onlyOwnerOrGov isLive {
-        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "LiquidationEngine/invalid-priceOracle"); // Sanity Check Call
-        priceOracle = _priceOracle;
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwner isLive {
