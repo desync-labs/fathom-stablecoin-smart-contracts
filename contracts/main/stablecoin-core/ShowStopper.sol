@@ -11,25 +11,9 @@ import "../interfaces/IPriceOracle.sol";
 import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
+import "../utils/CommonMath.sol";
 
-contract ShowStopperMath {
-    uint256 internal constant WAD = 10 ** 18;
-    uint256 internal constant RAY = 10 ** 27;
-
-    function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        return _x <= _y ? _x : _y;
-    }
-
-    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * _y) / RAY;
-    }
-
-    function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * WAD) / _y;
-    }
-}
-
-contract ShowStopper is ShowStopperMath, IShowStopper, Initializable {
+contract ShowStopper is CommonMath, IShowStopper, Initializable {
     IBookKeeper public bookKeeper; // CDP Engine
     ILiquidationEngine public liquidationEngine;
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
@@ -232,10 +216,9 @@ contract ShowStopper is ShowStopperMath, IShowStopper, Initializable {
     */
     function redeemLockedCollateral(
         bytes32 _collateralPoolId,
-        IGenericTokenAdapter _adapter,
         address _positionAddress,
         address _collateralReceiver,
-        bytes calldata _data
+        bytes calldata /* _data */
     ) external override {
         require(live == 0, "ShowStopper/still-live");
         require(_positionAddress == msg.sender || bookKeeper.positionWhitelist(_positionAddress, msg.sender) == 1, "ShowStopper/not-allowed");
