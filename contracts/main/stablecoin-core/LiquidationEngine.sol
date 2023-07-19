@@ -214,7 +214,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     function _liquidate(
         bytes32 _collateralPoolId,
         address _positionAddress,
-        uint256 _debtShareToBeLiquidated, // [rad]
+        uint256 _debtShareToBeLiquidated, // [wad]
         uint256 _maxDebtShareToBeLiquidated, // [wad]
         address _collateralRecipient,
         bytes calldata _data,
