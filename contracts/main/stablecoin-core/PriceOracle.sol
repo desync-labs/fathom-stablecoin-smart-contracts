@@ -12,9 +12,12 @@ import "../interfaces/IPausable.sol";
 import "../interfaces/ISetPrice.sol";
 import "../utils/CommonMath.sol";
 
-/** @notice A contract which is the price oracle of the BookKeeper to keep all collateral pools updated with the latest price of the collateral.
-    The price oracle is important in reflecting the current state of the market price.
-*/
+/**
+ * @title PriceOracle
+ * @notice A contract which is the price oracle of the BookKeeper to keep all collateral pools updated with the latest price of the collateral.
+ * The price oracle is important in reflecting the current state of the market price.
+ */
+
 contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
     struct CollateralPool {
         IPriceFeed priceFeed; // Price Feed
@@ -75,18 +78,27 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
         stableCoinReferencePrice = RAY;
         live = 1;
     }
-
+    /**
+     * @notice Set the BookKeeper address.
+     * @param _bookKeeper The address of the BookKeeper contract.
+     */
     function setBookKeeper(address _bookKeeper) external onlyOwner isLive {
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
     }
-
+    /**
+     * @notice Set the stable coin reference price.
+     * @param _referencePrice The reference price to set.
+     */
     function setStableCoinReferencePrice(uint256 _referencePrice) external onlyOwner isLive {
         require(_referencePrice > MIN_REFERENCE_PRICE && _referencePrice < MAX_REFERENCE_PRICE, "PriceOracle/invalid-reference-price");
         stableCoinReferencePrice = _referencePrice;
         emit LogSetStableCoinReferencePrice(msg.sender, _referencePrice);
     }
-
+    /**
+     * @notice Set the price for a given collateral pool id.
+     * @param _collateralPoolId The id of the collateral pool.
+     */
     function setPrice(bytes32 _collateralPoolId) external override whenNotPaused isLive {
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).collateralPools(_collateralPoolId).priceFeed);
         uint256 _liquidationRatio = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLiquidationRatio(_collateralPoolId);

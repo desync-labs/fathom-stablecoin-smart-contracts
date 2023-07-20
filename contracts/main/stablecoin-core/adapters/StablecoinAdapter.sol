@@ -11,6 +11,11 @@ import "../../interfaces/ICagable.sol";
 import "../../interfaces/IPausable.sol";
 import "../../utils/CommonMath.sol";
 
+/**
+ * @title Stablecoin Adapter contract
+ * @dev Handles deposit and withdrawal of stablecoins, along with emergency shutdown (caging) functionality.
+ */
+
 contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable, IPausable {
     IBookKeeper public override bookKeeper; // CDP Engine
     IStablecoin public override stablecoin; // Stablecoin Token
@@ -36,6 +41,11 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         _;
     }
 
+    /**
+     * @notice Initializes the contract.
+     * @param _bookKeeper Address of the BookKeeper contract.
+     * @param _stablecoin Address of the Stablecoin contract.
+     */
     function initialize(address _bookKeeper, address _stablecoin) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
@@ -61,16 +71,30 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         emit LogUncage();
     }
 
+    /**
+     * @notice Deposits stablecoin from msg.sender into the BookKeeper.
+     * @param usr Address of the user to credit the deposit to.
+     * @param wad Amount to deposit. [wad]
+     */
+
     function deposit(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         bookKeeper.moveStablecoin(address(this), usr, wad * RAY);
         stablecoin.burn(msg.sender, wad);
     }
-
+    /**
+     * @notice Deposits stablecoin from msg.sender into the BookKeeper in RAD.
+     * @param usr Address of the user to credit the deposit to.
+     * @param rad Amount to deposit. [rad]
+     */
     function depositRAD(address usr, uint256 rad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         bookKeeper.moveStablecoin(address(this), usr, rad);
         stablecoin.burn(msg.sender, (rad / RAY) + 1);
     }
-
+    /**
+     * @notice Withdraws stablecoin to a specified user.
+     * @param usr Address of the user to withdraw stablecoin to.
+     * @param wad Amount to withdraw. [wad]
+     */
     function withdraw(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         require(live == 1, "StablecoinAdapter/not-live");
         bookKeeper.moveStablecoin(msg.sender, address(this), wad * RAY);

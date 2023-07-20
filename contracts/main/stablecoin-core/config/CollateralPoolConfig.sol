@@ -8,6 +8,11 @@ import "../../interfaces/IGenericTokenAdapter.sol";
 import "../../interfaces/ICollateralPoolConfig.sol";
 import "../../interfaces/IAccessControlConfig.sol";
 
+/**
+ * @title CollateralPoolConfig
+ * @notice A contract can add collateral pool type to the protocol and also manage settings for a specific pool type.
+ */
+
 contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
     uint256 internal constant RAY = 10 ** 27;
 
@@ -44,20 +49,23 @@ contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
     function initialize(address _accessControlConfig) external initializer {
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
     }
-
+    /**
+    //@notice this function adds a collateral pool type to Fathom protocol
+    //@dev please refer to the deployment/migration script for more detail info on units for each params.
+     */
     function initCollateralPool(
-        bytes32 _collateralPoolId, // v
-        uint256 _debtCeiling, // v
-        uint256 _debtFloor,
-        uint256 _positionDebtCeiling,
+        bytes32 _collateralPoolId, // Identifier for a specific collateral pool.
+        uint256 _debtCeiling, // Debt ceiling of this collateral pool                                          [rad] 
+        uint256 _debtFloor, // Position debt floor of this collateral pool                                     [rad]
+        uint256 _positionDebtCeiling, // position debt ceiling of this collateral pool                         [rad]
         address _priceFeed,
-        uint256 _liquidationRatio, // v
-        uint256 _stabilityFeeRate, //v
-        address _adapter, //v
-        uint256 _closeFactorBps,
-        uint256 _liquidatorIncentiveBps,
-        uint256 _treasuryFeesBps,
-        address _strategy
+        uint256 _liquidationRatio, // Liquidation ratio or Collateral ratio, inverse of LTV                    [ray]
+        uint256 _stabilityFeeRate, //Collateral-specific, per-second stability fee debtAccumulatedRate or mint interest debtAccumulatedRate [ray]
+        address _adapter,   // collateralTokenAdapter address for a specific collateral pool
+        uint256 _closeFactorBps, // Percentage (BPS) of how much  of debt could be liquidated in a single liquidation
+        uint256 _liquidatorIncentiveBps, // Percentage (BPS) of how much additional collateral will be given to the liquidator incentive
+        uint256 _treasuryFeesBps, // Percentage (BPS) of how much additional collateral will be transferred to the treasury
+        address _strategy  // Liquidation strategy for this collateral pool
     ) external onlyOwner {
         require(_collateralPools[_collateralPoolId].debtAccumulatedRate == 0, "CollateralPoolConfig/collateral-pool-already-init");
         require(_debtCeiling > _debtFloor, "CollateralPoolConfig/invalid-ceiliing");
