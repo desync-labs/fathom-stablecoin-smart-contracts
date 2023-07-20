@@ -10,17 +10,15 @@ const { DeployerAddress, AliceAddress, BobAddress, TreasuryAddress } = require("
 const { loadFixture } = require("../helper/fixtures");
 const { getProxy } = require("../../common/proxies");
 
-const { formatBytes32String } = require("ethers/lib/utils");
-
 const { expect } = chai
-
-const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
+    const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
+
     const wxdcAddr = await collateralTokenAdapter.collateralToken();
     const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
 
@@ -29,7 +27,8 @@ const setup = async () => {
         accessControlConfig,
         WXDC,
         collateralTokenAdapter,
-        wxdcAddr
+        wxdcAddr,
+        bookKeeper
     }
 }
 
@@ -49,10 +48,11 @@ describe("CollateralTokenAdapter", () => {
             accessControlConfig,
             WXDC,
             collateralTokenAdapter,
-            wxdcAddr
+            wxdcAddr,
+            bookKeeper
         } = await loadFixture(setup));
     })
-    describe("#netAssetValuation", async () => {
+    describe("#totalShare", async () => {
         context("when all collateral tokens are deposited by deposit function", async () => {
             it("should return the correct net asset valuation", async () => {
                 //Alice wraps XDC to WXDC
@@ -67,7 +67,7 @@ describe("CollateralTokenAdapter", () => {
                     { from: AliceAddress, gasLimit: 2000000 }
                 )
 
-                expect(await collateralTokenAdapter.netAssetValuation()).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
 
                 await collateralTokenAdapter.withdraw(
                     AliceAddress,
@@ -75,7 +75,7 @@ describe("CollateralTokenAdapter", () => {
                     ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
                     { from: AliceAddress, gasLimit: 1000000 }
                 )
-                expect(await collateralTokenAdapter.netAssetValuation()).to.be.eq(0)
+                expect(await collateralTokenAdapter.totalShare()).to.be.eq(0)
             })
         })
 
@@ -97,7 +97,7 @@ describe("CollateralTokenAdapter", () => {
                 await WXDC.transfer(collateralTokenAdapter.address, ethers.utils.parseEther("88"), { from: BobAddress })
 
                 expect(await WXDC.balanceOf(collateralTokenAdapter.address)).to.be.eq(ethers.utils.parseEther("88"))
-                expect(await collateralTokenAdapter.netAssetValuation()).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
 
                 await collateralTokenAdapter.withdraw(
                     AliceAddress,
@@ -107,69 +107,7 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await WXDC.balanceOf(collateralTokenAdapter.address)).to.be.eq(ethers.utils.parseEther("88"))
-                expect(await collateralTokenAdapter.netAssetValuation()).to.be.eq(0)
-            })
-        })
-    })
-
-    describe("#netAssetPerShare", async () => {
-        context("when all collateral tokens are deposited by deposit function", async () => {
-            it("should return the correct net asset per share", async () => {
-                //Alice wraps XDC to WXDC
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
-                //Alice is whiteListed to directly call deposit function on CollateralTokenAdapter
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
-                await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
-                await collateralTokenAdapter.deposit(
-                    AliceAddress,
-                    ethers.utils.parseEther("1"),
-                    ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
-                    { from: AliceAddress, gasLimit: 1000000 }
-                )
-
-                // Expect netAssetPerShare = 1 as share = asset
-                expect(await collateralTokenAdapter.netAssetPerShare()).to.be.eq(ethers.utils.parseEther("1"))
-
-                await collateralTokenAdapter.withdraw(
-                    AliceAddress,
-                    ethers.utils.parseEther("1"),
-                    ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
-                    { from: AliceAddress, gasLimit: 1000000 }
-                )
-
-                // If total share = 0, the net asset per share = WAD
-                expect(await collateralTokenAdapter.netAssetPerShare()).to.be.eq(ethers.utils.parseEther("1"))
-            })
-        })
-
-        context("when some one directly transfer collateral tokens to CollateralTokenAdapter", async () => {
-            it("should only recognized collateral tokens from deposit function", async () => {
-                //Alice wraps XDC to WXDC
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
-                //Alice is whiteListed to directly call deposit function on CollateralTokenAdapter
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
-                await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
-                await collateralTokenAdapter.deposit(
-                    AliceAddress,
-                    ethers.utils.parseEther("1"),
-                    ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
-                    { from: AliceAddress, gasLimit: 1000000 }
-                )
-                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(89),  gasLimit: 1000000})
-                await WXDC.transfer(collateralTokenAdapter.address, ethers.utils.parseEther("88"), { from: BobAddress })
-
-                expect(await WXDC.balanceOf(collateralTokenAdapter.address)).to.be.eq(ethers.utils.parseEther("88"))
-                expect(await collateralTokenAdapter.netAssetPerShare()).to.be.eq(ethers.utils.parseEther("1"))
-
-                await collateralTokenAdapter.withdraw(
-                    AliceAddress,
-                    ethers.utils.parseEther("1"),
-                    ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
-                    { from: AliceAddress, gasLimit: 1000000 }
-                )
-                expect(await WXDC.balanceOf(collateralTokenAdapter.address)).to.be.eq(ethers.utils.parseEther("88"))
-                // If total share = 0, the net asset per share = WAD
-                expect(await collateralTokenAdapter.netAssetPerShare()).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await collateralTokenAdapter.totalShare()).to.be.eq(0)
             })
         })
     })
@@ -206,7 +144,10 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
 
                 await collateralTokenAdapter.deposit(
                     AliceAddress,
@@ -217,7 +158,11 @@ describe("CollateralTokenAdapter", () => {
 
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
+                // expect(await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress).to.be.eq(ethers.utils.parseEther("1")))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
 
                 //Bob wraps XDC to WXDC
                 await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4),  gasLimit: 1000000})
@@ -232,14 +177,22 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("5"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                // expect(await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress).to.be.eq(ethers.utils.parseEther("4")))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+
 
                 await collateralTokenAdapter.deposit(BobAddress, 0, ethers.utils.defaultAbiCoder.encode(["address"], [BobAddress]), { from: BobAddress })
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("5"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+
             })
         })
     })
@@ -265,7 +218,7 @@ describe("CollateralTokenAdapter", () => {
                         ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
                         { from: AliceAddress, gasLimit: 1000000 }
                     )
-                ).to.be.revertedWith("CollateralTokenAdapter/insufficient staked amount")
+                ).to.be.revertedWith("CollateralTokenAdapter/insufficient collateral amount")
             })
         })
 
@@ -297,7 +250,7 @@ describe("CollateralTokenAdapter", () => {
                         ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
                         { from: AliceAddress, gasLimit: 1000000 }
                     )
-                ).to.be.revertedWith("CollateralTokenAdapter/insufficient staked amount")
+                ).to.be.revertedWith("CollateralTokenAdapter/insufficient collateral amount")
             })
         })
 
@@ -315,7 +268,9 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
 
                 // Cage CollateralTokenAdapter
                 await collateralTokenAdapter.cage()
@@ -338,7 +293,9 @@ describe("CollateralTokenAdapter", () => {
 
                 expect(aliceWXDCafter.sub(aliceWXDCbefore)).to.be.eq(ethers.utils.parseEther("1"))
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("0"))
+
             })
 
             it("should still allow user to withdraw with pending rewards (if any)", async () => {
@@ -355,7 +312,10 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
 
                 await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4),  gasLimit: 1000000})
                 await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
@@ -370,8 +330,11 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("5"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+
 
                 await advanceBlock()
 
@@ -399,8 +362,12 @@ describe("CollateralTokenAdapter", () => {
 
                 expect(aliceWXDCafter.sub(aliceWXDCbefore)).to.be.eq(ethers.utils.parseEther("1"))
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("4"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("0"))
+
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+
 
                 let bobWXDCbefore = await WXDC.balanceOf(BobAddress)
                 await collateralTokenAdapter.withdraw(
@@ -413,8 +380,12 @@ describe("CollateralTokenAdapter", () => {
 
                 expect(bobWXDCafter.sub(bobWXDCbefore)).to.be.eq(ethers.utils.parseEther("4"))
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(0)
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("0"))
+
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("0"))
+
             })
         })
 
@@ -433,7 +404,10 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
 
                 // Now Alice withdraw her position. 1 block has been passed, hence Alice should get 90 (100 - 10%) FXD, treasury account should get 10 FXD.
                 let aliceWXDCbefore = await WXDC.balanceOf(AliceAddress)
@@ -447,7 +421,9 @@ describe("CollateralTokenAdapter", () => {
 
                 expect(aliceWXDCafter.sub(aliceWXDCbefore)).to.be.eq(ethers.utils.parseEther("1"))
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("0"))
+
             })
         })
         context("when bob withdraw collateral to alice", async () => {
@@ -464,6 +440,11 @@ describe("CollateralTokenAdapter", () => {
                         { from: AliceAddress, gasLimit: 1000000 }
                     )
                     await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
+                    //checking with Subik-ji
+                    let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
+
+                    expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
                     await expect(
                         collateralTokenAdapter.withdraw(
                             AliceAddress,
@@ -471,7 +452,7 @@ describe("CollateralTokenAdapter", () => {
                             ethers.utils.defaultAbiCoder.encode(["address"], [BobAddress]),
                             { from: BobAddress }
                         )
-                    ).to.be.revertedWith("CollateralTokenAdapter/insufficient staked amount")
+                    ).to.be.revertedWith("CollateralTokenAdapter/insufficient collateral amount")
                 })
             })
             context("when bob has collateral", async () => {
@@ -487,7 +468,9 @@ describe("CollateralTokenAdapter", () => {
                     )
 
                     expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
-                    expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                    // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                    let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
+                    expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
 
                     await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
                     await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
@@ -527,7 +510,10 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
 
                 await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4),  gasLimit: 1000000})
                 await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
@@ -541,8 +527,12 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("5"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("4"))
+
 
                 // Move 1 block so CollateralTokenAdapter make 100 FXD. However this portion
                 // won't be added as CollateralTokenAdapter cage before it get harvested.
@@ -568,9 +558,11 @@ describe("CollateralTokenAdapter", () => {
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("4"))
                 expect(await collateralTokenAdapter.accRewardPerShare()).to.be.eq(weiToRay(ethers.utils.parseEther("200")))
                 expect(await collateralTokenAdapter.accRewardBalance()).to.be.eq(ethers.utils.parseEther("200"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("0"))
                 expect(await collateralTokenAdapter.rewardDebts(AliceAddress)).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("4"))
                 expect(await collateralTokenAdapter.rewardDebts(BobAddress)).to.be.eq(ethers.utils.parseEther("800"))
 
                 // Bob is a cool guy. Not panic and withdraw normal.
@@ -595,9 +587,11 @@ describe("CollateralTokenAdapter", () => {
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(0)
                 expect(await collateralTokenAdapter.accRewardPerShare()).to.be.eq(weiToRay(ethers.utils.parseEther("200")))
                 expect(await collateralTokenAdapter.accRewardBalance()).to.be.eq(ethers.utils.parseEther("200"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("0"))
                 expect(await collateralTokenAdapter.rewardDebts(AliceAddress)).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(0)
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("0"))
                 expect(await collateralTokenAdapter.rewardDebts(BobAddress)).to.be.eq(0)
             })
         })
@@ -617,7 +611,10 @@ describe("CollateralTokenAdapter", () => {
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
                 expect(await collateralTokenAdapter.accRewardPerShare()).to.be.eq(0)
                 expect(await collateralTokenAdapter.accRewardBalance()).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
                 expect(await collateralTokenAdapter.rewardDebts(AliceAddress)).to.be.eq(0)
 
                 // Alice feels in-secure, so she does emergencyWithdraw
@@ -635,7 +632,8 @@ describe("CollateralTokenAdapter", () => {
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(0)
                 expect(await collateralTokenAdapter.accRewardPerShare()).to.be.eq(0)
                 expect(await collateralTokenAdapter.accRewardBalance()).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("0"))
                 expect(await collateralTokenAdapter.rewardDebts(AliceAddress)).to.be.eq(0)
             })
         })
@@ -679,7 +677,9 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
 
                 await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
                 await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4),  gasLimit: 1000000})
@@ -693,8 +693,12 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("5"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+
 
                 // Move 1 block so CollateralTokenAdapter make 100 FXD. However this portion
                 // won't be added as CollateralTokenAdapter cage before it get harvested.
@@ -716,8 +720,12 @@ describe("CollateralTokenAdapter", () => {
                 expect(aliceWXDCafter.sub(aliceWXDCbefore)).to.be.eq(ethers.utils.parseEther("1"))
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("4"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("0"))
+
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+
 
                 await collateralTokenAdapter.uncage()
                 expect(await collateralTokenAdapter.live()).to.be.eq(1)
@@ -744,8 +752,12 @@ describe("CollateralTokenAdapter", () => {
 
                 expect(bobWXDCafter.sub(bobWXDCbefore)).to.be.eq(ethers.utils.parseEther("4"))
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(0)
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("0"))
+
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("0"))
+
             })
         })
     })
@@ -764,7 +776,10 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
 
                 await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
                 await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4),  gasLimit: 1000000})
@@ -779,8 +794,11 @@ describe("CollateralTokenAdapter", () => {
                 )
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("5"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
+
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("4"))
 
                 // Move 1 block so CollateralTokenAdapter make 100 FXD. However this portion
                 // won't be added as CollateralTokenAdapter cage before it get harvested.
@@ -806,9 +824,13 @@ describe("CollateralTokenAdapter", () => {
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("4"))
                 expect(await collateralTokenAdapter.accRewardPerShare()).to.be.eq(weiToRay(ethers.utils.parseEther("200")))
                 expect(await collateralTokenAdapter.accRewardBalance()).to.be.eq(ethers.utils.parseEther("200"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("0"))
+
                 expect(await collateralTokenAdapter.rewardDebts(AliceAddress)).to.be.eq(0)
                 expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
+
                 expect(await collateralTokenAdapter.rewardDebts(BobAddress)).to.be.eq(ethers.utils.parseEther("800"))
 
                 // Everything is fine now. So CollateralTokenAdapter get uncage.
@@ -845,9 +867,13 @@ describe("CollateralTokenAdapter", () => {
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(0)
                 expect(await collateralTokenAdapter.accRewardPerShare()).to.be.eq(weiToRay(ethers.utils.parseEther("225")))
                 expect(await collateralTokenAdapter.accRewardBalance()).to.be.eq(ethers.utils.parseEther("200"))
-                expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                // expect(await collateralTokenAdapter.stake(AliceAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("0"))
+
                 expect(await collateralTokenAdapter.rewardDebts(AliceAddress)).to.be.eq(0)
-                expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(0)
+                // expect(await collateralTokenAdapter.stake(BobAddress)).to.be.eq(0)
+                expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("0"))
+
                 expect(await collateralTokenAdapter.rewardDebts(BobAddress)).to.be.eq(0)
                 expect(await fathomToken.balanceOf(TreasuryAddress)).to.be.eq(ethers.utils.parseEther("10"))
             })

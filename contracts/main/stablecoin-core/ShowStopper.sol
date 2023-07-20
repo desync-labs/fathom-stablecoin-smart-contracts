@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IShowStopper.sol";
@@ -11,25 +11,9 @@ import "../interfaces/IPriceOracle.sol";
 import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
+import "../utils/CommonMath.sol";
 
-contract ShowStopperMath {
-    uint256 internal constant WAD = 10 ** 18;
-    uint256 internal constant RAY = 10 ** 27;
-
-    function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        return _x <= _y ? _x : _y;
-    }
-
-    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * _y) / RAY;
-    }
-
-    function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = (_x * WAD) / _y;
-    }
-}
-
-contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
+contract ShowStopper is CommonMath, IShowStopper, Initializable {
     IBookKeeper public bookKeeper; // CDP Engine
     ILiquidationEngine public liquidationEngine;
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
@@ -71,8 +55,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     }
 
     function initialize(address _bookKeeper) external initializer {
-        PausableUpgradeable.__Pausable_init();
-
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         live = 1;
@@ -139,6 +121,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId);
         IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);
         totalDebtShare[_collateralPoolId] = _totalDebtShare;
+        require(_priceFeed.isPriceOk() == true, "ShowStopper/price-not-ok");
         cagePrice[_collateralPoolId] = wdiv(priceOracle.stableCoinReferencePrice(), _priceFeed.readPrice());
         emit LogCageCollateralPool(_collateralPoolId);
     }
@@ -214,7 +197,7 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
         emit LogAccumulateStablecoin(msg.sender, _amount);
     }
 
-    /// @dev Redeem all the stablecoin in the stablecoinAccumulator of the caller into the corresponding collateral token
+    /// @dev Redeem stablecoin in the stablecoinAccumulator of the caller into the corresponding collateral token
     function redeemStablecoin(bytes32 _collateralPoolId, uint256 _amount) external {
         require(_amount != 0, "ShowStopper/amount-zero");
         require(finalCashPrice[_collateralPoolId] != 0, "ShowStopper/final-cash-price-collateral-pool-id-not-defined");
@@ -234,10 +217,9 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     */
     function redeemLockedCollateral(
         bytes32 _collateralPoolId,
-        IGenericTokenAdapter _adapter,
         address _positionAddress,
         address _collateralReceiver,
-        bytes calldata _data
+        bytes calldata /* _data */
     ) external override {
         require(live == 0, "ShowStopper/still-live");
         require(_positionAddress == msg.sender || bookKeeper.positionWhitelist(_positionAddress, msg.sender) == 1, "ShowStopper/not-allowed");
@@ -252,7 +234,6 @@ contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
             -int256(_lockedCollateralAmount),
             0
         );
-        _adapter.onMoveCollateral(_positionAddress, _collateralReceiver, _lockedCollateralAmount, _data);
         emit LogRedeemLockedCollateral(_collateralPoolId, _collateralReceiver, _lockedCollateralAmount);
     }
 }

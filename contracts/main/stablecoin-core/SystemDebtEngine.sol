@@ -9,19 +9,14 @@ import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/IPausable.sol";
-
-contract SystemDebtEngineMath {
-    function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        return _x <= _y ? _x : _y;
-    }
-}
+import "../utils/CommonMath.sol";
 
 /** @notice A contract which manages the bad debt and the surplus of the system.
     SystemDebtEngine will be the debitor or debtor when a position is liquidated. 
     The debt recorded in the name of SystemDebtEngine will be considered as system bad debt unless it is cleared by liquidation.
     The stability fee will be accrued and kept within SystemDebtEngine. As it is the debtor, therefore SystemDebtEngine should be the holder of the surplus and use it to settle the bad debt.
 */
-contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ISystemDebtEngine, ICagable, IPausable {
+contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ISystemDebtEngine, ICagable, IPausable {
     IBookKeeper public bookKeeper; // CDP Engine
     uint256 public override surplusBuffer; // Surplus buffer         [rad]
     uint256 public live; // Active Flag
@@ -65,12 +60,10 @@ contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, Reentran
 
     function withdrawCollateralSurplus(
         bytes32 _collateralPoolId,
-        IGenericTokenAdapter _adapter,
         address _to,
         uint256 _amount // [wad]
     ) external onlyOwner {
         bookKeeper.moveCollateral(_collateralPoolId, address(this), _to, _amount);
-        _adapter.onMoveCollateral(address(this), _to, _amount, abi.encode(_to));
     }
 
     function withdrawStablecoinSurplus(address _to, uint256 _value) external onlyOwner {

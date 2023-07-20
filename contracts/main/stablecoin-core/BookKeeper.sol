@@ -10,47 +10,10 @@ import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IAccessControlConfig.sol";
 import "../interfaces/IPausable.sol";
-
-contract BookKeeperMath {
-    function add(uint256 x, int256 y) internal pure returns (uint256 z) {
-        unchecked {
-            z = x + uint256(y);
-        }
-        require(y >= 0 || z <= x);
-        require(y <= 0 || z >= x);
-    }
-
-    function sub(uint256 x, int256 y) internal pure returns (uint256 z) {
-        unchecked {
-            z = x - uint256(y);
-        }
-        require(y <= 0 || z <= x);
-        require(y >= 0 || z >= x);
-    }
-
-    function mul(uint256 x, int256 y) internal pure returns (int256 z) {
-        unchecked {
-            z = int256(x) * y;
-        }
-        require(int256(x) >= 0);
-        require(y == 0 || z / y == int256(x));
-    }
-
-    function either(bool _x, bool _y) internal pure returns (bool _z) {
-        assembly {
-            _z := or(_x, _y)
-        }
-    }
-
-    function both(bool _x, bool _y) internal pure returns (bool _z) {
-        assembly {
-            _z := and(_x, _y)
-        }
-    }
-}
+import "../utils/CommonMath.sol";
 
 /// @notice A contract which acts as a book keeper of the Fathom Stablecoin protocol. It has the ability to move collateral token and stablecoin with in the accounting state variable.
-contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, PausableUpgradeable, ReentrancyGuardUpgradeable {
+contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable {
     using Address for address;
 
     struct Position {
@@ -90,6 +53,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
     );
     event LogAddCollateral(address indexed _caller, address indexed _usr, int256 _amount);
     event LogMoveCollateral(address indexed _caller, bytes32 indexed _collateralPoolId, address _src, address indexed _dst, uint256 _amount);
+    event LogMoveStablecoin(address indexed _caller, address _src, address indexed _dst, uint256 _amount);
 
     event StablecoinIssuedAmount(uint256 _totalStablecoinIssued, bytes32 indexed _collateralPoolId, uint256 _poolStablecoinIssued);
 
@@ -262,6 +226,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         _requireAllowedPositionAdjustment(_src, msg.sender);
         stablecoin[_src] -= _value;
         stablecoin[_dst] += _value;
+        emit LogMoveStablecoin(msg.sender, _src, _dst, _value);
     }
 
     // solhint-disable function-max-lines

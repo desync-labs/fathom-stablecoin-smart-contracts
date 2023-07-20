@@ -9,9 +9,9 @@ interface IStablecoinAdapter {
 
     function stablecoin() external returns (IStablecoin);
 
-    function deposit(address positionAddress, uint256 wad, bytes calldata data) external payable;
+    function deposit(address positionAddress, uint256 wad, bytes calldata data) external;
 
-    function depositRAD(address positionAddress, uint256 wad, bytes calldata data) external payable;
+    function depositRAD(address positionAddress, uint256 rad, bytes calldata data) external;
 
     function withdraw(address positionAddress, uint256 wad, bytes calldata data) external;
 }

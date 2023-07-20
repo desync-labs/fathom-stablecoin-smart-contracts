@@ -8,7 +8,7 @@ import "../../main/interfaces/IBookKeeperFlashBorrower.sol";
 import "../../main/interfaces/IStableSwapModule.sol";
 import "../../main/interfaces/IStablecoinAdapter.sol";
 import "../../main/utils/SafeToken.sol";
-import "../../main/price-oracles/lib/IFathomSwapRouter.sol";
+import "../../main/apis/interfaces/IFathomSwapRouter.sol";
 
 contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBorrower {
     using SafeMathUpgradeable for uint256;

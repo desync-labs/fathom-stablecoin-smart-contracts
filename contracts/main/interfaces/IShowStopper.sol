@@ -6,7 +6,6 @@ import "../interfaces/IGenericTokenAdapter.sol";
 interface IShowStopper {
     function redeemLockedCollateral(
         bytes32 collateralPoolId,
-        IGenericTokenAdapter adapter,
         address positionAddress,
         address collateralReceiver,
         bytes calldata data

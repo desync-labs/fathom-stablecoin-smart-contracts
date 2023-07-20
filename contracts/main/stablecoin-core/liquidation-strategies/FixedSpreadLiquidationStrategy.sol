@@ -15,18 +15,9 @@ import "../../interfaces/IGenericTokenAdapter.sol";
 import "../../interfaces/IStablecoinAdapter.sol";
 import "../../interfaces/IERC165.sol";
 import "../../utils/SafeToken.sol";
+import "../../utils/CommonMath.sol";
 
-contract FixedSpreadLiquidationStrategyMath {
-    uint256 internal constant BLN = 10 ** 9;
-    uint256 internal constant RAY = 10 ** 27;
-
-    function rdiv(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        require(y > 0, "FixedSpreadLiquidationStrategy/zero-divisor");
-        z = (x * RAY) / y;
-    }
-}
-
-contract FixedSpreadLiquidationStrategy is FixedSpreadLiquidationStrategyMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
+contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
     using SafeToken for address;
 
     struct LiquidationInfo {
@@ -136,11 +127,11 @@ contract FixedSpreadLiquidationStrategy is FixedSpreadLiquidationStrategyMath, P
     // solhint-disable function-max-lines
     function execute(
         bytes32 _collateralPoolId,
-        uint256 _positionDebtShare, // Debt Value                  [rad]
+        uint256 _positionDebtShare, // Debt Value                  [wad]
         uint256 _positionCollateralAmount, // Collateral Amount           [wad]
         address _positionAddress, // Address that will receive any leftover collateral
-        uint256 _debtShareToBeLiquidated, // The value of debt to be liquidated as specified by the liquidator [rad]
-        uint256 _maxDebtShareToBeLiquidated, // The maximum value of debt to be liquidated as specified by the liquidator in case of full liquidation for slippage control [rad]
+        uint256 _debtShareToBeLiquidated, // The value of debt to be liquidated as specified by the liquidator [wad]
+        uint256 _maxDebtShareToBeLiquidated, // The maximum value of debt to be liquidated as specified by the liquidator in case of full liquidation for slippage control [wad]
         address _liquidatorAddress,
         address _collateralRecipient,
         bytes calldata _data // Data to pass in external call; if length 0, no call is done
@@ -187,11 +178,8 @@ contract FixedSpreadLiquidationStrategy is FixedSpreadLiquidationStrategyMath, P
         );
         IGenericTokenAdapter _adapter = IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId));
 
-        _adapter.onMoveCollateral(_positionAddress, address(this), info.collateralAmountToBeLiquidated, abi.encode(0));
-
         if (info.treasuryFees > 0) {
             bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
-            _adapter.onMoveCollateral(address(this), address(systemDebtEngine), info.treasuryFees, abi.encode(0));
         }
 
         if (
@@ -208,7 +196,7 @@ contract FixedSpreadLiquidationStrategy is FixedSpreadLiquidationStrategyMath, P
                 _collateralRecipient,
                 info.collateralAmountToBeLiquidated - info.treasuryFees
             );
-            _adapter.onMoveCollateral(address(this), _collateralRecipient, info.collateralAmountToBeLiquidated - info.treasuryFees, abi.encode(0));
+
             IFlashLendingCallee(_collateralRecipient).flashLendingCall(
                 msg.sender,
                 info.actualDebtValueToBeLiquidated,

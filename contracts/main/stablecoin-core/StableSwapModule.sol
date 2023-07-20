@@ -20,7 +20,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     using SafeToken for address;
 
     uint256 public constant ONE_DAY = 86400;
-    uint256 public constant MINIMUM_DAILY_SWAP_LIMIT = 1000 * 1e18;
     uint256 internal constant WAD = 10 ** 18;
 
     IBookKeeper public bookKeeper;
@@ -70,7 +69,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     event LogDepositToken(address indexed _owner, address indexed _token, uint256 _value);
     event LogWithdrawFees(address indexed _destination, uint256 _stablecoinFee, uint256 _tokenFee);
     event LogRemainingDailySwapAmount(uint256 _remainingDailySwapAmount);
-    event LogStableSwapPauseState(bool _pauseState);
     event LogEmergencyWithdraw(address indexed _account);
     event LogDecentralizedStateStatus(bool _oldDecentralizedStateStatus, bool _newDecentralizedStateStatus);
     event LogAddToWhitelist(address indexed user);
@@ -203,8 +201,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     }
 
     function setDecentralizedStatesStatus(bool _status) external onlyOwner {
-        isDecentralizedState = _status;
         emit LogDecentralizedStateStatus(isDecentralizedState, _status);
+        isDecentralizedState = _status;
     }
 
     function addToWhitelist(address _user) external onlyOwner {
@@ -328,12 +326,10 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
     function pause() external onlyOwnerOrGov {
         _pause();
-        emit LogStableSwapPauseState(true);
     }
 
     function unpause() external onlyOwnerOrGov {
         _unpause();
-        emit LogStableSwapPauseState(false);
     }
 
     /**

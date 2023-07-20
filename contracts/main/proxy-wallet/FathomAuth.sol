@@ -17,11 +17,6 @@ contract FathomAuth is FathomAuthEvents {
         _;
     }
 
-    modifier onlyOwner() {
-        require(msg.sender == owner, "only owner allowed");
-        _;
-    }
-
     constructor() {
         owner = msg.sender;
         emit LogSetOwner(msg.sender);

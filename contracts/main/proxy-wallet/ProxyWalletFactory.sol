@@ -28,11 +28,6 @@ contract ProxyWalletFactory is OwnableUpgradeable {
         proxyWalletRegistry = _proxyWalletRegistry;
     }
 
-    /// @dev Deploys a new proxy instance and sets owner of proxy to caller
-    function build0() external returns (address payable _proxy) {
-        _proxy = build(msg.sender);
-    }
-
     /// @dev Deploys a new proxy instance and sets custom owner of proxy
     function build(address _owner) public onlyRegistry returns (address payable _proxy) {
         _proxy = payable(address(new ProxyWallet(proxyActionStorage)));

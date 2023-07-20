@@ -11,14 +11,9 @@ import "../interfaces/IStablecoinAdapter.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IPausable.sol";
 import "../utils/SafeToken.sol";
+import "../utils/CommonMath.sol";
 
-contract FlashMintModuleMath {
-    uint256 internal constant WAD = 10 ** 18;
-    uint256 internal constant RAY = 10 ** 27;
-    uint256 internal constant RAD = 10 ** 45;
-}
-
-contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender, IPausable {
+contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender, IPausable {
     using SafeToken for address;
 
     IBookKeeper public bookKeeper;
@@ -98,7 +93,7 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
 
     // --- ERC 3156 Spec ---
 
-    function flashLoan(IERC3156FlashBorrower _receiver, address _token, uint256 _amount, bytes calldata _data) external override lock returns (bool) {
+    function flashLoan(IERC3156FlashBorrower _receiver, address _token, uint256 _amount, bytes calldata _data) external override lock whenNotPaused returns (bool) {
         require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
         require(_amount <= max, "FlashMintModule/ceiling-exceeded");
 
@@ -125,7 +120,7 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
         IBookKeeperFlashBorrower _receiver, // address of conformant IBookKeeperFlashBorrower
         uint256 _amount, // amount to flash loan [rad]
         bytes calldata _data // arbitrary data to pass to the receiver
-    ) external override lock returns (bool) {
+    ) external override lock whenNotPaused returns (bool) {
         require(_amount <= max * RAY, "FlashMintModule/ceiling-exceeded");
 
         uint256 _prev = bookKeeper.stablecoin(address(this));
@@ -146,11 +141,11 @@ contract FlashMintModule is FlashMintModuleMath, PausableUpgradeable, IERC3156Fl
         return true;
     }
 
-    function convert() external lock {
+    function convert() external lock whenNotPaused {
         stablecoinAdapter.deposit(address(this), stablecoin.balanceOf(address(this)), abi.encode(0));
     }
 
-    function accrue() external lock {
+    function accrue() external lock whenNotPaused {
         bookKeeper.moveStablecoin(address(this), systemDebtEngine, bookKeeper.stablecoin(address(this)));
     }
 
