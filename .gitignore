@@ -12,7 +12,7 @@ coverage
 coverage.json
 typechain
 typechain-types
-privateKey
+privateKey*
 /build
 addresses.json
 
