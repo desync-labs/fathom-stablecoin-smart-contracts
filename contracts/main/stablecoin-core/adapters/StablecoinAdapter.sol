@@ -41,11 +41,6 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         _;
     }
 
-    /**
-     * @notice Initializes the contract.
-     * @param _bookKeeper Address of the BookKeeper contract.
-     * @param _stablecoin Address of the Stablecoin contract.
-     */
     function initialize(address _bookKeeper, address _stablecoin) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
