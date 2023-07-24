@@ -196,7 +196,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         depositTracker[msg.sender] = 0;
 
         if(totalValueDeposited > stablecoinAmountToWithdraw + tokenAmountToWithdraw) {
-            totalValueDeposited -= stablecoinAmountToWithdraw + tokenAmountToWithdraw;
+            totalValueDeposited -= (stablecoinAmountToWithdraw + tokenAmountToWithdraw);
         } else {
             totalValueDeposited = 0;
         }

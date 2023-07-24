@@ -194,6 +194,8 @@ describe("StableSwapModuleWrapper", () => {
                     await TimeHelpers.increase(1)
                 }
 
+            
+
                 for (let i = 1; i < 5; i++) {
                     const feesFromGetter = await stableSwapModuleWrapper.getClaimableFeesPerUser(accounts[i])
                     console.log('Total FXD from getter that can be claimed: ', feesFromGetter[0].toString())
@@ -222,6 +224,12 @@ describe("StableSwapModuleWrapper", () => {
                     console.log('Total FXD withdrawn as fees for accounts: \n', totalFXDWithdrawnAsFeesAccounts)
                 }
 
+                //checking if updatingTotalValueDepositedWorks
+                const totalValueDepositedBeforeUpdate = await stableSwapModule.totalValueDeposited();
+                await stableSwapModule.udpateTotalValueDeposited()
+                const totalValueDepositedAfterUpdate = await stableSwapModule.totalValueDeposited();
+                expect(totalValueDepositedAfterUpdate).to.be.equal(totalValueDepositedBeforeUpdate)
+
                 await stableSwapModuleWrapper.claimFeesRewards({ from: accounts[0], gasLimit: 8000000 }) 
                 await stableSwapModuleWrapper.withdrawClaimedFees({ from: accounts[0], gasLimit: 8000000 })
                 await stableSwapModuleWrapper.withdrawTokens(TO_DEPOSIT.mul(2), { from: accounts[0], gasLimit: 8000000 })
@@ -244,6 +252,7 @@ describe("StableSwapModuleWrapper", () => {
                 
                 const totalValueLockedInStableswap = await stableSwapModule.totalValueLocked();
                 expect(totalValueLockedInStableswap.toString()).to.be.equal("0")
+
                 
             })
         })

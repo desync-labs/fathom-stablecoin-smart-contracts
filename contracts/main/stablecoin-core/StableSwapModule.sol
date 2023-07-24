@@ -35,7 +35,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     uint256 public remainingDailySwapAmount; // [wad]
     uint256 public dailySwapLimitNumerator;
     uint256 public singleSwapLimitNumerator;
-    uint256 public totalTokenFeeBalance; // [wad]
+    uint256 public totalTokenFeeBalance; // 6 decimals
     uint256 public totalFXDFeeBalance; // [wad]
     uint256 public totalValueDeposited;
     uint256 public numberOfSwapsLimitPerUser;
@@ -147,7 +147,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
      */
     function udpateTotalValueDeposited() external onlyOwner {
         uint256 newTotalValueDeposited = IStableSwapModuleWrapperRetriever(stableswapWrapper).totalValueDeposited();
-        totalValueDeposited = newTotalValueDeposited - totalFXDFeeBalance - _convertDecimals(totalTokenFeeBalance, IToken(token).decimals(),18);
+        totalValueDeposited = newTotalValueDeposited - (totalFXDFeeBalance + _convertDecimals(totalTokenFeeBalance, IToken(token).decimals(), 18));
     }
 
     function setStableSwapWrapper(address newStableSwapWrapper) external onlyOwner {
