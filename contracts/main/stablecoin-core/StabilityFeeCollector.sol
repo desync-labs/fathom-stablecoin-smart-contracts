@@ -62,10 +62,7 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
     function unpause() external override onlyOwnerOrGov {
         _unpause();
     }
-    /**
-     * @dev Sets the address of the SystemDebtEngine contract. Can only be called by the owner.
-     * @param _systemDebtEngine Address of the SystemDebtEngine contract.
-     */
+
     function setSystemDebtEngine(address _systemDebtEngine) external onlyOwner {
         require(_systemDebtEngine != address(0), "StabilityFeeCollector/bad-system-debt-engine-address");
         systemDebtEngine = _systemDebtEngine;

@@ -60,31 +60,20 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
     }
-    /**
-     * @notice Initializes the ShowStopper contract with the provided bookKeeper address.
-     * @param _bookKeeper Address of the BookKeeper contract to be used for tracking positions and system debt.
-     */
+
     function initialize(address _bookKeeper) external initializer {
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         live = 1;
     }
-    /**
-     * @notice Sets a new BookKeeper contract address.
-     * @dev Only the contract owner can call this function.
-     * @param _bookKeeper Address of the new BookKeeper contract.
-     */
+
     function setBookKeeper(address _bookKeeper) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         emit LogSetBookKeeper(msg.sender, _bookKeeper);
     }
-    /**
-     * @notice Sets a new LiquidationEngine contract address.
-     * @dev Only the contract owner can call this function.
-     * @param _liquidationEngine Address of the new LiquidationEngine contract.
-     */
+
     function setLiquidationEngine(address _liquidationEngine) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
         require(_liquidationEngine != address(0), "ShowStopper/zero-liquidation-engine");
@@ -92,11 +81,7 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         liquidationEngine = ILiquidationEngine(_liquidationEngine);
         emit LogSetLiquidationEngine(msg.sender, _liquidationEngine);
     }
-    /**
-     * @notice Sets a new SystemDebtEngine contract address.
-     * @dev Only the contract owner can call this function.
-     * @param _systemDebtEngine Address of the new SystemDebtEngine contract.
-     */
+
     function setSystemDebtEngine(address _systemDebtEngine) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
         require(_systemDebtEngine != address(0), "ShowStopper/zero-debt-engine");
@@ -104,11 +89,7 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
         emit LogSetSystemDebtEngine(msg.sender, _systemDebtEngine);
     }
-    /**
-     * @notice Sets a new PriceOracle contract address.
-     * @dev Only the contract owner can call this function.
-     * @param _priceOracle Address of the new PriceOracle contract.
-     */
+
     function setPriceOracle(address _priceOracle) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
         require(_priceOracle != address(0), "ShowStopper/zero-price-oracle");

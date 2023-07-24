@@ -125,14 +125,6 @@ import "../utils/CommonMath.sol";
 
     // --- Init ---
 
-    /**
-    * @notice Initializes the BookKeeper contract.
-    * @dev This function sets the initial configuration and state of the contract.
-    * @param _collateralPoolConfig The address of the CollateralPoolConfig contract to be used.
-    * @param _accessControlConfig The address of the AccessControlConfig contract to be used.
-    * @dev The caller of this function must have the OWNER_ROLE in the AccessControlConfig contract.
-    * @dev This function can only be called once during contract deployment.
-    */
     function initialize(address _collateralPoolConfig, address _accessControlConfig) external initializer {
         require(_collateralPoolConfig.isContract(), "BookKeeper/collateral-pool-config: NOT_CONTRACT_ADDRESS");
         require(_accessControlConfig.isContract(), "BookKeeper/access-control-config: NOT_CONTRACT_ADDRESS");
@@ -151,24 +143,12 @@ import "../utils/CommonMath.sol";
 
     // --- Administration ---
 
-    /**
-     * @notice Sets the total debt ceiling for the Fathom Stablecoin protocol.
-     * @dev This function can only be called by the contract owner.
-     * @param _totalDebtCeiling The new total debt ceiling value to be set.
-     */
     function setTotalDebtCeiling(uint256 _totalDebtCeiling) external onlyOwner {
         _requireLive();
         totalDebtCeiling = _totalDebtCeiling;
         emit LogSetTotalDebtCeiling(msg.sender, _totalDebtCeiling);
     }
 
-    /**
-     * @notice Sets the address of the AccessControlConfig contract to be used by the BookKeeper contract.
-     * @dev This function can only be called by the contract owner.
-     * @param _accessControlConfig The address of the AccessControlConfig contract to be set.
-     * @dev The AccessControlConfig contract must be a valid contract address.
-     * @dev The caller of this function must have the OWNER_ROLE in the AccessControlConfig contract.
-     */
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
         require(_accessControlConfig.isContract(), "BookKeeper/access-control-config: NOT_CONTRACT_ADDRESS");
         require(
@@ -180,12 +160,7 @@ import "../utils/CommonMath.sol";
         emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
 
-    /**
-     * @notice Sets the address of the CollateralPoolConfig contract to be used by the BookKeeper contract.
-     * @dev This function can only be called by the contract owner.
-     * @param _collateralPoolConfig The address of the CollateralPoolConfig contract to be set.
-     * @dev The CollateralPoolConfig contract must be a valid contract address.
-     */
+
     function setCollateralPoolConfig(address _collateralPoolConfig) external onlyOwner {
         require(_collateralPoolConfig.isContract(), "BookKeeper/collateral-pool-config: NOT_CONTRACT_ADDRESS");
 

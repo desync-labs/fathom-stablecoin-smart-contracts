@@ -97,87 +97,43 @@ contract AdminControls is OwnableUpgradeable {
         IPausable(stablecoinAdapter).unpause();
         emit LogUnpauseProtocol();
     }
-    /**
-    * @notice Change the BookKeeper contract address.
-    * @dev This function can only be called by owner or governance role.
-    * @param _bookKeeper The new BookKeeper contract address.
-    * @return None.
-    * @event Emits a LogSetBookKeeper event.
-    */
+
     function setBookKeeper(address _bookKeeper) external onlyOwnerOrGov {
         require(_bookKeeper != address(0), "AdminControls/zero-address");
         bookKeeper = _bookKeeper;
         emit LogSetBookKeeper(_bookKeeper);
     }
 
-    /**
-    * @notice Change the PositionManager contract address.
-    * @dev This function can only be called by owner or governance role.
-    * @param _positionManager The new PositionManager contract address.
-    * @return None.
-    * @event Emits a LogSetPositionManager event.
-    */
     function setPositionManager(address _positionManager) external onlyOwnerOrGov {
         require(_positionManager != address(0), "AdminControls/zero-address");
         positionManager = _positionManager;
         emit LogSetPositionManager(_positionManager);
     }
-    /**
-    * @notice Change the LiquidationEngine contract address.
-    * @dev This function can only be called by owner or governance role.
-    * @param _liquidationEngine The new LiquidationEngine contract address.
-    * @return None.
-    * @event Emits a LogSetLiquidationEngine event.
-    */
+
     function setLiquidationEngine(address _liquidationEngine) external onlyOwnerOrGov {
         require(_liquidationEngine != address(0), "AdminControls/zero-address");
         liquidationEngine = _liquidationEngine;
         emit LogSetLiquidationEngine(_liquidationEngine);
     }
-    /**
-    * @notice Change the SystemDebtEngine contract address.
-    * @dev This function can only be called by owner or governance role.
-    * @param _systemDebtEngine The new SystemDebtEngine contract address.
-    * @return None.
-    * @event Emits a LogSetSystemDebtEngine event.
-    */
+
     function setSystemDebtEngine(address _systemDebtEngine) external onlyOwnerOrGov {
         require(_systemDebtEngine != address(0), "AdminControls/zero-address");
         systemDebtEngine = _systemDebtEngine;
         emit LogSetSystemDebtEngine(_systemDebtEngine);
     }
 
-    /**
-    * @notice Change the FlashMintModule contract address.
-    * @dev This function can only be called by owner or governance role.
-    * @param _flashMintModule The new FlashMintModule contract address.
-    * @return None.
-    * @event Emits a LogSetFlashMintModule event.
-    */
     function setFlashMintModule(address _flashMintModule) external onlyOwnerOrGov {
         require(_flashMintModule != address(0), "AdminControls/zero-address");
         flashMintModule = _flashMintModule;
         emit LogSetFlashMintModule(_flashMintModule);
     }
-    /**
-    * @notice Change the PriceOracle contract address.
-    * @dev This function can only be called by owner or governance role.
-    * @param _priceOracle The new PriceOracle contract address.
-    * @return None.
-    * @event Emits a LogSetPriceOracle event.
-    */
+ 
     function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
         require(_priceOracle != address(0), "AdminControls/zero-address");
         priceOracle = _priceOracle;
         emit LogSetPriceOracle(_priceOracle);
     }
-    /**
-    * @notice Change the StablecoinAdapter contract address.
-    * @dev This function can only be called by owner or governance role.
-    * @param _stablecoinAdapter The new StablecoinAdapter contract address.
-    * @return None.
-    * @event Emits a LogSetStablecoinAdapter event.
-    */
+
     function setStablecoinAdapter(address _stablecoinAdapter) external onlyOwnerOrGov {
         require(_stablecoinAdapter != address(0), "AdminControls/zero-address");
         stablecoinAdapter = _stablecoinAdapter;

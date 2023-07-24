@@ -209,11 +209,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
             msg.sender
         );
     }
-    /**
-    * @notice Update the BookKeeper contract address
-    * @param _bookKeeper The new address of the BookKeeper contract
-    * @dev Can only be called by the contract owner
-    */
+
     function setBookKeeper(address _bookKeeper) external onlyOwner isLive {
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "LiquidationEngine/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);

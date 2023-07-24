@@ -20,12 +20,6 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
     mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
 
-    /**
-    * @notice Initialize the stablecoin contract with name and symbol.
-    * @dev Only callable once, when the contract is first deployed.
-    * @param _name The name of the stablecoin.
-    * @param _symbol The symbol of the stablecoin.
-    */
     function initialize(string memory _name, string memory _symbol) external initializer {
         AccessControlUpgradeable.__AccessControl_init();
 

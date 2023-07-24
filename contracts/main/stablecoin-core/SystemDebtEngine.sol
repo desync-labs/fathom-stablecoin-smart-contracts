@@ -54,14 +54,7 @@ contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpg
         );
         _;
     }
-    /**
-    * @notice Initialize the SystemDebtEngine contract
-    * @dev This function is used to initialize the SystemDebtEngine contract after deployment.
-    *      It sets up the initial state of the contract and requires an address of the BookKeeper contract to be provided.
-    *      The BookKeeper contract keeps track of system collateral, stablecoin, and other important data.
-    * @param _bookKeeper The address of the BookKeeper contract.
-    * @dev Reverts if the provided BookKeeper address is the zero address.
-    */
+
     function initialize(address _bookKeeper) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
