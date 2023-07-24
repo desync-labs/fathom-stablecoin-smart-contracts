@@ -130,10 +130,6 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         _unpause();
     }
 
-    /// @notice Sets the Vault address for this contract
-    /// @dev Only the contract owner can execute this function. The function can only be executed once.
-    /// The provided vault address cannot be the zero address.
-    /// @param _vault The address of the Vault to be associated with this contract
     function setVault(address _vault) external onlyOwner {
         require(true != flagVault, "CollateralTokenAdapter/Vault-set-already");
         require(_vault != address(0), "CollateralTokenAdapter/zero-vault");
@@ -143,7 +139,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     }
 
     /// @param _positionAddress The address that holding states of the position
-    /// @param _amount The XDC amount that being used as a collateral and to be staked to AnkrStakingPool
+    /// @param _amount The collateral token amount that being used as a collateral and to be staked to AnkrStakingPool
     /// @param _data The extra data that may needs to execute the deposit
     function deposit(
         address _positionAddress,
@@ -177,9 +173,9 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
 
             //deduct emergency withdrawl amount of FXD
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
-            //withdraw WXDC from Vault
+            //withdraw collateralToken from Vault
             vault.withdraw(_amount);
-            //Transfer WXDC to msg.sender
+            //Transfer collateralToken to msg.sender
             address(collateralToken).safeTransfer(_to, _amount);
             emit LogEmergencyWithdraw(msg.sender, _to);
         }
@@ -195,7 +191,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         if (_amount > 0) {
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
-            //transfer WXDC from proxyWallet to adapter
+            //transfer collateralToken from proxyWallet to adapter
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
             //bookKeeping
             bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_amount));
@@ -203,9 +199,9 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
 
             // safeApprove to Vault
             address(collateralToken).safeApprove(address(vault), _amount);
-            //deposit WXDC to Vault
+            //deposit collateralToken to Vault
             vault.deposit(_amount);
-            emit LogDeposit(_amount); // wxdc
+            emit LogDeposit(_amount); // collateralToken
         }
     }
 
@@ -218,9 +214,9 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
             totalShare -= _amount;
 
-            //withdraw WXDC from Vault
+            //withdraw collateralToken from Vault
             vault.withdraw(_amount);
-            //Transfer WXDC to proxyWallet
+            //Transfer collateralToken to proxyWallet
             address(collateralToken).safeTransfer(_usr, _amount);
         }
         emit LogWithdraw(_amount);
