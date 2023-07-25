@@ -165,12 +165,12 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         emit LogWithdrawTokens(msg.sender, _amount);
     }
 
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
         emit LogStableSwapWrapperPauseState(true);
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
         emit LogStableSwapWrapperPauseState(false);

@@ -88,11 +88,11 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         bookKeeper.moveStablecoin(msg.sender, address(this), wad * RAY);
         stablecoin.mint(usr, wad);
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();
     }

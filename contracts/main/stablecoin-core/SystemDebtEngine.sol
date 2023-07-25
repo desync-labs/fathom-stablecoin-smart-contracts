@@ -143,11 +143,11 @@ contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpg
             emit LogCage();
         }
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();
     }

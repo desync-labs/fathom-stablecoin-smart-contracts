@@ -125,17 +125,11 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         ); // Sanity Check Call
         stablecoinAdapter = IStablecoinAdapter(_stablecoinAdapter); //StablecoinAdapter to deposit FXD to bookKeeper
     }
-    /**
-     * @notice Pauses the FixedSpreadLiquidationStrategy contract.
-     * @dev This function can only be called by the contract owner or governance.
-     */
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
-    /**
-     * @notice Unpauses the FixedSpreadLiquidationStrategy contract.
-     * @dev This function can only be called by the contract owner or governance.
-     */
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }
