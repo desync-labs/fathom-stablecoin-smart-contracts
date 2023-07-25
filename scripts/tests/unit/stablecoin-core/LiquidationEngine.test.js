@@ -246,50 +246,6 @@ describe("LiquidationEngine", () => {
     })
   })
 
-  describe("#uncage()", () => {
-    context("when role can't access", () => {
-      it("should revert", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(false)
-
-        await expect(liquidationEngineAsAlice.uncage()).to.be.revertedWith("!(ownerRole or showStopperRole)")
-      })
-    })
-
-    context("when role can access", () => {
-      context("caller is owner role ", () => {
-        it("should be set live to 1", async () => {
-          await mockedAccessControlConfig.mock.hasRole.withArgs(formatBytes32String("OWNER_ROLE"), AliceAddress).returns(true)
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(1)
-
-          await liquidationEngineAsAlice.cage()
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(0)
-
-          await expect(liquidationEngineAsAlice.uncage()).to.emit(liquidationEngineAsAlice, "LogUncage").withArgs()
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(1)
-        })
-      })
-
-      context("caller is showStopper role", () => {
-        it("should be set live to 1", async () => {
-          await mockedAccessControlConfig.mock.hasRole.withArgs(formatBytes32String("SHOW_STOPPER_ROLE"), AliceAddress).returns(true)
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(1)
-
-          await liquidationEngineAsAlice.cage()
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(0)
-
-          await expect(liquidationEngineAsAlice.uncage()).to.emit(liquidationEngineAsAlice, "LogUncage").withArgs()
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(1)
-        })
-      })
-    })
-  })
-
   describe("#pause", () => {
     context("when role can't access", () => {
       it("should revert", async () => {

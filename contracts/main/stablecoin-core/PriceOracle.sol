@@ -103,13 +103,6 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
             emit LogCage();
         }
     }
-
-    function uncage() external override onlyOwnerOrShowStopper {
-        require(live == 0, "PriceOracle/not-caged");
-        live = 1;
-        emit LogUncage();
-    }
-
     function pause() external override onlyOwnerOrGov {
         _pause();
     }

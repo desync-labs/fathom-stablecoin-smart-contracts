@@ -192,13 +192,6 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         }
     }
 
-    /// @dev access: OWNER_ROLE, SHOW_STOPPER_ROLE
-    function uncage() external override onlyOwnerOrShowStopper {
-        require(live == 0, "LiquidationEngine/not-caged");
-        live = 1;
-        emit LogUncage();
-    }
-
     // --- pause ---
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {

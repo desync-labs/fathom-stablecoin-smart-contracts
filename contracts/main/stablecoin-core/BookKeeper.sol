@@ -172,13 +172,6 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
         }
     }
 
-    function uncage() external override onlyOwnerOrShowStopper {
-        require(live == 0, "BookKeeper/not-caged");
-        live = 1;
-
-        emit LogUncage();
-    }
-
     // --- Pause ---
 
     /// @dev access: OWNER_ROLE, GOV_ROLE
