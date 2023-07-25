@@ -96,9 +96,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
     /**
      * @dev _amount arg should be in 18 decimals
-     * @dev when you deposit tokens, you are depositing _amount of Stablecoin and Token each
-     * @dev so, the total deposit is twice the _amount   
-     * @notice claimFeesRewards is after deposit to stableswap
+     * @dev when you deposit tokens, you are depositing _amount of Stablecoin and Token each. So, the total deposit is twice the _amount   
+     * @notice claimFeesRewards is before deposit tracker is updated because we need to claim for all the liquidity available currently
      */
     function depositTokens(uint256 _amount) external override nonReentrant whenNotPaused onlyWhitelistedIfNotDecentralized {
         require(_amount != 0, "wrapper-depositTokens/amount-zero");
@@ -124,7 +123,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
      * @dev _amount arg should be in 18 decimals
      * @dev when you withdraw tokens, you are withdrawing _amount of total tokens , ie half of stablecoin and half of token
      * @dev please consider that the withdraw of each token is not exactly half but depends upon ratio of tokens in the stableswap
-     * @notice claimeFeesRewards is before deposit tracker is updated because we need to claim for all the liquidity available currently
+     * @notice claimFeesRewards is before deposit tracker is updated because we need to claim for all the liquidity available currently
      */
     function withdrawTokens(uint256 _amount) external override nonReentrant whenNotPaused onlyWhitelistedIfNotDecentralized {
         require(_amount != 0, "withdrawTokens/amount-zero");
@@ -188,10 +187,29 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         _withdrawClaimedFees();
     }
 
+    /**
+     * @dev emergencyWithdraw, allowed when SSM and Wrapper is paused
+     * @notice the function is used in emergency scenario, where the LPs will get back all of their shares of tokens in the stableswap
+     */
     function emergencyWithdraw() external override nonReentrant whenPaused {
         require(IStableSwapRetriever(stableSwapModule).paused(),"emergencyWithdraw/SSM-not-paused");
         require(depositTracker[msg.sender] != 0, "emergencyWithdraw/amount-zero");
         (uint256 stablecoinAmountToWithdraw, uint256 tokenAmountToWithdraw) = this.getActualLiquidityAvailablePerUser(msg.sender);
+        
+        depositTracker[msg.sender] = 0;
+
+        if(totalValueDeposited > stablecoinAmountToWithdraw + tokenAmountToWithdraw) {
+            totalValueDeposited -= (stablecoinAmountToWithdraw + tokenAmountToWithdraw);
+        } else {
+            totalValueDeposited = 0;
+        }
+        
+        checkpointFXDFee[msg.sender] = 0;
+        checkpointTokenFee[msg.sender] = 0;
+        
+        claimedFXDFeeRewards[msg.sender] = 0;
+        claimedTokenFeeRewards[msg.sender] = 0;
+        
         _withdrawFromStableSwap(stablecoin, stablecoinAmountToWithdraw);
         uint256 tokenAmountToWithdrawScaled = _convertDecimals(tokenAmountToWithdraw, 18, IToken(token).decimals());
         _withdrawFromStableSwap(token, tokenAmountToWithdrawScaled);
