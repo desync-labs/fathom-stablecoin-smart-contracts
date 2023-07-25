@@ -13,7 +13,8 @@ import "../../../interfaces/IVault.sol";
 import "../../../utils/SafeToken.sol";
 import "../../../utils/CommonMath.sol";
 
-/// @dev receives WXDC from users and deposit in Vault.
+/// @title CollateralTokenAdapter
+/// @dev receives collateral from users and deposit in Vault.
 contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
 
@@ -92,17 +93,20 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         bookKeeper = IBookKeeper(_bookKeeper);
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
     }
-
+    /// @notice Adds an address to the whitelist, allowing it to interact with the contract
+    /// @dev Only the contract owner or a governance address can execute this function. The provided address cannot be the zero address.
+    /// @param toBeWhitelisted The address to be added to the whitelist
     function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
         require(toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
         whiteListed[toBeWhitelisted] = true;
         emit LogWhitelisted(toBeWhitelisted, true);
     }
-
+    /// @notice Removes an address from the whitelist
+    /// @dev Only the contract owner or a governance address can execute this function.
+    /// @param toBeRemoved The address to be removed from the whitelist
     function blacklist(address toBeRemoved) external onlyOwnerOrGov {
         whiteListed[toBeRemoved] = false;
         emit LogWhitelisted(toBeRemoved, false);
-
     }
 
     function cage() external override nonReentrant onlyOwner {
@@ -111,11 +115,11 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
             emit LogCage();
         }
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }
@@ -129,7 +133,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     }
 
     /// @param _positionAddress The address that holding states of the position
-    /// @param _amount The XDC amount that being used as a collateral and to be staked to AnkrStakingPool
+    /// @param _amount The collateral token amount that being used as a collateral and to be staked to AnkrStakingPool
     /// @param _data The extra data that may needs to execute the deposit
     function deposit(
         address _positionAddress,
@@ -139,9 +143,9 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         _deposit(_positionAddress, _amount, _data);
     }
 
-    /// @dev Withdraw WXDC from Vault
+    /// @dev Withdraw collateralToken from Vault
     /// @param _usr The address that holding states of the position
-    /// @param _amount The WXDC col amount in Vault to be returned to proxyWallet and then to user
+    /// @param _amount The collateralToken amount in Vault to be returned to proxyWallet and then to user
     function withdraw(
         address _usr,
         uint256 _amount,
@@ -150,6 +154,9 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         _withdraw(_usr, _amount);
     }
 
+    /// @notice Withdraws the collateral from the Vault as the last step for emergency shutdown
+    /// @dev for excessCollateral withdraw flow of emergency shutdown, please call this fn via proxyWallet
+    /// @dev for flow that deposits FXD and then withdraw collateral, please call this fn from EOA.
     /// @dev EMERGENCY WHEN COLLATERAL TOKEN ADAPTER CAGED ONLY. Withdraw COLLATERAL from VAULT A after redeemStablecoin
     function emergencyWithdraw(address _to) external nonReentrant {
         if (live == 0) {
@@ -160,15 +167,15 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
 
             //deduct emergency withdrawl amount of FXD
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
-            //withdraw WXDC from Vault
+            //withdraw collateralToken from Vault
             vault.withdraw(_amount);
-            //Transfer WXDC to msg.sender
+            //Transfer collateralToken to msg.sender
             address(collateralToken).safeTransfer(_to, _amount);
             emit LogEmergencyWithdraw(msg.sender, _to);
         }
     }
 
-    /// @dev Lock XDC in the vault
+    /// @dev Lock collateral token in the vault
     /// deposit collateral tokens to staking contract, and update BookKeeper
     /// @param _positionAddress The position address to be updated
     /// @param _amount The amount to be deposited
@@ -178,7 +185,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         if (_amount > 0) {
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
-            //transfer WXDC from proxyWallet to adapter
+            //transfer collateralToken from proxyWallet to adapter
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
             //bookKeeping
             bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_amount));
@@ -186,9 +193,9 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
 
             // safeApprove to Vault
             address(collateralToken).safeApprove(address(vault), _amount);
-            //deposit WXDC to Vault
+            //deposit collateralToken to Vault
             vault.deposit(_amount);
-            emit LogDeposit(_amount); // wxdc
+            emit LogDeposit(_amount); // collateralToken
         }
     }
 
@@ -201,9 +208,9 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
             totalShare -= _amount;
 
-            //withdraw WXDC from Vault
+            //withdraw collateralToken from Vault
             vault.withdraw(_amount);
-            //Transfer WXDC to proxyWallet
+            //Transfer collateralToken to proxyWallet
             address(collateralToken).safeTransfer(_usr, _amount);
         }
         emit LogWithdraw(_amount);

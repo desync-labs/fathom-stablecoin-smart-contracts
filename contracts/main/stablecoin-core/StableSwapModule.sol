@@ -352,10 +352,11 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogWithdrawToken(msg.sender, _token, _amount);
     }
 
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }

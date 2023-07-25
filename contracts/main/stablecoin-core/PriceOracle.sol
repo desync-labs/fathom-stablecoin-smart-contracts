@@ -12,9 +12,12 @@ import "../interfaces/IPausable.sol";
 import "../interfaces/ISetPrice.sol";
 import "../utils/CommonMath.sol";
 
-/** @notice A contract which is the price oracle of the BookKeeper to keep all collateral pools updated with the latest price of the collateral.
-    The price oracle is important in reflecting the current state of the market price.
-*/
+/**
+ * @title PriceOracle
+ * @notice A contract which is the price oracle of the BookKeeper to keep all collateral pools updated with the latest price of the collateral.
+ * The price oracle is important in reflecting the current state of the market price.
+ */
+
 contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
     struct CollateralPool {
         IPriceFeed priceFeed; // Price Feed
@@ -103,10 +106,11 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
             emit LogCage();
         }
     }
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();
     }

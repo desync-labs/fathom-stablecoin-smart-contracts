@@ -57,11 +57,11 @@ contract MockSimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, I
     function setPoolId(bytes32 _poolId) external {
         poolId = _poolId;
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }

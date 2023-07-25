@@ -331,11 +331,11 @@ contract PositionManager is PausableUpgradeable, IManager {
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "PositionManager/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = _bookKeeper;
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }

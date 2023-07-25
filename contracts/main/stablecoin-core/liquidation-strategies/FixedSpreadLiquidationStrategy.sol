@@ -17,6 +17,13 @@ import "../../interfaces/IERC165.sol";
 import "../../utils/SafeToken.sol";
 import "../../utils/CommonMath.sol";
 
+/**
+ * @title FixedSpreadLiquidationStrategy
+ * @notice A contract representing a fixed spread liquidation strategy.
+ * This strategy is used for liquidating undercollateralized positions in a collateral pool.
+ * The strategy calculates the amount of debt and collateral to be liquidated based on current market conditions.
+ * @dev The FixedSpreadLiquidationStrategy contract implements the ILiquidationStrategy interface.
+ */
 contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
     using SafeToken for address;
 
@@ -81,7 +88,15 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
     }
-
+    /**
+     * @notice Initializes the FixedSpreadLiquidationStrategy contract with required dependencies.
+     * @param _bookKeeper The address of the BookKeeper contract.
+     * @param _priceOracle The address of the PriceOracle contract.
+     * @param _liquidationEngine The address of the LiquidationEngine contract.
+     * @param _systemDebtEngine The address of the SystemDebtEngine contract.
+     * @param _stablecoinAdapter The address of the StablecoinAdapter contract used for depositing FXD to the BookKeeper.
+     * @dev Reverts if any of the input parameters are the zero address or invalid.
+     */
     function initialize(
         address _bookKeeper,
         address _priceOracle,
@@ -110,15 +125,20 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         ); // Sanity Check Call
         stablecoinAdapter = IStablecoinAdapter(_stablecoinAdapter); //StablecoinAdapter to deposit FXD to bookKeeper
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }
-
+    /**
+     * @notice Sets the flash lending feature to enabled or disabled.
+     * @param _flashLendingEnabled The value indicating whether flash lending should be enabled (1) or disabled (0).
+     * @dev This function can only be called by the contract owner or governance.
+     * @dev Emits a LogSetFlashLendingEnabled event upon a successful update.
+     */
     function setFlashLendingEnabled(uint256 _flashLendingEnabled) external onlyOwnerOrGov {
         flashLendingEnabled = _flashLendingEnabled;
         emit LogSetFlashLendingEnabled(msg.sender, _flashLendingEnabled);
@@ -127,8 +147,8 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
     // solhint-disable function-max-lines
     function execute(
         bytes32 _collateralPoolId,
-        uint256 _positionDebtShare, // Debt Value                  [wad]
-        uint256 _positionCollateralAmount, // Collateral Amount           [wad]
+        uint256 _positionDebtShare, // positionDebtShare                  [wad]
+        uint256 _positionCollateralAmount, // positionLockedCollateral           [wad]
         address _positionAddress, // Address that will receive any leftover collateral
         uint256 _debtShareToBeLiquidated, // The value of debt to be liquidated as specified by the liquidator [wad]
         uint256 _maxDebtShareToBeLiquidated, // The maximum value of debt to be liquidated as specified by the liquidator in case of full liquidation for slippage control [wad]

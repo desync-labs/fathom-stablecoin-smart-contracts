@@ -82,7 +82,12 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         require(live == 1, "LiquidationEngine/not-live");
         _;
     }
-
+    /**
+    * @notice Initialize the contract
+    * @param _bookKeeper The address of the BookKeeper contract
+    * @param _systemDebtEngine The address of the SystemDebtEngine contract
+    * @dev The function can only be called once after contract deployment
+    */
     // --- Init ---
     function initialize(address _bookKeeper, address _systemDebtEngine) external initializer {
         PausableUpgradeable.__Pausable_init();
@@ -94,16 +99,33 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
 
         live = 1;
     }
-
+    /**
+    * @notice Add a new liquidator to the whitelist
+    * @param toBeWhitelisted The address to be whitelisted
+    * @dev Can only be called by the contract owner or the governance system
+    */
     function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
         require(toBeWhitelisted != address(0), "LiquidationEngine/whitelist-invalidAddress");
         liquidatorsWhitelist[toBeWhitelisted] = 1;
     }
-
+    /**
+    * @notice Remove a liquidator from the whitelist
+    * @param toBeRemoved The address to be removed from the whitelist
+    * @dev Can only be called by the contract owner or the governance system
+    */    
     function blacklist(address toBeRemoved) external onlyOwnerOrGov {
         liquidatorsWhitelist[toBeRemoved] = 0;
     }
-
+    /**
+    * @notice Batch liquidate multiple positions
+    * @param _collateralPoolIds The ids of the collateral pools for the positions to be liquidated
+    * @param _positionAddresses The addresses of the positions to be liquidated
+    * @param _debtShareToBeLiquidateds The amount of debt to be liquidated for each position
+    * @param _maxDebtShareToBeLiquidateds The maximum amount of debt that can be liquidated for each position
+    * @param _collateralRecipients The addresses to receive the liquidated collateral
+    * @param datas Extra data to be passed to each liquidation call
+    * @dev Can only be called by a whitelisted liquidator
+    */
     function batchLiquidate(
         bytes32[] calldata _collateralPoolIds,
         address[] calldata _positionAddresses,
@@ -159,7 +181,16 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         require(msg.sender == address(this), "LiquidationEngine/invalid-sender");
         _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated, _maxDebtShareToBeLiquidated, _collateralRecipient, _data, sender);
     }
-
+    /**
+    * @notice Liquidate a position
+    * @param _collateralPoolId The id of the collateral pool for the position to be liquidated
+    * @param _positionAddress The address of the position to be liquidated
+    * @param _debtShareToBeLiquidated The amount of debt to be liquidated
+    * @param _maxDebtShareToBeLiquidated The maximum amount of debt that can be liquidated
+    * @param _collateralRecipient The address to receive the liquidated collateral
+    * @param _data Extra data to be passed to the liquidation call
+    * @dev Can only be called by a whitelisted liquidator
+    */
     function liquidate(
         bytes32 _collateralPoolId,
         address _positionAddress,
@@ -184,7 +215,6 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         bookKeeper = IBookKeeper(_bookKeeper);
     }
 
-    /// @dev access: OWNER_ROLE, SHOW_STOPPER_ROLE
     function cage() external override onlyOwnerOrShowStopper {
         if (live == 1) {
             live = 0;
@@ -192,12 +222,12 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         }
     }
 
+
     // --- pause ---
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
-
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();

@@ -9,10 +9,14 @@ import "../interfaces/IStabilityFeeCollector.sol";
 import "../interfaces/IPausable.sol";
 import "../utils/CommonMath.sol";
 
-/** @notice A contract which acts as a collector for the stability fee.
-    The stability fee is a fee that is collected from the minter of Fathom Stablecoin in a per-seconds basis.
-    The stability fee will be accumulated in the system as a surplus to settle any bad debt.
-*/
+/**
+ * @title StabilityFeeCollector
+ * @notice A contract that acts as a collector for the stability fee.
+ * The stability fee is a fee that is collected from the minter of Fathom Stablecoin on a per-seconds basis.
+ * This fee is accumulated in the system as a surplus to settle any bad debt.
+ * The contract is Pausable, meaning it can be paused by the owner or governance to prevent fee collection temporarily.
+ * Stability fees are collected for each collateral pool separately.
+ */
 contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStabilityFeeCollector, IPausable {
     struct CollateralPool {
         uint256 stabilityFeeRate; // Collateral-specific, per-second stability fee debtAccumulatedRate or mint interest debtAccumulatedRate [ray]
@@ -50,11 +54,11 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
         require(_systemDebtEngine != address(0), "StabilityFeeCollector/bad-system-debt-engine-address");
         systemDebtEngine = _systemDebtEngine;
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();
     }
@@ -65,15 +69,24 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
         emit LogSetSystemDebtEngine(msg.sender, _systemDebtEngine);
     }
 
-    /** @dev Collect the stability fee of the collateral pool.
-      This function could be called by anyone.
-      It will update the `debtAccumulatedRate` of the specified collateral pool according to
-      the global and per-pool stability fee rates with respect to the last block that `collect` was called.
-    */
+    /**
+     * @dev Collects the stability fee of the specified collateral pool.
+     * This function can be called by anyone.
+     * It updates the `debtAccumulatedRate` of the specified collateral pool based on
+     * the global and per-pool stability fee rates with respect to the last block that `collect` was called.
+     * @param _collateralPool Collateral pool ID for which to collect the stability fee.
+     * @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
+     */
     function collect(bytes32 _collateralPool) external override whenNotPaused nonReentrant returns (uint256 _debtAccumulatedRate) {
         _debtAccumulatedRate = _collect(_collateralPool);
     }
-
+    /**
+     * @dev Internal function to collect the stability fee of the specified collateral pool.
+     * This function updates the `debtAccumulatedRate` of the specified collateral pool based on
+     * the global and per-pool stability fee rates with respect to the last block that `collect` was called.
+     * @param _collateralPoolId Collateral pool ID for which to collect the stability fee.
+     * @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
+     */
     function _collect(bytes32 _collateralPoolId) internal returns (uint256 _debtAccumulatedRate) {
         ICollateralPoolConfig _config = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
         

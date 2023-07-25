@@ -88,11 +88,11 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
             address(collateralToken).safeTransfer(_to, _amount);
         }
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }
