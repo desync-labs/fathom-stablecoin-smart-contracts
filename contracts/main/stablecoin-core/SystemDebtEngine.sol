@@ -96,12 +96,6 @@ contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpg
         }
     }
 
-    function uncage() external override onlyOwnerOrShowStopper {
-        require(live == 0, "SystemDebtEngine/not-caged");
-        live = 1;
-        emit LogUncage();
-    }
-
     function pause() external override onlyOwnerOrGov {
         _pause();
     }

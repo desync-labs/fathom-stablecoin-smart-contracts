@@ -154,12 +154,6 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
         }
     }
 
-    function uncage() external override onlyOwner {
-        require(live == 0, "CollateralTokenAdapter/not-caged");
-        live = 1;
-        emit LogUncage();
-    }
-
     function pause() external onlyOwnerOrGov {
         _pause();
     }

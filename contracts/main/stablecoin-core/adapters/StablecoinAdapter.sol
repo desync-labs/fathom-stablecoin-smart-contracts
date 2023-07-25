@@ -55,12 +55,6 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         }
     }
 
-    function uncage() external override onlyOwnerOrShowStopper {
-        require(live == 0, "StablecoinAdapter/not-caged");
-        live = 1;
-        emit LogUncage();
-    }
-
     function deposit(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         bookKeeper.moveStablecoin(address(this), usr, wad * RAY);
         stablecoin.burn(msg.sender, wad);

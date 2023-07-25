@@ -64,12 +64,6 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
         }
     }
 
-    function uncage() external override onlyOwnerOrShowStopper {
-        require(live == 0, "TokenAdapter/not-caged");
-        live = 1;
-        emit LogUncage();
-    }
-
     function deposit(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         require(live == 1, "TokenAdapter/not-live");
         require(int256(wad) >= 0, "TokenAdapter/overflow");
