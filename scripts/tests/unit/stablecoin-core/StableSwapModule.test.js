@@ -426,25 +426,10 @@ describe("StableSwapModule", () => {
     })
 
     describe("#withdrawFees", () => {
-      context("not authorized", () => {
+      context("only-stableswap-wrapper-can-call", () => {
         it("should revert", async () => {
           await mockedAccessControlConfig.mock.hasRole.returns(false)
-
-          await expect(stableSwapModule.withdrawFees(DeployerAddress)).to.be.revertedWith("!(ownerRole or govRole)")
-        })
-      })
-      context("zero balance", () => {
-        it("should revert", async () => {
-          await expect(
-            stableSwapModule.withdrawFees(DeployerAddress)
-          ).to.be.revertedWith("withdrawFees/no-fee-balance")
-        })
-      })
-      context("zero address", () => {
-        it("should revert", async () => {
-          await expect(
-            stableSwapModule.withdrawFees(AddressZero)
-          ).to.be.revertedWith("withdrawFees/wrong-destination")
+          await expect(stableSwapModule.withdrawFees(DeployerAddress, WeiPerWad, WeiPerWad)).to.be.revertedWith("only-stableswap-wrapper")
         })
       })
     })

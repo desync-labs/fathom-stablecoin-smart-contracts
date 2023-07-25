@@ -177,13 +177,6 @@ import "../utils/CommonMath.sol";
         }
     }
 
-    function uncage() external override onlyOwnerOrShowStopper {
-        require(live == 0, "BookKeeper/not-caged");
-        live = 1;
-
-        emit LogUncage();
-    }
-
     // --- Pause ---
 
     function pause() external override onlyOwnerOrGov {

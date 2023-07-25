@@ -338,32 +338,4 @@ describe("PriceOracle", () => {
       })
     })
   })
-
-  describe("#uncage()", () => {
-    context("when role can't access", () => {
-      it("should revert", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(false)
-
-        await expect(priceOracleAsAlice.uncage()).to.be.revertedWith("!(ownerRole or showStopperRole)")
-      })
-    })
-
-    context("when role can access", () => {
-      context("caller is owner role ", () => {
-        it("should be set live to 1", async () => {
-          await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-          expect(await priceOracleAsAlice.live()).to.be.equal(1)
-
-          await priceOracleAsAlice.cage()
-
-          expect(await priceOracleAsAlice.live()).to.be.equal(0)
-
-          await expect(priceOracleAsAlice.uncage()).to.emit(priceOracleAsAlice, "LogUncage").withArgs()
-
-          expect(await priceOracleAsAlice.live()).to.be.equal(1)
-        })
-      })
-    })
-  })
 })

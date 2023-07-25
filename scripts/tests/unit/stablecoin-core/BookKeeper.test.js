@@ -1968,30 +1968,4 @@ describe("BookKeeper", () => {
             })
         })
     })
-
-    describe("#uncage", () => {
-        context("when role can't access", () => {
-            it("should revert", async () => {
-                await mockedAccessControlConfig.mock.hasRole.returns(false)
-                await expect(bookKeeperAsAlice.uncage()).to.be.revertedWith("!(ownerRole or showStopperRole)")
-            })
-        })
-
-        context("when owner role can access", () => {
-            it("should be success", async () => {
-                // grant role access
-                await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-                expect(await bookKeeperAsAlice.live()).to.be.equal(1)
-
-                await bookKeeperAsAlice.cage()
-
-                expect(await bookKeeperAsAlice.live()).to.be.equal(0)
-
-                await expect(bookKeeperAsAlice.uncage()).to.emit(bookKeeperAsAlice, "LogUncage").withArgs()
-
-                expect(await bookKeeperAsAlice.live()).to.be.equal(1)
-            })
-        })
-    })
 })
