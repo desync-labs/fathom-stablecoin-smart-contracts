@@ -162,7 +162,6 @@ contract FathomStablecoinProxyActions is CommonMath {
             _positionAddress, 
             _positionAddress, 
             _collateralPoolId, 
-            _stabilityFeeCollector
         );
         // Deposits Fathom Stablecoin amount into the bookKeeper
         stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _requiredStablecoinAmount, _data);
@@ -174,6 +173,7 @@ contract FathomStablecoinProxyActions is CommonMath {
             SafeToken.safeTransferETH(msg.sender, _collateralAmount); // Send XDC to user
         }
         IManager(_manager).updatePrice(_collateralPoolId);
+        IStabilityFeeCollector(_stabilityFeeCollector).collect(_collateralPoolId); // [ray]. Updates stability fee rate
 
         emit LogPaidAmount(_positionAddress, _requiredStablecoinAmount);
     }
@@ -435,7 +435,6 @@ contract FathomStablecoinProxyActions is CommonMath {
             _positionAddress,
             _positionAddress,
             _collateralPoolId,
-            _stabilityFeeCollector
         );
         // Deposits Fathom Stablecoin amount into the bookKeeper
         stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _requiredStablecoinAmount, _data);
@@ -447,7 +446,7 @@ contract FathomStablecoinProxyActions is CommonMath {
             IGenericTokenAdapter(_tokenAdapter).withdraw(msg.sender, _collateralAmount, _data); // Withdraws token amount to the user's wallet as a token
         }
         IManager(_manager).updatePrice(_collateralPoolId);
-
+        IStabilityFeeCollector(_stabilityFeeCollector).collect(_collateralPoolId); // [ray]. Updates stability fee rate
         emit LogPaidAmount(_positionAddress, _requiredStablecoinAmount);
     }
 
@@ -499,9 +498,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         address _usr,
         address _positionAddress,
         bytes32 _collateralPoolId,
-        address _stabilityFeeCollector
     ) internal returns (uint256 _requiredStablecoinAmount) {
-        uint256 _debtAccumulatedRate = IStabilityFeeCollector(_stabilityFeeCollector).collect(_collateralPoolId); // [ray]. Updates stability fee rate
         (, uint256 _debtShare) = IBookKeeper(_bookKeeper).positions(_collateralPoolId, _positionAddress); // [wad]. Gets actual debtShare value of the positionAddress
         uint256 _stablecoinValue = IBookKeeper(_bookKeeper).stablecoin(_usr); // [rad]. Gets actual stablecoin amount in the usr
 
