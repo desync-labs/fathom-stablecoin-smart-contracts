@@ -237,7 +237,6 @@ import "../utils/CommonMath.sol";
     * @param _src The address from which collateral tokens are being moved.
     * @param _dst The address to which collateral tokens are being moved.
     * @param _amount The amount of collateral tokens being moved from the source to the destination.
-    * @emit LogMoveCollateral An event indicating the movement of collateral tokens from source to destination.
     */
 
     function moveCollateral(
@@ -260,7 +259,6 @@ import "../utils/CommonMath.sol";
     * @param _src The source address from which the stablecoin is being moved.
     * @param _dst The destination address to which the stablecoin is being moved.
     * @param _value The amount of stablecoin being moved from the source to the destination.
-    * @emit LogMoveStablecoin An event indicating the movement of stablecoin from source to destination.
     */
 
     function moveStablecoin(address _src, address _dst, uint256 _value) external override nonReentrant whenNotPaused {
@@ -280,8 +278,6 @@ import "../utils/CommonMath.sol";
     * @param _stablecoinOwner The address of the owner of the stablecoin. (positionAddress)
     * @param _collateralValue The change in collateral value. This is added to the position's current locked collateral.
     * @param _debtShare The change in debt share. This is added to the position's current debt share.
-    * @emit LogAdjustPosition An event indicating the successful adjustment of the position's collateral and debt.
-    * @emit StablecoinIssuedAmount An event indicating the total amount of stablecoin issued for the entire system and for the specific collateral pool.
     */
     // solhint-disable function-max-lines
     function adjustPosition(

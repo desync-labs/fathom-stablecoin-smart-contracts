@@ -243,7 +243,6 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
      * @param _collateralPoolId The ID of the collateral pool that the position belongs to.
      * @param _positionAddress The address of the position to redeem locked collateral from.
      * @param _collateralReceiver The address to receive the redeemed collateral tokens.
-     * @param _data Additional data (optional) that may be used by the position manager contract, if applicable.
      */
     function redeemLockedCollateral(
         bytes32 _collateralPoolId,
