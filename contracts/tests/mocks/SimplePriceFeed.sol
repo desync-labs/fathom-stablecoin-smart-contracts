@@ -46,8 +46,8 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
     /// @dev access: OWNER_ROLE
     function setPrice(uint256 _price) external onlyOwner {
         price = _price;
-        lastUpdate = block.timestamp;
-        emit LogSetPrice(msg.sender, price, lastUpdate);
+        lastUpdateTS = block.timestamp;
+        emit LogSetPrice(msg.sender, price, lastUpdateTS);
     }
 
     function setPriceLife(uint256 _second) external onlyOwner {
@@ -81,7 +81,7 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
     }
 
     function isPriceFresh() external view override returns (bool) {
-        return lastUpdate >= block.timestamp - priceLife;
+        return lastUpdateTS >= block.timestamp - priceLife;
     }
 
     function _isPriceOk() internal view returns (bool) {
