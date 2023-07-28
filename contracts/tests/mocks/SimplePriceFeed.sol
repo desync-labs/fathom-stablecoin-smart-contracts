@@ -11,7 +11,7 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
     IAccessControlConfig public accessControlConfig;
 
     uint256 public price;
-    uint256 public lastUpdate;
+    uint256 public lastUpdateTS;
     bytes32 public poolId;
 
     uint256 public priceLife;
@@ -59,11 +59,11 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
     function setPoolId(bytes32 _poolId) external {
         poolId = _poolId;
     }
-    /// @dev access: OWNER_ROLE, GOV_ROLE
+
     function pause() external onlyOwnerOrGov {
         _pause();
     }
-    /// @dev access: OWNER_ROLE, GOV_ROLE
+
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }
