@@ -68,8 +68,6 @@ contract AdminControls is OwnableUpgradeable {
     /**
     * @notice Pause all core modules of the protocol.
     * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are paused.
-    * @return None.
-    * @event Emits a LogPauseProtocol event.
     */
     function pauseProtocol() external onlyOwnerOrGov {
         IPausable(bookKeeper).pause();
@@ -84,8 +82,6 @@ contract AdminControls is OwnableUpgradeable {
     /**
     * @notice Unpause all core modules of the protocol.
     * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are unpaused.
-    * @return None.
-    * @event Emits a LogUnpauseProtocol event.
     */
     function unpauseProtocol() external onlyOwnerOrGov {
         IPausable(bookKeeper).unpause();
