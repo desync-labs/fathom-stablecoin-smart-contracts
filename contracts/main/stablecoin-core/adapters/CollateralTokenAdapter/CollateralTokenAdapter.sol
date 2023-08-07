@@ -47,7 +47,9 @@ contract CollateralTokenAdapterMath {
 
 /// @title CollateralTokenAdapter
 /// @dev receives collateral from users and deposit in Vault.contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
-    using SafeToken for address;
+contract CollateralTokenAdapter is CollateralTokenAdapterMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
+
+   using SafeToken for address;
 
     uint256 public live;
     bool internal flagVault;

@@ -36,7 +36,7 @@ contract ShowStopperMath {
  * calculate and settle bad debt, and finalize the total debt of the system after the shutdown.
  * It also calculates the redeemStablecoin price of each collateral pool and allows users to redeem their stablecoins for collateral tokens.
  */
-contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
+contract ShowStopper is ShowStopperMath, IShowStopper, Initializable {
     IBookKeeper public bookKeeper; // CDP Engine
     ILiquidationEngine public liquidationEngine;
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
