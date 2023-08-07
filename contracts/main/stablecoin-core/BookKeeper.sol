@@ -10,14 +10,51 @@ import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IAccessControlConfig.sol";
 import "../interfaces/IPausable.sol";
-import "../utils/CommonMath.sol";
+
+contract BookKeeperMath {
+    function add(uint256 x, int256 y) internal pure returns (uint256 z) {
+        unchecked {
+            z = x + uint256(y);
+        }
+        require(y >= 0 || z <= x);
+        require(y <= 0 || z >= x);
+    }
+
+    function sub(uint256 x, int256 y) internal pure returns (uint256 z) {
+        unchecked {
+            z = x - uint256(y);
+        }
+        require(y <= 0 || z <= x);
+        require(y >= 0 || z >= x);
+    }
+
+    function mul(uint256 x, int256 y) internal pure returns (int256 z) {
+        unchecked {
+            z = int256(x) * y;
+        }
+        require(int256(x) >= 0);
+        require(y == 0 || z / y == int256(x));
+    }
+
+    function either(bool _x, bool _y) internal pure returns (bool _z) {
+        assembly {
+            _z := or(_x, _y)
+        }
+    }
+
+    function both(bool _x, bool _y) internal pure returns (bool _z) {
+        assembly {
+            _z := and(_x, _y)
+        }
+    }
+}
 
 /**
  * @title BookKeeper
  * @notice A contract which acts as a bookkeeper of the Fathom Stablecoin protocol.
  * It has the ability to move collateral tokens and stablecoins within the accounting state variable.
  */
- contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable {
+ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, PausableUpgradeable, ReentrancyGuardUpgradeable {
     using Address for address;
 
     struct Position {

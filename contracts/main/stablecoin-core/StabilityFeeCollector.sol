@@ -7,7 +7,72 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IStabilityFeeCollector.sol";
 import "../interfaces/IPausable.sol";
-import "../utils/CommonMath.sol";
+
+contract StabilityFeeCollectorMath {
+    uint256 internal constant RAY = 10 ** 27;
+
+    function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
+        assembly {
+            switch x
+            case 0 {
+                switch n
+                case 0 {
+                    z := b
+                }
+                default {
+                    z := 0
+                }
+            }
+            default {
+                switch mod(n, 2)
+                case 0 {
+                    z := b
+                }
+                default {
+                    z := x
+                }
+                let half := div(b, 2) // for rounding.
+                for {
+                    n := div(n, 2)
+                } n {
+                    n := div(n, 2)
+                } {
+                    let xx := mul(x, x)
+                    if iszero(eq(div(xx, x), x)) {
+                        revert(0, 0)
+                    }
+                    let xxRound := add(xx, half)
+                    if lt(xxRound, xx) {
+                        revert(0, 0)
+                    }
+                    x := div(xxRound, b)
+                    if mod(n, 2) {
+                        let zx := mul(z, x)
+                        if and(iszero(iszero(x)), iszero(eq(div(zx, x), z))) {
+                            revert(0, 0)
+                        }
+                        let zxRound := add(zx, half)
+                        if lt(zxRound, zx) {
+                            revert(0, 0)
+                        }
+                        z := div(zxRound, b)
+                    }
+                }
+            }
+        }
+    }
+
+    function diff(uint256 _x, uint256 _y) internal pure returns (int256 _z) {
+        _z = int256(_x) - int256(_y);
+        require(int256(_x) >= 0 && int256(_y) >= 0);
+    }
+
+    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = _x * _y;
+        require(_y == 0 || _z / _y == _x);
+        _z = _z / RAY;
+    }
+}
 
 /**
  * @title StabilityFeeCollector
@@ -17,7 +82,7 @@ import "../utils/CommonMath.sol";
  * The contract is Pausable, meaning it can be paused by the owner or governance to prevent fee collection temporarily.
  * Stability fees are collected for each collateral pool separately.
  */
-contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStabilityFeeCollector, IPausable {
+contract StabilityFeeCollector is StabilityFeeCollectorMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStabilityFeeCollector, IPausable {
     struct CollateralPool {
         uint256 stabilityFeeRate; // Collateral-specific, per-second stability fee debtAccumulatedRate or mint interest debtAccumulatedRate [ray]
         uint256 lastAccumulationTime; // Time of last call to `collect` [unix epoch time]

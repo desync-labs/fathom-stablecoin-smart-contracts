@@ -9,7 +9,12 @@ import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/IPausable.sol";
-import "../utils/CommonMath.sol";
+
+contract SystemDebtEngineMath {
+    function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        return _x <= _y ? _x : _y;
+    }
+}
 
 /**
  * @title SystemDebtEngine
@@ -21,8 +26,7 @@ import "../utils/CommonMath.sol";
  * It is also protected against reentrancy attacks using the ReentrancyGuard modifier.
  * The contract has an active flag, live, which allows for system shutdown.
  */
-
-contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ISystemDebtEngine, ICagable, IPausable {
+contract SystemDebtEngine is SystemDebtEngineMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ISystemDebtEngine, ICagable, IPausable {
     IBookKeeper public bookKeeper; // CDP Engine
     uint256 public override surplusBuffer; // Surplus buffer         [rad]
     uint256 public live; // Active Flag

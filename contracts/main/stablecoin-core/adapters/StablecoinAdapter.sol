@@ -9,14 +9,15 @@ import "../../interfaces/IBookKeeper.sol";
 import "../../interfaces/IStablecoinAdapter.sol";
 import "../../interfaces/ICagable.sol";
 import "../../interfaces/IPausable.sol";
-import "../../utils/CommonMath.sol";
 
+contract StablecoinAdapterMath {
+    uint256 internal constant ONE = 10 ** 27;
+}
 /**
  * @title Stablecoin Adapter contract
  * @dev Handles deposit and withdrawal of stablecoins, along with emergency shutdown (caging) functionality.
  */
-
-contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable, IPausable {
+contract StablecoinAdapter is StablecoinAdapterMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable, IPausable {
     IBookKeeper public override bookKeeper; // CDP Engine
     IStablecoin public override stablecoin; // Stablecoin Token
     uint256 public live; // Active Flag
@@ -66,7 +67,7 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
      * @param wad Amount to deposit. [wad]
      */
     function deposit(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
-        bookKeeper.moveStablecoin(address(this), usr, wad * RAY);
+        bookKeeper.moveStablecoin(address(this), usr, wad * ONE);
         stablecoin.burn(msg.sender, wad);
     }
     /**
@@ -76,7 +77,7 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
      */
     function depositRAD(address usr, uint256 rad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         bookKeeper.moveStablecoin(address(this), usr, rad);
-        stablecoin.burn(msg.sender, (rad / RAY) + 1);
+        stablecoin.burn(msg.sender, (rad / ONE) + 1);
     }
     /**
      * @notice Withdraws stablecoin to a specified user.
@@ -85,7 +86,7 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
      */
     function withdraw(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         require(live == 1, "StablecoinAdapter/not-live");
-        bookKeeper.moveStablecoin(msg.sender, address(this), wad * RAY);
+        bookKeeper.moveStablecoin(msg.sender, address(this), wad * ONE);
         stablecoin.mint(usr, wad);
     }
     /// @dev access: OWNER_ROLE, GOV_ROLE

@@ -11,18 +11,32 @@ import "../interfaces/IStabilityFeeCollector.sol";
 import "../interfaces/IProxyRegistry.sol";
 import "../interfaces/IProxy.sol";
 import "../utils/SafeToken.sol";
-import "../utils/CommonMath.sol";
 
-/// @notice WARNING: These functions meant to be used as a library for a Proxy.
-/// @notice DO NOT CALL ANY FUNCTION IN THIS CONTRACT DIRECTLY.
-/// @notice Hence, it shouldn't has any state variables. Some are unsafe if you call them directly.
-contract FathomStablecoinProxyActions is CommonMath {
-    using SafeToken for address;
+contract FathomStablecoinProxyActionsMath {
+    uint256 internal constant RAY = 10 ** 27;
 
     // solhint-disable
     event LogBorrowedAmount(address _positionAddress, uint256 _FXDBorrowAmount);
     event LogPaidAmount(address _positionAddress, uint256 _FXDPaidAmount);
+
     // solhint-enable
+    function convertTo18(address _tokenAdapter, uint256 _amt) internal returns (uint256 _wad) {
+        // For those collaterals that have less than 18 decimals precision we need to do the conversion before passing to adjustPosition function
+        // Adapters will automatically handle the difference of precision
+        uint256 decimals = IToken(IGenericTokenAdapter(_tokenAdapter).collateralToken()).decimals();
+        _wad = decimals < 18 ? _amt * (10 ** (18 - decimals)) : _amt / (10 ** (decimals - 18));
+    }
+
+    function _toRad(uint256 _wad) internal pure returns (uint256 _rad) {
+        _rad = _wad * RAY;
+    }
+}
+
+/// @notice WARNING: These functions meant to be used as a library for a Proxy.
+/// @notice DO NOT CALL ANY FUNCTION IN THIS CONTRACT DIRECTLY.
+/// @notice Hence, it shouldn't has any state variables. Some are unsafe if you call them directly.
+contract FathomStablecoinProxyActions is FathomStablecoinProxyActionsMath {
+    using SafeToken for address;
 
     address immutable internal self = address(this);
 
@@ -84,7 +98,7 @@ contract FathomStablecoinProxyActions is CommonMath {
             _data
         );
 
-        moveStablecoin(_manager, _positionId, address(this), toRad(_amount)); // Moves the Fathom Stablecoin amount (balance in the bookKeeper in rad) to proxy's address
+        moveStablecoin(_manager, _positionId, address(this), _toRad(_amount)); // Moves the Fathom Stablecoin amount (balance in the bookKeeper in rad) to proxy's address
 
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_bookKeeper).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
@@ -299,7 +313,7 @@ contract FathomStablecoinProxyActions is CommonMath {
             _data
         );
         // Moves the Fathom Stablecoin amount (balance in the bookKeeper in rad) to proxy's address
-        moveStablecoin(_manager, _positionId, address(this), toRad(_stablecoinAmount));
+        moveStablecoin(_manager, _positionId, address(this), _toRad(_stablecoinAmount));
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_bookKeeper).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
             IBookKeeper(_bookKeeper).whitelist(_stablecoinAdapter);
@@ -326,7 +340,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         // Takes token amount from user's wallet and joins into the bookKeeper
         tokenAdapterDeposit(_tokenAdapter, _manager.positions(_positionId), _collateralAmount, _transferFrom, _data);
         // Locks token amount into the position and generates debt
-        int256 _collateralAmountInWad = int256(_convertTo18(_tokenAdapter, _collateralAmount));
+        int256 _collateralAmountInWad = int256(convertTo18(_tokenAdapter, _collateralAmount));
         int256 _drawDebtShare = _getDrawDebtShare(
             _manager.bookKeeper(),
             _stabilityFeeCollector,
@@ -336,7 +350,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         ); // [wad]
         adjustPosition(address(_manager), _positionId, _collateralAmountInWad, _drawDebtShare, _data);
         // Moves the Fathom Stablecoin amount (balance in the bookKeeper in rad) to proxy's address
-        moveStablecoin(address(_manager), _positionId, address(this), toRad(_stablecoinAmount));
+        moveStablecoin(address(_manager), _positionId, address(this), _toRad(_stablecoinAmount));
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_manager.bookKeeper()).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
             IBookKeeper(_manager.bookKeeper()).whitelist(_stablecoinAdapter);
@@ -388,7 +402,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
         // Deposits Fathom Stablecoin amount into the bookKeeper
         stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _stablecoinAmount, _data);
-        uint256 _collateralAmountInWad = _convertTo18(_tokenAdapter, _collateralAmount);
+        uint256 _collateralAmountInWad = convertTo18(_tokenAdapter, _collateralAmount);
         // Paybacks debt to the CDP and unlocks token amount from it
         int256 _wipeDebtShare = _getWipeDebtShare(
             IManager(_manager).bookKeeper(),
@@ -426,7 +440,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         );
         // Deposits Fathom Stablecoin amount into the bookKeeper
         stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _requiredStablecoinAmount, _data);
-        uint256 _collateralAmountInWad = _convertTo18(_tokenAdapter, _collateralAmount);
+        uint256 _collateralAmountInWad = convertTo18(_tokenAdapter, _collateralAmount);
         // Paybacks debt to the position and unlocks token amount from it
         adjustPosition(_manager, _positionId, -int256(_collateralAmountInWad), -int256(_debtShare), _data);
         if (_collateralAmount > 0) {
@@ -449,21 +463,14 @@ contract FathomStablecoinProxyActions is CommonMath {
         uint256 _positionStablecoinValue = IBookKeeper(_bookKeeper).stablecoin(_positionAddress); // [rad]. Gets Fathom Stablecoin balance of the positionAddress in the bookKeeper
 
         // If there was already enough Fathom Stablecoin in the bookKeeper balance, just exits it without adding more debt
-        if (_positionStablecoinValue < toRad(_stablecoinAmount)) {
+        if (_positionStablecoinValue < _toRad(_stablecoinAmount)) {
             // Calculates the needed resultDebtShare so together with the existing positionStablecoinValue in the bookKeeper is enough to exit stablecoinAmount of Fathom Stablecoin tokens
-            _resultDebtShare = int256((toRad(_stablecoinAmount) - _positionStablecoinValue) / _debtAccumulatedRate);
+            _resultDebtShare = int256((_toRad(_stablecoinAmount) - _positionStablecoinValue) / _debtAccumulatedRate);
             // This is neeeded due lack of precision. It might need to sum an extra resultDebtShare wei (for the given Fathom Stablecoin stablecoinAmount)
-            _resultDebtShare = (uint256(_resultDebtShare) * _debtAccumulatedRate) < toRad(_stablecoinAmount)
+            _resultDebtShare = (uint256(_resultDebtShare) * _debtAccumulatedRate) < _toRad(_stablecoinAmount)
                 ? _resultDebtShare + 1
                 : _resultDebtShare;
         }
-    }
-
-    function _convertTo18(address _tokenAdapter, uint256 _amt) internal returns (uint256 _wad) {
-        // For those collaterals that have less than 18 decimals precision we need to do the conversion before passing to adjustPosition function
-        // Adapters will automatically handle the difference of precision
-        uint256 decimals = IToken(IGenericTokenAdapter(_tokenAdapter).collateralToken()).decimals();
-        _wad = decimals < 18 ? _amt * (10 ** (18 - decimals)) : _amt / (10 ** (decimals - 18));
     }
 
     function _getWipeDebtShare(
@@ -499,7 +506,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         _requiredStablecoinAmount = _requiredStablecoinValue / RAY; // [wad] = [rad]/[ray]
 
         // If the value precision has some dust, it will need to request for 1 extra amount wei
-        _requiredStablecoinAmount = toRad(_requiredStablecoinAmount) < _requiredStablecoinValue
+        _requiredStablecoinAmount = _toRad(_requiredStablecoinAmount) < _requiredStablecoinValue
             ? _requiredStablecoinAmount + 1
             : _requiredStablecoinAmount;
     }

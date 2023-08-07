@@ -11,7 +11,23 @@ import "../interfaces/IPriceOracle.sol";
 import "../interfaces/ISystemDebtEngine.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
-import "../utils/CommonMath.sol";
+
+contract ShowStopperMath {
+    uint256 internal constant WAD = 10 ** 18;
+    uint256 internal constant RAY = 10 ** 27;
+
+    function min(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        return _x <= _y ? _x : _y;
+    }
+
+    function rmul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = (_x * _y) / RAY;
+    }
+
+    function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        _z = (_x * WAD) / _y;
+    }
+}
 
 /**
  * @title ShowStopper Contract
@@ -20,7 +36,7 @@ import "../utils/CommonMath.sol";
  * calculate and settle bad debt, and finalize the total debt of the system after the shutdown.
  * It also calculates the redeemStablecoin price of each collateral pool and allows users to redeem their stablecoins for collateral tokens.
  */
-contract ShowStopper is CommonMath, IShowStopper, Initializable {
+contract ShowStopper is ShowStopperMath, PausableUpgradeable, IShowStopper {
     IBookKeeper public bookKeeper; // CDP Engine
     ILiquidationEngine public liquidationEngine;
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
@@ -98,17 +114,12 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         emit LogSetPriceOracle(msg.sender, _priceOracle);
     }
 
-    /**
-    * @notice Initiates the process of emergency shutdown (cage).
-    * @dev This function can only be called by the contract owner.
-    * @param _cageCoolDown Length of the cooldown period for the emergency shutdown, in seconds.
-    *
-    * The cage function starts the emergency shutdown process, which includes the following steps:
-    *  - Start a cooldown period for the emergency shutdown.
-    *  - Pause BookKeeper: locking/unlocking collateral and mint/repay Fathom Stablecoin will not be allowed for any positions.
-    *  - Pause LiquidationEngine: positions will not be liquidated.
-    *  - Pause SystemDebtEngine: no accrual of new debt, no system debt settlement.
-    *  - Pause PriceOracle: no new price updates, no liquidation trigger.
+    /** @dev Start the process of emergency shutdown. The following will happen in order:
+      - Start a cooldown period of the emergency shutdown
+      - BookKeeper will be paused: locking/unlocking collateral and mint/repay Fathom Stablecoin will not be allow for any positions
+      - LiquidationEngine will be paused: positions will not be liquidated
+      - SystemDebtEngine will be paused: no accrual of new debt, no system debt settlement
+      - PriceOracle will be paused: no new price update, no liquidation trigger
     */
     function cage(uint256 _cageCoolDown) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
@@ -124,11 +135,7 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         emit LogCage(_cageCoolDown);
     }
 
-    /**
-     * @notice Sets the cage price of a specific collateral pool using the latest price from the PriceOracle.
-     * @dev This function can only be called by the contract owner after the system has been caged (emergency shutdown initiated).
-     * @param _collateralPoolId The ID of the collateral pool to set the cage price for.
-     */
+    /// @dev Set the cage price of the collateral pool with the latest price from the price oracle
     function cagePool(bytes32 _collateralPoolId) external onlyOwner {
         require(live == 0, "ShowStopper/still-live");
         require(cagePrice[_collateralPoolId] == 0, "ShowStopper/cage-price-collateral-pool-id-already-defined");
@@ -142,12 +149,10 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         emit LogCageCollateralPool(_collateralPoolId);
     }
 
-    /**
-     * @notice Inspects a specified position and calculates the current badDebtAccumulator for the collateral pool it belongs to.
-     * @dev The badDebtAccumulator will be used to determine the stablecoin redemption price and ensure all bad debt is covered.
-     * @param _collateralPoolId The ID of the collateral pool that the position belongs to.
-     * @param _positionAddress The address of the position to inspect for bad debt.
-     */
+    /** @dev Inspect the specified position and use the cage price of the collateral pool id to calculate the current badDebtAccumulator of the position.
+      The badDebtAccumulator will be tracked per collateral pool. It will be used in the determination of the stablecoin redemption price 
+      to make sure that all badDebtAccumulator will be covered. This process will clear the debt from the position.
+  */
     function accumulateBadDebt(bytes32 _collateralPoolId, address _positionAddress) external {
         require(cagePrice[_collateralPoolId] != 0, "ShowStopper/cage-price-collateral-pool-id-not-defined");
         uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(
@@ -171,12 +176,14 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         emit LogAccumulateBadDebt(_collateralPoolId, _positionAddress, _amount, _debtShare);
     }
 
-    /**
-     * @notice Finalizes the total debt of the system after the emergency shutdown.
-     * @dev This function should be called after all positions have undergone `accumulateBadDebt` or `snip` to settle all debt,
-     * system surplus must be zero, and the emergency shutdown cooldown period has passed.
-     * The total debt will be equivalent to the total stablecoin issued, reflecting the correct value after the emergency shutdown.
-     */
+    /** @dev Finalize the total debt of the system after the emergency shutdown.
+      This function should be called after:
+      - Every positions has undergone `accumulateBadDebt` or `snip` to settle all the debt.
+      - System surplus must be zero, this means all surplus should be used to settle bad debt already.
+      - The emergency shutdown cooldown period must have passed.
+      This total debt will be equivalent to the total stablecoin issued which should already reflect 
+      the correct value if all the above requirements before calling `finalizeDebt` are satisfied.
+    */
     function finalizeDebt() external {
         require(live == 0, "ShowStopper/still-live");
         require(debt == 0, "ShowStopper/debt-not-zero");
@@ -186,12 +193,10 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         emit LogFinalizeDebt();
     }
 
-    /**
-     * @notice Calculates the redeemStablecoin price of a specific collateral pool.
-     * @dev The redeemStablecoin price is the price at which Fathom Stablecoin holders can redeem their stablecoins for collateral tokens.
-     * The price takes into account the deficit/surplus of the collateral pool and ensures all bad debt is covered.
-     * @param _collateralPoolId The ID of the collateral pool to calculate the redeemStablecoin price for.
-     */
+    /** @dev Calculate the redeemStablecoin price of the collateral pool id.
+      The redeemStablecoin price is the price where the Fathom Stablecoin owner will be entitled to cagedTimestamp redeeming from Fathom Stablecoin -> collateral token.
+      The redeemStablecoin price will take into account the deficit/surplus of this collateral pool and calculate the price so that any bad debt will be covered.
+    */
     function finalizeCashPrice(bytes32 _collateralPoolId) external {
         require(debt != 0, "ShowStopper/debt-zero");
         require(finalCashPrice[_collateralPoolId] == 0, "ShowStopper/final-cash-price-collateral-pool-id-already-defined");
@@ -199,18 +204,18 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(
             _collateralPoolId
         ); // [ray]
+                            //total debtValue * 2 (2 is the ratio between FXD and Collatera's market price)
+                            //_wad is the collateral amount translation of debtValue
+                            
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
-
+                                                //(debtValue in collateral unit - badDebt from positions in collateral unit) / totalDebt
+                                                //->shows how much collateral is worth per FXD
         finalCashPrice[_collateralPoolId] = ((_wad - badDebtAccumulator[_collateralPoolId]) * RAY) / (debt / RAY);
 
         emit LogFinalizeCashPrice(_collateralPoolId);
     }
 
-    /**
-     * @notice Accumulates the deposited stablecoin of the caller into a stablecoinAccumulator to be redeemed into collateral tokens later.
-     * @dev The caller's stablecoin will be locked until they redeem the stablecoins for collateral tokens.
-     * @param _amount The amount of stablecoin to accumulate.
-     */
+    /// @dev Accumulate the deposited stablecoin of the caller into a stablecoinAccumulator to be redeemed into collateral token later
     function accumulateStablecoin(uint256 _amount) external {
         require(_amount != 0, "ShowStopper/amount-zero");
         require(debt != 0, "ShowStopper/debt-zero");
@@ -218,13 +223,8 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         stablecoinAccumulator[msg.sender] += _amount;
         emit LogAccumulateStablecoin(msg.sender, _amount);
     }
-
-    /**
-     * @notice Redeems stablecoin from the stablecoinAccumulator for collateral tokens of a specific collateral pool.
-     * @dev The stablecoin will be redeemed at the corresponding finalCashPrice of the collateral pool.
-     * @param _collateralPoolId The ID of the collateral pool to redeem stablecoin from.
-     * @param _amount The amount of stablecoin to redeem.
-     */
+    
+    /// @dev Redeem stablecoin in the stablecoinAccumulator of the caller into the corresponding collateral token
     function redeemStablecoin(bytes32 _collateralPoolId, uint256 _amount) external {
         require(_amount != 0, "ShowStopper/amount-zero");
         require(finalCashPrice[_collateralPoolId] != 0, "ShowStopper/final-cash-price-collateral-pool-id-not-defined");
@@ -237,13 +237,11 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         emit LogRedeemStablecoin(_collateralPoolId, msg.sender, _amount);
     }
 
-    /**
-     * @notice Redeems locked collateral from a position that has been safely settled after the emergency shutdown.
-     * @dev The position must have no debt and should have gone through the `accumulateBadDebt` or `smip` process already.
-     * @param _collateralPoolId The ID of the collateral pool that the position belongs to.
-     * @param _positionAddress The address of the position to redeem locked collateral from.
-     * @param _collateralReceiver The address to receive the redeemed collateral tokens.
-     */
+    /** @dev Redeem locked collateral from the position which has been safely settled by the emergency shutdown and give the collateral back to the position owner.
+      The position to be freed must has no debt at all. That means it must have gone through the process of `accumulateBadDebt` or `smip` already.
+      The position will be limited to the caller address. If the position address is not an EOA address but is managed by a position manager contract,
+      the owner of the position will have to move the collateral inside the position to the owner address first before calling `redeemLockedCollateral`.
+    */
     function redeemLockedCollateral(
         bytes32 _collateralPoolId,
         address _positionAddress,

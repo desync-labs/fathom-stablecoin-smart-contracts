@@ -15,7 +15,16 @@ import "../../interfaces/IGenericTokenAdapter.sol";
 import "../../interfaces/IStablecoinAdapter.sol";
 import "../../interfaces/IERC165.sol";
 import "../../utils/SafeToken.sol";
-import "../../utils/CommonMath.sol";
+
+contract FixedSpreadLiquidationStrategyMath {
+    uint256 internal constant BLN = 10 ** 9;
+    uint256 internal constant RAY = 10 ** 27;
+
+    function rdiv(uint256 x, uint256 y) internal pure returns (uint256 z) {
+        require(y > 0, "FixedSpreadLiquidationStrategy/zero-divisor");
+        z = (x * RAY) / y;
+    }
+}
 
 /**
  * @title FixedSpreadLiquidationStrategy
@@ -24,7 +33,7 @@ import "../../utils/CommonMath.sol";
  * The strategy calculates the amount of debt and collateral to be liquidated based on current market conditions.
  * @dev The FixedSpreadLiquidationStrategy contract implements the ILiquidationStrategy interface.
  */
-contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
+contract FixedSpreadLiquidationStrategy is FixedSpreadLiquidationStrategyMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
     using SafeToken for address;
 
     struct LiquidationInfo {
