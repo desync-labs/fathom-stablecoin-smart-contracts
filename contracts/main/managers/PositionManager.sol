@@ -215,6 +215,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         uint256 _wad,
         bytes calldata /* _data */
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
+        require(_destination != address(0), "PositionManager/dst-address(0)");
         bytes32 _collateralPoolId = collateralPools[_positionId];
         _requireHealthyPrice(_collateralPoolId);
 
@@ -234,6 +235,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         uint256 _wad,
         bytes calldata /* _data */
     ) external whenNotPaused onlyOwnerAllowed(_positionId) {
+        require(_destination != address(0), "PositionManager/dst-address(0)");
         _requireHealthyPrice(_collateralPoolId);
         IBookKeeper(bookKeeper).moveCollateral(_collateralPoolId, positions[_positionId], _destination, _wad);
     }
@@ -243,6 +245,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @param _destination The destination to received stablecoin
     /// @param _rad The amount in rad to be moved
     function moveStablecoin(uint256 _positionId, address _destination, uint256 _rad) external override whenNotPaused onlyOwnerAllowed(_positionId) {
+        require(_destination != address(0), "PositionManager/dst-address(0)");
         IBookKeeper(bookKeeper).moveStablecoin(positions[_positionId], _destination, _rad);
     }
 
@@ -254,6 +257,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         uint256 _positionId,
         address _destination
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) onlyMigrationAllowed(_destination) {
+        require(_destination != address(0), "PositionManager/dst-address(0)");
         (uint256 _lockedCollateral, uint256 _debtShare) = IBookKeeper(bookKeeper).positions(collateralPools[_positionId], positions[_positionId]);
         IBookKeeper(bookKeeper).movePosition(
             collateralPools[_positionId],

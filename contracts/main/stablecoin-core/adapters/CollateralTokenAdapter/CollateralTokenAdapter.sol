@@ -140,6 +140,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         uint256 _amount,
         bytes calldata _data
     ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
+        require(_positionAddress != address(0), "CollateralTokenAdapter/deposit-address(0)");
         _deposit(_positionAddress, _amount, _data);
     }
 
@@ -159,6 +160,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @dev for flow that deposits FXD and then withdraw collateral, please call this fn from EOA.
     /// @dev EMERGENCY WHEN COLLATERAL TOKEN ADAPTER CAGED ONLY. Withdraw COLLATERAL from VAULT A after redeemStablecoin
     function emergencyWithdraw(address _to) external nonReentrant {
+        require(_to != address(0), "CollateralTokenAdapter/emergency-address(0)");
         if (live == 0) {
             uint256 _amount = bookKeeper.collateralToken(collateralPoolId, msg.sender);
             require(_amount < 2 ** 255, "CollateralTokenAdapter/collateral-overflow");

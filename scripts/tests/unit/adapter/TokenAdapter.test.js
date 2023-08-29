@@ -79,6 +79,19 @@ describe("TokenAdapter", () => {
       })
     })
 
+    context("when a zero address is used for arg", () => {
+
+      it("should revert with 'TokenAdapter/deposit-address(0)'", async () => {
+          await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+          await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+          await expect(tokenAdapter.deposit("0x0000000000000000000000000000000000000000", WeiPerWad.mul(1), "0x"))
+          .to.be.revertedWith("TokenAdapter/deposit-address(0)");
+      });
+
+    });
+
     context("when wad input is overflow (> MaxInt256)", () => {
       it("should revert", async () => {
         await expect(tokenAdapter.deposit(AliceAddress, ethers.constants.MaxUint256, "0x")).to.be.revertedWith(
@@ -184,4 +197,13 @@ describe("TokenAdapter", () => {
       })
     })
   })
+
+  describe("#emergencyWithdraw()", () => {
+    context("when _to is a zero address", () => {
+        it("should revert with 'TokenAdapter/emergency-address(0)'", async () => {
+            await expect(tokenAdapter.emergencyWithdraw("0x0000000000000000000000000000000000000000"))
+            .to.be.revertedWith("TokenAdapter/emergency-address(0)");
+        });
+    });
+  });
 })
