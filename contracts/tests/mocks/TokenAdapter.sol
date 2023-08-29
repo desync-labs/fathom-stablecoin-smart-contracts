@@ -67,7 +67,7 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
     function deposit(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         require(usr != address(0), "TokenAdapter/deposit-address(0)");
         require(live == 1, "TokenAdapter/not-live");
-        require(int256(wad) >= 0, "TokenAdapter/overflow");
+        require(int256(wad) > 0, "TokenAdapter/overflow");
         bookKeeper.addCollateral(collateralPoolId, usr, int256(wad));
 
         // Move the actual token
@@ -75,7 +75,7 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
     }
 
     function withdraw(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
-        require(wad < 2 ** 255, "TokenAdapter/overflow");
+        require(int256(wad) > 0, "TokenAdapter/overflow");
         bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(wad));
 
         address(collateralToken).safeTransfer(usr, wad);
