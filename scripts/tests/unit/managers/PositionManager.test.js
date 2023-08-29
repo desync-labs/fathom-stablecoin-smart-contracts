@@ -395,6 +395,35 @@ describe("PositionManager", () => {
                 )
             })
         })
+        context("when _destination argument is a zero address, four args", () => {
+            it("should revert with 'PositionManager/dst-address(0)'", async () => {
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress);
+                await expect(
+                    positionManagerAsAlice["moveCollateral(uint256,address,uint256,bytes)"](
+                        1,
+                        "0x0000000000000000000000000000000000000000", // Zero address for _destination
+                        parseEther("1"),
+                        "0x"
+                    )
+                ).to.be.revertedWith("PositionManager/dst-address(0)");
+            });
+        });
+        context("when _destination argument is a zero address, five args", () => {
+            it("should revert with 'PositionManager/dst-address(0)' message", async () => {
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
+        
+                await expect(
+                    positionManagerAsAlice["moveCollateral(bytes32,uint256,address,uint256,bytes)"](
+                        formatBytes32String("WXDC"),
+                        1,
+                        '0x0000000000000000000000000000000000000000',
+                        parseEther("50"),
+                        "0x"
+                    )
+                ).to.be.revertedWith("PositionManager/dst-address(0)")
+            })
+        })
+        
     })
 
     // This function has the purpose to take away collateral from the system that doesn't correspond to the position but was sent there wrongly.
@@ -484,6 +513,22 @@ describe("PositionManager", () => {
                 await positionManagerAsAlice.moveStablecoin(1, BobAddress, WeiPerRad.mul(10))
             })
         })
+        context("when _destination argument is a zero address", () => {
+            it("should revert with 'PositionManager/dst-address(0)' message", async () => {
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
+                const positionAddress = await positionManager.positions(1)
+
+                await mockedBookKeeper.mock.moveStablecoin.withArgs(
+                    positionAddress,
+                    BobAddress,
+                    WeiPerRad.mul(10)
+                ).returns()
+
+                await expect(positionManagerAsAlice.moveStablecoin(1, '0x0000000000000000000000000000000000000000', WeiPerRad.mul(10))).to.be.revertedWith(
+                    "PositionManager/dst-address(0)"
+                )
+            })
+        })
     })
 
     describe("#exportPosition()", () => {
@@ -544,6 +589,23 @@ describe("PositionManager", () => {
                 await positionManagerAsBob.exportPosition(1, BobAddress)
             })
         })
+        context("when _destination is a zero address", () => {
+            it("onlyMigrationAllowed modifier will make sure zero address _destination provided fn flow will revert", async () => {
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
+                //migrationWhiteList can never have address(0) as the first key, therefore _destination as zero address will always be reverted in the modifier
+                await positionManagerAsAlice.allowManagePosition(1, BobAddress, 1)
+                await positionManagerAsAlice.allowManagePosition(1, '0x0000000000000000000000000000000000000000', 1)
+                await positionManagerAsAlice.allowMigratePosition('0x0000000000000000000000000000000000000000', 1)
+                await positionManagerAsAlice.allowMigratePosition(BobAddress, 1)
+
+                await expect(
+                    positionManagerAsBob.exportPosition(
+                        1,
+                        '0x0000000000000000000000000000000000000000'
+                    )
+                ).to.be.revertedWith("migration not allowed")
+            })
+        })        
     })
 
     describe("#importPosition()", () => {
