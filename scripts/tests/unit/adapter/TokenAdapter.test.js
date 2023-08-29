@@ -122,6 +122,17 @@ describe("TokenAdapter", () => {
         await tokenAdapter.deposit(AliceAddress, WeiPerWad.mul(1), "0x")
       })
     })
+    context("when wad input is overflow (> MaxInt256)", () => {
+      it("should revert", async () => {
+        // Set the wad input to a value that is greater than MaxInt256
+        const wad = BigNumber.from("115792089237316195423570985008687907853269984665640564039457584007913129639930")
+    
+        // Call the deposit function
+        await expect(tokenAdapter.deposit(AliceAddress, wad, "0x")).to.be.revertedWith(
+          "TokenAdapter/overflow"
+        )
+      })
+    })
   })
 
   describe("#withdraw()", () => {
@@ -152,6 +163,18 @@ describe("TokenAdapter", () => {
           BigNumber.from("1000000000000000000")
         ).returns(true)
         await tokenAdapter.withdraw(AliceAddress, WeiPerWad.mul(1), "0x")
+      })
+    })
+
+    context("when wad input is overflow (> MaxInt256)", () => {
+      it("should revert", async () => {
+        // Set the wad input to be greater than MaxInt256
+        const wad = BigNumber.from("115792089237316195423570985008687907853269984665640564039457584007913129639930")
+  
+        // Call the _withdraw() function
+        await expect(tokenAdapter.withdraw(AliceAddress, wad, "0x")).to.be.revertedWith(
+          "TokenAdapter/overflow"
+        )
       })
     })
   })

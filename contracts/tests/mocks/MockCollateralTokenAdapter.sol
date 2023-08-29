@@ -226,17 +226,18 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     /// @param _amount The amount to be deposited
     function _deposit(address _positionAddress, uint256 _amount, bytes calldata /* _data */) private {
         require(live == 1, "CollateralTokenAdapter/not-live");
-
         if (_amount > 0) {
-            uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
-            // Also enforces a non-zero wad
-            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
+            require(int256(_amount) > 0, "TokenAdapter/amount-overflow");
+            
             //transfer WXDC from proxyWallet to adapter
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
+
             //bookKeeping
-            bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
-            totalShare = add(totalShare, _share);
+            bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_amount));
+
+            // totalShare = add(totalShare, _share);
+            totalShare = add(totalShare, _amount);
 
             // safeApprove to Vault
             address(collateralToken).safeApprove(address(vault), _amount);
@@ -251,14 +252,14 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     /// @param _amount The amount to be withdrawn
     function _withdraw(address _usr, uint256 _amount) private {
         if (_amount > 0) {
-            uint256 _share = wdivup(_amount, netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
-            // Also enforces a non-zero wad
-            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
-            require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _share, "CollateralTokenAdapter/insufficient collateral amount");
+            require(int256(_amount) > 0, "TokenAdapter/amount-overflow");
 
-            bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
-            totalShare = sub(totalShare, _share);
+            require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _amount, "CollateralTokenAdapter/insufficient collateral amount");
+
+            bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
+
+            totalShare = sub(totalShare, _amount);
 
             //withdraw WXDC from Vault
             vault.withdraw(_amount);

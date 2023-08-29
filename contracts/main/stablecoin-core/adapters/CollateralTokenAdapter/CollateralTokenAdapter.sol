@@ -183,10 +183,10 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @param _amount The amount to be deposited
     function _deposit(address _positionAddress, uint256 _amount, bytes calldata /* _data */) private {
         require(live == 1, "CollateralTokenAdapter/not-live");
-
         if (_amount > 0) {
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
+            require(int256(_amount) > 0, "CollateralTokenAdapter/amount-overflow");
             //transfer collateralToken from proxyWallet to adapter
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
             //bookKeeping
@@ -206,6 +206,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @param _amount The amount to be withdrawn
     function _withdraw(address _usr, uint256 _amount) private {
         if (_amount > 0) {
+            require(int256(_amount) > 0, "CollateralTokenAdapter/amount-overflow");
             require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _amount, "CollateralTokenAdapter/insufficient collateral amount");
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
             totalShare -= _amount;
