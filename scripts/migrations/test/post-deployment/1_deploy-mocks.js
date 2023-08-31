@@ -10,16 +10,22 @@ module.exports =  async function(deployer) {
   const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
   const positionManager = await getProxy(proxyFactory, "PositionManager");
   const proxyWalletFactory = await getProxy(proxyFactory, "ProxyWalletFactory");
+  const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
+
 
   let MockSimplePriceFeed = artifacts.require('MockSimplePriceFeed.sol');
   let MockVault = artifacts.require('MockVault.sol');
   let MockCollateralTokenAdapter = artifacts.require('MockCollateralTokenAdapter.sol');
+  let ReentrancyAttacker = artifacts.require("ReentrancyAttacker");
+  let ReentrancyAttacker2 = artifacts.require("ReentrancyAttacker2");
 
 
   //deploying a mockVault and mockColTokenAdapter to add one more collateral type
   const promises0 = [
       deployer.deploy(MockCollateralTokenAdapter, { gas: 3050000 }),
       deployer.deploy(MockSimplePriceFeed, { gas: 3050000 }),
+      deployer.deploy(ReentrancyAttacker, proxyWalletRegistry.address, { gas: 3050000}),
+      deployer.deploy(ReentrancyAttacker2, proxyWalletRegistry.address, { gas: 3050000})
   ];
 
   await Promise.all(promises0);
