@@ -19,7 +19,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     using SafeToken for address;
 
     uint256 public live;
-    bool internal flagVault;
+    bool public flagVault;
 
     address public collateralToken;
     IBookKeeper public bookKeeper;
@@ -127,6 +127,10 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     function setVault(address _vault) external onlyOwner {
         require(true != flagVault, "CollateralTokenAdapter/Vault-set-already");
         require(_vault != address(0), "CollateralTokenAdapter/zero-vault");
+        address vaultsAdapter = IVault(_vault).collateralAdapter();
+        require(vaultsAdapter == address(this), "CollateralTokenAdapter/Adapter-no-match");
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        require(_accessControlConfig.hasRole(_accessControlConfig.ADAPTER_ROLE(), vaultsAdapter), "vaultsAdapter!Adapter");
 
         flagVault = true;
         vault = IVault(_vault);

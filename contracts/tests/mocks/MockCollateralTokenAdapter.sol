@@ -164,6 +164,12 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
 
     function setVault(address _vault) external onlyOwner {
         require(true != flagVault, "CollateralTokenAdapter/Vault-set-already");
+        require(_vault != address(0), "CollateralTokenAdapter/zero-vault");
+        address vaultsAdapter = IVault(_vault).collateralAdapter();
+        require(vaultsAdapter == address(this), "CollateralTokenAdapter/Adapter-no-match");
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        require(_accessControlConfig.hasRole(_accessControlConfig.ADAPTER_ROLE(), vaultsAdapter), "vaultsAdapter!Adapter");
+
         flagVault = true;
         vault = IVault(_vault);
     }
@@ -229,7 +235,7 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
         if (_amount > 0) {
             // Overflow check for int256(wad) cast below
             require(int256(_amount) > 0, "TokenAdapter/amount-overflow");
-            
+
             //transfer WXDC from proxyWallet to adapter
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
 
