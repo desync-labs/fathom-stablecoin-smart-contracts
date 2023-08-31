@@ -8,10 +8,22 @@ import "../../main/interfaces/IBookKeeper.sol";
 import "../../main/interfaces/IToken.sol";
 import "../../main/interfaces/IGenericTokenAdapter.sol";
 import "../../main/interfaces/ICagable.sol";
+import "../../main/interfaces/IVault.sol";
 import "../../main/utils/SafeToken.sol";
 
 contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGenericTokenAdapter, ICagable {
     using SafeToken for address;
+
+    uint256 public live; // Active Flag
+    bool public flagVault;
+
+    address public override collateralToken;
+    IBookKeeper public bookKeeper; // CDP Engine
+    bytes32 public override collateralPoolId; // Collateral Type
+
+    IVault public vault;
+
+    uint256 public override decimals;
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -38,12 +50,6 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
         );
         _;
     }
-
-    IBookKeeper public bookKeeper; // CDP Engine
-    bytes32 public override collateralPoolId; // Collateral Type
-    address public override collateralToken;
-    uint256 public override decimals;
-    uint256 public live; // Active Flag
 
     function initialize(address _bookKeeper, bytes32 collateralPoolId_, address collateralToken_) external initializer {
         PausableUpgradeable.__Pausable_init();
@@ -90,6 +96,20 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
             address(collateralToken).safeTransfer(_to, _amount);
         }
     }
+
+    function setVault(address _vault) external {
+        require(true != flagVault, "CollateralTokenAdapter/Vault-set-already");
+        require(_vault != address(0), "CollateralTokenAdapter/zero-vault");
+        address vaultsAdapter = IVault(_vault).collateralAdapter();
+        require(vaultsAdapter == address(this), "CollateralTokenAdapter/Adapter-no-match");
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        require(_accessControlConfig.hasRole(_accessControlConfig.ADAPTER_ROLE(), vaultsAdapter), "vaultsAdapter!Adapter");
+
+        flagVault = true;
+        vault = IVault(_vault);
+    }
+
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();

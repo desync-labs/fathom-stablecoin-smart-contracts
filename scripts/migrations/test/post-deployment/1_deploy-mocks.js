@@ -11,6 +11,7 @@ module.exports =  async function(deployer) {
   const positionManager = await getProxy(proxyFactory, "PositionManager");
   const proxyWalletFactory = await getProxy(proxyFactory, "ProxyWalletFactory");
   const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
+  const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
 
 
   let MockSimplePriceFeed = artifacts.require('MockSimplePriceFeed.sol');
@@ -41,12 +42,15 @@ module.exports =  async function(deployer) {
       positionManager.address,
       proxyWalletFactory.address
   ),
+  
     deployer.deploy(MockVault, pools.WXDC, addresses.WXDC, MockCollateralTokenAdapter.address, { gas: 3050000 }),
   ];
 
   await Promise.all(promises1);
 
   MockVault = await artifacts.initializeInterfaceAt("MockVault", "MockVault");
+  //giving ADAPTER_ROLE to MockCollateralTokenAdapter
+  await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), MockCollateralTokenAdapter.address)
 
   const promises2 = [
     MockCollateralTokenAdapter.setVault(MockVault.address),

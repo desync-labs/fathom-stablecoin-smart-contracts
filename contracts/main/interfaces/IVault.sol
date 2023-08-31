@@ -5,4 +5,6 @@ interface IVault {
     function deposit(uint256 _amount) external;
 
     function withdraw(uint256 _amount) external;
+
+    function collateralAdapter() external view returns(address);
 }
