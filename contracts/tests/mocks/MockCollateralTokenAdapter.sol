@@ -206,7 +206,7 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
             uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
             totalShare = sub(totalShare, _share);
 
-            //deduct emergency withdrawl amount of FXD
+            //deduct emergency withdrawal amount of FXD
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
             //withdraw WXDC from Vault
             vault.withdraw(_amount);

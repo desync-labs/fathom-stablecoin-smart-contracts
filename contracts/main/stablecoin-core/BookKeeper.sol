@@ -35,7 +35,7 @@ import "../utils/CommonMath.sol";
     /// @dev The position address -> The allowance delegate address -> true (1) means allowed or false (0) means not allowed
     mapping(address => mapping(address => uint256)) public override positionWhitelist;
 
-    uint256 public override totalStablecoinIssued; // Total stable coin issued or total stalbecoin in circulation   [rad]
+    uint256 public override totalStablecoinIssued; // Total stable coin issued or total stablecoin in circulation   [rad]
     uint256 public totalUnbackedStablecoin; // Total unbacked stable coin  [rad]
     uint256 public totalDebtCeiling; // Total debt ceiling  [rad]
     uint256 public live; // Active Flag
@@ -411,7 +411,7 @@ import "../utils/CommonMath.sol";
     ) external override nonReentrant whenNotPaused onlyLiquidationEngine {
         Position storage position = positions[_collateralPoolId][_positionAddress];
         ICollateralPoolConfig.CollateralPoolInfo memory _vars = ICollateralPoolConfig(collateralPoolConfig).getCollateralPoolInfo(_collateralPoolId);
-        // -- col from postion
+        // -- col from position
         position.lockedCollateral = add(position.lockedCollateral, _collateralAmount);
         // -- debt from position
         position.debtShare = add(position.debtShare, _debtShare);
@@ -424,7 +424,7 @@ import "../utils/CommonMath.sol";
         poolStablecoinIssued[_collateralPoolId] = add(_poolStablecoinAmount, _debtValue);
         // ++ col to _collateralCreditor(showStopper in case of skim/accumulateBadDebt)
         collateralToken[_collateralPoolId][_collateralCreditor] = sub(collateralToken[_collateralPoolId][_collateralCreditor], _collateralAmount);
-        // ++ debt to systemDebyEngine
+        // ++ debt to systemDebtEngine
         systemBadDebt[_stablecoinDebtor] = sub(systemBadDebt[_stablecoinDebtor], _debtValue);
         totalUnbackedStablecoin = sub(totalUnbackedStablecoin, _debtValue);
     }

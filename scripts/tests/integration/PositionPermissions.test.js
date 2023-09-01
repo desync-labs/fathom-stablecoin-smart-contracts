@@ -792,11 +792,11 @@ describe("PositionPermissions", () => {
                                 const fathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                                 expect(
                                     alicemovePosition.lockedCollateral,
-                                    "Alice's Position #1 lockedCollateral should be 2 WXDC, because Alice move form Position #2 to Postion #1"
+                                    "Alice's Position #1 lockedCollateral should be 2 WXDC, because Alice move form Position #2 to Position #1"
                                 ).to.be.equal(WeiPerWad.mul(2))
                                 expect(
                                     alicemovePosition.debtShare,
-                                    "Alice's Position #1 debtShare should be 2 FXD, because Alice move form Position #2 to Postion #1"
+                                    "Alice's Position #1 debtShare should be 2 FXD, because Alice move form Position #2 to Position #1"
                                 ).to.be.equal(WeiPerWad.mul(2))
                                 expect(
                                     await bookKeeper.collateralToken(pools.XDC, alicePositionAddress2),
