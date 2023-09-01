@@ -18,9 +18,15 @@ const loadFixtureHandler = async () => {
     const mockedPriceOracle = await createMock("PriceOracle");
     const mockedPriceFeed = await createMock("SimplePriceFeed");
 
+    const mockedAccessControlConfig = await createMock("AccessControlConfig");
+    await mockedAccessControlConfig.mock.hasRole.returns(true)
+    await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
+    await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
+
     await mockedShowStopper.mock.live.returns(1);
     await mockedBookKeeper.mock.totalStablecoinIssued.returns(0);
     await mockedBookKeeper.mock.whitelist.returns();
+    await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address);
     await mockedPriceOracle.mock.setPrice.returns()
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
     await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
@@ -61,7 +67,8 @@ const loadFixtureHandler = async () => {
         mockedShowStopper,
         mockedCollateralPoolConfig,
         mockedPriceOracle,
-        mockedPriceFeed
+        mockedPriceFeed,
+        mockedAccessControlConfig
     }
 }
 
@@ -97,7 +104,8 @@ describe("PositionManager", () => {
             mockedShowStopper,
             mockedCollateralPoolConfig,
             mockedPriceOracle,
-            mockedPriceFeed
+            mockedPriceFeed,
+            mockedAccessControlConfig
 
         } = await loadFixture(loadFixtureHandler))
 
@@ -755,6 +763,34 @@ describe("PositionManager", () => {
         })
     })
 
+    describe("#setBookKeeper()", () => {
+        context("when setting a new BookKeeper", () => {
+            it("should emit BookKeeperUpdated event with old and new addresses", async () => {
+                const oldBookKeeper = await positionManager.bookKeeper();
+                const mockedBookKeeper2 = await createMock("BookKeeper");
+                await mockedBookKeeper2.mock.totalStablecoinIssued.returns(WeiPerRad);
+                // Set the newBookKeeper and expect an event
+                await expect(positionManager.setBookKeeper(mockedBookKeeper2.address))
+                    .to.emit(positionManager, 'LogBookKeeperUpdated')
+                    .withArgs(oldBookKeeper, mockedBookKeeper2.address);
+            });
+        });
+    });
+
+    describe("#setPriceOracle()", () => {
+        context("when setting a new PriceOracle", () => {
+            it("should emit PriceOracleUpdated event with old and new addresses", async () => {
+                const oldPriceOracle = await positionManager.priceOracle();
+                const mockedPriceOracle2 = await createMock("PriceOracle");
+                await mockedPriceOracle2.mock.stableCoinReferencePrice.returns(WeiPerRad);
+                // Set the newPriceOracle and expect an event
+                await expect(positionManager.setPriceOracle(mockedPriceOracle2.address))
+                    .to.emit(positionManager, 'LogPriceOracleUpdated')
+                    .withArgs(oldPriceOracle, mockedPriceOracle2.address);
+            });
+        });
+    });
+
     describe("#redeemLockedCollateral()", () => {
         context("when caller has no access to the position (or have no allowance)", () => {
             xit("should revert", async () => {
@@ -779,4 +815,5 @@ describe("PositionManager", () => {
             })
         })
     })
+
 })
