@@ -49,6 +49,8 @@ contract PositionManager is PausableUpgradeable, IManager {
     event LogExportPosition(uint256 indexed _positionId, address _source, address _destination, uint256 _lockedCollateral, uint256 _debtShare);
     event LogImportPosition(uint256 indexed _positionId, address _source, address _destination, uint256 _lockedCollateral, uint256 _debtShare);
     event LogMovePosition(uint256 _sourceId, uint256 _destinationId, uint256 _lockedCollateral, uint256 _debtShare);
+    event LogPriceOracleUpdated(address _oldPriceOracle, address _newPriceOracle);
+    event LogBookKeeperUpdated(address _oldBookKeeper, address _newBookKeeper);
 
     /// @dev Require that the caller must be position's owner or owner whitelist
     modifier onlyOwnerAllowed(uint256 _positionId) {
@@ -333,13 +335,16 @@ contract PositionManager is PausableUpgradeable, IManager {
 
     function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
         require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
+        emit LogPriceOracleUpdated(priceOracle, _priceOracle);
         priceOracle = _priceOracle;
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwnerOrGov {
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "PositionManager/invalid-bookKeeper"); // Sanity Check Call
+        emit LogBookKeeperUpdated(bookKeeper, _bookKeeper);
         bookKeeper = _bookKeeper;
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
