@@ -172,7 +172,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
             //deduct totalShare
             totalShare -= _amount;
 
-            //deduct emergency withdrawl amount of FXD
+            //deduct emergency withdrawal amount of FXD
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
             //withdraw collateralToken from Vault
             vault.withdraw(_amount);

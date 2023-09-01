@@ -64,7 +64,7 @@ const setup = async () => {
     }
 }
 
-describe("Position Closure without collateral withdrawl", () => {
+describe("Position Closure without collateral withdrawal", () => {
     // Proxy wallet
     let aliceProxyWallet
 
@@ -96,7 +96,7 @@ describe("Position Closure without collateral withdrawl", () => {
     })
 
     describe("#wipeAndUnlockXDC", () => {
-        context("open position and pay back debt without collateral withdrawl", () => {
+        context("open position and pay back debt without collateral withdrawal", () => {
             it("should be success", async () => {
                 await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
 
@@ -215,7 +215,7 @@ describe("Position Closure without collateral withdrawl", () => {
     })
 
     describe("#wipeAllAndUnlockXDC", () => {
-        context("open position and pay back debt without collateral withdrawl", () => {
+        context("open position and pay back debt without collateral withdrawal", () => {
             it("should be success", async () => {
                 await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
 

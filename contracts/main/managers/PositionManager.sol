@@ -228,7 +228,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// This function has the purpose to take away collateral from the system that doesn't correspond to the position but was sent there wrongly
     /// @param _collateralPoolId The collateral pool id
     /// @param _positionId The position id to move collateral from
-    /// @param _destination The destination to recevied collateral
+    /// @param _destination The destination to received collateral
     /// @param _wad The amount in wad to be moved
     function moveCollateral(
         bytes32 _collateralPoolId,
