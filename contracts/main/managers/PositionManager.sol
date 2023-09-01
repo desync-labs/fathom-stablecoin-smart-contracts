@@ -116,27 +116,30 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         require(_debtAccumulatedRate != 0, "PositionManager/collateralPool-not-init");
 
-        lastPositionId += 1;
-        positions[lastPositionId] = address(new PositionHandler(bookKeeper));
-        owners[lastPositionId] = _user;
-        mapPositionHandlerToOwner[positions[lastPositionId]] = _user;
-        collateralPools[lastPositionId] = _collateralPoolId;
+        uint256 newLastPositionId = lastPositionId + 1;
+        lastPositionId = newLastPositionId;
+
+        positions[newLastPositionId] = address(new PositionHandler(bookKeeper));
+        owners[newLastPositionId] = _user;
+        mapPositionHandlerToOwner[positions[newLastPositionId]] = _user;
+        collateralPools[newLastPositionId] = _collateralPoolId;
 
         // Add new position to double linked list and pointers
         if (ownerFirstPositionId[_user] == 0) {
-            ownerFirstPositionId[_user] = lastPositionId;
+            ownerFirstPositionId[_user] = newLastPositionId;
         }
         if (ownerLastPositionId[_user] != 0) {
-            list[lastPositionId].prev = ownerLastPositionId[_user];
-            list[ownerLastPositionId[_user]].next = lastPositionId;
+            list[newLastPositionId].prev = ownerLastPositionId[_user];
+            list[ownerLastPositionId[_user]].next = newLastPositionId;
         }
-        ownerLastPositionId[_user] = lastPositionId;
+        ownerLastPositionId[_user] = newLastPositionId;
         ownerPositionCount[_user] += 1;
 
-        emit LogNewPosition(msg.sender, _user, lastPositionId);
+        emit LogNewPosition(msg.sender, _user, newLastPositionId);
 
-        return lastPositionId;
+        return newLastPositionId;
     }
+
 
     /// @dev Give the position ownership to a destination address
     /// @param _positionId The position id to be given away ownership
