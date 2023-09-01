@@ -455,7 +455,7 @@ import "../utils/CommonMath.sol";
     */
     function mintUnbackedStablecoin(address _from, address _to, uint256 _value) external override nonReentrant whenNotPaused onlyMintable {
         _requireLive();
-
+        require(_from != address(0) && _to != address(0), "BookKeeper/zero-address");
         systemBadDebt[_from] += _value;
         stablecoin[_to] += _value;
         totalUnbackedStablecoin += _value;

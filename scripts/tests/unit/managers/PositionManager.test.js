@@ -180,6 +180,12 @@ describe("PositionManager", () => {
                 await expect(positionManager.allowManagePosition(1, AliceAddress, 1)).to.be.revertedWith("owner not allowed")
             })
         })
+        context("when _user address is zero", () => {
+            it("should revert with user address zero error", async () => {
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress);
+                await expect(positionManagerAsAlice.allowManagePosition(1, '0x0000000000000000000000000000000000000000', 1)).to.be.revertedWith("PositionManager/user-address(0)");
+            });
+        })
         context("ok is not valid", () => {
             it("should revert", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
@@ -205,6 +211,11 @@ describe("PositionManager", () => {
                 await expect(positionManagerAsAlice.allowMigratePosition(BobAddress, 2)).to.be.revertedWith("PositionManager/invalid-ok")
             })
         })
+        context("when _user address is zero", () => {
+            it("should revert with user address zero error", async () => {
+                await expect(positionManagerAsAlice.allowMigratePosition('0x0000000000000000000000000000000000000000', 1)).to.be.revertedWith("PositionManager/user-address(0)");
+            });
+        });
         context("when parameters are valid", () => {
             it("should be able to give/revoke migration allowance to other address", async () => {
                 expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(0)
@@ -214,6 +225,7 @@ describe("PositionManager", () => {
                 expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(0)
             })
         })
+        
     })
 
     describe("#list()", () => {
@@ -594,8 +606,6 @@ describe("PositionManager", () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 //migrationWhiteList can never have address(0) as the first key, therefore _destination as zero address will always be reverted in the modifier
                 await positionManagerAsAlice.allowManagePosition(1, BobAddress, 1)
-                await positionManagerAsAlice.allowManagePosition(1, '0x0000000000000000000000000000000000000000', 1)
-                await positionManagerAsAlice.allowMigratePosition('0x0000000000000000000000000000000000000000', 1)
                 await positionManagerAsAlice.allowMigratePosition(BobAddress, 1)
 
                 await expect(

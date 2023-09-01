@@ -105,6 +105,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @dev Only the contract owner or a governance address can execute this function.
     /// @param toBeRemoved The address to be removed from the whitelist
     function blacklist(address toBeRemoved) external onlyOwnerOrGov {
+        require(toBeRemoved != address(0), "CollateralTokenAdapter/blacklist-invalidAdds");
         whiteListed[toBeRemoved] = false;
         emit LogWhitelisted(toBeRemoved, false);
     }

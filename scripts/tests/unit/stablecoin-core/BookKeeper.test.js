@@ -1742,6 +1742,32 @@ describe("BookKeeper", () => {
                 })
             })
         })
+        context("when the _from address is the zero address", async () => {
+            it("should revert with 'BookKeeper/zero-address'", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(true)
+                await expect(
+                    bookKeeper.mintUnbackedStablecoin('0x0000000000000000000000000000000000000000', AliceAddress, WeiPerRad, { gasLimit: 1000000 })
+                ).to.be.revertedWith("BookKeeper/zero-address")
+            })
+        })
+
+        context("when the _to address is the zero address", async () => {
+            it("should revert with 'BookKeeper/zero-address'", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(true)
+                await expect(
+                    bookKeeper.mintUnbackedStablecoin(DeployerAddress, '0x0000000000000000000000000000000000000000', WeiPerRad, { gasLimit: 1000000 })
+                ).to.be.revertedWith("BookKeeper/zero-address")
+            })
+        })
+
+        context("when both the _from and _to addresses are the zero address", async () => {
+            it("should revert with 'BookKeeper/zero-address'", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(true)
+                await expect(
+                    bookKeeper.mintUnbackedStablecoin('0x0000000000000000000000000000000000000000', '0x0000000000000000000000000000000000000000', WeiPerRad, { gasLimit: 1000000 })
+                ).to.be.revertedWith("BookKeeper/zero-address")
+            })
+        })
     })
 
     describe("#settleSystemBadDebt", () => {
