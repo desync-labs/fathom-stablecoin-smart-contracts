@@ -110,12 +110,6 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
         _;
     }
 
-    modifier onlyCollateralManager() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
-        require(_accessControlConfig.hasRole(_accessControlConfig.COLLATERAL_MANAGER_ROLE(), msg.sender), "!collateralManager");
-        _;
-    }
-
     function initialize(
         address _bookKeeper,
         bytes32 _collateralPoolId,
