@@ -431,7 +431,9 @@ import "../utils/CommonMath.sol";
 
     /**
     * @notice Settles the system's bad debt of the caller.
-    * @dev This function can only be called by the SystemDebtEngine, which incurs the system debt. The BookKeeper contract must not be paused.
+    * @dev This function can be called by the SystemDebtEngine, which incurs the system debt. The BookKeeper contract must not be paused.
+    * @dev Even though the function has no modifier that restricts access exclusively to SystemDebtEngine, 
+           the action of the function—reducing the systemBadDebt of msg.sender—effectively limits the function callers to SystemDebtEngine.
     * @dev To execute this function, the SystemDebtEngine must have enough stablecoin, which typically comes from the protocol's surplus.
     * @dev A successful execution of this function removes the bad debt from the system.
     * @param _value The amount of bad debt to be settled.
