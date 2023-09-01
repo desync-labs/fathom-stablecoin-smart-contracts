@@ -778,6 +778,15 @@ describe("PositionManager", () => {
     });
 
     describe("#setPriceOracle()", () => {
+        context("when stablecoinReferencePrice is 0 for the new priceOracle", () => {
+            it("should revert", async () => {
+                const mockedPriceOracle2 = await createMock("PriceOracle");
+                await mockedPriceOracle2.mock.stableCoinReferencePrice.returns(0);
+                // Set the newPriceOracle and expect an event
+                await expect(positionManager.setPriceOracle(mockedPriceOracle2.address))
+                    .to.be.revertedWith("PositionManager/invalid-priceOracle")
+            });
+        });
         context("when setting a new PriceOracle", () => {
             it("should emit PriceOracleUpdated event with old and new addresses", async () => {
                 const oldPriceOracle = await positionManager.priceOracle();

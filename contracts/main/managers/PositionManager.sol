@@ -83,7 +83,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         require(IShowStopper(_showStopper).live() == 1, "PositionManager/showStopper-not-live"); // Sanity Check Call
         showStopper = _showStopper;
 
-        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() > 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
         priceOracle = _priceOracle;
     }
 
@@ -334,7 +334,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     }
 
     function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
-        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() > 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
         emit LogPriceOracleUpdated(priceOracle, _priceOracle);
         priceOracle = _priceOracle;
     }
