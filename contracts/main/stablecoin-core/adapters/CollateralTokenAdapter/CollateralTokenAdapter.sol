@@ -220,7 +220,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
             vault.withdraw(_amount);
             //Transfer collateralToken to proxyWallet
             address(collateralToken).safeTransfer(_usr, _amount);
+            emit LogWithdraw(_amount);
         }
-        emit LogWithdraw(_amount);
     }
 }

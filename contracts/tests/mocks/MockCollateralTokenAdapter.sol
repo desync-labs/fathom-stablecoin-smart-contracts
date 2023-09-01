@@ -272,7 +272,7 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
             vault.withdraw(_amount);
             //Transfer WXDC to proxyWallet
             address(collateralToken).safeTransfer(_usr, _amount);
+            emit LogWithdraw(_amount);
         }
-        emit LogWithdraw(_amount);
     }
 }
