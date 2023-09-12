@@ -39,7 +39,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         IBookKeeper(_bookKeeper).blacklist(_usr);
     }
 
-    function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok) external {
+    function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok) external onlyDelegateCall{
         IManager(_manager).allowManagePosition(_positionId, _user, _ok);
     }
 
