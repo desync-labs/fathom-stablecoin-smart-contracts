@@ -57,12 +57,18 @@ contract PositionManager is PausableUpgradeable, IManager {
         require(msg.sender == owners[_positionId] || ownerWhitelist[owners[_positionId]][_positionId][msg.sender] == 1, "owner not allowed");
         _;
     }
+    /// @dev auditor's sugesttion
+    modifier onlyPositionOwner(uint256 _positionId) {
+        require(msg.sender == owners[_positionId], "owner not allowed");
+        _;
+    }
 
     /// @dev Require that the caller must be allowed to migrate position to the migrant address
     modifier onlyMigrationAllowed(address _migrantAddress) {
         require(msg.sender == _migrantAddress || migrationWhitelist[_migrantAddress][msg.sender] == 1, "migration not allowed");
         _;
     }
+
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
@@ -91,7 +97,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @param _positionId The position id
     /// @param _user The address to be allowed for managing the position
     /// @param _ok Ok flag to allow/disallow. 1 for allow and 0 for disallow.
-    function allowManagePosition(uint256 _positionId, address _user, uint256 _ok) external override whenNotPaused onlyOwnerAllowed(_positionId) {
+    function allowManagePosition(uint256 _positionId, address _user, uint256 _ok) external override whenNotPaused onlyPositionOwner(_positionId) {
         require(_user != address(0), "PositionManager/user-address(0)");
         require(_ok < 2, "PositionManager/invalid-ok");
         ownerWhitelist[owners[_positionId]][_positionId][_user] = _ok;
@@ -146,7 +152,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @dev Give the position ownership to a destination address
     /// @param _positionId The position id to be given away ownership
     /// @param _destination The destination to be a new owner of the position
-    function give(uint256 _positionId, address _destination) external override whenNotPaused onlyOwnerAllowed(_positionId) {
+    function give(uint256 _positionId, address _destination) external override whenNotPaused onlyPositionOwner(_positionId) {
         require(_destination != address(0), "destination address(0)");
         require(_destination != owners[_positionId], "destination already owner");
 
