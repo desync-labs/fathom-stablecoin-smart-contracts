@@ -103,7 +103,10 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         whiteListed[toBeRemoved] = false;
         emit LogWhitelisted(toBeRemoved, false);
     }
-
+    /// @dev The `cage` function permanently halts the `collateralTokenAdapter` contract.
+    /// Please exercise caution when using this function as there is no corresponding `uncage` function.
+    /// The `cage` function in this contract is unique because it must be called before users can initiate `emergencyWithdraw` in the `collateralTokenAdapter`.
+    /// It's a must to invoke this function in the `collateralTokenAdapter` during the final phase of an emergency shutdown.
     function cage() external override nonReentrant onlyOwner {
         if (live == 1) {
             live = 0;
@@ -118,7 +121,8 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }
-
+    /// @dev The `setVault` function stores the address of the vault contract that holds the collateral.
+    /// @param _vault the address of vault smart contract
     function setVault(address _vault) external onlyOwner {
         require(true != flagVault, "CollateralTokenAdapter/Vault-set-already");
         require(_vault != address(0), "CollateralTokenAdapter/zero-vault");
