@@ -142,7 +142,10 @@ import "../utils/CommonMath.sol";
     }
 
     // --- Administration ---
-
+    /**
+     * @dev Sets the total debt ceiling of the entire protocol. The totalDebtCeiling is the maximum amount of debt that can be borrowed from the protocol.
+     * @param _totalDebtCeiling The new total debt ceiling value to be set.
+     */
     function setTotalDebtCeiling(uint256 _totalDebtCeiling) external onlyOwner {
         _requireLive();
         totalDebtCeiling = _totalDebtCeiling;
@@ -169,7 +172,8 @@ import "../utils/CommonMath.sol";
     }
 
     // --- Cage ---
-
+    /// @dev Cage function halts bookKeeper contract for good.
+    /// Please be cautious with this function since there is no uncage function
     function cage() external override onlyOwnerOrShowStopper {
         if (live == 1) {
             live = 0;

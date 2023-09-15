@@ -214,7 +214,9 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "LiquidationEngine/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
     }
-
+    // --- Cage ---
+    /// @dev Cage function halts liquidationEngine contract for good.
+    /// Please be cautious with this function since there is no uncage function
     function cage() external override onlyOwnerOrShowStopper {
         if (live == 1) {
             live = 0;

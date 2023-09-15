@@ -360,6 +360,8 @@ contract PositionManager is PausableUpgradeable, IManager {
         _unpause();
     }
 
+    /// @dev Updates the priceWithSafetyMargin of a specific pool.
+    /// @param _poolId The bytes32 ID of the target pool for which the priceWithSafetyMargin should be updated.
     function updatePrice(bytes32 _poolId) external override whenNotPaused {
         ISetPrice(priceOracle).setPrice(_poolId);
     }
