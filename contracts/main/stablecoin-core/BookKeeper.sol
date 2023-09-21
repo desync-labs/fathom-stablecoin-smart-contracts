@@ -249,6 +249,8 @@ import "../utils/CommonMath.sol";
         address _dst,
         uint256 _amount
     ) external override nonReentrant whenNotPaused onlyCollateralManager {
+        require(_amount > 0 , "bookKeeper/moveCollateral-zero-amount");
+        require(_src != _dst, "bookKeeper/moveCollateral-src-dst-same");
         _requireAllowedPositionAdjustment(_src, msg.sender);
         collateralToken[_collateralPoolId][_src] -= _amount;
         collateralToken[_collateralPoolId][_dst] += _amount;
@@ -266,6 +268,8 @@ import "../utils/CommonMath.sol";
     */
 
     function moveStablecoin(address _src, address _dst, uint256 _value) external override nonReentrant whenNotPaused {
+        require(_value > 0, "bookKeeper/moveStablecoin-zero-amount");
+        require(_src != _dst, "bookKeeper/moveStablecoin-src-dst-same");
         _requireAllowedPositionAdjustment(_src, msg.sender);
         stablecoin[_src] -= _value;
         stablecoin[_dst] += _value;
@@ -458,6 +462,7 @@ import "../utils/CommonMath.sol";
     * @param _value The amount of unbacked stablecoin to mint.
     */
     function mintUnbackedStablecoin(address _from, address _to, uint256 _value) external override nonReentrant whenNotPaused onlyMintable {
+        require(_value > 0 , "bookKeeper/mintUnbackedStablecoin-zero-amount");
         _requireLive();
         require(_from != address(0) && _to != address(0), "BookKeeper/zero-address");
         systemBadDebt[_from] += _value;
