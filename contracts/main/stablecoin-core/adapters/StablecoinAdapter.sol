@@ -41,6 +41,15 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         _;
     }
 
+    modifier onlyLiquidationStrategy(bytes32 _collateralPoolId) {
+        ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
+        require(
+            msg.sender == _collateralPoolConfig.getStrategy(_collateralPoolId),
+            "!(LiquidationStrategy)"
+        );
+        _;
+    }
+
     function initialize(address _bookKeeper, address _stablecoin) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
@@ -76,7 +85,7 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
      * @param usr Address of the user to credit the deposit to.
      * @param rad Amount to deposit. [rad]
      */
-    function depositRAD(address usr, uint256 rad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
+    function depositRAD(address usr, uint256 rad, bytes32 collateralPoolId, bytes calldata /* data */) external override nonReentrant whenNotPaused onlyLiquidationStrategy(collateralPoolId) {
         bookKeeper.moveStablecoin(address(this), usr, rad);
         stablecoin.burn(msg.sender, (rad / RAY) + 1);
     }
