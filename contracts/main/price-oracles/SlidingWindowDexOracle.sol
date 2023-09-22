@@ -4,8 +4,8 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./lib/FathomSwapLibrary.sol";
-import "./lib/IFathomSwapPair.sol";
-import "./lib/IFathomSwapFactory.sol";
+import "../apis/interfaces/IFathomSwapPair.sol";
+import "../apis/interfaces/IFathomSwapFactory.sol";
 import "../interfaces/IFathomDEXOracle.sol";
 import "../interfaces/IToken.sol";
 
@@ -38,8 +38,10 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
     uint8 public constant RESOLUTION = 112;
 
     function initialize(address _factory, uint256 _windowSize, uint8 _granularity) external initializer {
+        require(_factory != address(0), "SlidingWindowDexOracle/zero-factory");
         require(_granularity > 1, "SlidingWindowDexOracle/invalid-granularity");
         require((periodSize = _windowSize / _granularity) * _granularity == _windowSize, "SlidingWindowDexOracle/window-not-evenly-divisible");
+
         factory = _factory;
         windowSize = _windowSize;
         granularity = _granularity;
@@ -111,7 +113,7 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
     }
 
     function currentCumulativePrice(address pair) public view returns (uint256 price0Cumulative, uint256 price1Cumulative) {
-        uint32 blockTimestamp = uint32(block.timestamp);
+        uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
         price0Cumulative = IFathomSwapPair(pair).price0CumulativeLast();
         price1Cumulative = IFathomSwapPair(pair).price1CumulativeLast();
 

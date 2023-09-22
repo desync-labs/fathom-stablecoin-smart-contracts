@@ -21,13 +21,11 @@ contract ProxyWalletFactory is OwnableUpgradeable {
     function initialize(address _proxyActionStorage, address _proxyWalletRegistry) external initializer {
         OwnableUpgradeable.__Ownable_init();
 
+        require(_proxyActionStorage != address(0), "ProxyWalletFactory/zero-storage");
+        require(_proxyWalletRegistry != address(0), "ProxyWalletFactory/zero-Registry");
+
         proxyActionStorage = _proxyActionStorage;
         proxyWalletRegistry = _proxyWalletRegistry;
-    }
-
-    /// @dev Deploys a new proxy instance and sets owner of proxy to caller
-    function build0() external returns (address payable _proxy) {
-        _proxy = build(msg.sender);
     }
 
     /// @dev Deploys a new proxy instance and sets custom owner of proxy

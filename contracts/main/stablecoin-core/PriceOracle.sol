@@ -2,7 +2,6 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IPriceFeed.sol";
@@ -11,23 +10,15 @@ import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IPausable.sol";
 import "../interfaces/ISetPrice.sol";
+import "../utils/CommonMath.sol";
 
-contract PriceOracleMath {
-    uint256 internal constant ONE = 10 ** 27;
+/**
+ * @title PriceOracle
+ * @notice A contract which is the price oracle of the BookKeeper to keep all collateral pools updated with the latest price of the collateral.
+ * The price oracle is important in reflecting the current state of the market price.
+ */
 
-    function mul(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        require(_y == 0 || (_z = _x * _y) / _y == _x);
-    }
-
-    function rdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
-        _z = mul(_x, ONE) / _y;
-    }
-}
-
-/** @notice A contract which is the price oracle of the BookKeeper to keep all collateral pools updated with the latest price of the collateral.
-    The price oracle is important in reflecting the current state of the market price.
-*/
-contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
+contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
     struct CollateralPool {
         IPriceFeed priceFeed; // Price Feed
         uint256 liquidationRatio; // Liquidation ratio or Collateral ratio [ray]
@@ -56,7 +47,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICag
     }
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
@@ -66,7 +57,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICag
     }
 
     modifier onlyOwnerOrShowStopper() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.SHOW_STOPPER_ROLE(), msg.sender),
@@ -84,7 +75,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICag
         PausableUpgradeable.__Pausable_init();
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
-        stableCoinReferencePrice = ONE;
+        stableCoinReferencePrice = RAY;
         live = 1;
     }
 
@@ -94,7 +85,6 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICag
     }
 
     function setStableCoinReferencePrice(uint256 _referencePrice) external onlyOwner isLive {
-        require(_referencePrice > 0, "PriceOracle/zero-reference-price");
         require(_referencePrice > MIN_REFERENCE_PRICE && _referencePrice < MAX_REFERENCE_PRICE, "PriceOracle/invalid-reference-price");
         stableCoinReferencePrice = _referencePrice;
         emit LogSetStableCoinReferencePrice(msg.sender, _referencePrice);
@@ -104,7 +94,7 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICag
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).collateralPools(_collateralPoolId).priceFeed);
         uint256 _liquidationRatio = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLiquidationRatio(_collateralPoolId);
         (uint256 _rawPrice, bool _hasPrice) = _priceFeed.peekPrice();
-        uint256 _priceWithSafetyMargin = _hasPrice ? rdiv(rdiv(mul(_rawPrice, 10 ** 9), stableCoinReferencePrice), _liquidationRatio) : 0;
+        uint256 _priceWithSafetyMargin = _hasPrice ? rdiv(rdiv(_rawPrice * (10 ** 9), stableCoinReferencePrice), _liquidationRatio) : 0;
         address _collateralPoolConfig = address(bookKeeper.collateralPoolConfig());
         ICollateralPoolConfig(_collateralPoolConfig).setPriceWithSafetyMargin(_collateralPoolId, _priceWithSafetyMargin);
         emit LogSetPrice(_collateralPoolId, _rawPrice, _priceWithSafetyMargin);
@@ -116,17 +106,11 @@ contract PriceOracle is PriceOracleMath, PausableUpgradeable, IPriceOracle, ICag
             emit LogCage();
         }
     }
-
-    function uncage() external override onlyOwnerOrShowStopper {
-        require(live == 0, "PriceOracle/not-caged");
-        live = 1;
-        emit LogUncage();
-    }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();
     }

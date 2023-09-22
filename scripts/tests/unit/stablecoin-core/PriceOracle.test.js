@@ -167,13 +167,6 @@ describe("PriceOracle", () => {
           await expect(priceOracle.setStableCoinReferencePrice(10 ** 10)).to.be.revertedWith("PriceOracle/not-live")
         })
       })
-      context("new price is 0", () => {
-        it("should revert", async () => {
-          await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-          await expect(priceOracle.setStableCoinReferencePrice(0)).to.be.revertedWith("PriceOracle/zero-reference-price")
-        })
-      })
       context("new price is lower than min", () => {
         it("should revert", async () => {
           await mockedAccessControlConfig.mock.hasRole.returns(true)
@@ -341,34 +334,6 @@ describe("PriceOracle", () => {
           await expect(priceOracleAsAlice.cage()).to.emit(priceOracleAsAlice, "LogCage").withArgs()
 
           expect(await priceOracleAsAlice.live()).to.be.equal(0)
-        })
-      })
-    })
-  })
-
-  describe("#uncage()", () => {
-    context("when role can't access", () => {
-      it("should revert", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(false)
-
-        await expect(priceOracleAsAlice.uncage()).to.be.revertedWith("!(ownerRole or showStopperRole)")
-      })
-    })
-
-    context("when role can access", () => {
-      context("caller is owner role ", () => {
-        it("should be set live to 1", async () => {
-          await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-          expect(await priceOracleAsAlice.live()).to.be.equal(1)
-
-          await priceOracleAsAlice.cage()
-
-          expect(await priceOracleAsAlice.live()).to.be.equal(0)
-
-          await expect(priceOracleAsAlice.uncage()).to.emit(priceOracleAsAlice, "LogUncage").withArgs()
-
-          expect(await priceOracleAsAlice.live()).to.be.equal(1)
         })
       })
     })

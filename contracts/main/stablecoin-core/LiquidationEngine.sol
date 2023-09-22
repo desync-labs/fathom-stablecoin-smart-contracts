@@ -1,12 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
 pragma solidity 0.8.17;
-pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ISystemDebtEngine.sol";
@@ -14,8 +11,8 @@ import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/ILiquidationStrategy.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ISetPrice.sol";
-import "../interfaces/IPriceOracle.sol";
 import "../interfaces/IPausable.sol";
+import "../interfaces/IPriceFeed.sol";
 
 /// @title LiquidationEngine
 /** @notice A contract which is the manager for all of the liquidations of the protocol.
@@ -23,8 +20,6 @@ import "../interfaces/IPausable.sol";
 */
 
 contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable, ILiquidationEngine, IPausable {
-    using SafeMathUpgradeable for uint256;
-
     struct LocalVars {
         uint256 positionLockedCollateral;
         uint256 positionDebtShare;
@@ -43,7 +38,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     // --- Math ---
     uint256 internal constant WAD = 10 ** 18;
 
-    address public priceOracle;
+    bytes32 internal deprecated;
 
     IBookKeeper public bookKeeper; // CDP Engine
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
@@ -53,7 +48,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     event LiquidationFail(bytes32 _collateralPoolIds, address _positionAddresses, address _liquidator, string reason);
 
     modifier onlyOwnerOrShowStopper() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.SHOW_STOPPER_ROLE(), msg.sender),
@@ -63,7 +58,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     }
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
@@ -73,7 +68,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     }
 
     modifier onlyOwner() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
     }
@@ -87,34 +82,54 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         require(live == 1, "LiquidationEngine/not-live");
         _;
     }
-
+    /**
+    * @notice Initialize the contract
+    * @param _bookKeeper The address of the BookKeeper contract
+    * @param _systemDebtEngine The address of the SystemDebtEngine contract
+    * @dev The function can only be called once after contract deployment
+    */
     // --- Init ---
-    function initialize(address _bookKeeper, address _systemDebtEngine, address _priceOracle) external initializer {
+    function initialize(address _bookKeeper, address _systemDebtEngine) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "LiquidationEngine/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         require(ISystemDebtEngine(_systemDebtEngine).surplusBuffer() >= 0, "LiquidationEngine/invalid-systemDebtEngine"); // Sanity Check Call
         systemDebtEngine = ISystemDebtEngine(_systemDebtEngine);
-        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "LiquidationEngine/invalid-priceOracle"); // Sanity Check Call
-        priceOracle = _priceOracle;
 
         live = 1;
     }
-
+    /**
+    * @notice Add a new liquidator to the whitelist
+    * @param toBeWhitelisted The address to be whitelisted
+    * @dev Can only be called by the contract owner or the governance system
+    */
     function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
         require(toBeWhitelisted != address(0), "LiquidationEngine/whitelist-invalidAddress");
         liquidatorsWhitelist[toBeWhitelisted] = 1;
     }
-
+    /**
+    * @notice Remove a liquidator from the whitelist
+    * @param toBeRemoved The address to be removed from the whitelist
+    * @dev Can only be called by the contract owner or the governance system
+    */    
     function blacklist(address toBeRemoved) external onlyOwnerOrGov {
         liquidatorsWhitelist[toBeRemoved] = 0;
     }
-
+    /**
+    * @notice Batch liquidate multiple positions
+    * @param _collateralPoolIds The ids of the collateral pools for the positions to be liquidated
+    * @param _positionAddresses The addresses of the positions to be liquidated
+    * @param _debtShareToBeLiquidateds The amount of debt to be liquidated for each position
+    * @param _maxDebtShareToBeLiquidateds The maximum amount of debt that can be liquidated for each position
+    * @param _collateralRecipients The addresses to receive the liquidated collateral
+    * @param datas Extra data to be passed to each liquidation call
+    * @dev Can only be called by a whitelisted liquidator
+    */
     function batchLiquidate(
         bytes32[] calldata _collateralPoolIds,
         address[] calldata _positionAddresses,
-        uint256[] calldata _debtShareToBeLiquidateds, // [rad]
+        uint256[] calldata _debtShareToBeLiquidateds, // [wad]
         uint256[] calldata _maxDebtShareToBeLiquidateds, // [rad]
         address[] calldata _collateralRecipients,
         bytes[] calldata datas
@@ -157,7 +172,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     function liquidateForBatch(
         bytes32 _collateralPoolId,
         address _positionAddress,
-        uint256 _debtShareToBeLiquidated, // [rad]
+        uint256 _debtShareToBeLiquidated, // [wad]
         uint256 _maxDebtShareToBeLiquidated, // [wad]
         address _collateralRecipient,
         bytes calldata _data,
@@ -166,11 +181,20 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         require(msg.sender == address(this), "LiquidationEngine/invalid-sender");
         _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated, _maxDebtShareToBeLiquidated, _collateralRecipient, _data, sender);
     }
-
+    /**
+    * @notice Liquidate a position
+    * @param _collateralPoolId The id of the collateral pool for the position to be liquidated
+    * @param _positionAddress The address of the position to be liquidated
+    * @param _debtShareToBeLiquidated The amount of debt to be liquidated
+    * @param _maxDebtShareToBeLiquidated The maximum amount of debt that can be liquidated
+    * @param _collateralRecipient The address to receive the liquidated collateral
+    * @param _data Extra data to be passed to the liquidation call
+    * @dev Can only be called by a whitelisted liquidator
+    */
     function liquidate(
         bytes32 _collateralPoolId,
         address _positionAddress,
-        uint256 _debtShareToBeLiquidated, // [rad]
+        uint256 _debtShareToBeLiquidated, // [wad]
         uint256 _maxDebtShareToBeLiquidated, // [wad]
         address _collateralRecipient,
         bytes calldata _data
@@ -186,17 +210,11 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         );
     }
 
-    function setPriceOracle(address _priceOracle) external onlyOwnerOrGov isLive {
-        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "LiquidationEngine/invalid-priceOracle"); // Sanity Check Call
-        priceOracle = _priceOracle;
-    }
-
     function setBookKeeper(address _bookKeeper) external onlyOwner isLive {
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "LiquidationEngine/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
     }
 
-    /// @dev access: OWNER_ROLE, SHOW_STOPPER_ROLE
     function cage() external override onlyOwnerOrShowStopper {
         if (live == 1) {
             live = 0;
@@ -204,19 +222,12 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         }
     }
 
-    /// @dev access: OWNER_ROLE, SHOW_STOPPER_ROLE
-    function uncage() external override onlyOwnerOrShowStopper {
-        require(live == 0, "LiquidationEngine/not-caged");
-        live = 1;
-        emit LogUncage();
-    }
 
     // --- pause ---
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
-
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();
@@ -226,7 +237,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     function _liquidate(
         bytes32 _collateralPoolId,
         address _positionAddress,
-        uint256 _debtShareToBeLiquidated, // [rad]
+        uint256 _debtShareToBeLiquidated, // [wad]
         uint256 _maxDebtShareToBeLiquidated, // [wad]
         address _collateralRecipient,
         bytes calldata _data,
@@ -256,8 +267,8 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         // (positionDebtShare [wad] * debtAccumulatedRate [ray]) [rad]
         require(
             _collateralPoolLocalVars.priceWithSafetyMargin > 0 &&
-                _vars.positionLockedCollateral.mul(_collateralPoolLocalVars.priceWithSafetyMargin) <
-                _vars.positionDebtShare.mul(_collateralPoolLocalVars.debtAccumulatedRate),
+                _vars.positionLockedCollateral * _collateralPoolLocalVars.priceWithSafetyMargin <
+                _vars.positionDebtShare * _collateralPoolLocalVars.debtAccumulatedRate,
             "LiquidationEngine/position-is-safe"
         );
 
@@ -280,11 +291,10 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
 
         // (positionDebtShare [wad] - newPositionDebtShare [wad]) * debtAccumulatedRate [ray]
 
-        _vars.wantStablecoinValueFromLiquidation = _vars.positionDebtShare.sub(_vars.newPositionDebtShare).mul(
-            _collateralPoolLocalVars.debtAccumulatedRate
-        ); // [rad]
+        _vars.wantStablecoinValueFromLiquidation =
+            (_vars.positionDebtShare - _vars.newPositionDebtShare) * _collateralPoolLocalVars.debtAccumulatedRate; // [rad]
         require(
-            bookKeeper.stablecoin(address(systemDebtEngine)).sub(_vars.systemDebtEngineStablecoinBefore) >= _vars.wantStablecoinValueFromLiquidation,
+            bookKeeper.stablecoin(address(systemDebtEngine)) - _vars.systemDebtEngineStablecoinBefore >= _vars.wantStablecoinValueFromLiquidation,
             "LiquidationEngine/payment-not-received"
         );
 
@@ -307,7 +317,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     // solhint-enable function-max-lines
 
     function _isPriceOk(bytes32 _collateralPoolId) internal view returns (bool) {
-        IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_collateralPoolId));
+        IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId));
         return _priceFeed.isPriceOk();
     }
 }

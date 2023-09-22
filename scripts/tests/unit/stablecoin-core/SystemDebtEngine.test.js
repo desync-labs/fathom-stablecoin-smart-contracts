@@ -145,51 +145,6 @@ describe("SystemDebtEngine", () => {
     })
   })
 
-  describe("#uncage()", () => {
-    context("when role can't access", () => {
-      it("should revert", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(false)
-
-        await expect(systemDebtEngineAsAlice.uncage()).to.be.revertedWith("!(ownerRole or showStopperRole)")
-      })
-    })
-
-    context("when role can access", () => {
-      context("caller is owner role ", () => {
-        it("should be set live to 1", async () => {
-          await mockedAccessControlConfig.mock.hasRole.returns(true)
-          await mockedBookKeeper.mock.settleSystemBadDebt.returns()
-
-          expect(await systemDebtEngineAsAlice.live()).to.be.equal(1)
-
-          await systemDebtEngineAsAlice.cage()
-
-          expect(await systemDebtEngineAsAlice.live()).to.be.equal(0)
-
-          await expect(systemDebtEngineAsAlice.uncage()).to.emit(systemDebtEngineAsAlice, "LogUncage").withArgs()
-
-          expect(await systemDebtEngineAsAlice.live()).to.be.equal(1)
-        })
-      })
-
-      context("caller is showStopper role", () => {
-        it("should be set live to 1", async () => {
-          mockedAccessControlConfig.mock.hasRole.returns(true)
-          await mockedBookKeeper.mock.settleSystemBadDebt.returns()
-
-          expect(await systemDebtEngineAsAlice.live()).to.be.equal(1)
-
-          await systemDebtEngineAsAlice.cage()
-
-          expect(await systemDebtEngineAsAlice.live()).to.be.equal(0)
-
-          await expect(systemDebtEngineAsAlice.uncage()).to.emit(systemDebtEngineAsAlice, "LogUncage").withArgs()
-
-          expect(await systemDebtEngineAsAlice.live()).to.be.equal(1)
-        })
-      })
-    })
-  })
 
   describe("#setSurplusBuffer", () => {
     context("when the caller is not the owner", async () => {
@@ -206,6 +161,13 @@ describe("SystemDebtEngine", () => {
         await expect(systemDebtEngine.setSurplusBuffer(UnitHelpers.WeiPerRad))
           .to.emit(systemDebtEngine, "LogSetSurplusBuffer")
           .withArgs(DeployerAddress, UnitHelpers.WeiPerRad)
+      })
+    })
+    context("when the caller is the owner but the setSurplusBuffer value is less than RAD", async () => {
+      it("should revert", async () => {
+        await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+        await expect(systemDebtEngineAsAlice.setSurplusBuffer(BigNumber.from("100"))).to.be.revertedWith("SystemDebtEngine/invalidSurplusBuffer")
       })
     })
   })
@@ -302,7 +264,6 @@ describe("SystemDebtEngine", () => {
         await expect(
           systemDebtEngineAsAlice.withdrawCollateralSurplus(
             formatBytes32String("WXDC"),
-            mockedCollateralTokenAdapter.address,
             DeployerAddress,
             UnitHelpers.WeiPerWad
           )
@@ -320,16 +281,8 @@ describe("SystemDebtEngine", () => {
           UnitHelpers.WeiPerWad
         ).returns()
 
-        await mockedCollateralTokenAdapter.mock.onMoveCollateral.withArgs(
-          systemDebtEngine.address,
-          DeployerAddress,
-          UnitHelpers.WeiPerWad,
-          ethers.utils.defaultAbiCoder.encode(["address"], [DeployerAddress])
-        ).returns()
-
         await systemDebtEngine.withdrawCollateralSurplus(
           formatBytes32String("WXDC"),
-          mockedCollateralTokenAdapter.address,
           DeployerAddress,
           UnitHelpers.WeiPerWad
         )

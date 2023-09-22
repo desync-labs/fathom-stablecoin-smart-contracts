@@ -64,9 +64,9 @@ describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () =
 
     it("Check timeDelay method returns correct time delay value after calling setTimeDelay with valid parameter value", async () => {
       await mockedDexPriceOracle.mock.getPrice.returns(100, await latest())
-      await delayFathomOraclePriceFeed.setTimeDelay(1200);
+      await delayFathomOraclePriceFeed.setTimeDelay(800);
       const returnValue = await delayFathomOraclePriceFeed.timeDelay();
-      expect(returnValue).to.be.equal(1200);
+      expect(returnValue).to.be.equal(800);
     })
 
     it("Check accessControlConfig address", async () => {

@@ -39,13 +39,14 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
     }
 
     function setPriceLife(uint256 _second) external onlyOwner {
-        require(_second >= timeDelay && _second >= 5 minutes && _second <= 1 days, "DelayPriceFeed/bad-price-life");
+        require(_second >= timeDelay * 2 && _second >= 5 minutes && _second <= 1 days, "DelayPriceFeed/bad-price-life");
+        this.peekPrice();
         priceLife = _second;
         emit LogSetPriceLife(msg.sender, _second);
     }
 
     function setTimeDelay(uint256 _second) external onlyOwner {
-        require(_second <= priceLife && _second >= 5 minutes && _second <= 1 days, "DelayPriceFeed/bad-delay-time");
+        require(_second <= priceLife / 2 && _second >= 5 minutes && _second <= 1 days, "DelayPriceFeed/bad-delay-time");
         this.peekPrice();
         timeDelay = _second;
         emit LogSetTimeDelay(msg.sender, _second);
@@ -54,11 +55,11 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
     function setPoolId(bytes32 _poolId) external onlyOwner {
         poolId = _poolId;
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
-
+    /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
         this.peekPrice();
@@ -66,12 +67,18 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
 
     function peekPrice() external override returns (uint256, bool) {
         if (block.timestamp >= lastUpdateTS + timeDelay || !this.isPriceFresh()) {
-            PriceInfo memory _priceInfo = _retrivePrice();
-            delayedPrice = delayedPrice.price == 0 ? _priceInfo : latestPrice;
-            latestPrice = _priceInfo;
-            lastUpdateTS = block.timestamp;
-        }
+            try this.retrivePrice() returns (PriceInfo memory _priceInfo) {
+                
+                require(_priceInfo.price > 0, "DelayPriceFeed/wrong-price");
+                require(_priceInfo.lastUpdate <= block.timestamp, "DelayPriceFeed/wrong-lastUpdate");
 
+                delayedPrice = delayedPrice.price == 0 ? _priceInfo : latestPrice;
+                latestPrice = _priceInfo;
+                lastUpdateTS = block.timestamp;
+            } catch Error(string memory reason) {
+                emit LogPeekPriceFailed(msg.sender, reason);
+            }
+        }
         return (delayedPrice.price, this.isPriceOk());
     }
 
@@ -91,5 +98,5 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
         return delayedPrice.lastUpdate >= block.timestamp - priceLife;
     }
 
-    function _retrivePrice() internal view virtual returns (PriceInfo memory);
+    function retrivePrice() external view virtual returns (PriceInfo memory);
 }

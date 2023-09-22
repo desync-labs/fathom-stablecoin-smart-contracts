@@ -242,8 +242,6 @@ describe("FixedSpreadLiquidationStrategy", () => {
                         await mockedCollateralPoolConfig.mock.getDebtFloor.returns(10)
                         await mockedCollateralPoolConfig.mock.getAdapter.returns(mockedCollateralTokenAdapter.address)
 
-                        await mockedCollateralTokenAdapter.mock.onMoveCollateral.returns()
-
                         await mockedBookKeeper.mock.confiscatePosition.withArgs(
                             formatBytes32String("WXDC"),
                             AliceAddress,
@@ -310,7 +308,6 @@ describe("FixedSpreadLiquidationStrategy", () => {
                         await mockedCollateralPoolConfig.mock.getTreasuryFeesBps.returns(700)
                         await mockedCollateralPoolConfig.mock.getDebtFloor.returns(10)
                         await mockedCollateralPoolConfig.mock.getAdapter.returns(mockedCollateralTokenAdapter.address)
-                        await mockedCollateralTokenAdapter.mock.onMoveCollateral.returns()
 
                         await mockedBookKeeper.mock.confiscatePosition.withArgs(
                             formatBytes32String("WXDC"),
@@ -369,8 +366,6 @@ describe("FixedSpreadLiquidationStrategy", () => {
                 await mockedCollateralPoolConfig.mock.getTreasuryFeesBps.returns(17)
                 await mockedCollateralPoolConfig.mock.getDebtFloor.returns(10)
                 await mockedCollateralPoolConfig.mock.getAdapter.returns(mockedCollateralTokenAdapter.address)
-
-                await mockedCollateralTokenAdapter.mock.onMoveCollateral.returns()
 
                 await mockedBookKeeper.mock.confiscatePosition.withArgs(
                     formatBytes32String("WXDC"),

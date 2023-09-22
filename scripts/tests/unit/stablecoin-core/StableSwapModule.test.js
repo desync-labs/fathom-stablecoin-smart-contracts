@@ -303,6 +303,7 @@ describe("StableSwapModule", () => {
     context("valid deployer", () => {
       it("should set status and emit an event", async () => {
         await expect(stableSwapModule.setDecentralizedStatesStatus(true)).to.be.emit(stableSwapModule, "LogDecentralizedStateStatus")
+          .withArgs(false, true);
         expect(await stableSwapModule.isDecentralizedState()).to.be.equal(true)
       })
     })
@@ -425,25 +426,10 @@ describe("StableSwapModule", () => {
     })
 
     describe("#withdrawFees", () => {
-      context("not authorized", () => {
+      context("only-stableswap-wrapper-can-call", () => {
         it("should revert", async () => {
           await mockedAccessControlConfig.mock.hasRole.returns(false)
-
-          await expect(stableSwapModule.withdrawFees(DeployerAddress)).to.be.revertedWith("!(ownerRole or govRole)")
-        })
-      })
-      context("zero balance", () => {
-        it("should revert", async () => {
-          await expect(
-            stableSwapModule.withdrawFees(DeployerAddress)
-          ).to.be.revertedWith("withdrawFees/no-fee-balance")
-        })
-      })
-      context("zero address", () => {
-        it("should revert", async () => {
-          await expect(
-            stableSwapModule.withdrawFees(AddressZero)
-          ).to.be.revertedWith("withdrawFees/wrong-destination")
+          await expect(stableSwapModule.withdrawFees(DeployerAddress, WeiPerWad, WeiPerWad)).to.be.revertedWith("only-stableswap-wrapper")
         })
       })
     })
@@ -496,10 +482,7 @@ describe("StableSwapModule", () => {
       context("when role can access", () => {
         it("should be success", async () => {
           await mockedAccessControlConfig.mock.hasRole.returns(true)
-          await expect(
-            stableSwapModule.pause()
-          ).to.be.emit(stableSwapModule, "LogStableSwapPauseState")
-            .withArgs(true)
+          await stableSwapModule.pause()
           expect(await stableSwapModule.paused()).to.be.equal(true)
         })
       })
@@ -516,10 +499,7 @@ describe("StableSwapModule", () => {
         it("should be success", async () => {
           await mockedAccessControlConfig.mock.hasRole.returns(true)
           await stableSwapModule.pause();
-          await expect(
-            stableSwapModule.unpause()
-          ).to.be.emit(stableSwapModule, "LogStableSwapPauseState")
-            .withArgs(false)
+          await stableSwapModule.unpause()
           expect(await stableSwapModule.paused()).to.be.equal(false)
         })
       })

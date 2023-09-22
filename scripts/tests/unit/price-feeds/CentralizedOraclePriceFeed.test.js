@@ -84,8 +84,8 @@ describe("CentralizedOraclePriceFeed", () => {
         context("set price life", async () => {
             it("should succeed", async () => {
                 await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad, await latest());
-                await centralizedOraclePriceFeed.setPriceLife(950);
-                expect(await centralizedOraclePriceFeed.priceLife()).to.be.equal(950);
+                await centralizedOraclePriceFeed.setPriceLife(2000);
+                expect(await centralizedOraclePriceFeed.priceLife()).to.be.equal(2000);
             })
         })
     })
@@ -115,16 +115,22 @@ describe("CentralizedOraclePriceFeed", () => {
     })
 
     describe("#peekPrice()", async () => {
+        context("oracle reverts", async () => {
+            it("should emit event", async () => {
+                await mockedCentralizedPriceOracle.mock.getPrice.revertsWithReason("some-error")
+                await expect(centralizedOraclePriceFeed.peekPrice()).to.emit(centralizedOraclePriceFeed, "LogPeekPriceFailed").withArgs(DeployerAddress, "some-error")
+            })
+        })
         context("zero price", async () => {
             it("should revert", async () => {
                 await mockedCentralizedPriceOracle.mock.getPrice.returns(0, await latest());
-                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("CentralizedOraclePriceFeed/wrong-price");
+                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("DelayPriceFeed/wrong-price");
             })
         })
         context("zero invalid timestamp", async () => {
             it("should revert", async () => {
                 await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad, await latest() + 1);
-                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("CentralizedOraclePriceFeed/wrong-lastUpdate");
+                await expect(centralizedOraclePriceFeed.peekPrice()).to.be.revertedWith("DelayPriceFeed/wrong-lastUpdate");
             })
         })
         context("peek price", async () => {

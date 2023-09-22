@@ -3,6 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
+import "../interfaces/IPausable.sol";
 import "./ProxyWallet.sol";
 import "./ProxyWalletFactory.sol";
 
@@ -11,7 +12,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     mapping(address => ProxyWallet) public proxies;
     ProxyWalletFactory internal factory;
     mapping(address => bool) public whitelisted;
-    address public bookKeeper;
+    IBookKeeper public bookKeeper;
     bool public isDecentralizedMode;
 
     event LogAddToWhitelist(address indexed user);
@@ -20,7 +21,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     event LogProxyWalletCreation(address owner, address proxyWallet);
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
             _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
@@ -30,7 +31,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     }
 
     modifier onlyOwner() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
     }
@@ -38,9 +39,11 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     function initialize(address _factory, address _bookKeeper) external initializer {
         PausableUpgradeable.__Pausable_init();
 
+        require(_factory != address(0), "ProxyWalletRegistry/zero-factory");
+        require(_bookKeeper != address(0), "ProxyWalletRegistry/zero-bookKeeper");
+
         factory = ProxyWalletFactory(_factory);
-        bookKeeper = _bookKeeper;
-        isDecentralizedMode = false;
+        bookKeeper = IBookKeeper(_bookKeeper);
     }
 
     function addToWhitelist(address _usr) external onlyOwner {
@@ -74,7 +77,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
         _proxy = build(msg.sender);
     }
 
-    function setOwner(address _newOwner) external {
+    function setOwner(address _newOwner) external whenNotPaused {
         require(proxies[_newOwner] == ProxyWallet(payable(address(0))));
         ProxyWallet _proxy = proxies[msg.sender];
         require(_proxy.owner() == _newOwner);
@@ -83,7 +86,7 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     }
 
     /// @dev Deploys a new proxy instance and sets custom owner of proxy
-    function build(address _owner) public returns (address payable _proxy) {
+    function build(address _owner) public whenNotPaused returns (address payable _proxy) {
         require(whitelisted[_owner] || isDecentralizedMode, "ProxyWalletRegistry/user-is-not-whitelisted");
         require(proxies[_owner] == ProxyWallet(payable(address(0)))); // Not allow new proxy if the user already has one
         _proxy = factory.build(_owner);

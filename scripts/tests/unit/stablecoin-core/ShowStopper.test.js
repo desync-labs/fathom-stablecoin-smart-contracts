@@ -9,8 +9,11 @@ const { WeiPerRay, WeiPerWad, WeiPerRad } = require("../../helper/unit")
 const { DeployerAddress, AliceAddress, AddressZero } = require("../../helper/address");
 const { getContract, createMock } = require("../../helper/contracts");
 const { loadFixture } = require("../../helper/fixtures");
+const { increase } = require("../../helper/time");
 
 const { formatBytes32String } = ethers.utils
+
+const WeekInSeconds = 604800;
 
 const loadFixtureHandler = async () => {
     const mockedAccessControlConfig = await createMock("AccessControlConfig");
@@ -71,19 +74,20 @@ describe("ShowStopper", () => {
     await showStopper.setLiquidationEngine(mockedLiquidationEngine.address)
     await showStopper.setSystemDebtEngine(mockedSystemDebtEngine.address)
     await showStopper.setPriceOracle(mockedPriceOracle.address)
-    await showStopper.cage()
+    await showStopper.cage(WeekInSeconds)
 
     await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address)
     await mockedCollateralPoolConfig.mock.getTotalDebtShare.returns(WeiPerWad)
 
     await mockedPriceFeed.mock.readPrice.returns(formatBytes32BigNumber(WeiPerWad))
+    await mockedPriceFeed.mock.isPriceOk.returns(true);
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
     await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRad);
     
     await showStopper.cagePool(formatBytes32String("XDC"))
     await mockedBookKeeper.mock.positionWhitelist.returns(BigNumber.from(0))
-    await mockedTokenAdapter.mock.onMoveCollateral.returns();
     await mockedBookKeeper.mock.stablecoin.returns(0)
+
   }
 
   before(async () => {
@@ -125,9 +129,23 @@ describe("ShowStopper", () => {
         await showStopper.setSystemDebtEngine(mockedSystemDebtEngine.address)
         await showStopper.setPriceOracle(mockedPriceOracle.address)
 
-        await expect(showStopper.cage()).to.emit(showStopper, "LogCage()").withArgs()
+        await expect(showStopper.cage(WeekInSeconds)).to.emit(showStopper, "LogCage(uint256)").withArgs(WeekInSeconds)
 
         expect(await showStopper.live()).to.be.equal(0)
+      })
+    })
+
+    context("invalid cooldown time", () => {
+      it("should revert", async () => {
+        await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+        await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+        await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+        // less than 1 week
+        await expect(showStopper.cage(WeekInSeconds-1)).to.be.revertedWith("ShowStopper/invalid-cool-down")
+
+        // more than three months
+        await expect(showStopper.cage(7862401)).to.be.revertedWith("ShowStopper/invalid-cool-down")
       })
     })
 
@@ -150,7 +168,7 @@ describe("ShowStopper", () => {
         await showStopper.setPriceOracle(mockedPriceOracle.address)
 
         await mockedAccessControlConfig.mock.hasRole.returns(false)
-        await expect(showStopperAsAlice.cage()).to.be.revertedWith("!ownerRole")
+        await expect(showStopperAsAlice.cage(WeekInSeconds)).to.be.revertedWith("!ownerRole")
       })
     })
   })
@@ -162,6 +180,7 @@ describe("ShowStopper", () => {
           await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
           await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
           await mockedAccessControlConfig.mock.hasRole.returns(true)
+          await mockedPriceFeed.mock.isPriceOk.returns(true);
 
           expect(await showStopper.live()).to.be.equal(1)
 
@@ -175,7 +194,7 @@ describe("ShowStopper", () => {
           await showStopper.setLiquidationEngine(mockedLiquidationEngine.address)
           await showStopper.setSystemDebtEngine(mockedSystemDebtEngine.address)
           await showStopper.setPriceOracle(mockedPriceOracle.address)
-          await showStopper.cage()
+          await showStopper.cage(WeekInSeconds)
 
           await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address)
           await mockedCollateralPoolConfig.mock.getTotalDebtShare.returns(WeiPerWad)
@@ -204,7 +223,7 @@ describe("ShowStopper", () => {
         })
       })
 
-      context("cage price is already defined", () => {
+      context("priceFeed's isPriceOk is false", () => {
         it("should be revert", async () => {
           await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
           await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
@@ -221,7 +240,43 @@ describe("ShowStopper", () => {
           await showStopper.setLiquidationEngine(mockedLiquidationEngine.address)
           await showStopper.setSystemDebtEngine(mockedSystemDebtEngine.address)
           await showStopper.setPriceOracle(mockedPriceOracle.address)
-          await showStopper.cage()
+          await showStopper.cage(WeekInSeconds)
+
+          await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address)
+          await mockedCollateralPoolConfig.mock.getTotalDebtShare.returns(WeiPerWad)
+
+          await mockedPriceFeed.mock.readPrice.returns(formatBytes32BigNumber(WeiPerWad))
+          await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
+          await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRad);
+          await mockedPriceFeed.mock.isPriceOk.returns(false);
+
+          await expect(showStopper.cagePool(formatBytes32String("XDC"))).to.be.revertedWith(
+            "ShowStopper/price-not-ok"
+          )
+
+          expect(await showStopper.live()).to.be.equal(0)
+        })
+      })
+
+      context("cage price is already defined", () => {
+        it("should be revert", async () => {
+          await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+          await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+          await mockedPriceFeed.mock.isPriceOk.returns(true);
+
+          expect(await showStopper.live()).to.be.equal(1)
+
+          await mockedBookKeeper.mock.cage.returns()
+          await mockedLiquidationEngine.mock.cage.returns()
+          await mockedSystemDebtEngine.mock.cage.returns()
+          await mockedPriceOracle.mock.cage.returns()
+
+          await showStopper.setBookKeeper(await mockedBookKeeper.address)
+          await showStopper.setLiquidationEngine(mockedLiquidationEngine.address)
+          await showStopper.setSystemDebtEngine(mockedSystemDebtEngine.address)
+          await showStopper.setPriceOracle(mockedPriceOracle.address)
+          await showStopper.cage(WeekInSeconds)
 
           await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address)
           await mockedCollateralPoolConfig.mock.getTotalDebtShare.returns(WeiPerWad)
@@ -246,7 +301,7 @@ describe("ShowStopper", () => {
     context("when setting collateral pool is active", () => {
       context("pool is inactive", () => {
         context("and debtShare is more than 0", () => {
-          xit("should revert", async () => {
+          it("should revert", async () => {
             await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
             await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
             await mockedAccessControlConfig.mock.hasRole.returns(true)
@@ -258,7 +313,6 @@ describe("ShowStopper", () => {
             await expect(
               showStopper.redeemLockedCollateral(
                 formatBytes32String("XDC"),
-                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -268,7 +322,7 @@ describe("ShowStopper", () => {
         })
 
         context("and lockedCollateral is overflow (> MaxInt256)", () => {
-          xit("should revert", async () => {
+           it("should revert", async () => {
             await setup()
 
             await mockedBookKeeper.mock.positions.returns(ethers.constants.MaxUint256, BigNumber.from("0"))
@@ -276,7 +330,6 @@ describe("ShowStopper", () => {
             await expect(
               showStopper.redeemLockedCollateral(
                 formatBytes32String("XDC"),
-                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -286,14 +339,13 @@ describe("ShowStopper", () => {
         })
 
         context("when the caller has no access to the position", () => {
-          xit("should revert", async () => {
+           it("should revert", async () => {
             await setup()
 
             await mockedBookKeeper.mock.positions.returns(WeiPerRay, BigNumber.from("0"))
             await expect(
               showStopperAsAlice.redeemLockedCollateral(
                 formatBytes32String("XDC"),
-                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -303,7 +355,7 @@ describe("ShowStopper", () => {
         })
 
         context("and debtShare is 0 and lockedCollateral is 1 ray", () => {
-          xit("should be success", async () => {
+           it("should be success", async () => {
             await setup()
 
             await mockedBookKeeper.mock.positions.withArgs(
@@ -322,7 +374,6 @@ describe("ShowStopper", () => {
             await expect(
               showStopper.redeemLockedCollateral(
                 formatBytes32String("XDC"),
-                mockedTokenAdapter.address,
                 DeployerAddress,
                 DeployerAddress,
                 "0x"
@@ -336,7 +387,7 @@ describe("ShowStopper", () => {
         context(
           "and debtShare is 0 and lockedCollateral is 1 ray, but the caller does not have access to the position",
           () => {
-            xit("should be success", async () => {
+             it("should be success", async () => {
               await setup()
 
               await mockedBookKeeper.mock.positions.returns(WeiPerRay, BigNumber.from("0"))
@@ -345,7 +396,6 @@ describe("ShowStopper", () => {
               await expect(
                 showStopperAsAlice.redeemLockedCollateral(
                   formatBytes32String("XDC"),
-                  mockedTokenAdapter.address,
                   DeployerAddress,
                   DeployerAddress,
                   "0x"
@@ -358,7 +408,7 @@ describe("ShowStopper", () => {
         context(
           "and debtShare is 0 and lockedCollateral is 1 ray, the caller is not the owner of the address but has access to",
           () => {
-            xit("should be success", async () => {
+             it("should be success", async () => {
               await setup()
 
               await mockedAccessControlConfig.mock.hasRole.returns(false)
@@ -383,7 +433,6 @@ describe("ShowStopper", () => {
               await expect(
                 showStopper.redeemLockedCollateral(
                   formatBytes32String("XDC"),
-                  mockedTokenAdapter.address,
                   AliceAddress,
                   AliceAddress,
                   "0x"
@@ -397,11 +446,10 @@ describe("ShowStopper", () => {
       })
 
       context("pool is active", () => {
-        xit("should revert", async () => {
+         it("should revert", async () => {
           await expect(
             showStopper.redeemLockedCollateral(
               formatBytes32String("XDC"),
-              mockedTokenAdapter.address,
               DeployerAddress,
               DeployerAddress,
               "0x"
@@ -420,6 +468,8 @@ describe("ShowStopper", () => {
             await setup()
 
             await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
+
+            await increase(WeekInSeconds);
             await showStopper.finalizeDebt()
 
             await expect(showStopper.finalizeDebt()).to.be.revertedWith("ShowStopper/debt-not-zero")
@@ -432,6 +482,7 @@ describe("ShowStopper", () => {
 
             await mockedBookKeeper.mock.stablecoin.returns(WeiPerRay)
 
+            await increase(WeekInSeconds);
             await expect(showStopper.finalizeDebt()).to.be.revertedWith("ShowStopper/surplus-not-zero")
           })
         })
@@ -443,6 +494,8 @@ describe("ShowStopper", () => {
             await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
             await mockedBookKeeper.mock.stablecoin.returns(BigNumber.from("0"))
 
+
+            await increase(WeekInSeconds);
             await expect(showStopper.finalizeDebt()).to.emit(showStopper, "LogFinalizeDebt").withArgs()
           })
         })
@@ -469,6 +522,7 @@ describe("ShowStopper", () => {
       context("cash price is already defined", () => {
         it("should revert", async () => {
           await setup()
+          await increase(WeekInSeconds);
 
           await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
           await showStopper.finalizeDebt()
@@ -489,6 +543,7 @@ describe("ShowStopper", () => {
       context("cash price is 1 ray", () => {
         it("should be success", async () => {
           await setup()
+          await increase(WeekInSeconds);
 
           await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
           await showStopper.finalizeDebt()
@@ -517,6 +572,7 @@ describe("ShowStopper", () => {
       context("debt is not 0", () => {
         it("should be success", async () => {
           await setup()
+          await increase(WeekInSeconds);
 
           await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
           await showStopper.finalizeDebt()
@@ -545,6 +601,7 @@ describe("ShowStopper", () => {
         context("and stablecoinAccumulator balance < withdraw", () => {
           it("should revert", async () => {
             await setup()
+            await increase(WeekInSeconds);
 
             await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
             await showStopper.finalizeDebt()
@@ -565,6 +622,7 @@ describe("ShowStopper", () => {
         context("and stablecoinAccumulator balance = withdraw", () => {
           it("should be success", async () => {
             await setup()
+            await increase(WeekInSeconds);
 
             await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
             await showStopper.finalizeDebt()
@@ -595,6 +653,7 @@ describe("ShowStopper", () => {
         context("and stablecoinAccumulator balance > withdraw", () => {
           it("should be success", async () => {
             await setup()
+            await increase(WeekInSeconds);
 
             await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
             await showStopper.finalizeDebt()

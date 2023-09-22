@@ -19,7 +19,6 @@ const loadFixtureHandler = async () => {
   const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
   const mockedBookKeeper = await createMock("BookKeeper");
   const mockedSystemDebtEngine = await createMock("SystemDebtEngine");
-  const mockedPriceOracle = await createMock("PriceOracle");
   const mockedFixedSpreadLiquidationStrategy = await createMock("FixedSpreadLiquidationStrategy");
   const mockedPriceFeed = await createMock("SimplePriceFeed");
 
@@ -31,8 +30,6 @@ const loadFixtureHandler = async () => {
   await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))
   await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
   await mockedAccessControlConfig.mock.hasRole.returns(true)
-  await mockedPriceOracle.mock.setPrice.returns()
-  await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
 
   await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address);
   await mockedPriceFeed.mock.isPriceOk.returns(true);
@@ -41,7 +38,7 @@ const loadFixtureHandler = async () => {
   liquidationEngineAsAlice = getContract("LiquidationEngine", AliceAddress)
   liquidationEngineAsBob = getContract("LiquidationEngine", BobAddress)
 
-  await liquidationEngine.initialize(mockedBookKeeper.address, mockedSystemDebtEngine.address, mockedPriceOracle.address);
+  await liquidationEngine.initialize(mockedBookKeeper.address, mockedSystemDebtEngine.address);
   await liquidationEngine.whitelist(DeployerAddress);
   await liquidationEngine.whitelist(AliceAddress);
 
@@ -244,50 +241,6 @@ describe("LiquidationEngine", () => {
           await expect(liquidationEngineAsAlice.cage()).to.emit(liquidationEngineAsAlice, "LogCage").withArgs()
 
           expect(await liquidationEngineAsAlice.live()).to.be.equal(0)
-        })
-      })
-    })
-  })
-
-  describe("#uncage()", () => {
-    context("when role can't access", () => {
-      it("should revert", async () => {
-        await mockedAccessControlConfig.mock.hasRole.returns(false)
-
-        await expect(liquidationEngineAsAlice.uncage()).to.be.revertedWith("!(ownerRole or showStopperRole)")
-      })
-    })
-
-    context("when role can access", () => {
-      context("caller is owner role ", () => {
-        it("should be set live to 1", async () => {
-          await mockedAccessControlConfig.mock.hasRole.withArgs(formatBytes32String("OWNER_ROLE"), AliceAddress).returns(true)
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(1)
-
-          await liquidationEngineAsAlice.cage()
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(0)
-
-          await expect(liquidationEngineAsAlice.uncage()).to.emit(liquidationEngineAsAlice, "LogUncage").withArgs()
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(1)
-        })
-      })
-
-      context("caller is showStopper role", () => {
-        it("should be set live to 1", async () => {
-          await mockedAccessControlConfig.mock.hasRole.withArgs(formatBytes32String("SHOW_STOPPER_ROLE"), AliceAddress).returns(true)
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(1)
-
-          await liquidationEngineAsAlice.cage()
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(0)
-
-          await expect(liquidationEngineAsAlice.uncage()).to.emit(liquidationEngineAsAlice, "LogUncage").withArgs()
-
-          expect(await liquidationEngineAsAlice.live()).to.be.equal(1)
         })
       })
     })

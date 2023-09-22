@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-interface ICollateralTokenAdapter {
+import "../../../interfaces/IGenericTokenAdapter.sol";
+
+interface ICollateralTokenAdapter is IGenericTokenAdapter {
     function initialize(
         address _bookKeeper,
         bytes32 _collateralPoolId,

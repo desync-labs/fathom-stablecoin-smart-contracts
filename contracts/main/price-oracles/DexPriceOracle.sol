@@ -4,7 +4,7 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./lib/FathomSwapLibrary.sol";
-import "./lib/IFathomSwapPair.sol";
+import "../apis/interfaces/IFathomSwapPair.sol";
 import "../interfaces/IFathomDEXOracle.sol";
 import "../interfaces/IToken.sol";
 
@@ -12,6 +12,8 @@ contract DexPriceOracle is Initializable, IFathomDEXOracle {
     address public dexFactory;
 
     function initialize(address _dexFactory) external initializer {
+        require(_dexFactory != address(0), "DexPriceOracle/zero-factory");
+
         dexFactory = _dexFactory;
     }
 

@@ -2,67 +2,22 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
+
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IAccessControlConfig.sol";
 import "../interfaces/IPausable.sol";
+import "../utils/CommonMath.sol";
 
-contract BookKeeperMath {
-    function add(uint256 x, int256 y) internal pure returns (uint256 z) {
-        unchecked {
-            z = x + uint256(y);
-        }
-        require(y >= 0 || z <= x);
-        require(y <= 0 || z >= x);
-    }
-
-    function sub(uint256 x, int256 y) internal pure returns (uint256 z) {
-        unchecked {
-            z = x - uint256(y);
-        }
-        require(y <= 0 || z <= x);
-        require(y >= 0 || z >= x);
-    }
-
-    function mul(uint256 x, int256 y) internal pure returns (int256 z) {
-        unchecked {
-            z = int256(x) * y;
-        }
-        require(int256(x) >= 0);
-        require(y == 0 || z / y == int256(x));
-    }
-
-    function add(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = x + y;
-    }
-
-    function sub(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = x - y;
-    }
-
-    function mul(uint256 x, uint256 y) internal pure returns (uint256 z) {
-        z = x * y;
-    }
-
-    function either(bool _x, bool _y) internal pure returns (bool _z) {
-        assembly {
-            _z := or(_x, _y)
-        }
-    }
-
-    function both(bool _x, bool _y) internal pure returns (bool _z) {
-        assembly {
-            _z := and(_x, _y)
-        }
-    }
-}
-
-/// @notice A contract which acts as a book keeper of the Fathom Stablecoin protocol. It has the ability to move collateral token and stablecoin with in the accounting state variable.
-contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, PausableUpgradeable, ReentrancyGuardUpgradeable {
+/**
+ * @title BookKeeper
+ * @notice A contract which acts as a bookkeeper of the Fathom Stablecoin protocol.
+ * It has the ability to move collateral tokens and stablecoins within the accounting state variable.
+ */
+ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable {
     using Address for address;
 
     struct Position {
@@ -102,6 +57,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
     );
     event LogAddCollateral(address indexed _caller, address indexed _usr, int256 _amount);
     event LogMoveCollateral(address indexed _caller, bytes32 indexed _collateralPoolId, address _src, address indexed _dst, uint256 _amount);
+    event LogMoveStablecoin(address indexed _caller, address _src, address indexed _dst, uint256 _amount);
 
     event StablecoinIssuedAmount(uint256 _totalStablecoinIssued, bytes32 indexed _collateralPoolId, uint256 _poolStablecoinIssued);
 
@@ -194,11 +150,20 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
+        require(_accessControlConfig.isContract(), "BookKeeper/access-control-config: NOT_CONTRACT_ADDRESS");
+        require(
+            IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender),
+            "BookKeeper/msgsender-not-owner"
+        );
+
         accessControlConfig = _accessControlConfig;
         emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
 
+
     function setCollateralPoolConfig(address _collateralPoolConfig) external onlyOwner {
+        require(_collateralPoolConfig.isContract(), "BookKeeper/collateral-pool-config: NOT_CONTRACT_ADDRESS");
+
         collateralPoolConfig = _collateralPoolConfig;
         emit LogSetCollateralPoolConfig(msg.sender, _collateralPoolConfig);
     }
@@ -212,43 +177,67 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         }
     }
 
-    function uncage() external override onlyOwnerOrShowStopper {
-        require(live == 0, "BookKeeper/not-caged");
-        live = 1;
-
-        emit LogUncage();
-    }
-
     // --- Pause ---
-
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
-
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();
     }
 
+
     // --- Whitelist ---
 
-    /// @dev Give an allowance to the `usr` address to adjust the position address who is the caller.
+    /**
+    * @dev Grants an allowance to the `toBeWhitelistedAddress` to adjust the position address of the caller.
+    * @notice This function can only be called when the BookKeeper contract is not paused.
+    * @param toBeWhitelistedAddress The address that is granted permission to adjust the position address of the caller.
+    * @dev Emits no events.
+    */
     function whitelist(address toBeWhitelistedAddress) external override whenNotPaused {
         positionWhitelist[msg.sender][toBeWhitelistedAddress] = 1;
     }
 
-    /// @dev Revoke an allowance from the `usr` address to adjust the position address who is the caller.
+    /**
+    * @dev Revokes the allowance from the `toBeBlacklistedAddress` to adjust the position address of the caller.
+    * @notice This function can only be called when the BookKeeper contract is not paused.
+    * @param toBeBlacklistedAddress The address that is no longer allowed to adjust the position address of the caller.
+    * @dev Emits no events.
+    */
     function blacklist(address toBeBlacklistedAddress) external override whenNotPaused {
         positionWhitelist[msg.sender][toBeBlacklistedAddress] = 0;
     }
 
+
     // --- Core Logic ---
 
+    /**
+    * @dev Updates the accounting of collateral tokens deposited by a position in the specified collateral pool.
+    * @dev Although the second argument is named as _usr, addCollateral is more often used in the context of CDP manipulation, and the _usr address
+    * often represents the position's address. Refer to deposit function in CollateralTokenAdapter.
+    * @notice This function can only be called by the Adapter role when the BookKeeper contract is not paused.
+    * @param _collateralPoolId The ID of the collateral pool in which the position's collateral is being updated.
+    * @param _usr The address of the position for which collateral is being adjusted.
+    * @param _amount The amount of collateral being added (positive value) or removed (negative value) from the user's position.
+    * @dev Emits a LogAddCollateral event to record the change in the position's collateral amount.
+    */
     function addCollateral(bytes32 _collateralPoolId, address _usr, int256 _amount) external override nonReentrant whenNotPaused onlyAdapter {
         collateralToken[_collateralPoolId][_usr] = add(collateralToken[_collateralPoolId][_usr], _amount);
         emit LogAddCollateral(msg.sender, _usr, _amount);
     }
+
+
+    /**
+    * @notice Moves collateral tokens from one address (often a position address) to another in a specified collateral pool.
+    * @dev This function can only be called by an entity with the Collateral Manager role when the BookKeeper contract is not paused.
+    * @dev It also requires that the entity making the call has the authority to adjust the position (or any address that holds collateralToken), as determined by `_requireAllowedPositionAdjustment`.
+    * @param _collateralPoolId The ID of the collateral pool from which the collateral tokens are being moved.
+    * @param _src The address from which collateral tokens are being moved.
+    * @param _dst The address to which collateral tokens are being moved.
+    * @param _amount The amount of collateral tokens being moved from the source to the destination.
+    */
 
     function moveCollateral(
         bytes32 _collateralPoolId,
@@ -257,17 +246,39 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         uint256 _amount
     ) external override nonReentrant whenNotPaused onlyCollateralManager {
         _requireAllowedPositionAdjustment(_src, msg.sender);
-        collateralToken[_collateralPoolId][_src] = sub(collateralToken[_collateralPoolId][_src], _amount);
-        collateralToken[_collateralPoolId][_dst] = add(collateralToken[_collateralPoolId][_dst], _amount);
+        collateralToken[_collateralPoolId][_src] -= _amount;
+        collateralToken[_collateralPoolId][_dst] += _amount;
         emit LogMoveCollateral(msg.sender, _collateralPoolId, _src, _dst, _amount);
     }
 
+    /**
+    * @notice Moves stablecoin from one address to another.
+    * @dev This function can only be called when the BookKeeper contract is not paused.
+    * @dev It also requires that the entity making the call is allowed to adjust the position (or any address that holds stablecoin) 
+    * @dev according to `_requireAllowedPositionAdjustment`.
+    * @param _src The source address from which the stablecoin is being moved.
+    * @param _dst The destination address to which the stablecoin is being moved.
+    * @param _value The amount of stablecoin being moved from the source to the destination.
+    */
+
     function moveStablecoin(address _src, address _dst, uint256 _value) external override nonReentrant whenNotPaused {
         _requireAllowedPositionAdjustment(_src, msg.sender);
-        stablecoin[_src] = sub(stablecoin[_src], _value);
-        stablecoin[_dst] = add(stablecoin[_dst], _value);
+        stablecoin[_src] -= _value;
+        stablecoin[_dst] += _value;
+        emit LogMoveStablecoin(msg.sender, _src, _dst, _value);
     }
 
+    /**
+    * @notice Adjusts the collateral and debt of a position in a specific collateral pool.
+    * @dev This function can only be called by an entity with the Position Manager role when the BookKeeper contract is not paused and the collateral pool is active.
+    * @dev It ensures multiple conditions are met regarding debt and collateral values to maintain system stability and safety.
+    * @param _collateralPoolId The ID of the collateral pool where the position is located.
+    * @param _positionAddress The address of the position to be adjusted.
+    * @param _collateralOwner The address of the owner of the collateral. (positionAddress)
+    * @param _stablecoinOwner The address of the owner of the stablecoin. (positionAddress)
+    * @param _collateralValue The change in collateral value. This is added to the position's current locked collateral.
+    * @param _debtShare The change in debt share. This is added to the position's current debt share.
+    */
     // solhint-disable function-max-lines
     function adjustPosition(
         bytes32 _collateralPoolId,
@@ -289,7 +300,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         ICollateralPoolConfig(collateralPoolConfig).setTotalDebtShare(_collateralPoolId, _vars.totalDebtShare);
 
         int256 _debtValue = mul(_vars.debtAccumulatedRate, _debtShare);
-        uint256 _positionDebtValue = mul(_vars.debtAccumulatedRate, position.debtShare);
+        uint256 _positionDebtValue = _vars.debtAccumulatedRate * position.debtShare;
         totalStablecoinIssued = add(totalStablecoinIssued, _debtValue);
         uint256 _poolStablecoinAmount = poolStablecoinIssued[_collateralPoolId];
         poolStablecoinIssued[_collateralPoolId] = add(_poolStablecoinAmount, _debtValue);
@@ -297,13 +308,13 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         require(
             either(
                 _debtShare <= 0,
-                both(mul(_vars.totalDebtShare, _vars.debtAccumulatedRate) <= _vars.debtCeiling, totalStablecoinIssued <= totalDebtCeiling)
+                both(_vars.totalDebtShare * _vars.debtAccumulatedRate <= _vars.debtCeiling, totalStablecoinIssued <= totalDebtCeiling)
             ),
             "BookKeeper/ceiling-exceeded"
         );
 
         require(
-            either(both(_debtShare <= 0, _collateralValue >= 0), _positionDebtValue <= mul(position.lockedCollateral, _vars.priceWithSafetyMargin)),
+            either(both(_debtShare <= 0, _collateralValue >= 0), _positionDebtValue <= position.lockedCollateral * _vars.priceWithSafetyMargin),
             "BookKeeper/not-safe"
         );
 
@@ -335,8 +346,17 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         );
     }
 
+    /**
+    * @notice Moves collateral and debt from one position to another in a specific collateral pool.
+    * @dev This function can only be called by an entity with the Position Manager role when the BookKeeper contract is not paused.
+    * @dev It ensures that the caller is allowed to manipulate both source and destination positions and the positions remain safe after the move.
+    * @param _collateralPoolId The ID of the collateral pool where the positions are located.
+    * @param _src The address of the source position from which collateral and debt are being moved.
+    * @param _dst The address of the destination position to which collateral and debt are being moved.
+    * @param _collateralAmount The amount of collateral being moved from the source to the destination position.
+    * @param _debtShare The amount of debt share being moved from the source to the destination position.
+    */
     // solhint-enable function-max-lines
-
     function movePosition(
         bytes32 _collateralPoolId,
         address _src,
@@ -354,23 +374,32 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         _positionDst.lockedCollateral = add(_positionDst.lockedCollateral, _collateralAmount);
         _positionDst.debtShare = add(_positionDst.debtShare, _debtShare);
 
-        uint256 _utab = mul(_positionSrc.debtShare, _vars.debtAccumulatedRate);
-        uint256 _vtab = mul(_positionDst.debtShare, _vars.debtAccumulatedRate);
+        uint256 _utab = _positionSrc.debtShare * _vars.debtAccumulatedRate;
+        uint256 _vtab = _positionDst.debtShare * _vars.debtAccumulatedRate;
 
         require(both(_wish(_src, msg.sender), _wish(_dst, msg.sender)), "BookKeeper/movePosition/not-allowed");
 
-        require(_utab <= mul(_positionSrc.lockedCollateral, _vars.priceWithSafetyMargin), "BookKeeper/not-safe-src");
-        require(_vtab <= mul(_positionDst.lockedCollateral, _vars.priceWithSafetyMargin), "BookKeeper/not-safe-dst");
+        require(_utab <= _positionSrc.lockedCollateral * _vars.priceWithSafetyMargin, "BookKeeper/not-safe-src");
+        require(_vtab <= _positionDst.lockedCollateral * _vars.priceWithSafetyMargin, "BookKeeper/not-safe-dst");
 
         require(either(_utab >= _vars.debtFloor, _positionSrc.debtShare == 0), "BookKeeper/debt-floor-src");
         require(either(_vtab >= _vars.debtFloor, _positionDst.debtShare == 0), "BookKeeper/debt-floor-dst");
+
+        require(_vtab <= _vars.positionDebtCeiling, "BookKeeper/position-debt-ceiling-exceeded-dst");
     }
 
-    /** @dev Confiscate position from the owner for the position to be liquidated.
-      The position will be confiscated of collateral in which these collateral will be sold through a liquidation process to repay the stablecoin debt.
-      The confiscated collateral will be seized by the Auctioneer contracts and will be moved to the corresponding liquidator addresses upon later.
-      The stablecoin debt will be mark up on the SystemDebtEngine contract first. This would signify that the system currently has a bad debt of this amount. 
-      But it will be cleared later on from a successful liquidation. If this debt is not fully liquidated, the remaining debt will stay inside SystemDebtEngine as bad debt.
+    /**
+    * @notice Confiscates a position for liquidation. It seizes collateral and marks a debt.
+    * @dev This function can only be called by an entity with the Liquidation Engine role when the BookKeeper contract is not paused.
+    * @dev The seized collateral will be transferred to the Auctioneer contracts and later moved to the corresponding liquidator addresses.
+    * @dev The stablecoin debt will be initially marked in the SystemDebtEngine contract and will be cleared later on from a successful liquidation. 
+    * @dev If the debt is not fully liquidated, the remaining debt will stay inside SystemDebtEngine as bad debt.
+    * @param _collateralPoolId The ID of the collateral pool where the positions are located.
+    * @param _positionAddress The address of the position from which collateral and debt are being confiscated.
+    * @param _collateralCreditor The address where confiscated collateral will be transferred.
+    * @param _stablecoinDebtor The address from which the stablecoin debt is being confiscated.
+    * @param _collateralAmount The amount of collateral being confiscated from the position.
+    * @param _debtShare The amount of debt share being confiscated from the position.
     */
     function confiscatePosition(
         bytes32 _collateralPoolId,
@@ -400,32 +429,44 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, BookKeeperMath, Pausabl
         totalUnbackedStablecoin = sub(totalUnbackedStablecoin, _debtValue);
     }
 
-    /** @dev Settle the system bad debt of the caller.
-      This function will always be called by the SystemDebtEngine which will be the contract that always incur the system debt.
-      By executing this function, the SystemDebtEngine must have enough stablecoin which will come from the Surplus of the protocol.
-      A successful `settleSystemBadDebt` would remove the bad debt from the system.
+    /**
+    * @notice Settles the system's bad debt of the caller.
+    * @dev This function can only be called by the SystemDebtEngine, which incurs the system debt. The BookKeeper contract must not be paused.
+    * @dev To execute this function, the SystemDebtEngine must have enough stablecoin, which typically comes from the protocol's surplus.
+    * @dev A successful execution of this function removes the bad debt from the system.
+    * @param _value The amount of bad debt to be settled.
     */
     function settleSystemBadDebt(uint256 _value) external override nonReentrant whenNotPaused {
-        systemBadDebt[msg.sender] = sub(systemBadDebt[msg.sender], _value);
-        stablecoin[msg.sender] = sub(stablecoin[msg.sender], _value);
-        totalUnbackedStablecoin = sub(totalUnbackedStablecoin, _value);
-        totalStablecoinIssued = sub(totalStablecoinIssued, _value);
+        systemBadDebt[msg.sender] -= _value;
+        stablecoin[msg.sender] -= _value;
+        totalUnbackedStablecoin -= _value;
+        totalStablecoinIssued -= _value;
     }
 
+    /**
+    * @notice Mints unbacked stablecoin.
+    * @dev This function can only be called by the Mintable role when the BookKeeper contract is not paused.
+    * @dev It also requires the system to be live.
+    * @param _from The address from which the unbacked stablecoin is being minted.
+    * @param _to The address to which the unbacked stablecoin is being minted.
+    * @param _value The amount of unbacked stablecoin to mint.
+    */
     function mintUnbackedStablecoin(address _from, address _to, uint256 _value) external override nonReentrant whenNotPaused onlyMintable {
         _requireLive();
 
-        systemBadDebt[_from] = add(systemBadDebt[_from], _value);
-        stablecoin[_to] = add(stablecoin[_to], _value);
-        totalUnbackedStablecoin = add(totalUnbackedStablecoin, _value);
-        totalStablecoinIssued = add(totalStablecoinIssued, _value);
+        systemBadDebt[_from] += _value;
+        stablecoin[_to] += _value;
+        totalUnbackedStablecoin += _value;
+        totalStablecoinIssued += _value;
     }
 
-    /** @dev Accrue stability fee or the mint interest rate.
-      This function will always be called only by the StabilityFeeCollector contract.
-      `debtAccumulatedRate` of a collateral pool is the exchange rate of the stablecoin minted from that pool (think of it like collateral price from Lending Vault).
-      The higher the `debtAccumulatedRate` means the minter of the stablecoin will need to pay back the debt with higher amount.
-      The point of Stability Fee is to collect a surplus amount from minters and this is technically done by incrementing the `debtAccumulatedRate` overtime.
+    /**
+    * @notice Accrue stability fee for a specific collateral pool.
+    * @dev This function can only be called by the StabilityFeeCollector role when the BookKeeper contract is not paused.
+    * @dev It also requires the system to be live.
+    * @param _collateralPoolId The ID of the collateral pool where the stability fee is being accrued.
+    * @param _stabilityFeeRecipient The address that will receive the accrued stability fee.
+    * @param _debtAccumulatedRate The debt accumulation rate used in the calculation of the stability fee.
     */
     function accrueStabilityFee(
         bytes32 _collateralPoolId,
