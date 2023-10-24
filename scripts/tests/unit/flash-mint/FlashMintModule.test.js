@@ -135,9 +135,29 @@ describe("FlashMintModule", () => {
             })
         })
     })
+    describe("#whitelisting", () => {
+        context("when not whitelisted ", () => {
+            it("flashloan should be revert", async () => {
+                await expect(
+                    flashMintModule.flashLoan(
+                        mockMyFashLoan.address,
+                        mockERC20.address,
+                        WeiPerWad.mul(10),
+                        formatBytes32String("")
+                    )
+                ).to.be.revertedWith("FlashMintModule/flashMinter-not-whitelisted")
+            })
+            it("bookKeeper flashlon should not revert", async () => {
+                await expect(
+                    flashMintModule.bookKeeperFlashLoan(mockMyFashLoan.address, WeiPerRad.mul(10), formatBytes32String(""))
+                ).to.be.revertedWith("FlashMintModule/flashMinter-not-whitelisted")
+            })
+        })
+    })
     describe("#flashLoan", () => {
         context("when invalid token", () => {
             it("should be revert", async () => {
+                await flashMintModule.whitelist(DeployerAddress);
                 await expect(
                     flashMintModule.flashLoan(
                         mockMyFashLoan.address,
@@ -150,6 +170,7 @@ describe("FlashMintModule", () => {
         })
         context("when ceiling exceeded", () => {
             it("should be revert", async () => {
+                await flashMintModule.whitelist(DeployerAddress);
                 await expect(
                     flashMintModule.flashLoan(
                         mockMyFashLoan.address,
@@ -162,6 +183,7 @@ describe("FlashMintModule", () => {
         })
         context("when callback failed", () => {
             it("should be revert", async () => {
+                await flashMintModule.whitelist(DeployerAddress);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
                 await flashMintModule.setFeeRate(WeiPerWad.div(10))
 
@@ -180,6 +202,7 @@ describe("FlashMintModule", () => {
         })
         context("when parameters are valid", () => {
             it("should be able to call flashLoan", async () => {
+                await flashMintModule.whitelist(DeployerAddress);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
                 await flashMintModule.setFeeRate(WeiPerWad.div(10))
 
@@ -220,6 +243,7 @@ describe("FlashMintModule", () => {
     describe("#bookKeeperFlashLoan", () => {
         context("when ceiling exceeded", () => {
             it("should be revert", async () => {
+                await flashMintModule.whitelist(DeployerAddress);
                 await expect(
                     flashMintModule.bookKeeperFlashLoan(mockMyFashLoan.address, WeiPerRad.mul(10), formatBytes32String(""))
                 ).to.be.revertedWith("FlashMintModule/ceiling-exceeded")
@@ -227,6 +251,7 @@ describe("FlashMintModule", () => {
         })
         context("when callback failed", () => {
             it("should be revert", async () => {
+                await flashMintModule.whitelist(DeployerAddress);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
                 await flashMintModule.setFeeRate(WeiPerWad.div(10))
 
@@ -244,6 +269,7 @@ describe("FlashMintModule", () => {
         })
         context("when insufficient fee", () => {
             it("should be revert", async () => {
+                await flashMintModule.whitelist(DeployerAddress);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
                 await flashMintModule.setFeeRate(WeiPerWad.div(10))
 
@@ -261,6 +287,7 @@ describe("FlashMintModule", () => {
         })
         context("when parameters are valid", () => {
             it("should be able to call flashLoan", async () => {
+                await flashMintModule.whitelist(DeployerAddress);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
                 await mockMyFashLoan.mock.onBookKeeperFlashLoan.returns(
                     keccak256(toUtf8Bytes("BookKeeperFlashBorrower.onBookKeeperFlashLoan"))
