@@ -190,7 +190,7 @@ describe("FlashMintModule", () => {
                     )
                 ).to.be.emit(flashMintModule, "LogFlashLoan")
             })
-            it("should be able to call flashLoan", async () => {
+            it("should be able to call bookKeeper flashLoan", async () => {
                 await flashMintModule.setDecentralizedStatesStatus(true);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
                 await mockMyFashLoan.mock.onBookKeeperFlashLoan.returns(
