@@ -135,8 +135,8 @@ describe("FlashMintModule", () => {
             })
         })
     })
-    describe("#whitelisting", () => {
-        context("when not whitelisted ", () => {
+    describe("#whitelisting and decentralization", () => {
+        context("when not whitelisted and not decentralized ", () => {
             it("flashloan should be revert", async () => {
                 await expect(
                     flashMintModule.flashLoan(
@@ -147,10 +147,69 @@ describe("FlashMintModule", () => {
                     )
                 ).to.be.revertedWith("FlashMintModule/flashMinter-not-whitelisted")
             })
-            it("bookKeeper flashlon should not revert", async () => {
+            it("bookKeeper flashlon should revert", async () => {
                 await expect(
                     flashMintModule.bookKeeperFlashLoan(mockMyFashLoan.address, WeiPerRad.mul(10), formatBytes32String(""))
                 ).to.be.revertedWith("FlashMintModule/flashMinter-not-whitelisted")
+            })
+        })
+        context("when not whitelisted and decentralized ", () => {
+            it("should be able to call flashLoan", async () => {
+                await flashMintModule.setDecentralizedStatesStatus(true);
+                await flashMintModule.setMax(WeiPerWad.mul(100))
+                await flashMintModule.setFeeRate(WeiPerWad.div(10))
+
+                await mockFathomStablecoin.mock.transferFrom.withArgs(
+                    mockMyFashLoan.address,
+                    flashMintModule.address,
+                    WeiPerWad.mul(11)
+                ).returns(true)
+                await mockStablecoinAdapter.mock.deposit.withArgs(
+                    flashMintModule.address,
+                    WeiPerWad.mul(11),
+                    ethers.utils.defaultAbiCoder.encode(["uint256"], [0])
+                ).returns()
+                await mockBookKeeper.mock.settleSystemBadDebt.withArgs(WeiPerRad.mul(10)).returns()
+                await mockBookKeeper.mock.mintUnbackedStablecoin.withArgs(
+                    flashMintModule.address,
+                    flashMintModule.address,
+                    WeiPerRad.mul(10)
+                ).returns()
+                await mockStablecoinAdapter.mock.withdraw.withArgs(
+                    mockMyFashLoan.address,
+                    WeiPerWad.mul(10),
+                    ethers.utils.defaultAbiCoder.encode(["uint256"], [0])
+                ).returns()
+                await mockMyFashLoan.mock.onFlashLoan.returns(keccak256(toUtf8Bytes("ERC3156FlashBorrower.onFlashLoan")))
+                await expect(
+                    flashMintModule.flashLoan(
+                        mockMyFashLoan.address,
+                        mockFathomStablecoin.address,
+                        WeiPerWad.mul(10),
+                        formatBytes32String("")
+                    )
+                ).to.be.emit(flashMintModule, "LogFlashLoan")
+            })
+            it("should be able to call flashLoan", async () => {
+                await flashMintModule.setDecentralizedStatesStatus(true);
+                await flashMintModule.setMax(WeiPerWad.mul(100))
+                await mockMyFashLoan.mock.onBookKeeperFlashLoan.returns(
+                    keccak256(toUtf8Bytes("BookKeeperFlashBorrower.onBookKeeperFlashLoan"))
+                )
+
+                await mockBookKeeper.mock.mintUnbackedStablecoin.withArgs(
+                    flashMintModule.address,
+                    mockMyFashLoan.address,
+                    WeiPerRad.mul(10)
+                ).returns()
+                await mockBookKeeper.mock.settleSystemBadDebt.withArgs(
+                    WeiPerRad.mul(10)
+                ).returns()
+                await mockBookKeeper.mock.stablecoin.returns(0)
+
+                await expect(
+                    flashMintModule.bookKeeperFlashLoan(mockMyFashLoan.address, WeiPerRad.mul(10), formatBytes32String(""))
+                ).to.be.emit(flashMintModule, "LogBookKeeperFlashLoan")
             })
         })
     })
