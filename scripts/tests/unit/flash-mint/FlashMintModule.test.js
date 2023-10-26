@@ -28,6 +28,8 @@ const loadFixtureHandler = async () => {
     await mockBookKeeper.mock.whitelist.returns()
     await mockedAccessControlConfig.mock.hasRole.returns(true)
     await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
+    await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
+
     await mockMyFashLoan.mock.onFlashLoan.returns(formatBytes32String(1))
 
     const flashMintModule = getContract("FlashMintModule", DeployerAddress)
@@ -132,6 +134,61 @@ describe("FlashMintModule", () => {
                 await flashMintModule.setFeeRate(WeiPerWad.div(10))
                 const fee = await flashMintModule.flashFee(mockFathomStablecoin.address, WeiPerWad.mul(10))
                 expect(fee).to.be.equal(WeiPerWad)
+            })
+        })
+    })
+    describe("#whitelist & removeFromWhitelist", () => {
+        context("fn whitelist when the caller is not the owner", () => {
+            it("should be revert", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(false)
+                await expect(flashMintModuleAsAlice.whitelist(AliceAddress)).to.be.revertedWith("!(ownerRole or govRole)")
+            })
+        })
+        context("fn removeFromtWhitelist when the caller is not the owner", () => {
+            it("should be revert", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(false)
+                await expect(flashMintModuleAsAlice.removeFromWhitelist(AliceAddress)).to.be.revertedWith("!(ownerRole or govRole)")
+            })
+        })
+        context("when the caller is the owner", () => {
+            it("should be able to call whitelist", async () => {
+                await expect(flashMintModule.whitelist(AliceAddress))
+                    .to.be.emit(flashMintModule, "LogAddToWhitelist")
+                    .withArgs(AliceAddress)
+                const flag = await flashMintModule.flashMintWhitelist(AliceAddress);
+                expect(flag).to.be.equal(1)
+            })
+        })
+        context("when the caller is the owner", () => {
+            it("should be able to call removeFromtWhitelist", async () => {
+                await flashMintModuleAsAlice.whitelist(AliceAddress)
+                await expect(flashMintModule.removeFromWhitelist(AliceAddress))
+                    .to.be.emit(flashMintModule, "LogRemoveFromWhitelist")
+                    .withArgs(AliceAddress)
+                const flag = await flashMintModule.flashMintWhitelist(AliceAddress)
+                expect(flag).to.be.equal(0)
+            })
+        })
+        context("when the caller is the owner", () => {
+            it("should revert when trying to whitelist the zero address", async () => {
+                await expect(flashMintModule.whitelist("0x0000000000000000000000000000000000000000"))
+                    .to.be.revertedWith("FlashMintModule/whitelist-invalidAddress");
+            })
+        })
+
+        context("when the caller is the owner", () => {
+            it("should revert when trying to remove zero address from whitelist", async () => {
+                await flashMintModuleAsAlice.whitelist(AliceAddress)
+                await expect(flashMintModule.removeFromWhitelist("0x0000000000000000000000000000000000000000"))
+                    .to.be.revertedWith("FlashMintModule/removeWL-invalidAddress");
+            })
+        })
+
+        context("when the caller is the owner and the address is not whitelisted", () => {
+            it("should revert when trying to remove an address that's not whitelisted", async () => {
+                await flashMintModuleAsAlice.whitelist(AliceAddress)
+                await expect(flashMintModule.removeFromWhitelist(DeployerAddress))
+                    .to.be.revertedWith("_user-not-whitelisted");
             })
         })
     })
