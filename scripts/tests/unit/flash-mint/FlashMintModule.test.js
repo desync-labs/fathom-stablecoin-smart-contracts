@@ -28,6 +28,8 @@ const loadFixtureHandler = async () => {
     await mockBookKeeper.mock.whitelist.returns()
     await mockedAccessControlConfig.mock.hasRole.returns(true)
     await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
+    await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
+
     await mockMyFashLoan.mock.onFlashLoan.returns(formatBytes32String(1))
 
     const flashMintModule = getContract("FlashMintModule", DeployerAddress)
@@ -135,6 +137,61 @@ describe("FlashMintModule", () => {
             })
         })
     })
+    describe("#addToWhitelist & removeFromWhitelist", () => {
+        context("fn whitelist when the caller is not the owner", () => {
+            it("should be revert", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(false)
+                await expect(flashMintModuleAsAlice.addToWhitelist(AliceAddress)).to.be.revertedWith("!(ownerRole or govRole)")
+            })
+        })
+        context("fn removeFromtWhitelist when the caller is not the owner", () => {
+            it("should be revert", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(false)
+                await expect(flashMintModuleAsAlice.removeFromWhitelist(AliceAddress)).to.be.revertedWith("!(ownerRole or govRole)")
+            })
+        })
+        context("when the caller is the owner", () => {
+            it("should be able to call whitelist", async () => {
+                await expect(flashMintModule.addToWhitelist(AliceAddress))
+                    .to.be.emit(flashMintModule, "LogAddToWhitelist")
+                    .withArgs(AliceAddress)
+                const flag = await flashMintModule.flashMintWhitelist(AliceAddress);
+                expect(flag).to.be.equal(1)
+            })
+        })
+        context("when the caller is the owner", () => {
+            it("should be able to call removeFromtWhitelist", async () => {
+                await flashMintModuleAsAlice.addToWhitelist(AliceAddress)
+                await expect(flashMintModule.removeFromWhitelist(AliceAddress))
+                    .to.be.emit(flashMintModule, "LogRemoveFromWhitelist")
+                    .withArgs(AliceAddress)
+                const flag = await flashMintModule.flashMintWhitelist(AliceAddress)
+                expect(flag).to.be.equal(0)
+            })
+        })
+        context("when the caller is the owner", () => {
+            it("should revert when trying to whitelist the zero address", async () => {
+                await expect(flashMintModule.addToWhitelist("0x0000000000000000000000000000000000000000"))
+                    .to.be.revertedWith("FlashMintModule/whitelist-invalidAddress");
+            })
+        })
+
+        context("when the caller is the owner", () => {
+            it("should revert when trying to remove zero address from whitelist", async () => {
+                await flashMintModuleAsAlice.addToWhitelist(AliceAddress)
+                await expect(flashMintModule.removeFromWhitelist("0x0000000000000000000000000000000000000000"))
+                    .to.be.revertedWith("FlashMintModule/removeWL-invalidAddress");
+            })
+        })
+
+        context("when the caller is the owner and the address is not whitelisted", () => {
+            it("should revert when trying to remove an address that's not whitelisted", async () => {
+                await flashMintModuleAsAlice.addToWhitelist(AliceAddress)
+                await expect(flashMintModule.removeFromWhitelist(DeployerAddress))
+                    .to.be.revertedWith("FlashMintModule/user-not-whitelisted");
+            })
+        })
+    })
     describe("#whitelisting and decentralization", () => {
         context("when not whitelisted and not decentralized ", () => {
             it("flashloan should be revert", async () => {
@@ -216,7 +273,7 @@ describe("FlashMintModule", () => {
     describe("#flashLoan", () => {
         context("when invalid token", () => {
             it("should be revert", async () => {
-                await flashMintModule.whitelist(DeployerAddress);
+                await flashMintModule.addToWhitelist(DeployerAddress);
                 await expect(
                     flashMintModule.flashLoan(
                         mockMyFashLoan.address,
@@ -229,7 +286,7 @@ describe("FlashMintModule", () => {
         })
         context("when ceiling exceeded", () => {
             it("should be revert", async () => {
-                await flashMintModule.whitelist(DeployerAddress);
+                await flashMintModule.addToWhitelist(DeployerAddress);
                 await expect(
                     flashMintModule.flashLoan(
                         mockMyFashLoan.address,
@@ -242,7 +299,7 @@ describe("FlashMintModule", () => {
         })
         context("when callback failed", () => {
             it("should be revert", async () => {
-                await flashMintModule.whitelist(DeployerAddress);
+                await flashMintModule.addToWhitelist(DeployerAddress);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
                 await flashMintModule.setFeeRate(WeiPerWad.div(10))
 
@@ -261,7 +318,7 @@ describe("FlashMintModule", () => {
         })
         context("when parameters are valid", () => {
             it("should be able to call flashLoan", async () => {
-                await flashMintModule.whitelist(DeployerAddress);
+                await flashMintModule.addToWhitelist(DeployerAddress);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
                 await flashMintModule.setFeeRate(WeiPerWad.div(10))
 
@@ -302,7 +359,7 @@ describe("FlashMintModule", () => {
     describe("#bookKeeperFlashLoan", () => {
         context("when ceiling exceeded", () => {
             it("should be revert", async () => {
-                await flashMintModule.whitelist(DeployerAddress);
+                await flashMintModule.addToWhitelist(DeployerAddress);
                 await expect(
                     flashMintModule.bookKeeperFlashLoan(mockMyFashLoan.address, WeiPerRad.mul(10), formatBytes32String(""))
                 ).to.be.revertedWith("FlashMintModule/ceiling-exceeded")
@@ -310,7 +367,7 @@ describe("FlashMintModule", () => {
         })
         context("when callback failed", () => {
             it("should be revert", async () => {
-                await flashMintModule.whitelist(DeployerAddress);
+                await flashMintModule.addToWhitelist(DeployerAddress);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
                 await flashMintModule.setFeeRate(WeiPerWad.div(10))
 
@@ -328,7 +385,7 @@ describe("FlashMintModule", () => {
         })
         context("when insufficient fee", () => {
             it("should be revert", async () => {
-                await flashMintModule.whitelist(DeployerAddress);
+                await flashMintModule.addToWhitelist(DeployerAddress);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
                 await flashMintModule.setFeeRate(WeiPerWad.div(10))
 
@@ -346,7 +403,7 @@ describe("FlashMintModule", () => {
         })
         context("when parameters are valid", () => {
             it("should be able to call flashLoan", async () => {
-                await flashMintModule.whitelist(DeployerAddress);
+                await flashMintModule.addToWhitelist(DeployerAddress);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
                 await mockMyFashLoan.mock.onBookKeeperFlashLoan.returns(
                     keccak256(toUtf8Bytes("BookKeeperFlashBorrower.onBookKeeperFlashLoan"))
