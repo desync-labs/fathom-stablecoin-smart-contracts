@@ -36,6 +36,8 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
     event LogFlashLoan(address indexed _receiver, address indexed _token, uint256 _amount, uint256 _fee);
     event LogBookKeeperFlashLoan(address indexed _receiver, uint256 _amount, uint256 _fee);
     event LogDecentralizedStateStatus(bool _oldDecentralizedStateStatus, bool _newDecentralizedStateStatus);
+    event LogAddToWhitelist(address indexed user);
+    event LogRemoveFromWhitelist(address indexed user);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -89,6 +91,19 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
     function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
         require(toBeWhitelisted != address(0), "FlashMintModule/whitelist-invalidAddress");
         flashMintWhitelist[toBeWhitelisted] = 1;
+        emit LogAddToWhitelist(toBeWhitelisted);
+    }
+
+    /**
+     * @notice remove an address from the whitelist
+     * @param _usr The address to be removed from the whitelist
+     * @dev Can only be called by the contract owner or the governance system
+     */
+    function removeFromWhitelist(address _usr) external onlyOwnerOrGov {
+        require(_usr != address(0), "FlashMintModule/removeWL-invalidAddress");
+        require(flashMintWhitelist[_usr] == 1, "_user-not-whitelisted");
+        flashMintWhitelist[_usr] = 0;
+        emit LogRemoveFromWhitelist(_usr);
     }
 
     /// @dev access: OWNER_ROLE, GOV_ROLE
