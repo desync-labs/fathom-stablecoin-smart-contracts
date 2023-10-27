@@ -137,7 +137,7 @@ describe("FlashMintModule", () => {
             })
         })
     })
-    describe("#addToWhitelist & removeFromWhitelist", () => {
+    describe("#whitelist & removeFromWhitelist", () => {
         context("fn whitelist when the caller is not the owner", () => {
             it("should be revert", async () => {
                 await mockedAccessControlConfig.mock.hasRole.returns(false)
