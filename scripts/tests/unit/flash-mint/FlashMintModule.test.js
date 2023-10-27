@@ -156,7 +156,7 @@ describe("FlashMintModule", () => {
                     .to.be.emit(flashMintModule, "LogAddToWhitelist")
                     .withArgs(AliceAddress)
                 const flag = await flashMintModule.flashMintWhitelist(AliceAddress);
-                expect(flag).to.be.equal(1)
+                expect(flag).to.be.equal(true)
             })
         })
         context("when the caller is the owner", () => {
@@ -166,7 +166,7 @@ describe("FlashMintModule", () => {
                     .to.be.emit(flashMintModule, "LogRemoveFromWhitelist")
                     .withArgs(AliceAddress)
                 const flag = await flashMintModule.flashMintWhitelist(AliceAddress)
-                expect(flag).to.be.equal(0)
+                expect(flag).to.be.equal(false)
             })
         })
         context("when the caller is the owner", () => {
@@ -189,6 +189,14 @@ describe("FlashMintModule", () => {
                 await flashMintModuleAsAlice.addToWhitelist(AliceAddress)
                 await expect(flashMintModule.removeFromWhitelist(DeployerAddress))
                     .to.be.revertedWith("FlashMintModule/user-not-whitelisted");
+            })
+        })
+
+        context("when the caller is the owner and the address is whitelisted", () => {
+            it("should revert when trying to again whitelist an address that's already whitelisted", async () => {
+                await flashMintModuleAsAlice.addToWhitelist(AliceAddress)
+                await expect(flashMintModule.addToWhitelist(AliceAddress))
+                    .to.be.revertedWith("FlashMintModule/user-already-whitelisted");
             })
         })
     })
