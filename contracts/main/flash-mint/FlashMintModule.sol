@@ -36,8 +36,8 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
     event LogFlashLoan(address indexed _receiver, address indexed _token, uint256 _amount, uint256 _fee);
     event LogBookKeeperFlashLoan(address indexed _receiver, uint256 _amount, uint256 _fee);
     event LogDecentralizedStateStatus(bool _oldDecentralizedStateStatus, bool _newDecentralizedStateStatus);
-    event LogAddToWhitelist(address indexed user);
-    event LogRemoveFromWhitelist(address indexed user);
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
