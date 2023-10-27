@@ -39,7 +39,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         IBookKeeper(_bookKeeper).blacklist(_usr);
     }
 
-    function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok) external {
+    function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok) external onlyDelegateCall{
         IManager(_manager).allowManagePosition(_positionId, _user, _ok);
     }
 
@@ -452,7 +452,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         if (_positionStablecoinValue < toRad(_stablecoinAmount)) {
             // Calculates the needed resultDebtShare so together with the existing positionStablecoinValue in the bookKeeper is enough to exit stablecoinAmount of Fathom Stablecoin tokens
             _resultDebtShare = int256((toRad(_stablecoinAmount) - _positionStablecoinValue) / _debtAccumulatedRate);
-            // This is neeeded due lack of precision. It might need to sum an extra resultDebtShare wei (for the given Fathom Stablecoin stablecoinAmount)
+            // This is needed due lack of precision. It might need to sum an extra resultDebtShare wei (for the given Fathom Stablecoin stablecoinAmount)
             _resultDebtShare = (uint256(_resultDebtShare) * _debtAccumulatedRate) < toRad(_stablecoinAmount)
                 ? _resultDebtShare + 1
                 : _resultDebtShare;

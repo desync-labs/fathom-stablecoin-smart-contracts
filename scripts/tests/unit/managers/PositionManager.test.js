@@ -18,9 +18,15 @@ const loadFixtureHandler = async () => {
     const mockedPriceOracle = await createMock("PriceOracle");
     const mockedPriceFeed = await createMock("SimplePriceFeed");
 
+    const mockedAccessControlConfig = await createMock("AccessControlConfig");
+    await mockedAccessControlConfig.mock.hasRole.returns(true)
+    await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
+    await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
+
     await mockedShowStopper.mock.live.returns(1);
     await mockedBookKeeper.mock.totalStablecoinIssued.returns(0);
     await mockedBookKeeper.mock.whitelist.returns();
+    await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address);
     await mockedPriceOracle.mock.setPrice.returns()
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
     await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
@@ -61,7 +67,8 @@ const loadFixtureHandler = async () => {
         mockedShowStopper,
         mockedCollateralPoolConfig,
         mockedPriceOracle,
-        mockedPriceFeed
+        mockedPriceFeed,
+        mockedAccessControlConfig
     }
 }
 
@@ -97,7 +104,8 @@ describe("PositionManager", () => {
             mockedShowStopper,
             mockedCollateralPoolConfig,
             mockedPriceOracle,
-            mockedPriceFeed
+            mockedPriceFeed,
+            mockedAccessControlConfig
 
         } = await loadFixture(loadFixtureHandler))
 
@@ -180,6 +188,12 @@ describe("PositionManager", () => {
                 await expect(positionManager.allowManagePosition(1, AliceAddress, 1)).to.be.revertedWith("owner not allowed")
             })
         })
+        context("when _user address is zero", () => {
+            it("should revert with user address zero error", async () => {
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress);
+                await expect(positionManagerAsAlice.allowManagePosition(1, '0x0000000000000000000000000000000000000000', 1)).to.be.revertedWith("PositionManager/user-address(0)");
+            });
+        })
         context("ok is not valid", () => {
             it("should revert", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
@@ -205,6 +219,11 @@ describe("PositionManager", () => {
                 await expect(positionManagerAsAlice.allowMigratePosition(BobAddress, 2)).to.be.revertedWith("PositionManager/invalid-ok")
             })
         })
+        context("when _user address is zero", () => {
+            it("should revert with user address zero error", async () => {
+                await expect(positionManagerAsAlice.allowMigratePosition('0x0000000000000000000000000000000000000000', 1)).to.be.revertedWith("PositionManager/user-address(0)");
+            });
+        });
         context("when parameters are valid", () => {
             it("should be able to give/revoke migration allowance to other address", async () => {
                 expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(0)
@@ -214,6 +233,7 @@ describe("PositionManager", () => {
                 expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(0)
             })
         })
+        
     })
 
     describe("#list()", () => {
@@ -395,6 +415,35 @@ describe("PositionManager", () => {
                 )
             })
         })
+        context("when _destination argument is a zero address, four args", () => {
+            it("should revert with 'PositionManager/dst-address(0)'", async () => {
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress);
+                await expect(
+                    positionManagerAsAlice["moveCollateral(uint256,address,uint256,bytes)"](
+                        1,
+                        "0x0000000000000000000000000000000000000000", // Zero address for _destination
+                        parseEther("1"),
+                        "0x"
+                    )
+                ).to.be.revertedWith("PositionManager/dst-address(0)");
+            });
+        });
+        context("when _destination argument is a zero address, five args", () => {
+            it("should revert with 'PositionManager/dst-address(0)' message", async () => {
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
+        
+                await expect(
+                    positionManagerAsAlice["moveCollateral(bytes32,uint256,address,uint256,bytes)"](
+                        formatBytes32String("WXDC"),
+                        1,
+                        '0x0000000000000000000000000000000000000000',
+                        parseEther("50"),
+                        "0x"
+                    )
+                ).to.be.revertedWith("PositionManager/dst-address(0)")
+            })
+        })
+        
     })
 
     // This function has the purpose to take away collateral from the system that doesn't correspond to the position but was sent there wrongly.
@@ -484,6 +533,22 @@ describe("PositionManager", () => {
                 await positionManagerAsAlice.moveStablecoin(1, BobAddress, WeiPerRad.mul(10))
             })
         })
+        context("when _destination argument is a zero address", () => {
+            it("should revert with 'PositionManager/dst-address(0)' message", async () => {
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
+                const positionAddress = await positionManager.positions(1)
+
+                await mockedBookKeeper.mock.moveStablecoin.withArgs(
+                    positionAddress,
+                    BobAddress,
+                    WeiPerRad.mul(10)
+                ).returns()
+
+                await expect(positionManagerAsAlice.moveStablecoin(1, '0x0000000000000000000000000000000000000000', WeiPerRad.mul(10))).to.be.revertedWith(
+                    "PositionManager/dst-address(0)"
+                )
+            })
+        })
     })
 
     describe("#exportPosition()", () => {
@@ -544,6 +609,21 @@ describe("PositionManager", () => {
                 await positionManagerAsBob.exportPosition(1, BobAddress)
             })
         })
+        context("when _destination is a zero address", () => {
+            it("onlyMigrationAllowed modifier will make sure zero address _destination provided fn flow will revert", async () => {
+                await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
+                //migrationWhiteList can never have address(0) as the first key, therefore _destination as zero address will always be reverted in the modifier
+                await positionManagerAsAlice.allowManagePosition(1, BobAddress, 1)
+                await positionManagerAsAlice.allowMigratePosition(BobAddress, 1)
+
+                await expect(
+                    positionManagerAsBob.exportPosition(
+                        1,
+                        '0x0000000000000000000000000000000000000000'
+                    )
+                ).to.be.revertedWith("migration not allowed")
+            })
+        })        
     })
 
     describe("#importPosition()", () => {
@@ -683,6 +763,43 @@ describe("PositionManager", () => {
         })
     })
 
+    describe("#setBookKeeper()", () => {
+        context("when setting a new BookKeeper", () => {
+            it("should emit BookKeeperUpdated event with old and new addresses", async () => {
+                const oldBookKeeper = await positionManager.bookKeeper();
+                const mockedBookKeeper2 = await createMock("BookKeeper");
+                await mockedBookKeeper2.mock.totalStablecoinIssued.returns(WeiPerRad);
+                // Set the newBookKeeper and expect an event
+                await expect(positionManager.setBookKeeper(mockedBookKeeper2.address))
+                    .to.emit(positionManager, 'LogBookKeeperUpdated')
+                    .withArgs(oldBookKeeper, mockedBookKeeper2.address);
+            });
+        });
+    });
+
+    describe("#setPriceOracle()", () => {
+        context("when stablecoinReferencePrice is 0 for the new priceOracle", () => {
+            it("should revert", async () => {
+                const mockedPriceOracle2 = await createMock("PriceOracle");
+                await mockedPriceOracle2.mock.stableCoinReferencePrice.returns(0);
+                // Set the newPriceOracle and expect an event
+                await expect(positionManager.setPriceOracle(mockedPriceOracle2.address))
+                    .to.be.revertedWith("PositionManager/invalid-priceOracle")
+            });
+        });
+        context("when setting a new PriceOracle", () => {
+            it("should emit PriceOracleUpdated event with old and new addresses", async () => {
+                const oldPriceOracle = await positionManager.priceOracle();
+                const mockedPriceOracle2 = await createMock("PriceOracle");
+                await mockedPriceOracle2.mock.stableCoinReferencePrice.returns(WeiPerRad);
+                // Set the newPriceOracle and expect an event
+                await expect(positionManager.setPriceOracle(mockedPriceOracle2.address))
+                    .to.emit(positionManager, 'LogPriceOracleUpdated')
+                    .withArgs(oldPriceOracle, mockedPriceOracle2.address);
+            });
+        });
+    });
+
     describe("#redeemLockedCollateral()", () => {
         context("when caller has no access to the position (or have no allowance)", () => {
             xit("should revert", async () => {
@@ -707,4 +824,5 @@ describe("PositionManager", () => {
             })
         })
     })
+
 })

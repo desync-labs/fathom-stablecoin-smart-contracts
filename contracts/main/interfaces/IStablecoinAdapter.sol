@@ -11,7 +11,7 @@ interface IStablecoinAdapter {
 
     function deposit(address positionAddress, uint256 wad, bytes calldata data) external;
 
-    function depositRAD(address positionAddress, uint256 rad, bytes calldata data) external;
+    function depositRAD(address positionAddress, uint256 rad, bytes32 collateralPoolId, bytes calldata data) external;
 
     function withdraw(address positionAddress, uint256 wad, bytes calldata data) external;
 }

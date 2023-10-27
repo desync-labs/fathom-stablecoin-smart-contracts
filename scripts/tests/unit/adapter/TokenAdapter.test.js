@@ -14,6 +14,8 @@ const { loadFixture } = require("../../helper/fixtures");
 const loadFixtureHandler = async () => {
   const mockedAccessControlConfig = await createMock("AccessControlConfig");
   const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
+  const mockedVault = await createMock("Vault");
+
   const mockedBookKeeper = await createMock("BookKeeper");
   const mockedToken = await createMock("ERC20Mintable");
 
@@ -26,6 +28,7 @@ const loadFixtureHandler = async () => {
   const tokenAdapter = getContract("TokenAdapter", DeployerAddress)
   const tokenAdapterAsAlice = getContract("TokenAdapter", AliceAddress)
 
+
   await tokenAdapter.initialize(
     mockedBookKeeper.address,
     formatBytes32String("BTCB"),
@@ -37,7 +40,8 @@ const loadFixtureHandler = async () => {
     mockedBookKeeper,
     mockedToken,
     mockedAccessControlConfig,
-    mockedCollateralPoolConfig
+    mockedCollateralPoolConfig,
+    mockedVault
   }
 }
 
@@ -49,6 +53,7 @@ describe("TokenAdapter", () => {
   let mockedAccessControlConfig
   let mockedCollateralPoolConfig
   let tokenAdapterAsAlice
+  let mockedVault
 
   before(async () => {
     await snapshot.revertToSnapshot();
@@ -60,6 +65,7 @@ describe("TokenAdapter", () => {
       tokenAdapterAsAlice,
       mockedBookKeeper,
       mockedToken,
+      mockedVault,
       mockedAccessControlConfig,
       mockedCollateralPoolConfig
     } = await loadFixture(loadFixtureHandler))
@@ -78,6 +84,19 @@ describe("TokenAdapter", () => {
         )
       })
     })
+
+    context("when a zero address is used for arg", () => {
+
+      it("should revert with 'TokenAdapter/deposit-address(0)'", async () => {
+          await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+          await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+          await expect(tokenAdapter.deposit("0x0000000000000000000000000000000000000000", WeiPerWad.mul(1), "0x"))
+          .to.be.revertedWith("TokenAdapter/deposit-address(0)");
+      });
+
+    });
 
     context("when wad input is overflow (> MaxInt256)", () => {
       it("should revert", async () => {
@@ -107,6 +126,17 @@ describe("TokenAdapter", () => {
           BigNumber.from("1000000000000000000")
         ).returns(true)
         await tokenAdapter.deposit(AliceAddress, WeiPerWad.mul(1), "0x")
+      })
+    })
+    context("when wad input is overflow (> MaxInt256)", () => {
+      it("should revert", async () => {
+        // Set the wad input to a value that is greater than MaxInt256
+        const wad = BigNumber.from("115792089237316195423570985008687907853269984665640564039457584007913129639930")
+    
+        // Call the deposit function
+        await expect(tokenAdapter.deposit(AliceAddress, wad, "0x")).to.be.revertedWith(
+          "TokenAdapter/overflow"
+        )
       })
     })
   })
@@ -139,6 +169,18 @@ describe("TokenAdapter", () => {
           BigNumber.from("1000000000000000000")
         ).returns(true)
         await tokenAdapter.withdraw(AliceAddress, WeiPerWad.mul(1), "0x")
+      })
+    })
+
+    context("when wad input is overflow (> MaxInt256)", () => {
+      it("should revert", async () => {
+        // Set the wad input to be greater than MaxInt256
+        const wad = BigNumber.from("115792089237316195423570985008687907853269984665640564039457584007913129639930")
+  
+        // Call the _withdraw() function
+        await expect(tokenAdapter.withdraw(AliceAddress, wad, "0x")).to.be.revertedWith(
+          "TokenAdapter/overflow"
+        )
       })
     })
   })
@@ -184,4 +226,81 @@ describe("TokenAdapter", () => {
       })
     })
   })
+
+  describe("#emergencyWithdraw()", () => {
+    context("when _to is a zero address", () => {
+        it("should revert with 'TokenAdapter/emergency-address(0)'", async () => {
+            await expect(tokenAdapter.emergencyWithdraw("0x0000000000000000000000000000000000000000"))
+            .to.be.revertedWith("TokenAdapter/emergency-address(0)");
+        });
+    });
+  });
+
+  describe("#setVault", async () => {
+    context("when vault is not yet set", async () => {
+        it("should set the vault", async () => {
+            await mockedVault.mock.collateralAdapter.returns(tokenAdapter.address);
+            await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+            await mockedAccessControlConfig.mock.hasRole.returns(true)
+            await mockedAccessControlConfig.mock.ADAPTER_ROLE.returns(formatBytes32String("ADAPTER_ROLE"))
+            await tokenAdapter.setVault(mockedVault.address);
+
+            expect(await tokenAdapterAsAlice.vault()).to.be.equal(mockedVault.address);
+            expect(await tokenAdapterAsAlice.flagVault()).to.be.equal(true);
+            
+        });
+    });
+
+    context("when vault is already set", async () => {
+        it("should revert with the appropriate message", async () => {
+            await mockedVault.mock.collateralAdapter.returns(tokenAdapter.address);
+            await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+            await mockedAccessControlConfig.mock.hasRole.returns(true)
+            await mockedAccessControlConfig.mock.ADAPTER_ROLE.returns(formatBytes32String("ADAPTER_ROLE"))
+            await tokenAdapter.setVault(mockedVault.address);
+
+            await expect(
+              tokenAdapter.setVault(mockedVault.address)
+            ).to.be.revertedWith("CollateralTokenAdapter/Vault-set-already");
+        });
+    });
+
+    context("when vault address is zero", async () => {
+        it("should revert with the appropriate message", async () => {
+          await mockedVault.mock.collateralAdapter.returns(tokenAdapter.address);
+          await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+          await mockedAccessControlConfig.mock.ADAPTER_ROLE.returns(formatBytes32String("ADAPTER_ROLE"))
+
+          await expect(
+              tokenAdapter.setVault("0x0000000000000000000000000000000000000000")
+            ).to.be.revertedWith("CollateralTokenAdapter/zero-vault");
+        });
+    });
+
+    context("when vault's collateral adapter does not match", async () => {
+        it("should revert with the appropriate message", async () => {
+          await mockedVault.mock.collateralAdapter.returns(mockedBookKeeper.address);
+          await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+          await mockedAccessControlConfig.mock.ADAPTER_ROLE.returns(formatBytes32String("ADAPTER_ROLE"))
+            await expect(
+              tokenAdapter.setVault(mockedVault.address)
+            ).to.be.revertedWith("CollateralTokenAdapter/Adapter-no-match");
+        });
+    });
+
+    context("when vault's adapter role is not assigned", async () => {
+        it("should revert with the appropriate message", async () => {
+            await mockedVault.mock.collateralAdapter.returns(tokenAdapter.address);
+            await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+            await mockedAccessControlConfig.mock.hasRole.returns(false)
+            await mockedAccessControlConfig.mock.ADAPTER_ROLE.returns(formatBytes32String("ADAPTER_ROLE"))
+
+            await expect(
+              tokenAdapter.setVault(mockedVault.address)
+            ).to.be.revertedWith("vaultsAdapter!Adapter");
+        });
+    });
+  });
 })

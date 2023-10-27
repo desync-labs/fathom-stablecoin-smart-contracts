@@ -100,6 +100,8 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
         emit LogSetPrice(_collateralPoolId, _rawPrice, _priceWithSafetyMargin);
     }
 
+    /// @dev Cage function halts priceOracle contract for good.
+    /// Please be cautious with this function since there is no uncage function
     function cage() external override onlyOwnerOrShowStopper {
         if (live == 1) {
             live = 0;

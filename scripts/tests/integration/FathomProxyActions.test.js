@@ -1,4 +1,5 @@
 const chai = require('chai');
+
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 const { expect } = chai
@@ -29,6 +30,19 @@ const setup = async () => {
     ({
         proxyWallets: [aliceProxyWallet],
     } = await createProxyWallets([AliceAddress]));
+    const reentrancyAttacker = await artifacts.initializeInterfaceAt("ReentrancyAttacker", "ReentrancyAttacker");
+    const reentrancyAttacker2 = await artifacts.initializeInterfaceAt("ReentrancyAttacker2", "ReentrancyAttacker2");
+
+    //making proxyWallet of reentrancyAttacker contract
+    await proxyWalletRegistry.build(reentrancyAttacker.address);
+    await proxyWalletRegistry.build(reentrancyAttacker2.address);
+
+    const reEntrantProxyWallet = await proxyWalletRegistry.proxies(reentrancyAttacker.address);
+    const reEntrantProxyWallet2 = await proxyWalletRegistry.proxies(reentrancyAttacker2.address);
+
+    await reentrancyAttacker.setProxyWallet(reEntrantProxyWallet);
+    await reentrancyAttacker2.setProxyWallet(reEntrantProxyWallet2);
+
 
     await stabilityFeeCollector.setSystemDebtEngine(DevAddress)
 
@@ -41,11 +55,16 @@ const setup = async () => {
         stabilityFeeCollector,
         simplePriceFeed,
         collateralPoolConfig,
-        aliceProxyWallet
+        aliceProxyWallet,
+        reEntrantProxyWallet,
+        reEntrantProxyWallet2,
+        reentrancyAttacker,
+        reentrancyAttacker2,
+        fathomStablecoin
     }
 }
 
-describe("Position Closure without collateral withdrawl", () => {
+describe("Position Closure without collateral withdrawal", () => {
     // Proxy wallet
     let aliceProxyWallet
 
@@ -67,12 +86,17 @@ describe("Position Closure without collateral withdrawl", () => {
             stabilityFeeCollector,
             simplePriceFeed,
             collateralPoolConfig,
-            aliceProxyWallet
+            aliceProxyWallet,
+            reEntrantProxyWallet,
+            reEntrantProxyWallet2,
+            reentrancyAttacker,
+            reentrancyAttacker2,
+            fathomStablecoin
         } = await loadFixture(setup));
     })
 
     describe("#wipeAndUnlockXDC", () => {
-        context("open position and pay back debt without collateral withdrawl", () => {
+        context("open position and pay back debt without collateral withdrawal", () => {
             it("should be success", async () => {
                 await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
 
@@ -110,10 +134,88 @@ describe("Position Closure without collateral withdrawl", () => {
                 )
             })
         })
+        context("try reentry with ReentrancyAttacker", () => {
+            it("should not make change to the position", async () => {
+                await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
+
+                // position 1
+                //  a. open a new position
+                //  b. lock WXDC
+                //  c. mint FXD
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
+
+                const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
+                const positionAddress = await positionManager.positions(positionId)
+                
+                // call allowmanagerPosition so that reentrancyAttacker can close position
+                await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, reEntrantProxyWallet, 1)
+                //transfer some FXD to reentrancyAttacker contract
+                await fathomStablecoin.transfer(reentrancyAttacker.address, WeiPerWad.mul(5), { from: AliceAddress });
+                //reentrancyAttack approve reEntrantProxyWallet as spender of FXD
+                await reentrancyAttacker.approveWallet(fathomStablecoin.address);
+                //reentrancyAttacker tries to call wipeAndUnlockXDC and then all proxyWallet again with fallback function
+                //but due to gas limit set in safeTransferETH, the fn call fails.
+
+                    PositionHelper.wipeAndUnlockXDC(
+                        reentrancyAttacker,
+                        AliceAddress,
+                        positionId,
+                        WeiPerWad.mul(1),
+                        WeiPerWad.mul(2)
+                    )
+
+                const [lockedCollateral, debtShare] = await bookKeeper.positions(
+                    pools.XDC,
+                    positionAddress
+                )
+
+                expect(lockedCollateral).to.be.equal(WeiPerWad.mul(10));
+                AssertHelpers.assertAlmostEqual(
+                    debtShare,
+                    WeiPerWad.mul(5)
+                )
+
+
+                
+            })
+        })
+        context("try reentry with ReentrancyAttacker2", () => {
+            it("should fail", async () => {
+                await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
+
+                // position 1
+                //  a. open a new position
+                //  b. lock WXDC
+                //  c. mint FXD
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
+
+                const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
+                const positionAddress = await positionManager.positions(positionId)
+                
+                // call allowmanagerPosition so that reentrancyAttacker can close position
+                await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, reEntrantProxyWallet2, 1)
+                //transfer some FXD to reentrancyAttacker contract
+                await fathomStablecoin.transfer(reentrancyAttacker2.address, WeiPerWad.mul(5), { from: AliceAddress });
+                //reentrancyAttack approve reEntrantProxyWallet as spender of FXD
+                await reentrancyAttacker2.approveWallet(fathomStablecoin.address);
+                //reentrancyAttacker tries to call wipeAndUnlockXDC and then all proxyWallet again with fallback function
+                //but due to gas limit set in safeTransferETH, the fn call fails.
+
+                await expect(
+                    PositionHelper.wipeAndUnlockXDC(
+                        reentrancyAttacker2,
+                        AliceAddress,
+                        positionId,
+                        WeiPerWad.mul(1),
+                        WeiPerWad.mul(2)
+                    )
+                ).to.be.revertedWith("!safeTransferETH")
+            })
+        })
     })
 
     describe("#wipeAllAndUnlockXDC", () => {
-        context("open position and pay back debt without collateral withdrawl", () => {
+        context("open position and pay back debt without collateral withdrawal", () => {
             it("should be success", async () => {
                 await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
 
