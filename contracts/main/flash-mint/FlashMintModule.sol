@@ -28,7 +28,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
     bytes32 public constant CALLBACK_SUCCESS = keccak256("ERC3156FlashBorrower.onFlashLoan");
     bytes32 public constant CALLBACK_SUCCESS_BOOK_KEEPER_STABLE_COIN = keccak256("BookKeeperFlashBorrower.onBookKeeperFlashLoan");
 
-    mapping(address => uint256) public flashMintWhitelist;
+    mapping(address => bool) public flashMintWhitelist;
     bool public isDecentralizedState;
 
     event LogSetMax(uint256 _data);
@@ -57,7 +57,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
 
     modifier onlyWhitelistedIfNotDecentralized() {
         if (!isDecentralizedState) {
-            require(flashMintWhitelist[msg.sender] == 1, "FlashMintModule/flashMinter-not-whitelisted");
+            require(flashMintWhitelist[msg.sender] == true, "FlashMintModule/flashMinter-not-whitelisted");
         }
         _;
     }
@@ -85,13 +85,14 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
 
     /**
      * @notice Add an address to the whitelist
-     * @param toBeWhitelisted The address to be whitelisted
+     * @param _toBeWhitelisted The address to be whitelisted
      * @dev Can only be called by the contract owner or the governance system
      */
-    function addToWhitelist(address toBeWhitelisted) external onlyOwnerOrGov {
-        require(toBeWhitelisted != address(0), "FlashMintModule/whitelist-invalidAddress");
-        flashMintWhitelist[toBeWhitelisted] = 1;
-        emit LogAddToWhitelist(toBeWhitelisted);
+    function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
+        require(_toBeWhitelisted != address(0), "FlashMintModule/whitelist-invalidAddress");
+        require(flashMintWhitelist[_toBeWhitelisted] == false, "FlashMintModule/user-already-whitelisted");
+        flashMintWhitelist[_toBeWhitelisted] = true;
+        emit LogAddToWhitelist(_toBeWhitelisted);
     }
 
     /**
@@ -101,8 +102,8 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
      */
     function removeFromWhitelist(address _usr) external onlyOwnerOrGov {
         require(_usr != address(0), "FlashMintModule/removeWL-invalidAddress");
-        require(flashMintWhitelist[_usr] == 1, "FlashMintModule/user-not-whitelisted");
-        flashMintWhitelist[_usr] = 0;
+        require(flashMintWhitelist[_usr] == true, "FlashMintModule/user-not-whitelisted");
+        flashMintWhitelist[_usr] = false;
         emit LogRemoveFromWhitelist(_usr);
     }
 
