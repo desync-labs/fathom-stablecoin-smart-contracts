@@ -27,10 +27,9 @@ contract ReentrancyAttacker {
     function approveWallet(address _tokenAddress) external {
         IERC(_tokenAddress).approve(proxyWallet, 2 * 10 ** 18);
     }
-
+    
     receive() external payable {
         (bool success, ) = proxyWallet.call{ gas: gasleft(), value: msg.value }("");
-
         require(success, "ReentrancyAttacker/reEntry-failed");
     }
 }

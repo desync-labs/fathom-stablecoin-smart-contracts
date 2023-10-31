@@ -69,6 +69,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         _;
     }
 
+
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
         require(
@@ -146,6 +147,7 @@ contract PositionManager is PausableUpgradeable, IManager {
 
         return newLastPositionId;
     }
+
 
     /// @dev Give the position ownership to a destination address
     /// @param _positionId The position id to be given away ownership
