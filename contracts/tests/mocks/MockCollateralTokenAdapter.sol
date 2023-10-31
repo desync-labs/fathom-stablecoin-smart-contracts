@@ -110,12 +110,6 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
         _;
     }
 
-    modifier onlyCollateralManager() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
-        require(_accessControlConfig.hasRole(_accessControlConfig.COLLATERAL_MANAGER_ROLE(), msg.sender), "!collateralManager");
-        _;
-    }
-
     function initialize(
         address _bookKeeper,
         bytes32 _collateralPoolId,
@@ -144,9 +138,11 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     }
 
     function blacklist(address toBeRemoved) external onlyOwnerOrGov {
+        require(toBeRemoved != address(0), "CollateralTokenAdapter/blacklist-invalidAdds");
         whiteListed[toBeRemoved] = false;
     }
-
+    /// @dev Cage function halts MockCollateralTokenAdapter contract for good.
+    /// Please be cautious with this function since there is no uncage function
     function cage() external override nonReentrant onlyOwner {
         if (live == 1) {
             live = 0;
@@ -164,6 +160,12 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
 
     function setVault(address _vault) external onlyOwner {
         require(true != flagVault, "CollateralTokenAdapter/Vault-set-already");
+        require(_vault != address(0), "CollateralTokenAdapter/zero-vault");
+        address vaultsAdapter = IVault(_vault).collateralAdapter();
+        require(vaultsAdapter == address(this), "CollateralTokenAdapter/Adapter-no-match");
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        require(_accessControlConfig.hasRole(_accessControlConfig.ADAPTER_ROLE(), vaultsAdapter), "vaultsAdapter!Adapter");
+
         flagVault = true;
         vault = IVault(_vault);
     }
@@ -199,7 +201,7 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
             uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
             totalShare = sub(totalShare, _share);
 
-            //deduct emergency withdrawl amount of FXD
+            //deduct emergency withdrawal amount of FXD
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
             //withdraw WXDC from Vault
             vault.withdraw(_amount);
@@ -226,17 +228,18 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     /// @param _amount The amount to be deposited
     function _deposit(address _positionAddress, uint256 _amount, bytes calldata /* _data */) private {
         require(live == 1, "CollateralTokenAdapter/not-live");
-
         if (_amount > 0) {
-            uint256 _share = wdiv(_amount, netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
-            // Also enforces a non-zero wad
-            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
+            require(int256(_amount) > 0, "TokenAdapter/amount-overflow");
+
             //transfer WXDC from proxyWallet to adapter
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
+
             //bookKeeping
-            bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_share));
-            totalShare = add(totalShare, _share);
+            bookKeeper.addCollateral(collateralPoolId, _positionAddress, int256(_amount));
+
+            // totalShare = add(totalShare, _share);
+            totalShare = add(totalShare, _amount);
 
             // safeApprove to Vault
             address(collateralToken).safeApprove(address(vault), _amount);
@@ -251,20 +254,20 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     /// @param _amount The amount to be withdrawn
     function _withdraw(address _usr, uint256 _amount) private {
         if (_amount > 0) {
-            uint256 _share = wdivup(_amount, netAssetPerShare()); // [wad]
             // Overflow check for int256(wad) cast below
-            // Also enforces a non-zero wad
-            require(int256(_share) > 0, "CollateralTokenAdapter/share-overflow");
-            require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _share, "CollateralTokenAdapter/insufficient collateral amount");
+            require(int256(_amount) > 0, "TokenAdapter/amount-overflow");
 
-            bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_share));
-            totalShare = sub(totalShare, _share);
+            require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _amount, "CollateralTokenAdapter/insufficient collateral amount");
+
+            bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
+
+            totalShare = sub(totalShare, _amount);
 
             //withdraw WXDC from Vault
             vault.withdraw(_amount);
             //Transfer WXDC to proxyWallet
             address(collateralToken).safeTransfer(_usr, _amount);
+            emit LogWithdraw(_amount);
         }
-        emit LogWithdraw(_amount);
     }
 }

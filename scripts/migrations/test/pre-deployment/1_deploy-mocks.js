@@ -14,7 +14,6 @@ const SimplePriceFeed = artifacts.require('SimplePriceFeed.sol')
 const StableswapMultipleSwapsMock =  artifacts.require("StableswapMultipleSwapsMock");
 const PluginOracleMock = artifacts.require("PluginOracleMock");
 
-
 module.exports =  async function(deployer) {
   const promises = [
       deployer.deploy(ERC20, "US+", "US+", { gas: 3050000 }),

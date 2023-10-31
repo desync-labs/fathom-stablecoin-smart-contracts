@@ -19,7 +19,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     using SafeToken for address;
 
     uint256 public live;
-    bool internal flagVault;
+    bool public flagVault;
 
     address public collateralToken;
     IBookKeeper public bookKeeper;
@@ -65,12 +65,6 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         _;
     }
 
-    modifier onlyCollateralManager() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
-        require(_accessControlConfig.hasRole(_accessControlConfig.COLLATERAL_MANAGER_ROLE(), msg.sender), "!collateralManager");
-        _;
-    }
-
     function initialize(
         address _bookKeeper,
         bytes32 _collateralPoolId,
@@ -105,10 +99,14 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @dev Only the contract owner or a governance address can execute this function.
     /// @param toBeRemoved The address to be removed from the whitelist
     function blacklist(address toBeRemoved) external onlyOwnerOrGov {
+        require(toBeRemoved != address(0), "CollateralTokenAdapter/blacklist-invalidAdds");
         whiteListed[toBeRemoved] = false;
         emit LogWhitelisted(toBeRemoved, false);
     }
-
+    /// @dev The `cage` function permanently halts the `collateralTokenAdapter` contract.
+    /// Please exercise caution when using this function as there is no corresponding `uncage` function.
+    /// The `cage` function in this contract is unique because it must be called before users can initiate `emergencyWithdraw` in the `collateralTokenAdapter`.
+    /// It's a must to invoke this function in the `collateralTokenAdapter` during the final phase of an emergency shutdown.
     function cage() external override nonReentrant onlyOwner {
         if (live == 1) {
             live = 0;
@@ -123,10 +121,15 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }
-
+    /// @dev The `setVault` function stores the address of the vault contract that holds the collateral.
+    /// @param _vault the address of vault smart contract
     function setVault(address _vault) external onlyOwner {
         require(true != flagVault, "CollateralTokenAdapter/Vault-set-already");
         require(_vault != address(0), "CollateralTokenAdapter/zero-vault");
+        address vaultsAdapter = IVault(_vault).collateralAdapter();
+        require(vaultsAdapter == address(this), "CollateralTokenAdapter/Adapter-no-match");
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        require(_accessControlConfig.hasRole(_accessControlConfig.ADAPTER_ROLE(), vaultsAdapter), "vaultsAdapter!Adapter");
 
         flagVault = true;
         vault = IVault(_vault);
@@ -140,6 +143,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         uint256 _amount,
         bytes calldata _data
     ) external override nonReentrant whenNotPaused onlyProxyWalletOrWhiteListed {
+        require(_positionAddress != address(0), "CollateralTokenAdapter/deposit-address(0)");
         _deposit(_positionAddress, _amount, _data);
     }
 
@@ -159,13 +163,14 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @dev for flow that deposits FXD and then withdraw collateral, please call this fn from EOA.
     /// @dev EMERGENCY WHEN COLLATERAL TOKEN ADAPTER CAGED ONLY. Withdraw COLLATERAL from VAULT A after redeemStablecoin
     function emergencyWithdraw(address _to) external nonReentrant {
+        require(_to != address(0), "CollateralTokenAdapter/emergency-address(0)");
         if (live == 0) {
             uint256 _amount = bookKeeper.collateralToken(collateralPoolId, msg.sender);
             require(_amount < 2 ** 255, "CollateralTokenAdapter/collateral-overflow");
             //deduct totalShare
             totalShare -= _amount;
 
-            //deduct emergency withdrawl amount of FXD
+            //deduct emergency withdrawal amount of FXD
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
             //withdraw collateralToken from Vault
             vault.withdraw(_amount);
@@ -181,10 +186,10 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @param _amount The amount to be deposited
     function _deposit(address _positionAddress, uint256 _amount, bytes calldata /* _data */) private {
         require(live == 1, "CollateralTokenAdapter/not-live");
-
         if (_amount > 0) {
             // Overflow check for int256(wad) cast below
             // Also enforces a non-zero wad
+            require(int256(_amount) > 0, "CollateralTokenAdapter/amount-overflow");
             //transfer collateralToken from proxyWallet to adapter
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
             //bookKeeping
@@ -204,6 +209,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @param _amount The amount to be withdrawn
     function _withdraw(address _usr, uint256 _amount) private {
         if (_amount > 0) {
+            require(int256(_amount) > 0, "CollateralTokenAdapter/amount-overflow");
             require(bookKeeper.collateralToken(collateralPoolId, msg.sender) >= _amount, "CollateralTokenAdapter/insufficient collateral amount");
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
             totalShare -= _amount;
@@ -211,8 +217,8 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
             //withdraw collateralToken from Vault
             vault.withdraw(_amount);
             //Transfer collateralToken to proxyWallet
-            address(collateralToken).safeTransfer(_usr, _amount);
+            collateralToken.safeTransfer(_usr, _amount);
+            emit LogWithdraw(_amount);
         }
-        emit LogWithdraw(_amount);
     }
 }

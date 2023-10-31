@@ -49,10 +49,17 @@ contract PositionManager is PausableUpgradeable, IManager {
     event LogExportPosition(uint256 indexed _positionId, address _source, address _destination, uint256 _lockedCollateral, uint256 _debtShare);
     event LogImportPosition(uint256 indexed _positionId, address _source, address _destination, uint256 _lockedCollateral, uint256 _debtShare);
     event LogMovePosition(uint256 _sourceId, uint256 _destinationId, uint256 _lockedCollateral, uint256 _debtShare);
+    event LogPriceOracleUpdated(address _oldPriceOracle, address _newPriceOracle);
+    event LogBookKeeperUpdated(address _oldBookKeeper, address _newBookKeeper);
 
     /// @dev Require that the caller must be position's owner or owner whitelist
     modifier onlyOwnerAllowed(uint256 _positionId) {
         require(msg.sender == owners[_positionId] || ownerWhitelist[owners[_positionId]][_positionId][msg.sender] == 1, "owner not allowed");
+        _;
+    }
+    /// @dev auditor's sugesttion
+    modifier onlyPositionOwner(uint256 _positionId) {
+        require(msg.sender == owners[_positionId], "owner not allowed");
         _;
     }
 
@@ -61,6 +68,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         require(msg.sender == _migrantAddress || migrationWhitelist[_migrantAddress][msg.sender] == 1, "migration not allowed");
         _;
     }
+
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
@@ -81,7 +89,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         require(IShowStopper(_showStopper).live() == 1, "PositionManager/showStopper-not-live"); // Sanity Check Call
         showStopper = _showStopper;
 
-        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() > 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
         priceOracle = _priceOracle;
     }
 
@@ -89,7 +97,8 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @param _positionId The position id
     /// @param _user The address to be allowed for managing the position
     /// @param _ok Ok flag to allow/disallow. 1 for allow and 0 for disallow.
-    function allowManagePosition(uint256 _positionId, address _user, uint256 _ok) external override whenNotPaused onlyOwnerAllowed(_positionId) {
+    function allowManagePosition(uint256 _positionId, address _user, uint256 _ok) external override whenNotPaused onlyPositionOwner(_positionId) {
+        require(_user != address(0), "PositionManager/user-address(0)");
         require(_ok < 2, "PositionManager/invalid-ok");
         ownerWhitelist[owners[_positionId]][_positionId][_user] = _ok;
         emit LogAllowManagePosition(msg.sender, _positionId, owners[_positionId], _user, _ok);
@@ -99,6 +108,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @param _user The address of user that will be allowed to do such an action to msg.sender
     /// @param _ok Ok flag to allow/disallow
     function allowMigratePosition(address _user, uint256 _ok) external override whenNotPaused {
+        require(_user != address(0), "PositionManager/user-address(0)");
         require(_ok < 2, "PositionManager/invalid-ok");
         migrationWhitelist[msg.sender][_user] = _ok;
         emit LogAllowMigratePosition(msg.sender, _user, _ok);
@@ -114,32 +124,35 @@ contract PositionManager is PausableUpgradeable, IManager {
         );
         require(_debtAccumulatedRate != 0, "PositionManager/collateralPool-not-init");
 
-        lastPositionId += 1;
-        positions[lastPositionId] = address(new PositionHandler(bookKeeper));
-        owners[lastPositionId] = _user;
-        mapPositionHandlerToOwner[positions[lastPositionId]] = _user;
-        collateralPools[lastPositionId] = _collateralPoolId;
+        uint256 newLastPositionId = lastPositionId + 1;
+        lastPositionId = newLastPositionId;
+
+        positions[newLastPositionId] = address(new PositionHandler(bookKeeper));
+        owners[newLastPositionId] = _user;
+        mapPositionHandlerToOwner[positions[newLastPositionId]] = _user;
+        collateralPools[newLastPositionId] = _collateralPoolId;
 
         // Add new position to double linked list and pointers
         if (ownerFirstPositionId[_user] == 0) {
-            ownerFirstPositionId[_user] = lastPositionId;
+            ownerFirstPositionId[_user] = newLastPositionId;
         }
         if (ownerLastPositionId[_user] != 0) {
-            list[lastPositionId].prev = ownerLastPositionId[_user];
-            list[ownerLastPositionId[_user]].next = lastPositionId;
+            list[newLastPositionId].prev = ownerLastPositionId[_user];
+            list[ownerLastPositionId[_user]].next = newLastPositionId;
         }
-        ownerLastPositionId[_user] = lastPositionId;
+        ownerLastPositionId[_user] = newLastPositionId;
         ownerPositionCount[_user] += 1;
 
-        emit LogNewPosition(msg.sender, _user, lastPositionId);
+        emit LogNewPosition(msg.sender, _user, newLastPositionId);
 
-        return lastPositionId;
+        return newLastPositionId;
     }
+
 
     /// @dev Give the position ownership to a destination address
     /// @param _positionId The position id to be given away ownership
     /// @param _destination The destination to be a new owner of the position
-    function give(uint256 _positionId, address _destination) external override whenNotPaused onlyOwnerAllowed(_positionId) {
+    function give(uint256 _positionId, address _destination) external override whenNotPaused onlyPositionOwner(_positionId) {
         require(_destination != address(0), "destination address(0)");
         require(_destination != owners[_positionId], "destination already owner");
 
@@ -215,6 +228,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         uint256 _wad,
         bytes calldata /* _data */
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) {
+        require(_destination != address(0), "PositionManager/dst-address(0)");
         bytes32 _collateralPoolId = collateralPools[_positionId];
         _requireHealthyPrice(_collateralPoolId);
 
@@ -225,7 +239,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// This function has the purpose to take away collateral from the system that doesn't correspond to the position but was sent there wrongly
     /// @param _collateralPoolId The collateral pool id
     /// @param _positionId The position id to move collateral from
-    /// @param _destination The destination to recevied collateral
+    /// @param _destination The destination to received collateral
     /// @param _wad The amount in wad to be moved
     function moveCollateral(
         bytes32 _collateralPoolId,
@@ -234,6 +248,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         uint256 _wad,
         bytes calldata /* _data */
     ) external whenNotPaused onlyOwnerAllowed(_positionId) {
+        require(_destination != address(0), "PositionManager/dst-address(0)");
         _requireHealthyPrice(_collateralPoolId);
         IBookKeeper(bookKeeper).moveCollateral(_collateralPoolId, positions[_positionId], _destination, _wad);
     }
@@ -243,17 +258,19 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @param _destination The destination to received stablecoin
     /// @param _rad The amount in rad to be moved
     function moveStablecoin(uint256 _positionId, address _destination, uint256 _rad) external override whenNotPaused onlyOwnerAllowed(_positionId) {
+        require(_destination != address(0), "PositionManager/dst-address(0)");
         IBookKeeper(bookKeeper).moveStablecoin(positions[_positionId], _destination, _rad);
     }
 
     /// @dev Export the positions's lockedCollateral and debtShare to a different destination address
-    /// The destination address must allow position's owner to do so.
+    /// The destination addresss can be either a contract address or an EOA but not positionHandler/positionAddress
     /// @param _positionId The position id to be exported
     /// @param _destination The PositionHandler to be exported to
     function exportPosition(
         uint256 _positionId,
         address _destination
     ) external override whenNotPaused onlyOwnerAllowed(_positionId) onlyMigrationAllowed(_destination) {
+        require(_destination != address(0), "PositionManager/dst-address(0)");
         (uint256 _lockedCollateral, uint256 _debtShare) = IBookKeeper(bookKeeper).positions(collateralPools[_positionId], positions[_positionId]);
         IBookKeeper(bookKeeper).movePosition(
             collateralPools[_positionId],
@@ -323,14 +340,17 @@ contract PositionManager is PausableUpgradeable, IManager {
     }
 
     function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
-        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
+        require(IPriceOracle(_priceOracle).stableCoinReferencePrice() > 0, "PositionManager/invalid-priceOracle"); // Sanity Check Call
+        emit LogPriceOracleUpdated(priceOracle, _priceOracle);
         priceOracle = _priceOracle;
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwnerOrGov {
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "PositionManager/invalid-bookKeeper"); // Sanity Check Call
+        emit LogBookKeeperUpdated(bookKeeper, _bookKeeper);
         bookKeeper = _bookKeeper;
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
@@ -340,6 +360,8 @@ contract PositionManager is PausableUpgradeable, IManager {
         _unpause();
     }
 
+    /// @dev Updates the priceWithSafetyMargin of a specific pool.
+    /// @param _poolId The bytes32 ID of the target pool for which the priceWithSafetyMargin should be updated.
     function updatePrice(bytes32 _poolId) external override whenNotPaused {
         ISetPrice(priceOracle).setPrice(_poolId);
     }

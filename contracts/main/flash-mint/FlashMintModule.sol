@@ -28,10 +28,16 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
     bytes32 public constant CALLBACK_SUCCESS = keccak256("ERC3156FlashBorrower.onFlashLoan");
     bytes32 public constant CALLBACK_SUCCESS_BOOK_KEEPER_STABLE_COIN = keccak256("BookKeeperFlashBorrower.onBookKeeperFlashLoan");
 
+    mapping(address => bool) public flashMintWhitelist;
+    bool public isDecentralizedState;
+
     event LogSetMax(uint256 _data);
     event LogSetFeeRate(uint256 _data);
     event LogFlashLoan(address indexed _receiver, address indexed _token, uint256 _amount, uint256 _fee);
     event LogBookKeeperFlashLoan(address indexed _receiver, uint256 _amount, uint256 _fee);
+    event LogDecentralizedStateStatus(bool _oldDecentralizedStateStatus, bool _newDecentralizedStateStatus);
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -46,6 +52,13 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
                 _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
             "!(ownerRole or govRole)"
         );
+        _;
+    }
+
+    modifier onlyWhitelistedIfNotDecentralized() {
+        if (!isDecentralizedState) {
+            require(flashMintWhitelist[msg.sender] == true, "FlashMintModule/flashMinter-not-whitelisted");
+        }
         _;
     }
 
@@ -70,6 +83,30 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         address(stablecoin).safeApprove(_stablecoinAdapter, type(uint256).max);
     }
 
+    /**
+     * @notice Add an address to the whitelist
+     * @param _toBeWhitelisted The address to be whitelisted
+     * @dev Can only be called by the contract owner or the governance system
+     */
+    function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
+        require(_toBeWhitelisted != address(0), "FlashMintModule/whitelist-invalidAddress");
+        require(flashMintWhitelist[_toBeWhitelisted] == false, "FlashMintModule/user-already-whitelisted");
+        flashMintWhitelist[_toBeWhitelisted] = true;
+        emit LogAddToWhitelist(_toBeWhitelisted);
+    }
+
+    /**
+     * @notice remove an address from the whitelist
+     * @param _usr The address to be removed from the whitelist
+     * @dev Can only be called by the contract owner or the governance system
+     */
+    function removeFromWhitelist(address _usr) external onlyOwnerOrGov {
+        require(_usr != address(0), "FlashMintModule/removeWL-invalidAddress");
+        require(flashMintWhitelist[_usr] == true, "FlashMintModule/user-not-whitelisted");
+        flashMintWhitelist[_usr] = false;
+        emit LogRemoveFromWhitelist(_usr);
+    }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
@@ -91,9 +128,19 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         emit LogSetFeeRate(_data);
     }
 
+    function setDecentralizedStatesStatus(bool _status) external onlyOwner {
+        emit LogDecentralizedStateStatus(isDecentralizedState, _status);
+        isDecentralizedState = _status;
+    }
+
     // --- ERC 3156 Spec ---
 
-    function flashLoan(IERC3156FlashBorrower _receiver, address _token, uint256 _amount, bytes calldata _data) external override lock whenNotPaused returns (bool) {
+    function flashLoan(
+        IERC3156FlashBorrower _receiver,
+        address _token,
+        uint256 _amount,
+        bytes calldata _data
+    ) external override lock whenNotPaused onlyWhitelistedIfNotDecentralized returns (bool) {
         require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
         require(_amount <= max, "FlashMintModule/ceiling-exceeded");
 
@@ -120,7 +167,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         IBookKeeperFlashBorrower _receiver, // address of conformant IBookKeeperFlashBorrower
         uint256 _amount, // amount to flash loan [rad]
         bytes calldata _data // arbitrary data to pass to the receiver
-    ) external override lock whenNotPaused returns (bool) {
+    ) external override lock whenNotPaused onlyWhitelistedIfNotDecentralized returns (bool) {
         require(_amount <= max * RAY, "FlashMintModule/ceiling-exceeded");
 
         uint256 _prev = bookKeeper.stablecoin(address(this));

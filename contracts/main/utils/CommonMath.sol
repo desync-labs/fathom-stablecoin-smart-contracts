@@ -32,14 +32,17 @@ contract CommonMath {
     }
 
     function divup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require(_y != 0, "CommonMath/zero-division");
         _z = (_x + _y - 1) / _y;
     }
 
     function rdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require(_y != 0, "CommonMath/zero-division");
         _z = (_x * RAY) / _y;
     }
 
     function wdiv(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
+        require(_y != 0, "CommonMath/zero-division");
         _z = (_x * WAD) / _y;
     }
 

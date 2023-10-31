@@ -164,17 +164,12 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
             "!liquidationEngingRole"
         );
 
-        require(_positionDebtShare > 0, "FixedSpreadLiquidationStrategy/zero-debt");
-        require(_positionCollateralAmount > 0, "FixedSpreadLiquidationStrategy/zero-collateral-amount");
-        require(_positionAddress != address(0), "FixedSpreadLiquidationStrategy/zero-position-address");
-
-        uint256 _currentCollateralPrice = getFeedPrice(_collateralPoolId); // [ray]
-        require(_currentCollateralPrice > 0, "FixedSpreadLiquidationStrategy/zero-collateral-price");
+        _validateValues(_collateralPoolId, _positionDebtShare, _positionCollateralAmount, _positionAddress);
 
         LiquidationInfo memory info = _calculateLiquidationInfo(
             _collateralPoolId,
             _debtShareToBeLiquidated,
-            _currentCollateralPrice,
+             getFeedPrice(_collateralPoolId),
             _positionCollateralAmount,
             _positionDebtShare
         );
@@ -196,7 +191,6 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
             -int256(info.collateralAmountToBeLiquidated),
             -int256(info.actualDebtShareToBeLiquidated)
         );
-        IGenericTokenAdapter _adapter = IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId));
 
         if (info.treasuryFees > 0) {
             bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
@@ -224,11 +218,11 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
                 _data
             );
         } else {
-            _adapter.withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated - info.treasuryFees, abi.encode(0));
+            IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId)).withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated - info.treasuryFees, abi.encode(0));
             address _stablecoin = address(stablecoinAdapter.stablecoin());
             _stablecoin.safeTransferFrom(_liquidatorAddress, address(this), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
             _stablecoin.safeApprove(address(stablecoinAdapter), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
-            stablecoinAdapter.depositRAD(_liquidatorAddress, info.actualDebtValueToBeLiquidated, abi.encode(0));
+            stablecoinAdapter.depositRAD(_liquidatorAddress, info.actualDebtValueToBeLiquidated, _collateralPoolId, abi.encode(0));
         }
 
         bookKeeper.moveStablecoin(_liquidatorAddress, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
@@ -277,6 +271,13 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         require(priceOk, "FixedSpreadLiquidationStrategy/invalid-price");
         // (price [wad] * BLN [10 ** 9] ) [ray] / priceOracle.stableCoinReferencePrice [ray]
         feedPrice = rdiv(price * BLN, priceOracle.stableCoinReferencePrice()); // [ray]
+    }
+
+    function _validateValues(bytes32 _collateralPoolId, uint256 _positionDebtShare, uint256 _positionCollateralAmount, address _positionAddress) internal {
+        require(_positionDebtShare > 0, "FixedSpreadLiquidationStrategy/zero-debt");
+        require(_positionCollateralAmount > 0, "FixedSpreadLiquidationStrategy/zero-collateral-amount");
+        require(_positionAddress != address(0), "FixedSpreadLiquidationStrategy/zero-position-address");
+        require(getFeedPrice(_collateralPoolId) > 0, "FixedSpreadLiquidationStrategy/zero-collateral-price");
     }
 
     // solhint-disable function-max-lines

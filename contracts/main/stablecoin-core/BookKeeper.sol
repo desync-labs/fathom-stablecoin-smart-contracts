@@ -35,7 +35,7 @@ import "../utils/CommonMath.sol";
     /// @dev The position address -> The allowance delegate address -> true (1) means allowed or false (0) means not allowed
     mapping(address => mapping(address => uint256)) public override positionWhitelist;
 
-    uint256 public override totalStablecoinIssued; // Total stable coin issued or total stalbecoin in circulation   [rad]
+    uint256 public override totalStablecoinIssued; // Total stable coin issued or total stablecoin in circulation   [rad]
     uint256 public totalUnbackedStablecoin; // Total unbacked stable coin  [rad]
     uint256 public totalDebtCeiling; // Total debt ceiling  [rad]
     uint256 public live; // Active Flag
@@ -142,7 +142,10 @@ import "../utils/CommonMath.sol";
     }
 
     // --- Administration ---
-
+    /**
+     * @dev Sets the total debt ceiling of the entire protocol. The totalDebtCeiling is the maximum amount of debt that can be borrowed from the protocol.
+     * @param _totalDebtCeiling The new total debt ceiling value to be set.
+     */
     function setTotalDebtCeiling(uint256 _totalDebtCeiling) external onlyOwner {
         _requireLive();
         totalDebtCeiling = _totalDebtCeiling;
@@ -169,7 +172,8 @@ import "../utils/CommonMath.sol";
     }
 
     // --- Cage ---
-
+    /// @dev Cage function halts bookKeeper contract for good.
+    /// Please be cautious with this function since there is no uncage function
     function cage() external override onlyOwnerOrShowStopper {
         if (live == 1) {
             live = 0;
@@ -245,6 +249,8 @@ import "../utils/CommonMath.sol";
         address _dst,
         uint256 _amount
     ) external override nonReentrant whenNotPaused onlyCollateralManager {
+        require(_amount > 0 , "bookKeeper/moveCollateral-zero-amount");
+        require(_src != _dst, "bookKeeper/moveCollateral-src-dst-same");
         _requireAllowedPositionAdjustment(_src, msg.sender);
         collateralToken[_collateralPoolId][_src] -= _amount;
         collateralToken[_collateralPoolId][_dst] += _amount;
@@ -262,6 +268,8 @@ import "../utils/CommonMath.sol";
     */
 
     function moveStablecoin(address _src, address _dst, uint256 _value) external override nonReentrant whenNotPaused {
+        require(_value > 0, "bookKeeper/moveStablecoin-zero-amount");
+        require(_src != _dst, "bookKeeper/moveStablecoin-src-dst-same");
         _requireAllowedPositionAdjustment(_src, msg.sender);
         stablecoin[_src] -= _value;
         stablecoin[_dst] += _value;
@@ -411,7 +419,7 @@ import "../utils/CommonMath.sol";
     ) external override nonReentrant whenNotPaused onlyLiquidationEngine {
         Position storage position = positions[_collateralPoolId][_positionAddress];
         ICollateralPoolConfig.CollateralPoolInfo memory _vars = ICollateralPoolConfig(collateralPoolConfig).getCollateralPoolInfo(_collateralPoolId);
-        // -- col from postion
+        // -- col from position
         position.lockedCollateral = add(position.lockedCollateral, _collateralAmount);
         // -- debt from position
         position.debtShare = add(position.debtShare, _debtShare);
@@ -424,14 +432,16 @@ import "../utils/CommonMath.sol";
         poolStablecoinIssued[_collateralPoolId] = add(_poolStablecoinAmount, _debtValue);
         // ++ col to _collateralCreditor(showStopper in case of skim/accumulateBadDebt)
         collateralToken[_collateralPoolId][_collateralCreditor] = sub(collateralToken[_collateralPoolId][_collateralCreditor], _collateralAmount);
-        // ++ debt to systemDebyEngine
+        // ++ debt to systemDebtEngine
         systemBadDebt[_stablecoinDebtor] = sub(systemBadDebt[_stablecoinDebtor], _debtValue);
         totalUnbackedStablecoin = sub(totalUnbackedStablecoin, _debtValue);
     }
 
     /**
     * @notice Settles the system's bad debt of the caller.
-    * @dev This function can only be called by the SystemDebtEngine, which incurs the system debt. The BookKeeper contract must not be paused.
+    * @dev This function can be called by the SystemDebtEngine, which incurs the system debt. The BookKeeper contract must not be paused.
+    * @dev Even though the function has no modifier that restricts access exclusively to SystemDebtEngine, 
+           the action of the function—reducing the systemBadDebt of msg.sender—effectively limits the function callers to SystemDebtEngine.
     * @dev To execute this function, the SystemDebtEngine must have enough stablecoin, which typically comes from the protocol's surplus.
     * @dev A successful execution of this function removes the bad debt from the system.
     * @param _value The amount of bad debt to be settled.
@@ -452,8 +462,9 @@ import "../utils/CommonMath.sol";
     * @param _value The amount of unbacked stablecoin to mint.
     */
     function mintUnbackedStablecoin(address _from, address _to, uint256 _value) external override nonReentrant whenNotPaused onlyMintable {
+        require(_value > 0 , "bookKeeper/mintUnbackedStablecoin-zero-amount");
         _requireLive();
-
+        require(_from != address(0) && _to != address(0), "BookKeeper/zero-address");
         systemBadDebt[_from] += _value;
         stablecoin[_to] += _value;
         totalUnbackedStablecoin += _value;
