@@ -141,6 +141,7 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
         require(toBeRemoved != address(0), "CollateralTokenAdapter/blacklist-invalidAdds");
         whiteListed[toBeRemoved] = false;
     }
+
     /// @dev Cage function halts MockCollateralTokenAdapter contract for good.
     /// Please be cautious with this function since there is no uncage function
     function cage() external override nonReentrant onlyOwner {
@@ -149,10 +150,12 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
             emit LogCage();
         }
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();

@@ -99,20 +99,20 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
     }
 
     /**
-    * @notice Initiates the process of emergency shutdown (cage).
-    * @dev This function can only be called by the contract owner.
-    * @param _cageCoolDown Length of the cooldown period for the emergency shutdown, in seconds.
-    *
-    * The cage function starts the emergency shutdown process, which includes the following steps:
-    *  - Start a cooldown period for the emergency shutdown.
-    *  - Pause BookKeeper: locking/unlocking collateral and mint/repay Fathom Stablecoin will not be allowed for any positions.
-    *  - Pause LiquidationEngine: positions will not be liquidated.
-    *  - Pause SystemDebtEngine: no accrual of new debt, no system debt settlement.
-    *  - Pause PriceOracle: no new price updates, no liquidation trigger.
-    */
+     * @notice Initiates the process of emergency shutdown (cage).
+     * @dev This function can only be called by the contract owner.
+     * @param _cageCoolDown Length of the cooldown period for the emergency shutdown, in seconds.
+     *
+     * The cage function starts the emergency shutdown process, which includes the following steps:
+     *  - Start a cooldown period for the emergency shutdown.
+     *  - Pause BookKeeper: locking/unlocking collateral and mint/repay Fathom Stablecoin will not be allowed for any positions.
+     *  - Pause LiquidationEngine: positions will not be liquidated.
+     *  - Pause SystemDebtEngine: no accrual of new debt, no system debt settlement.
+     *  - Pause PriceOracle: no new price updates, no liquidation trigger.
+     */
     function cage(uint256 _cageCoolDown) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
-        require(_cageCoolDown >= 1 weeks  && _cageCoolDown <= 13 weeks, "ShowStopper/invalid-cool-down" );
+        require(_cageCoolDown >= 1 weeks && _cageCoolDown <= 13 weeks, "ShowStopper/invalid-cool-down");
 
         live = 0;
         cageCoolDown = _cageCoolDown;
@@ -150,9 +150,7 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
      */
     function accumulateBadDebt(bytes32 _collateralPoolId, address _positionAddress) external {
         require(cagePrice[_collateralPoolId] != 0, "ShowStopper/cage-price-collateral-pool-id-not-defined");
-        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(
-            _collateralPoolId
-        ); // [ray]
+        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(_collateralPoolId); // [ray]
         (uint256 _lockedCollateralAmount, uint256 _debtShare) = bookKeeper.positions(_collateralPoolId, _positionAddress);
         uint256 _debtAmount = rmul(rmul(_debtShare, _debtAccumulatedRate), cagePrice[_collateralPoolId]); // find the amount of debt in the unit of collateralToken
         uint256 _amount = min(_lockedCollateralAmount, _debtAmount); // if debt > lockedCollateralAmount, that's mean bad debt occur
@@ -196,9 +194,7 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         require(debt != 0, "ShowStopper/debt-zero");
         require(finalCashPrice[_collateralPoolId] == 0, "ShowStopper/final-cash-price-collateral-pool-id-already-defined");
 
-        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(
-            _collateralPoolId
-        ); // [ray]
+        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(_collateralPoolId); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
 
         finalCashPrice[_collateralPoolId] = ((_wad - badDebtAccumulator[_collateralPoolId]) * RAY) / (debt / RAY);

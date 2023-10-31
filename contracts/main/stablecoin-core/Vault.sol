@@ -25,6 +25,7 @@ contract Vault is IVault {
         require(msg.sender == collateralAdapter, "Vault/caller-not-adapter");
         _;
     }
+
     /**
      * @notice Vault constructor.
      * @param _collateralPoolId The identifier of the collateral pool associated with the Vault.
@@ -41,6 +42,7 @@ contract Vault is IVault {
         collateralToken = _collateralToken;
         collateralAdapter = _collateralAdapter;
     }
+
     /**
      * @notice Deposit collateral tokens into the Vault.
      * @param _amount The amount of collateral tokens to deposit.

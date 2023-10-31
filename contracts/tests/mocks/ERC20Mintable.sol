@@ -10,6 +10,7 @@ contract ERC20Mintable is Ownable, ERC20 {
     function mint(address _to, uint256 _amount) external onlyOwner {
         _mint(_to, _amount);
     }
+
     function burn(address _address, uint256 amount) public virtual {
         _burn(_address, amount);
     }

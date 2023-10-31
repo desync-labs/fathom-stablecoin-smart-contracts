@@ -43,10 +43,7 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
 
     modifier onlyLiquidationStrategy(bytes32 _collateralPoolId) {
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
-        require(
-            msg.sender == _collateralPoolConfig.getStrategy(_collateralPoolId),
-            "!(LiquidationStrategy)"
-        );
+        require(msg.sender == _collateralPoolConfig.getStrategy(_collateralPoolId), "!(LiquidationStrategy)");
         _;
     }
 
@@ -80,15 +77,22 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         bookKeeper.moveStablecoin(address(this), usr, wad * RAY);
         stablecoin.burn(msg.sender, wad);
     }
+
     /**
      * @notice Deposits stablecoin from msg.sender into the BookKeeper in RAD.
      * @param usr Address of the user to credit the deposit to.
      * @param rad Amount to deposit. [rad]
      */
-    function depositRAD(address usr, uint256 rad, bytes32 collateralPoolId, bytes calldata /* data */) external override nonReentrant whenNotPaused onlyLiquidationStrategy(collateralPoolId) {
+    function depositRAD(
+        address usr,
+        uint256 rad,
+        bytes32 collateralPoolId,
+        bytes calldata /* data */
+    ) external override nonReentrant whenNotPaused onlyLiquidationStrategy(collateralPoolId) {
         bookKeeper.moveStablecoin(address(this), usr, rad);
         stablecoin.burn(msg.sender, (rad / RAY) + 1);
     }
+
     /**
      * @notice Withdraws stablecoin to a specified user.
      * @param usr Address of the user to withdraw stablecoin to.
@@ -99,10 +103,12 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         bookKeeper.moveStablecoin(msg.sender, address(this), wad * RAY);
         stablecoin.mint(usr, wad);
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();

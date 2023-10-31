@@ -69,7 +69,6 @@ contract PositionManager is PausableUpgradeable, IManager {
         _;
     }
 
-
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
         require(
@@ -148,7 +147,6 @@ contract PositionManager is PausableUpgradeable, IManager {
         return newLastPositionId;
     }
 
-
     /// @dev Give the position ownership to a destination address
     /// @param _positionId The position id to be given away ownership
     /// @param _destination The destination to be a new owner of the position
@@ -207,14 +205,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         _requireHealthyPrice(_collateralPoolId);
 
         address _positionAddress = positions[_positionId];
-        IBookKeeper(bookKeeper).adjustPosition(
-            _collateralPoolId,
-            _positionAddress,
-            _positionAddress,
-            _positionAddress,
-            _collateralValue,
-            _debtShare
-        );
+        IBookKeeper(bookKeeper).adjustPosition(_collateralPoolId, _positionAddress, _positionAddress, _positionAddress, _collateralValue, _debtShare);
         ISetPrice(priceOracle).setPrice(_collateralPoolId);
     }
 
@@ -331,12 +322,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         bytes calldata _data
     ) external override whenNotPaused onlyOwnerAllowed(_posId) {
         address _positionAddress = positions[_posId];
-        IShowStopper(showStopper).redeemLockedCollateral(
-            collateralPools[_posId],
-            _positionAddress,
-            _collateralReceiver,
-            _data
-        );
+        IShowStopper(showStopper).redeemLockedCollateral(collateralPools[_posId], _positionAddress, _collateralReceiver, _data);
     }
 
     function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
@@ -355,6 +341,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     function pause() external onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();

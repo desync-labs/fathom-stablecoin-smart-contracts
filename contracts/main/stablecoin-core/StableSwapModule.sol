@@ -54,7 +54,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
     //storage variables after upgrade
     address public stableswapWrapper;
-   
+
     //storage variables after upgrade - 2
     uint256 public override remainingFXDFeeBalance;
     uint256 public override remainingTokenFeeBalance;
@@ -138,12 +138,13 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     /**
      * @notice the function is to be called by the owner to initialize the fees after upgrade
      */
-    function initializeFeesAfterUpgrade() external onlyOwner{
+    function initializeFeesAfterUpgrade() external onlyOwner {
         require(feesUpgradeInitialized != true, "StableSwapModule/already-initialized");
         feesUpgradeInitialized = true;
         remainingFXDFeeBalance = totalFXDFeeBalance;
         remainingTokenFeeBalance = totalTokenFeeBalance;
     }
+
     /**
      * @notice the function is to only mitigate the bad storage after upgrade.
      */
@@ -216,12 +217,12 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         usersWhitelist[_user] = false;
         emit LogRemoveFromWhitelist(_user);
     }
-    
+
     /**
-    * @dev the function is to be called by the stableswap wrapper to swap tokens to stablecoin
-    * @param _usr the address of the user that receives the stablecoin
-    * @param _amount the amount of tokens to be swapped
-    */
+     * @dev the function is to be called by the stableswap wrapper to swap tokens to stablecoin
+     * @param _usr the address of the user that receives the stablecoin
+     * @param _amount the amount of tokens to be swapped
+     */
     function swapTokenToStablecoin(address _usr, uint256 _amount) external override whenNotPaused onlyWhitelistedIfNotDecentralized nonReentrant {
         require(_amount != 0, "StableSwapModule/amount-zero");
 
@@ -238,7 +239,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         tokenBalance[stablecoin] -= tokenAmount18;
         tokenBalance[token] += _amount;
-        
+
         totalFXDFeeBalance += fee;
         remainingFXDFeeBalance += fee;
 
@@ -250,10 +251,10 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     }
 
     /**
-    * @dev the function is to be called by the stableswap wrapper to swap stablecoin to tokens
-    * @param _usr the address of the user that receives the tokens
-    * @param _amount the amount of stablecoin to be swapped
-    */
+     * @dev the function is to be called by the stableswap wrapper to swap stablecoin to tokens
+     * @param _usr the address of the user that receives the tokens
+     * @param _amount the amount of stablecoin to be swapped
+     */
     function swapStablecoinToToken(address _usr, uint256 _amount) external override whenNotPaused onlyWhitelistedIfNotDecentralized nonReentrant {
         require(_amount != 0, "StableSwapModule/amount-zero");
 
@@ -271,9 +272,9 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         tokenBalance[token] -= _amountScaled;
         tokenBalance[stablecoin] += _amount;
-        
+
         totalValueDeposited -= fee;
-        
+
         totalTokenFeeBalance += _convertDecimals(fee, 18, IToken(token).decimals());
         remainingTokenFeeBalance += _convertDecimals(fee, 18, IToken(token).decimals());
 
@@ -282,7 +283,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         emit LogSwapStablecoinToToken(_usr, _amount, fee);
     }
 
-    /** 
+    /**
      * @dev the function is to be called by the stableswap wrapper to deposit tokens
      * @param _token the address of the token to be deposited
      * @param _amount the amount of tokens to be deposited
@@ -291,12 +292,12 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         require(_token == token || _token == stablecoin, "depositStablecoin/invalid-token");
         require(_amount != 0, "stableswap-depositStablecoin/amount-zero");
         require(_token.balanceOf(msg.sender) >= _amount, "depositStablecoin/not-enough-balance");
-        
+
         tokenBalance[_token] += _amount;
         _token.safeTransferFrom(msg.sender, address(this), _amount);
-        
+
         totalValueDeposited += _convertDecimals(_amount, IToken(_token).decimals(), 18);
-    
+
         if (isDecentralizedState) {
             lastUpdate = block.timestamp;
             remainingDailySwapAmount = _dailySwapLimit();
@@ -304,7 +305,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         emit LogDepositToken(msg.sender, _token, _amount);
     }
-    
+
     /**
      * @dev the function is to be called by the stableswap wrapper to withdraw fees
      * @param _destination the address of the user that receives the fees
@@ -318,11 +319,11 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
 
         remainingFXDFeeBalance -= _amountFXDFee;
         remainingTokenFeeBalance -= _amountTokenFee;
-        
-        if(_amountFXDFee > 0) {
+
+        if (_amountFXDFee > 0) {
             stablecoin.safeTransfer(_destination, _amountFXDFee);
         }
-        if(_amountTokenFee > 0) {
+        if (_amountTokenFee > 0) {
             token.safeTransfer(_destination, _amountTokenFee);
         }
     }
@@ -343,12 +344,12 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         uint256 amountScaled = _convertDecimals(_amount, IToken(_token).decimals(), 18);
 
         //to account for precision loss due to convert decimals
-        if(amountScaled > totalValueDeposited) {
+        if (amountScaled > totalValueDeposited) {
             totalValueDeposited = 0;
         } else {
             totalValueDeposited -= amountScaled;
         }
-        
+
         emit LogWithdrawToken(msg.sender, _token, _amount);
     }
 
@@ -356,6 +357,7 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     function pause() external onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
@@ -365,20 +367,20 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
      * @dev the function withdraws whole balance of both the tokens
      * @dev Fees is also withdrawn, so once emergencyWithdraw is done, people wont be able to withdraw their fees
      * @dev All the balances will be reset
-    */
+     */
     function emergencyWithdraw(address _account) external override nonReentrant onlyOwnerOrGov whenPaused {
         require(_account != address(0), "withdrawFees/empty-account");
-        
+
         totalValueDeposited = 0;
         totalTokenFeeBalance = 0;
         totalFXDFeeBalance = 0;
 
         remainingFXDFeeBalance = 0;
         remainingTokenFeeBalance = 0;
-        
+
         tokenBalance[token] = 0;
         tokenBalance[stablecoin] = 0;
-        
+
         token.safeTransfer(_account, token.balanceOf(address(this)));
         stablecoin.safeTransfer(_account, stablecoin.balanceOf(address(this)));
         emit LogEmergencyWithdraw(_account);

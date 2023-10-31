@@ -88,6 +88,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
     }
+
     /**
      * @notice Initializes the FixedSpreadLiquidationStrategy contract with required dependencies.
      * @param _bookKeeper The address of the BookKeeper contract.
@@ -125,14 +126,17 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         ); // Sanity Check Call
         stablecoinAdapter = IStablecoinAdapter(_stablecoinAdapter); //StablecoinAdapter to deposit FXD to bookKeeper
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }
+
     /**
      * @notice Sets the flash lending feature to enabled or disabled.
      * @param _flashLendingEnabled The value indicating whether flash lending should be enabled (1) or disabled (0).
@@ -169,7 +173,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         LiquidationInfo memory info = _calculateLiquidationInfo(
             _collateralPoolId,
             _debtShareToBeLiquidated,
-             getFeedPrice(_collateralPoolId),
+            getFeedPrice(_collateralPoolId),
             _positionCollateralAmount,
             _positionDebtShare
         );
@@ -218,7 +222,11 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
                 _data
             );
         } else {
-            IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId)).withdraw(_collateralRecipient, info.collateralAmountToBeLiquidated - info.treasuryFees, abi.encode(0));
+            IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId)).withdraw(
+                _collateralRecipient,
+                info.collateralAmountToBeLiquidated - info.treasuryFees,
+                abi.encode(0)
+            );
             address _stablecoin = address(stablecoinAdapter.stablecoin());
             _stablecoin.safeTransferFrom(_liquidatorAddress, address(this), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
             _stablecoin.safeApprove(address(stablecoinAdapter), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
@@ -273,7 +281,12 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         feedPrice = rdiv(price * BLN, priceOracle.stableCoinReferencePrice()); // [ray]
     }
 
-    function _validateValues(bytes32 _collateralPoolId, uint256 _positionDebtShare, uint256 _positionCollateralAmount, address _positionAddress) internal {
+    function _validateValues(
+        bytes32 _collateralPoolId,
+        uint256 _positionDebtShare,
+        uint256 _positionCollateralAmount,
+        address _positionAddress
+    ) internal {
         require(_positionDebtShare > 0, "FixedSpreadLiquidationStrategy/zero-debt");
         require(_positionCollateralAmount > 0, "FixedSpreadLiquidationStrategy/zero-collateral-amount");
         require(_positionAddress != address(0), "FixedSpreadLiquidationStrategy/zero-position-address");
@@ -305,8 +318,8 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
             : _debtShareToBeLiquidated; // [wad]
         info.actualDebtValueToBeLiquidated = info.actualDebtShareToBeLiquidated * _vars.debtAccumulatedRate; // [rad]
 
-        uint256 _maxCollateralAmountToBeLiquidated = 
-            ((info.actualDebtValueToBeLiquidated * _vars.liquidatorIncentiveBps) / 10000) / _currentCollateralPrice; // [wad]
+        uint256 _maxCollateralAmountToBeLiquidated = ((info.actualDebtValueToBeLiquidated * _vars.liquidatorIncentiveBps) / 10000) /
+            _currentCollateralPrice; // [wad]
 
         if (
             _maxCollateralAmountToBeLiquidated > _positionCollateralAmount ||
@@ -317,12 +330,12 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
             info.actualDebtValueToBeLiquidated = (_currentCollateralPrice * _positionCollateralAmount * 10000) / _vars.liquidatorIncentiveBps; // [rad]
         } else {
             if (
-                _positionDebtValue > info.actualDebtValueToBeLiquidated &&
-                _positionDebtValue - info.actualDebtValueToBeLiquidated < _vars.debtFloor
+                _positionDebtValue > info.actualDebtValueToBeLiquidated && _positionDebtValue - info.actualDebtValueToBeLiquidated < _vars.debtFloor
             ) {
                 info.actualDebtValueToBeLiquidated = _positionDebtValue; // [rad]
-                info.collateralAmountToBeLiquidated = 
-                ((info.actualDebtValueToBeLiquidated * _vars.liquidatorIncentiveBps) / 10000) / _currentCollateralPrice; // [wad]
+                info.collateralAmountToBeLiquidated =
+                    ((info.actualDebtValueToBeLiquidated * _vars.liquidatorIncentiveBps) / 10000) /
+                    _currentCollateralPrice; // [wad]
             } else {
                 info.collateralAmountToBeLiquidated = _maxCollateralAmountToBeLiquidated; // [wad]
             }
@@ -332,8 +345,8 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
 
         // collateralAmountToBeLiquidated - (collateralAmountToBeLiquidated * 10000 / liquidatorIncentiveBps)
         // 1 - (1 * 10000 / 10500) = 0.047619048 which is roughly around 0.05
-        uint256 liquidatorIncentiveCollectedFromPosition = 
-            info.collateralAmountToBeLiquidated - (info.collateralAmountToBeLiquidated * 10000 / _vars.liquidatorIncentiveBps); // [wad]
+        uint256 liquidatorIncentiveCollectedFromPosition = info.collateralAmountToBeLiquidated -
+            ((info.collateralAmountToBeLiquidated * 10000) / _vars.liquidatorIncentiveBps); // [wad]
 
         // liquidatorIncentiveCollectedFromPosition * (treasuryFeesBps) / 10000
         // 0.047619048 * 5000 / 10000

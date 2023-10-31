@@ -19,12 +19,12 @@ import "../utils/CommonMath.sol";
 contract FathomStablecoinProxyActions is CommonMath {
     using SafeToken for address;
 
+    address internal immutable self = address(this);
+
     // solhint-disable
     event LogBorrowedAmount(address _positionAddress, uint256 _FXDBorrowAmount);
     event LogPaidAmount(address _positionAddress, uint256 _FXDPaidAmount);
     // solhint-enable
-
-    address immutable internal self = address(this);
 
     modifier onlyDelegateCall() {
         require(address(this) != self);
@@ -39,7 +39,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         IBookKeeper(_bookKeeper).blacklist(_usr);
     }
 
-    function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok) external onlyDelegateCall{
+    function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok) external onlyDelegateCall {
         IManager(_manager).allowManagePosition(_positionId, _user, _ok);
     }
 
@@ -59,7 +59,13 @@ contract FathomStablecoinProxyActions is CommonMath {
         IManager(_manager).movePosition(_source, _destination);
     }
 
-    function safeLockXDC(address _manager, address _xdcAdapter, uint256 _positionId, address _owner, bytes calldata _data) external payable onlyDelegateCall {
+    function safeLockXDC(
+        address _manager,
+        address _xdcAdapter,
+        uint256 _positionId,
+        address _owner,
+        bytes calldata _data
+    ) external payable onlyDelegateCall {
         require(IManager(_manager).owners(_positionId) == _owner, "!owner");
         lockXDC(_manager, _xdcAdapter, _positionId, _data);
     }
@@ -346,7 +352,7 @@ contract FathomStablecoinProxyActions is CommonMath {
 
         address _positionAddress = IManager(_manager).positions(_positionId);
         IManager(_manager).updatePrice(_collateralPoolId);
-        
+
         emit LogBorrowedAmount(_positionAddress, _stablecoinAmount);
     }
 

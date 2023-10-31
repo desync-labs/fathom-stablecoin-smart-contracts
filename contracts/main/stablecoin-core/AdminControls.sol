@@ -65,10 +65,11 @@ contract AdminControls is OwnableUpgradeable {
         systemDebtEngine = _systemDebtEngine;
         stablecoinAdapter = _stablecoinAdapter;
     }
+
     /**
-    * @notice Pause all core modules of the protocol.
-    * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are paused.
-    */
+     * @notice Pause all core modules of the protocol.
+     * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are paused.
+     */
     function pauseProtocol() external onlyOwnerOrGov {
         IPausable(bookKeeper).pause();
         IPausable(positionManager).pause();
@@ -79,10 +80,11 @@ contract AdminControls is OwnableUpgradeable {
         IPausable(stablecoinAdapter).pause();
         emit LogPauseProtocol();
     }
+
     /**
-    * @notice Unpause all core modules of the protocol.
-    * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are unpaused.
-    */
+     * @notice Unpause all core modules of the protocol.
+     * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are unpaused.
+     */
     function unpauseProtocol() external onlyOwnerOrGov {
         IPausable(bookKeeper).unpause();
         IPausable(positionManager).unpause();
@@ -123,7 +125,7 @@ contract AdminControls is OwnableUpgradeable {
         flashMintModule = _flashMintModule;
         emit LogSetFlashMintModule(_flashMintModule);
     }
- 
+
     function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
         require(_priceOracle != address(0), "AdminControls/zero-address");
         priceOracle = _priceOracle;

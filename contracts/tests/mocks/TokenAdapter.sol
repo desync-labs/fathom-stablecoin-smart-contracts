@@ -62,6 +62,7 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
         decimals = IToken(collateralToken).decimals();
         require(decimals == 18, "TokenAdapter/bad-token-decimals");
     }
+
     /// @dev Cage function halts TokenAdapter contract for good.
     /// Please be cautious with this function since there is no uncage function
     function cage() external override onlyOwnerOrShowStopper {
@@ -110,11 +111,11 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
         vault = IVault(_vault);
     }
 
-
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
