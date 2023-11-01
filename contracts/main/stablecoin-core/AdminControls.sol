@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IAccessControlConfig.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IPausable.sol";
 import "../interfaces/IBookKeeper.sol";
 
-contract AdminControls is OwnableUpgradeable {
+contract AdminControls is Initializable {
     address public bookKeeper;
     address public liquidationEngine;
     address public priceOracle;
@@ -47,8 +47,6 @@ contract AdminControls is OwnableUpgradeable {
         address _flashMintModule,
         address _stablecoinAdapter
     ) external initializer {
-        OwnableUpgradeable.__Ownable_init();
-
         require(_bookKeeper != address(0), "AdminControls/zero-book-keeper");
         require(_liquidationEngine != address(0), "AdminControls/zero-liquidation-engine");
         require(_priceOracle != address(0), "AdminControls/zero-price-oracle");
