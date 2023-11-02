@@ -15,8 +15,8 @@ module.exports = async function (deployer) {
 
     await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapter.address)
 
-    await collateralTokenAdapter.whitelist(positionManager.address, { gasLimit: 1000000 });
-    await collateralTokenAdapter.whitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
-    await collateralTokenAdapter.whitelist(liquidationEngine.address, { gasLimit: 1000000 });
-    await collateralTokenAdapter.whitelist(showStopper.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(positionManager.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(liquidationEngine.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(showStopper.address, { gasLimit: 1000000 });
 }

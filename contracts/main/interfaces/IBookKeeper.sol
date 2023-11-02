@@ -60,9 +60,9 @@ interface IBookKeeper {
 
     function settleSystemBadDebt(uint256 value) external; // [rad]
 
-    function whitelist(address toBeWhitelistedAddress) external;
+    function addToWhitelist(address toBeWhitelistedAddress) external;
 
-    function blacklist(address toBeBlacklistedAddress) external;
+    function removeFromWhitelist(address toBeRemovedAddress) external;
 
     function collateralToken(bytes32 collateralPoolId, address ownerAddress) external view returns (uint256);
 

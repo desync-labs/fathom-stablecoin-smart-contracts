@@ -106,7 +106,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
      * @param toBeWhitelisted The address to be whitelisted
      * @dev Can only be called by the contract owner or the governance system
      */
-    function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
+    function addToWhitelist(address toBeWhitelisted) external onlyOwnerOrGov {
         require(toBeWhitelisted != address(0), "LiquidationEngine/whitelist-invalidAddress");
         liquidatorsWhitelist[toBeWhitelisted] = 1;
     }
@@ -116,7 +116,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
      * @param toBeRemoved The address to be removed from the whitelist
      * @dev Can only be called by the contract owner or the governance system
      */
-    function blacklist(address toBeRemoved) external onlyOwnerOrGov {
+    function removeFromWhitelist(address toBeRemoved) external onlyOwnerOrGov {
         liquidatorsWhitelist[toBeRemoved] = 0;
     }
 

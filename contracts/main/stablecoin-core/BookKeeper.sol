@@ -199,18 +199,18 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
      * @param toBeWhitelistedAddress The address that is granted permission to adjust the position address of the caller.
      * @dev Emits no events.
      */
-    function whitelist(address toBeWhitelistedAddress) external override whenNotPaused {
+    function addToWhitelist(address toBeWhitelistedAddress) external override whenNotPaused {
         positionWhitelist[msg.sender][toBeWhitelistedAddress] = 1;
     }
 
     /**
-     * @dev Revokes the allowance from the `toBeBlacklistedAddress` to adjust the position address of the caller.
+     * @dev Revokes the allowance from the `toBeRemovedAddress` to adjust the position address of the caller.
      * @notice This function can only be called when the BookKeeper contract is not paused.
-     * @param toBeBlacklistedAddress The address that is no longer allowed to adjust the position address of the caller.
+     * @param toBeRemovedAddress The address that is no longer allowed to adjust the position address of the caller.
      * @dev Emits no events.
      */
-    function blacklist(address toBeBlacklistedAddress) external override whenNotPaused {
-        positionWhitelist[msg.sender][toBeBlacklistedAddress] = 0;
+    function removeFromWhitelist(address toBeRemovedAddress) external override whenNotPaused {
+        positionWhitelist[msg.sender][toBeRemovedAddress] = 0;
     }
 
     // --- Core Logic ---

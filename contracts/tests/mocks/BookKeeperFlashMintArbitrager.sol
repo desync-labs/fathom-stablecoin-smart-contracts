@@ -44,7 +44,7 @@ contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBo
         uint256 loanAmount = loanValue / RAY;
 
         // 1. Swap AUSD to BUSD at a DEX
-        //    vars.stableSwapModule.stablecoinAdapter().bookKeeper().whitelist(address(vars.stableSwapModule.stablecoinAdapter()));
+        //    vars.stableSwapModule.stablecoinAdapter().bookKeeper().addToWhitelist(address(vars.stableSwapModule.stablecoinAdapter()));
         //  vars.stableSwapModule.stablecoinAdapter().withdraw(address(this), loanAmount, abi.encode(0));
         uint256 balanceBefore = vars.stableSwapToken.myBalance();
         stablecoin.safeApprove(vars.router, type(uint).max);

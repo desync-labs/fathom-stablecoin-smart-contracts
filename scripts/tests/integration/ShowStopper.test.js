@@ -34,7 +34,7 @@ const setup = async () => {
     const MockCollateralTokenAdapter = await artifacts.initializeInterfaceAt("MockCollateralTokenAdapter", "MockCollateralTokenAdapter");
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
     await proxyWalletRegistry.setDecentralizedMode(true);
-    
+
     ({
         proxyWallets: [aliceProxyWallet, bobProxyWallet],
     } = await createProxyWallets([AliceAddress, BobAddress]));
@@ -375,7 +375,7 @@ describe("ShowStopper", () => {
                     { from: AliceAddress, gasLimit: 1000000 }
                 )
 
-                await bookKeeper.whitelist(showStopper.address, { from: AliceAddress })
+                await bookKeeper.addToWhitelist(showStopper.address, { from: AliceAddress })
 
                 await showStopper.accumulateStablecoin(WeiPerWad.mul(5), { from: AliceAddress })
 
@@ -398,7 +398,7 @@ describe("ShowStopper", () => {
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
 
-                
+
                 // bob's position #2
                 //  a. open a new position
                 //  b. lock XDC
@@ -417,7 +417,7 @@ describe("ShowStopper", () => {
                 const positionId3 = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress3 = await positionManager.positions(positionId3)
 
-                
+
                 // bob's position #4
                 //  a. open a new position
                 //  b. lock WXDC
@@ -496,7 +496,7 @@ describe("ShowStopper", () => {
                     { from: AliceAddress, gasLimit: 1000000 }
                 )
 
-                await bookKeeper.whitelist(showStopper.address, { from: AliceAddress })
+                await bookKeeper.addToWhitelist(showStopper.address, { from: AliceAddress })
 
                 await showStopper.accumulateStablecoin(WeiPerWad.mul(5), { from: AliceAddress })
 

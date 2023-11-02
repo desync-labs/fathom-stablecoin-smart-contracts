@@ -42,17 +42,17 @@ const setup = async () => {
     const GLD = await artifacts.initializeInterfaceAt("ERC20Mintable", gldAddr);
 
     await GLD.mint(AliceAddress, WeiPerWad.mul(1000), { gasLimit: 1000000 })
-    await GLD.approve(aliceProxyWallet.address, WeiPerWad.mul(1000),  { from: AliceAddress, gasLimit: 1000000 })
+    await GLD.approve(aliceProxyWallet.address, WeiPerWad.mul(1000), { from: AliceAddress, gasLimit: 1000000 })
     await GLD.mint(BobAddress, WeiPerWad.mul(1000), { gasLimit: 1000000 })
-    await GLD.approve(bobProxyWallet.address, WeiPerWad.mul(1000),  { from: BobAddress, gasLimit: 1000000 })
+    await GLD.approve(bobProxyWallet.address, WeiPerWad.mul(1000), { from: BobAddress, gasLimit: 1000000 })
 
     await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
     await collateralPoolConfig.setStabilityFeeRate(pools.XDC, WeiPerRay, { gasLimit: 1000000 });
     await collateralPoolConfig.setStabilityFeeRate(pools.GLD, WeiPerRay, { gasLimit: 1000000 });
 
-    await priceOracle.setPrice(pools.GLD, { gasLimit: 1000000})
+    await priceOracle.setPrice(pools.GLD, { gasLimit: 1000000 })
     await TimeHelpers.increase(TimeHelpers.duration.seconds(BigNumber.from("900")))
-    await priceOracle.setPrice(pools.GLD, { gasLimit: 1000000})
+    await priceOracle.setPrice(pools.GLD, { gasLimit: 1000000 })
     await priceOracle.setPrice(pools.XDC);
 
     return {
@@ -1925,7 +1925,7 @@ describe("PositionPermissions", () => {
                     )
 
                     // 5. allow bob to window
-                    await bookKeeper.whitelist(stablecoinAdapter.address, { from: BobAddress })
+                    await bookKeeper.addToWhitelist(stablecoinAdapter.address, { from: BobAddress })
 
                     // 6. mint ausd
                     await stablecoinAdapter.withdraw(
@@ -2365,7 +2365,7 @@ describe("PositionPermissions", () => {
                 expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, AliceAddress)).to.be.equal(1)
 
                 // 3. alice allow positionManage
-                await bookKeeper.whitelist(positionManager.address, { from: AliceAddress })
+                await bookKeeper.addToWhitelist(positionManager.address, { from: AliceAddress })
 
                 // 4. alice allow migration
                 await positionManager.allowMigratePosition(aliceProxyWallet.address, 1, { from: AliceAddress })

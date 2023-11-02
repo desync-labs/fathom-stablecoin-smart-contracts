@@ -79,7 +79,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         require(_systemDebtEngine != address(0), "FlashMintModule/bad-system-debt-engine-address");
         systemDebtEngine = _systemDebtEngine;
 
-        bookKeeper.whitelist(_stablecoinAdapter);
+        bookKeeper.addToWhitelist(_stablecoinAdapter);
         address(stablecoin).safeApprove(_stablecoinAdapter, type(uint256).max);
     }
 

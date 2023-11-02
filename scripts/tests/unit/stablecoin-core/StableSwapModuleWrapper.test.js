@@ -31,7 +31,7 @@ const loadFixtureHandler = async () => {
   await mockedAccessControlConfig.mock.hasRole.returns(true)
 
   await mockFathomStablecoin.mock.approve.returns(true)
-  await mockBookKeeper.mock.whitelist.returns()
+  await mockBookKeeper.mock.addToWhitelist.returns()
   await mockFathomStablecoin.mock.transferFrom.returns(true)
   await mockFathomStablecoin.mock.transfer.returns(true)
   await mockUSD.mock.transferFrom.returns(true)
@@ -46,8 +46,8 @@ const loadFixtureHandler = async () => {
   stableSwapModuleAsAlice = getContract("StableSwapModule", AliceAddress)
   stableSwapModuleWrapper = getContract("StableSwapModuleWrapper", DeployerAddress)
   stableSwapModuleWrapperAsAlice = getContract("StableSwapModuleWrapper", AliceAddress)
-  
-  
+
+
   await stableSwapModule.initialize(
     mockBookKeeper.address,
     mockUSD.address,
@@ -194,14 +194,14 @@ describe("StableSwapModuleWrapper", () => {
       })
     })
 
-    context("zero amount", async() => {
-      it("Should revert", async() => {
+    context("zero amount", async () => {
+      it("Should revert", async () => {
         await expect(stableSwapModuleWrapper.withdrawTokens(BigNumber.from("0"))).to.be.revertedWith("withdrawTokens/amount-zero")
       })
     })
 
-    context("not enough deposit", async() => {
-      it("Should revert", async() => {
+    context("not enough deposit", async () => {
+      it("Should revert", async () => {
         await expect(stableSwapModuleWrapper.withdrawTokens(WeiPerWad.mul(10000))).to.be.revertedWith("withdrawTokens/amount-exceeds-users-deposit")
       })
     })

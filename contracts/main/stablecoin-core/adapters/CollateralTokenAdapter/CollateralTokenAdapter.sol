@@ -86,7 +86,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @notice Adds an address to the whitelist, allowing it to interact with the contract
     /// @dev Only the contract owner or a governance address can execute this function. The provided address cannot be the zero address.
     /// @param toBeWhitelisted The address to be added to the whitelist
-    function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
+    function addToWhitelist(address toBeWhitelisted) external onlyOwnerOrGov {
         require(toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
         whiteListed[toBeWhitelisted] = true;
         emit LogWhitelisted(toBeWhitelisted, true);
@@ -95,8 +95,8 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     /// @notice Removes an address from the whitelist
     /// @dev Only the contract owner or a governance address can execute this function.
     /// @param toBeRemoved The address to be removed from the whitelist
-    function blacklist(address toBeRemoved) external onlyOwnerOrGov {
-        require(toBeRemoved != address(0), "CollateralTokenAdapter/blacklist-invalidAdds");
+    function removeFromWhitelist(address toBeRemoved) external onlyOwnerOrGov {
+        require(toBeRemoved != address(0), "CollateralTokenAdapter/removeFromWL-invalidAdds");
         whiteListed[toBeRemoved] = false;
         emit LogWhitelisted(toBeRemoved, false);
     }

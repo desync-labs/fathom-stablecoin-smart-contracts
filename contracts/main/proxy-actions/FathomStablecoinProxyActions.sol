@@ -31,12 +31,12 @@ contract FathomStablecoinProxyActions is CommonMath {
         _;
     }
 
-    function whitelist(address _bookKeeper, address _usr) external onlyDelegateCall {
-        IBookKeeper(_bookKeeper).whitelist(_usr);
+    function addToWhitelist(address _bookKeeper, address _usr) external onlyDelegateCall {
+        IBookKeeper(_bookKeeper).addToWhitelist(_usr);
     }
 
-    function blacklist(address _bookKeeper, address _usr) external onlyDelegateCall {
-        IBookKeeper(_bookKeeper).blacklist(_usr);
+    function removeFromWhitelist(address _bookKeeper, address _usr) external onlyDelegateCall {
+        IBookKeeper(_bookKeeper).removeFromWhitelist(_usr);
     }
 
     function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok) external onlyDelegateCall {
@@ -94,7 +94,7 @@ contract FathomStablecoinProxyActions is CommonMath {
 
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_bookKeeper).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
-            IBookKeeper(_bookKeeper).whitelist(_stablecoinAdapter);
+            IBookKeeper(_bookKeeper).addToWhitelist(_stablecoinAdapter);
         }
 
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _amount, _data); // Withdraws Fathom Stablecoin to the user's wallet as a token
@@ -308,7 +308,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         moveStablecoin(_manager, _positionId, address(this), toRad(_stablecoinAmount));
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_bookKeeper).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
-            IBookKeeper(_bookKeeper).whitelist(_stablecoinAdapter);
+            IBookKeeper(_bookKeeper).addToWhitelist(_stablecoinAdapter);
         }
         // Withdraws Fathom Stablecoin to the user's wallet as a token
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data);
@@ -345,7 +345,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         moveStablecoin(address(_manager), _positionId, address(this), toRad(_stablecoinAmount));
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_manager.bookKeeper()).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
-            IBookKeeper(_manager.bookKeeper()).whitelist(_stablecoinAdapter);
+            IBookKeeper(_manager.bookKeeper()).addToWhitelist(_stablecoinAdapter);
         }
         // Withdraws FXD to the user's wallet as a token
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data);

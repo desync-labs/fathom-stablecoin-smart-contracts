@@ -132,13 +132,13 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
     }
 
-    function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
+    function addToWhitelist(address toBeWhitelisted) external onlyOwnerOrGov {
         require(toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
         whiteListed[toBeWhitelisted] = true;
     }
 
-    function blacklist(address toBeRemoved) external onlyOwnerOrGov {
-        require(toBeRemoved != address(0), "CollateralTokenAdapter/blacklist-invalidAdds");
+    function removeFromWhitelist(address toBeRemoved) external onlyOwnerOrGov {
+        require(toBeRemoved != address(0), "CollateralTokenAdapter/toBeRemoved-invalidAdds");
         whiteListed[toBeRemoved] = false;
     }
 

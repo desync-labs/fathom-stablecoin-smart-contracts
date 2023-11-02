@@ -25,7 +25,7 @@ const loadFixtureHandler = async () => {
 
     await mockedShowStopper.mock.live.returns(1);
     await mockedBookKeeper.mock.totalStablecoinIssued.returns(0);
-    await mockedBookKeeper.mock.whitelist.returns();
+    await mockedBookKeeper.mock.addToWhitelist.returns();
     await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address);
     await mockedPriceOracle.mock.setPrice.returns()
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
@@ -233,7 +233,7 @@ describe("PositionManager", () => {
                 expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(0)
             })
         })
-        
+
     })
 
     describe("#list()", () => {
@@ -431,7 +431,7 @@ describe("PositionManager", () => {
         context("when _destination argument is a zero address, five args", () => {
             it("should revert with 'PositionManager/dst-address(0)' message", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
-        
+
                 await expect(
                     positionManagerAsAlice["moveCollateral(bytes32,uint256,address,uint256,bytes)"](
                         formatBytes32String("WXDC"),
@@ -443,7 +443,7 @@ describe("PositionManager", () => {
                 ).to.be.revertedWith("PositionManager/dst-address(0)")
             })
         })
-        
+
     })
 
     // This function has the purpose to take away collateral from the system that doesn't correspond to the position but was sent there wrongly.
@@ -506,7 +506,7 @@ describe("PositionManager", () => {
                     "0x"
                 )
 
-                
+
             })
         })
     })
@@ -623,7 +623,7 @@ describe("PositionManager", () => {
                     )
                 ).to.be.revertedWith("migration not allowed")
             })
-        })        
+        })
     })
 
     describe("#importPosition()", () => {
