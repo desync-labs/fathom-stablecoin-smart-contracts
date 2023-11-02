@@ -138,7 +138,7 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     }
 
     function removeFromWhitelist(address toBeRemoved) external onlyOwnerOrGov {
-        require(toBeRemoved != address(0), "CollateralTokenAdapter/toBeRemoved-invalidAdds");
+        require(toBeRemoved != address(0), "CollateralTokenAdapter/removeFromWL-invalidAdds");
         whiteListed[toBeRemoved] = false;
     }
 
