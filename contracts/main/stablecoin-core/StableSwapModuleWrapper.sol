@@ -37,8 +37,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
     event LogDepositTokens(address indexed _depositor, uint256 _amount);
     event LogWithdrawTokens(address indexed _depositor, uint256 _amount);
-    event LogAddToWhitelist(address indexed user);
-    event LogRemoveFromWhitelist(address indexed user);
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
     event LogStableSwapWrapperPauseState(bool _pauseState);
     event LogUpdateIsDecentralizedState(bool _isDecentralizedState);
 
@@ -233,8 +233,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         return (stablecoinAmountToWithdraw, tokenAmountToWithdraw);
     }
 
-    function getActualLiquidityAvailablePerUser(address account) external view override returns (uint256, uint256) {
-        uint256 _amount = depositTracker[account];
+    function getActualLiquidityAvailablePerUser(address _account) external view override returns (uint256, uint256) {
+        uint256 _amount = depositTracker[_account];
         uint256 stablecoinBalanceStableSwap18Decimals = IStableSwapModule(stableSwapModule).tokenBalance(stablecoin);
         uint256 tokenBalanceStableSwapScaled = IStableSwapModule(stableSwapModule).tokenBalance(token);
         uint256 tokenBalanceStableSwap18Decimals = _convertDecimals(tokenBalanceStableSwapScaled, IToken(token).decimals(), 18);
@@ -250,15 +250,15 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         return (stablecoinAmountToWithdraw, tokenAmountToWithdraw);
     }
 
-    function getClaimableFeesPerUser(address account) external view override returns (uint256, uint256) {
+    function getClaimableFeesPerUser(address _account) external view override returns (uint256, uint256) {
         uint256 totalStablecoinLiquidity = _totalStablecoinBalanceStableswap();
         uint256 totalTokenLiquidity = _totalTokenBalanceStableswap();
 
-        uint256 stablecoinProviderLiquidity = (depositTracker[account] * WAD) / (2 * WAD);
-        uint256 tokenProviderLiquidity = _convertDecimals((depositTracker[account] * WAD) / (2 * WAD), 18, IToken(token).decimals());
+        uint256 stablecoinProviderLiquidity = (depositTracker[_account] * WAD) / (2 * WAD);
+        uint256 tokenProviderLiquidity = _convertDecimals((depositTracker[_account] * WAD) / (2 * WAD), 18, IToken(token).decimals());
 
-        uint256 unclaimedStablecoinFees = _totalFXDFeeBalance() - checkpointFXDFee[account];
-        uint256 unclaimedTokenFees = _totalTokenFeeBalance() - checkpointTokenFee[account];
+        uint256 unclaimedStablecoinFees = _totalFXDFeeBalance() - checkpointFXDFee[_account];
+        uint256 unclaimedTokenFees = _totalTokenFeeBalance() - checkpointTokenFee[_account];
 
         uint256 newFeeRewardsForStablecoin;
         uint256 newFeesRewardsForToken;

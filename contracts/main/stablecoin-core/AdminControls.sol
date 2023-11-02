@@ -20,13 +20,13 @@ contract AdminControls is Initializable {
     event LogPauseProtocol();
     event LogUnpauseProtocol();
 
-    event LogSetBookKeeper(address indexed newAddress);
-    event LogSetPositionManager(address indexed newAddress);
-    event LogSetLiquidationEngine(address indexed newAddress);
-    event LogSetSystemDebtEngine(address indexed newAddress);
-    event LogSetFlashMintModule(address indexed newAddress);
-    event LogSetPriceOracle(address indexed newAddress);
-    event LogSetStablecoinAdapter(address indexed newAddress);
+    event LogSetBookKeeper(address indexed _newAddress);
+    event LogSetPositionManager(address indexed _newAddress);
+    event LogSetLiquidationEngine(address indexed _newAddress);
+    event LogSetSystemDebtEngine(address indexed _newAddress);
+    event LogSetFlashMintModule(address indexed _newAddress);
+    event LogSetPriceOracle(address indexed _newAddress);
+    event LogSetStablecoinAdapter(address indexed _newAddress);
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());

@@ -15,10 +15,10 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
     IBookKeeper public bookKeeper;
     bool public isDecentralizedMode;
 
-    event LogAddToWhitelist(address indexed user);
-    event LogRemoveFromWhitelist(address indexed user);
-    event LogSetDecentralizedMode(bool newValue);
-    event LogProxyWalletCreation(address owner, address proxyWallet);
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
+    event LogSetDecentralizedMode(bool _newValue);
+    event LogProxyWalletCreation(address _owner, address _proxyWallet);
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -56,9 +56,9 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
         emit LogRemoveFromWhitelist(_usr);
     }
 
-    function setDecentralizedMode(bool isOn) external onlyOwner {
-        isDecentralizedMode = isOn;
-        emit LogSetDecentralizedMode(isOn);
+    function setDecentralizedMode(bool _isOn) external onlyOwner {
+        isDecentralizedMode = _isOn;
+        emit LogSetDecentralizedMode(_isOn);
     }
 
     // --- pause ---

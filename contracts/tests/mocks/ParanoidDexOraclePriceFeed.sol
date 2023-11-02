@@ -85,15 +85,15 @@ contract ParanoidDexOraclePriceFeed is PausableUpgradeable, IPriceFeed {
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
     }
 
-    function addVerificationFeed(address priceFeed) external onlyOwner {
-        require(IPriceFeed(priceFeed).isPriceOk(), "ParanoidOraclePriceFeed/feed-is-not-healthy");
-        verificationFeeds.push(priceFeed);
+    function addVerificationFeed(address _priceFeed) external onlyOwner {
+        require(IPriceFeed(_priceFeed).isPriceOk(), "ParanoidOraclePriceFeed/feed-is-not-healthy");
+        verificationFeeds.push(_priceFeed);
     }
 
-    function removeVerificationFeed(uint index) external onlyOwner {
+    function removeVerificationFeed(uint _index) external onlyOwner {
         require(verificationFeeds.length > 1, "ParanoidOraclePriceFeed/cant-remove-last-verification-feed");
-        require(index < verificationFeeds.length, "ParanoidOraclePriceFeed/wrong-index");
-        verificationFeeds[index] = verificationFeeds[verificationFeeds.length - 1];
+        require(_index < verificationFeeds.length, "ParanoidOraclePriceFeed/wrong-index");
+        verificationFeeds[_index] = verificationFeeds[verificationFeeds.length - 1];
         verificationFeeds.pop();
     }
 
@@ -189,12 +189,12 @@ contract ParanoidDexOraclePriceFeed is PausableUpgradeable, IPriceFeed {
         }
     }
 
-    function _arePricesSimilar(uint256 price0, uint256 price1) internal view returns (bool) {
-        if (price0 == price1) {
+    function _arePricesSimilar(uint256 _price0, uint256 _price1) internal view returns (bool) {
+        if (_price0 == _price1) {
             return true;
         }
-        uint256 tolerance = (price0 * tolleranceBps) / 10000;
-        uint256 diff = price0 > price1 ? price0 - price1 : price1 - price0;
+        uint256 tolerance = (_price0 * tolleranceBps) / 10000;
+        uint256 diff = _price0 > _price1 ? _price0 - _price1 : _price1 - _price0;
         return diff <= tolerance;
     }
 

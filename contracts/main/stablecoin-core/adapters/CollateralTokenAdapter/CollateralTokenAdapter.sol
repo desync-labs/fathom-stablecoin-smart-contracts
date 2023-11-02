@@ -41,7 +41,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
 
     event LogDeposit(uint256 _val);
     event LogWithdraw(uint256 _val);
-    event LogWhitelisted(address indexed user, bool isWhitelisted);
+    event LogWhitelisted(address indexed _user, bool _isWhitelisted);
     event LogEmergencyWithdraw(address indexed _caller, address _to);
 
     modifier onlyOwner() {
@@ -85,20 +85,20 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
 
     /// @notice Adds an address to the whitelist, allowing it to interact with the contract
     /// @dev Only the contract owner or a governance address can execute this function. The provided address cannot be the zero address.
-    /// @param toBeWhitelisted The address to be added to the whitelist
-    function addToWhitelist(address toBeWhitelisted) external onlyOwnerOrGov {
-        require(toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
-        whiteListed[toBeWhitelisted] = true;
-        emit LogWhitelisted(toBeWhitelisted, true);
+    /// @param _toBeWhitelisted The address to be added to the whitelist
+    function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
+        require(_toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
+        whiteListed[_toBeWhitelisted] = true;
+        emit LogWhitelisted(_toBeWhitelisted, true);
     }
 
     /// @notice Removes an address from the whitelist
     /// @dev Only the contract owner or a governance address can execute this function.
-    /// @param toBeRemoved The address to be removed from the whitelist
-    function removeFromWhitelist(address toBeRemoved) external onlyOwnerOrGov {
-        require(toBeRemoved != address(0), "CollateralTokenAdapter/removeFromWL-invalidAdds");
-        whiteListed[toBeRemoved] = false;
-        emit LogWhitelisted(toBeRemoved, false);
+    /// @param _toBeRemoved The address to be removed from the whitelist
+    function removeFromWhitelist(address _toBeRemoved) external onlyOwnerOrGov {
+        require(_toBeRemoved != address(0), "CollateralTokenAdapter/removeFromWL-invalidAdds");
+        whiteListed[_toBeRemoved] = false;
+        emit LogWhitelisted(_toBeRemoved, false);
     }
 
     /// @dev The `cage` function permanently halts the `collateralTokenAdapter` contract.

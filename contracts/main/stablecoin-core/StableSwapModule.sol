@@ -70,8 +70,8 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     event LogRemainingDailySwapAmount(uint256 _remainingDailySwapAmount);
     event LogEmergencyWithdraw(address indexed _account);
     event LogDecentralizedStateStatus(bool _oldDecentralizedStateStatus, bool _newDecentralizedStateStatus);
-    event LogAddToWhitelist(address indexed user);
-    event LogRemoveFromWhitelist(address indexed user);
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
     event LogNumberOfSwapsLimitPerUserUpdate(uint256 _newNumberOfSwapsLimitPerUser, uint256 _oldNumberOfSwapsLimitPerUser);
     event LogBlocksPerLimitUpdate(uint256 _newBlocksPerLimit, uint256 _oldBlocksPerLimit);
     event LogWithdrawToken(address _account, address _token, uint256 _amount);
@@ -152,42 +152,42 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
         totalValueDeposited = newTotalValueDeposited - (totalFXDFeeBalance + _convertDecimals(totalTokenFeeBalance, IToken(token).decimals(), 18));
     }
 
-    function setStableSwapWrapper(address newStableSwapWrapper) external onlyOwner {
-        require(AddressUpgradeable.isContract(newStableSwapWrapper), "StableSwapModule/not-contract");
-        stableswapWrapper = newStableSwapWrapper;
+    function setStableSwapWrapper(address _newStableSwapWrapper) external onlyOwner {
+        require(AddressUpgradeable.isContract(_newStableSwapWrapper), "StableSwapModule/not-contract");
+        stableswapWrapper = _newStableSwapWrapper;
     }
 
-    function setDailySwapLimitNumerator(uint256 newdailySwapLimitNumerator) external onlyOwner {
-        require(newdailySwapLimitNumerator <= DAILY_SWAP_LIMIT_DENOMINATOR, "StableSwapModule/numerator-over-denominator");
-        require(newdailySwapLimitNumerator >= MINIMUM_DAILY_SWAP_LIMIT_NUMERATOR, "StableSwapModule/less-than-minimum-daily-swap-limit");
-        emit LogDailySwapLimitUpdate(newdailySwapLimitNumerator, dailySwapLimitNumerator);
-        dailySwapLimitNumerator = newdailySwapLimitNumerator;
+    function setDailySwapLimitNumerator(uint256 _newdailySwapLimitNumerator) external onlyOwner {
+        require(_newdailySwapLimitNumerator <= DAILY_SWAP_LIMIT_DENOMINATOR, "StableSwapModule/numerator-over-denominator");
+        require(_newdailySwapLimitNumerator >= MINIMUM_DAILY_SWAP_LIMIT_NUMERATOR, "StableSwapModule/less-than-minimum-daily-swap-limit");
+        emit LogDailySwapLimitUpdate(_newdailySwapLimitNumerator, dailySwapLimitNumerator);
+        dailySwapLimitNumerator = _newdailySwapLimitNumerator;
         if (isDecentralizedState) {
             lastUpdate = block.timestamp;
             remainingDailySwapAmount = _dailySwapLimit();
         }
     }
 
-    function setSingleSwapLimitNumerator(uint256 newSingleSwapLimitNumerator) external onlyOwner {
-        require(newSingleSwapLimitNumerator <= SINGLE_SWAP_LIMIT_DENOMINATOR, "StableSwapModule/numerator-over-denominator");
-        require(newSingleSwapLimitNumerator >= MINIMUM_SINGLE_SWAP_LIMIT_NUMERATOR, "StableSwapModule/less-than-minimum-single-swap-limit");
-        emit LogSingleSwapLimitUpdate(newSingleSwapLimitNumerator, singleSwapLimitNumerator);
-        singleSwapLimitNumerator = newSingleSwapLimitNumerator;
+    function setSingleSwapLimitNumerator(uint256 _newSingleSwapLimitNumerator) external onlyOwner {
+        require(_newSingleSwapLimitNumerator <= SINGLE_SWAP_LIMIT_DENOMINATOR, "StableSwapModule/numerator-over-denominator");
+        require(_newSingleSwapLimitNumerator >= MINIMUM_SINGLE_SWAP_LIMIT_NUMERATOR, "StableSwapModule/less-than-minimum-single-swap-limit");
+        emit LogSingleSwapLimitUpdate(_newSingleSwapLimitNumerator, singleSwapLimitNumerator);
+        singleSwapLimitNumerator = _newSingleSwapLimitNumerator;
     }
 
-    function setNumberOfSwapsLimitPerUser(uint256 newNumberOfSwapsLimitPerUser) external onlyOwner {
+    function setNumberOfSwapsLimitPerUser(uint256 _newNumberOfSwapsLimitPerUser) external onlyOwner {
         require(
-            newNumberOfSwapsLimitPerUser >= MINIMUM_NUMBER_OF_SWAPS_LIMIT_PER_USER,
+            _newNumberOfSwapsLimitPerUser >= MINIMUM_NUMBER_OF_SWAPS_LIMIT_PER_USER,
             "StableSwapModule/less-than-minimum-number-of-swaps-limit-per-user"
         );
-        emit LogNumberOfSwapsLimitPerUserUpdate(newNumberOfSwapsLimitPerUser, numberOfSwapsLimitPerUser);
-        numberOfSwapsLimitPerUser = newNumberOfSwapsLimitPerUser;
+        emit LogNumberOfSwapsLimitPerUserUpdate(_newNumberOfSwapsLimitPerUser, numberOfSwapsLimitPerUser);
+        numberOfSwapsLimitPerUser = _newNumberOfSwapsLimitPerUser;
     }
 
-    function setBlocksPerLimit(uint256 newBlocksPerLimit) external onlyOwner {
-        require(newBlocksPerLimit >= MINIMUM_BLOCKS_PER_LIMIT, "StableSwapModule/less-than-minimum-blocks-per-limit");
-        emit LogBlocksPerLimitUpdate(newBlocksPerLimit, blocksPerLimit);
-        blocksPerLimit = newBlocksPerLimit;
+    function setBlocksPerLimit(uint256 _newBlocksPerLimit) external onlyOwner {
+        require(_newBlocksPerLimit >= MINIMUM_BLOCKS_PER_LIMIT, "StableSwapModule/less-than-minimum-blocks-per-limit");
+        emit LogBlocksPerLimitUpdate(_newBlocksPerLimit, blocksPerLimit);
+        blocksPerLimit = _newBlocksPerLimit;
     }
 
     function setFeeIn(uint256 _feeIn) external onlyOwner {

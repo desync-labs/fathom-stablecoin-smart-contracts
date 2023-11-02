@@ -44,7 +44,7 @@ contract PluginPriceOracle is Initializable, IFathomCentralizedOracle {
     }
 
     /// price from plugin oracle returns multiplied y 10000 and we want it in wad
-    function _toWad(uint256 amount) private pure returns (uint256) {
-        return amount * DECIMALS_CONVERSION_NUM;
+    function _toWad(uint256 _amount) private pure returns (uint256) {
+        return _amount * DECIMALS_CONVERSION_NUM;
     }
 }

@@ -14,7 +14,7 @@ interface IPluginInvokeOracle {
 
     function latestRound() external view returns (uint256);
 
-    function getAnswer(uint256 roundId) external view returns (int256);
+    function getAnswer(uint256 _roundId) external view returns (int256);
 
-    function getTimestamp(uint256 roundId) external view returns (uint256);
+    function getTimestamp(uint256 _roundId) external view returns (uint256);
 }

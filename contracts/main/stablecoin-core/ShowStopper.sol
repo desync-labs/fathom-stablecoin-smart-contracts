@@ -40,20 +40,20 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
     mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
 
     event LogCage(uint256 _cageCoolDown);
-    event LogCageCollateralPool(bytes32 indexed collateralPoolId);
+    event LogCageCollateralPool(bytes32 indexed _collateralPoolId);
 
-    event LogAccumulateBadDebt(bytes32 indexed collateralPoolId, address indexed positionAddress, uint256 amount, uint256 debtShare);
-    event LogRedeemLockedCollateral(bytes32 indexed collateralPoolId, address indexed positionAddress, uint256 lockedCollateral);
+    event LogAccumulateBadDebt(bytes32 indexed _collateralPoolId, address indexed _positionAddress, uint256 _amount, uint256 _debtShare);
+    event LogRedeemLockedCollateral(bytes32 indexed _collateralPoolId, address indexed _positionAddress, uint256 _lockedCollateral);
     event LogFinalizeDebt();
-    event LogFinalizeCashPrice(bytes32 indexed collateralPoolId);
-    event LogAccumulateStablecoin(address indexed ownerAddress, uint256 amount);
-    event LogRedeemStablecoin(bytes32 indexed collateralPoolId, address indexed ownerAddress, uint256 amount);
+    event LogFinalizeCashPrice(bytes32 indexed _collateralPoolId);
+    event LogAccumulateStablecoin(address indexed _ownerAddress, uint256 _amount);
+    event LogRedeemStablecoin(bytes32 indexed _collateralPoolId, address indexed _ownerAddress, uint256 _amount);
 
-    event LogSetBookKeeper(address indexed caller, address _bookKeeper);
-    event LogSetLiquidationEngine(address indexed caller, address _liquidationEngine);
-    event LogSetSystemDebtEngine(address indexed caller, address _systemDebtEngine);
-    event LogSetPriceOracle(address indexed caller, address _priceOracle);
-    event LogSetCageCoolDown(address indexed caller, uint256 _cageCoolDown);
+    event LogSetBookKeeper(address indexed _caller, address _bookKeeper);
+    event LogSetLiquidationEngine(address indexed _caller, address _liquidationEngine);
+    event LogSetSystemDebtEngine(address indexed _caller, address _systemDebtEngine);
+    event LogSetPriceOracle(address indexed _caller, address _priceOracle);
+    event LogSetCageCoolDown(address indexed _caller, uint256 _cageCoolDown);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());

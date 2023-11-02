@@ -51,15 +51,15 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
         _;
     }
 
-    function initialize(address _bookKeeper, bytes32 collateralPoolId_, address collateralToken_) external initializer {
+    function initialize(address _bookKeeper, bytes32 _collateralPoolId, address _collateralToken) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
         live = 1;
         bookKeeper = IBookKeeper(_bookKeeper);
-        collateralPoolId = collateralPoolId_;
-        collateralToken = collateralToken_;
-        decimals = IToken(collateralToken).decimals();
+        collateralPoolId = _collateralPoolId;
+        collateralToken = _collateralToken;
+        decimals = IToken(_collateralToken).decimals();
         require(decimals == 18, "TokenAdapter/bad-token-decimals");
     }
 
@@ -72,21 +72,21 @@ contract TokenAdapter is PausableUpgradeable, ReentrancyGuardUpgradeable, IGener
         }
     }
 
-    function deposit(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
-        require(usr != address(0), "TokenAdapter/deposit-address(0)");
+    function deposit(address _usr, uint256 _wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
+        require(_usr != address(0), "TokenAdapter/deposit-address(0)");
         require(live == 1, "TokenAdapter/not-live");
-        require(int256(wad) > 0, "TokenAdapter/overflow");
-        bookKeeper.addCollateral(collateralPoolId, usr, int256(wad));
+        require(int256(_wad) > 0, "TokenAdapter/overflow");
+        bookKeeper.addCollateral(collateralPoolId, _usr, int256(_wad));
 
         // Move the actual token
-        address(collateralToken).safeTransferFrom(msg.sender, address(this), wad);
+        address(collateralToken).safeTransferFrom(msg.sender, address(this), _wad);
     }
 
-    function withdraw(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
-        require(int256(wad) > 0, "TokenAdapter/overflow");
-        bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(wad));
+    function withdraw(address _usr, uint256 _wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
+        require(int256(_wad) > 0, "TokenAdapter/overflow");
+        bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_wad));
 
-        address(collateralToken).safeTransfer(usr, wad);
+        address(collateralToken).safeTransfer(_usr, _wad);
     }
 
     function emergencyWithdraw(address _to) external nonReentrant {

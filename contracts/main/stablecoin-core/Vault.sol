@@ -18,8 +18,8 @@ contract Vault is IVault {
     address public immutable collateralToken;
     address public immutable collateralAdapter;
 
-    event Deposit(uint256 amount);
-    event Withdraw(uint256 amount);
+    event Deposit(uint256 _amount);
+    event Withdraw(uint256 _amount);
 
     modifier onlyAdapter() {
         require(msg.sender == collateralAdapter, "Vault/caller-not-adapter");

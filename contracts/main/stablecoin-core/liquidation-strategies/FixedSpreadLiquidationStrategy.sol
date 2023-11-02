@@ -71,7 +71,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         uint256 _collateralAmountToBeLiquidated,
         uint256 _treasuryFees
     );
-    event LogSetFlashLendingEnabled(address indexed caller, uint256 _flashLendingEnabled);
+    event LogSetFlashLendingEnabled(address indexed _caller, uint256 _flashLendingEnabled);
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -272,8 +272,8 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         liquidationEngine = ILiquidationEngine(_liquidationEngine);
     }
 
-    function getFeedPrice(bytes32 collateralPoolId) internal returns (uint256 feedPrice) {
-        address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(collateralPoolId);
+    function getFeedPrice(bytes32 _collateralPoolId) internal returns (uint256 feedPrice) {
+        address _priceFeedAddress = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId);
         IPriceFeed _priceFeed = IPriceFeed(_priceFeedAddress);
         (uint256 price, bool priceOk) = _priceFeed.peekPrice();
         require(priceOk, "FixedSpreadLiquidationStrategy/invalid-price");

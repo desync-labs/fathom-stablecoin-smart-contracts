@@ -103,21 +103,21 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
 
     /**
      * @notice Add a new liquidator to the whitelist
-     * @param toBeWhitelisted The address to be whitelisted
+     * @param _toBeWhitelisted The address to be whitelisted
      * @dev Can only be called by the contract owner or the governance system
      */
-    function addToWhitelist(address toBeWhitelisted) external onlyOwnerOrGov {
-        require(toBeWhitelisted != address(0), "LiquidationEngine/whitelist-invalidAddress");
-        liquidatorsWhitelist[toBeWhitelisted] = true;
+    function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
+        require(_toBeWhitelisted != address(0), "LiquidationEngine/whitelist-invalidAddress");
+        liquidatorsWhitelist[_toBeWhitelisted] = true;
     }
 
     /**
      * @notice Remove a liquidator from the whitelist
-     * @param toBeRemoved The address to be removed from the whitelist
+     * @param _toBeRemoved The address to be removed from the whitelist
      * @dev Can only be called by the contract owner or the governance system
      */
-    function removeFromWhitelist(address toBeRemoved) external onlyOwnerOrGov {
-        liquidatorsWhitelist[toBeRemoved] = false;
+    function removeFromWhitelist(address _toBeRemoved) external onlyOwnerOrGov {
+        liquidatorsWhitelist[_toBeRemoved] = false;
     }
 
     /**
@@ -127,7 +127,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
      * @param _debtShareToBeLiquidateds The amount of debt to be liquidated for each position
      * @param _maxDebtShareToBeLiquidateds The maximum amount of debt that can be liquidated for each position
      * @param _collateralRecipients The addresses to receive the liquidated collateral
-     * @param datas Extra data to be passed to each liquidation call
+     * @param _datas Extra data to be passed to each liquidation call
      * @dev Can only be called by a whitelisted liquidator
      */
     function batchLiquidate(
@@ -136,14 +136,14 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         uint256[] calldata _debtShareToBeLiquidateds, // [wad]
         uint256[] calldata _maxDebtShareToBeLiquidateds, // [rad]
         address[] calldata _collateralRecipients,
-        bytes[] calldata datas
+        bytes[] calldata _datas
     ) external override nonReentrant onlyWhitelisted {
         require(
             _collateralPoolIds.length == _positionAddresses.length &&
                 _collateralPoolIds.length == _debtShareToBeLiquidateds.length &&
                 _collateralPoolIds.length == _maxDebtShareToBeLiquidateds.length &&
                 _collateralPoolIds.length == _collateralRecipients.length &&
-                _collateralPoolIds.length == datas.length,
+                _collateralPoolIds.length == _datas.length,
             "LiquidationEngine/batchLiquidate-invalid-arguments"
         );
 
@@ -155,7 +155,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
                     _debtShareToBeLiquidateds[i],
                     _maxDebtShareToBeLiquidateds[i],
                     _collateralRecipients[i],
-                    datas[i],
+                    _datas[i],
                     msg.sender
                 )
             {} catch Error(string memory reason) {
@@ -180,10 +180,10 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         uint256 _maxDebtShareToBeLiquidated, // [wad]
         address _collateralRecipient,
         bytes calldata _data,
-        address sender
+        address _sender
     ) external override whenNotPaused {
         require(msg.sender == address(this), "LiquidationEngine/invalid-sender");
-        _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated, _maxDebtShareToBeLiquidated, _collateralRecipient, _data, sender);
+        _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated, _maxDebtShareToBeLiquidated, _collateralRecipient, _data, _sender);
     }
 
     /**
@@ -249,7 +249,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         uint256 _maxDebtShareToBeLiquidated, // [wad]
         address _collateralRecipient,
         bytes calldata _data,
-        address sender
+        address _sender
     ) internal isLive {
         require(_debtShareToBeLiquidated != 0, "LiquidationEngine/zero-debt-value-to-be-liquidated");
         require(_maxDebtShareToBeLiquidated != 0, "LiquidationEngine/zero-max-debt-value-to-be-liquidated");
@@ -289,7 +289,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
             _positionAddress,
             _debtShareToBeLiquidated,
             _maxDebtShareToBeLiquidated,
-            sender,
+            _sender,
             _collateralRecipient,
             _data
         );
