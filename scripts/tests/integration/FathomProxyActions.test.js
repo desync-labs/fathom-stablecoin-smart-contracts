@@ -146,9 +146,9 @@ describe("Position Closure without collateral withdrawal", () => {
 
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
-                
+
                 // call allowmanagerPosition so that reentrancyAttacker can close position
-                await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, reEntrantProxyWallet, 1)
+                await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, reEntrantProxyWallet, true)
                 //transfer some FXD to reentrancyAttacker contract
                 await fathomStablecoin.transfer(reentrancyAttacker.address, WeiPerWad.mul(5), { from: AliceAddress });
                 //reentrancyAttack approve reEntrantProxyWallet as spender of FXD
@@ -156,13 +156,13 @@ describe("Position Closure without collateral withdrawal", () => {
                 //reentrancyAttacker tries to call wipeAndUnlockXDC and then all proxyWallet again with fallback function
                 //but due to gas limit set in safeTransferETH, the fn call fails.
 
-                    PositionHelper.wipeAndUnlockXDC(
-                        reentrancyAttacker,
-                        AliceAddress,
-                        positionId,
-                        WeiPerWad.mul(1),
-                        WeiPerWad.mul(2)
-                    )
+                PositionHelper.wipeAndUnlockXDC(
+                    reentrancyAttacker,
+                    AliceAddress,
+                    positionId,
+                    WeiPerWad.mul(1),
+                    WeiPerWad.mul(2)
+                )
 
                 const [lockedCollateral, debtShare] = await bookKeeper.positions(
                     pools.XDC,
@@ -176,7 +176,7 @@ describe("Position Closure without collateral withdrawal", () => {
                 )
 
 
-                
+
             })
         })
         context("try reentry with ReentrancyAttacker2", () => {
@@ -191,9 +191,9 @@ describe("Position Closure without collateral withdrawal", () => {
 
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
-                
+
                 // call allowmanagerPosition so that reentrancyAttacker can close position
-                await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, reEntrantProxyWallet2, 1)
+                await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, reEntrantProxyWallet2, true)
                 //transfer some FXD to reentrancyAttacker contract
                 await fathomStablecoin.transfer(reentrancyAttacker2.address, WeiPerWad.mul(5), { from: AliceAddress });
                 //reentrancyAttack approve reEntrantProxyWallet as spender of FXD

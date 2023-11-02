@@ -43,7 +43,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     IBookKeeper public bookKeeper; // CDP Engine
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
     uint256 public override live; // Active Flag
-    mapping(address => uint256) public liquidatorsWhitelist;
+    mapping(address => bool) public liquidatorsWhitelist;
 
     event LiquidationFail(bytes32 _collateralPoolIds, address _positionAddresses, address _liquidator, string reason);
 
@@ -74,7 +74,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     }
 
     modifier onlyWhitelisted() {
-        require(liquidatorsWhitelist[msg.sender] == 1, "LiquidationEngine/liquidator-not-whitelisted");
+        require(liquidatorsWhitelist[msg.sender] == true, "LiquidationEngine/liquidator-not-whitelisted");
         _;
     }
 
@@ -108,7 +108,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
      */
     function addToWhitelist(address toBeWhitelisted) external onlyOwnerOrGov {
         require(toBeWhitelisted != address(0), "LiquidationEngine/whitelist-invalidAddress");
-        liquidatorsWhitelist[toBeWhitelisted] = 1;
+        liquidatorsWhitelist[toBeWhitelisted] = true;
     }
 
     /**
@@ -117,7 +117,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
      * @dev Can only be called by the contract owner or the governance system
      */
     function removeFromWhitelist(address toBeRemoved) external onlyOwnerOrGov {
-        liquidatorsWhitelist[toBeRemoved] = 0;
+        liquidatorsWhitelist[toBeRemoved] = false;
     }
 
     /**

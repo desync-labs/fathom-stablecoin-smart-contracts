@@ -39,13 +39,13 @@ contract PositionManager is PausableUpgradeable, IManager {
     mapping(address => uint256) public ownerPositionCount;
 
     /// @dev Mapping of owner => whitelisted address that can manage owner's position
-    mapping(address => mapping(uint256 => mapping(address => uint256))) public override ownerWhitelist;
+    mapping(address => mapping(uint256 => mapping(address => bool))) public override ownerWhitelist;
     /// @dev Mapping of owner => whitelisted address that can migrate position
-    mapping(address => mapping(address => uint256)) public migrationWhitelist;
+    mapping(address => mapping(address => bool)) public migrationWhitelist;
 
     event LogNewPosition(address indexed _usr, address indexed _own, uint256 indexed _positionId);
-    event LogAllowManagePosition(address indexed _caller, uint256 indexed _positionId, address _owner, address _user, uint256 _ok);
-    event LogAllowMigratePosition(address indexed _caller, address _user, uint256 _ok);
+    event LogAllowManagePosition(address indexed _caller, uint256 indexed _positionId, address _owner, address _user, bool _ok);
+    event LogAllowMigratePosition(address indexed _caller, address _user, bool _ok);
     event LogExportPosition(uint256 indexed _positionId, address _source, address _destination, uint256 _lockedCollateral, uint256 _debtShare);
     event LogImportPosition(uint256 indexed _positionId, address _source, address _destination, uint256 _lockedCollateral, uint256 _debtShare);
     event LogMovePosition(uint256 _sourceId, uint256 _destinationId, uint256 _lockedCollateral, uint256 _debtShare);
@@ -54,7 +54,7 @@ contract PositionManager is PausableUpgradeable, IManager {
 
     /// @dev Require that the caller must be position's owner or owner whitelist
     modifier onlyOwnerAllowed(uint256 _positionId) {
-        require(msg.sender == owners[_positionId] || ownerWhitelist[owners[_positionId]][_positionId][msg.sender] == 1, "owner not allowed");
+        require(msg.sender == owners[_positionId] || ownerWhitelist[owners[_positionId]][_positionId][msg.sender] == true, "owner not allowed");
         _;
     }
     /// @dev auditor's sugesttion
@@ -65,7 +65,7 @@ contract PositionManager is PausableUpgradeable, IManager {
 
     /// @dev Require that the caller must be allowed to migrate position to the migrant address
     modifier onlyMigrationAllowed(address _migrantAddress) {
-        require(msg.sender == _migrantAddress || migrationWhitelist[_migrantAddress][msg.sender] == 1, "migration not allowed");
+        require(msg.sender == _migrantAddress || migrationWhitelist[_migrantAddress][msg.sender] == true, "migration not allowed");
         _;
     }
 
@@ -96,9 +96,8 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @param _positionId The position id
     /// @param _user The address to be allowed for managing the position
     /// @param _ok Ok flag to allow/disallow. 1 for allow and 0 for disallow.
-    function allowManagePosition(uint256 _positionId, address _user, uint256 _ok) external override whenNotPaused onlyPositionOwner(_positionId) {
+    function allowManagePosition(uint256 _positionId, address _user, bool _ok) external override whenNotPaused onlyPositionOwner(_positionId) {
         require(_user != address(0), "PositionManager/user-address(0)");
-        require(_ok < 2, "PositionManager/invalid-ok");
         ownerWhitelist[owners[_positionId]][_positionId][_user] = _ok;
         emit LogAllowManagePosition(msg.sender, _positionId, owners[_positionId], _user, _ok);
     }
@@ -106,9 +105,8 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @dev Allow/disallow a user to importPosition/exportPosition from/to msg.sender
     /// @param _user The address of user that will be allowed to do such an action to msg.sender
     /// @param _ok Ok flag to allow/disallow
-    function allowMigratePosition(address _user, uint256 _ok) external override whenNotPaused {
+    function allowMigratePosition(address _user, bool _ok) external override whenNotPaused {
         require(_user != address(0), "PositionManager/user-address(0)");
-        require(_ok < 2, "PositionManager/invalid-ok");
         migrationWhitelist[msg.sender][_user] = _ok;
         emit LogAllowMigratePosition(msg.sender, _user, _ok);
     }
