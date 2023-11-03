@@ -20,3 +20,5 @@ artifacts
 
 *.zip
 addresses_GLD.json
+add-collateral.json
+externalAddresses.json
