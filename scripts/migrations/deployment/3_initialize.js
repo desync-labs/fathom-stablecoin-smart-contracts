@@ -35,6 +35,11 @@ module.exports = async function (deployer) {
     const pluginPriceOracle = await getProxy(proxyFactory, "PluginPriceOracle");
     const centralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed");
     const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
+    const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
+    const slidingWindowDexOracle = await getProxy(proxyFactory, "SlidingWindowDexOracle");
+
+
+
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const addresses = getAddresses(deployer.networkId())
@@ -105,6 +110,7 @@ module.exports = async function (deployer) {
         stableSwapModule.initialize(
             bookKeeper.address,
             addresses.USDSTABLE,
+            // addresses.USD,
             fathomStablecoin.address,
             dailyLimitNumerator,
             singleSwapLimitNumerator,
@@ -114,20 +120,20 @@ module.exports = async function (deployer) {
         ),
         flashMintArbitrager.initialize({ gasLimit: 1000000 }),
         bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
-        dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
+        // dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
         collateralTokenAdapter.initialize(
             bookKeeper.address,
             pools.XDC,
             addresses.WXDC,
             proxyWalletFactory.address
         ),
-        delayFathomOraclePriceFeed.initialize(
-            dexPriceOracle.address,
-            addresses.WXDC,
-            addresses.USD,
-            accessControlConfig.address,
-            pools.XDC
-        ),
+        // delayFathomOraclePriceFeed.initialize(
+        //     dexPriceOracle.address,
+        //     addresses.WXDC,
+        //     addresses.USD,
+        //     accessControlConfig.address,
+        //     pools.XDC
+        // ),
         adminControls.initialize(
             bookKeeper.address,
             liquidationEngine.address,
@@ -137,11 +143,15 @@ module.exports = async function (deployer) {
             flashMintModule.address,
             stablecoinAdapter.address
         ),
-        pluginPriceOracle.initialize(accessControlConfig.address, addresses.PluginOracle),
-        centralizedOraclePriceFeed.initialize(pluginPriceOracle.address, accessControlConfig.address, pools.XDC),
+        // pluginPriceOracle.initialize(accessControlConfig.address, addresses.PluginOracle),
+        // centralizedOraclePriceFeed.initialize(pluginPriceOracle.address, accessControlConfig.address, pools.XDC),
         stableSwapModuleWrapper.initialize(
-            bookKeeper.address, 
-            stableSwapModule.address)
+            bookKeeper.address,
+            stableSwapModule.address),
+        simplePriceFeed.initialize(
+            accessControlConfig.address,
+        ),
+        // slidingWindowDexOracle.initialize(addresses.DEXFactory, 1800, 15);
     ];
 
     await Promise.all(promises);
@@ -173,7 +183,10 @@ module.exports = async function (deployer) {
         delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address,
         adminControls: adminControls.address,
         pluginPriceOracle: pluginPriceOracle.address,
-        centralizedOraclePriceFeed: centralizedOraclePriceFeed.address
+        centralizedOraclePriceFeed: centralizedOraclePriceFeed.address,
+        proxyActionsStorage: proxyActionsStorage.address,
+        fathomProxyAdmin: proxyAdmin.address,
+        slidingWindowDexOracle: slidingWindowDexOracle.address,
     }
 
     fs.writeFileSync('./addresses.json', JSON.stringify(newAddresses));
