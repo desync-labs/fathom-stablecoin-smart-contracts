@@ -32,7 +32,8 @@ module.exports = async function (deployer) {
         "AdminControls",
         "PluginPriceOracle",
         "CentralizedOraclePriceFeed",
-        "StableSwapModuleWrapper"
+        "StableSwapModuleWrapper",
+        "SimplePriceFeed"
     ]
 
     const promises = contracts.map(contract => {

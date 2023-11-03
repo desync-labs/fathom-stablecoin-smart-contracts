@@ -4,8 +4,6 @@
 .vscode
 .env
 *.DS_Store
-externalAddresses.json
-addresses.json
 yarn.lock
 package-lock.json
 coverage
@@ -16,9 +14,9 @@ privateKey*
 /build
 addresses.json
 
-addresses.json
 #Hardhat files
 cache
 artifacts
 
 *.zip
+addresses_GLD.json

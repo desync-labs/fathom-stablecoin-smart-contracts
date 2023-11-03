@@ -14,4 +14,8 @@ contract ERC20Mintable is Ownable, ERC20 {
     function burn(address _address, uint256 _amount) public virtual {
         _burn(_address, _amount);
     }
+
+    function decimals() public view virtual override returns (uint8) {
+        return 6;
+    }
 }
