@@ -298,9 +298,64 @@ For example, if the price of XDC set by SimplePriceFeed is 1 USD and the Loan-to
 
 ## How to change priceFeed for the protocol
 
-SimplePriceFeed is a reasonable choice for testing and initial deployment, however, it is not suitable for production level. Currently(as of 2023 Nov) there are two source of truth,
+Please call below function to change priceFeed for the protocol.
 
-### DEX price feed
-### Centralized price feed
+```Solidity=
+In CollateralPoolConfig
 
+    function setPriceFeed(bytes32 _poolId, address _priceFeed) external onlyOwner {
+        require(_priceFeed != address(0), "CollateralPoolConfig/zero-price-feed");
+        require(IPriceFeed(_priceFeed).poolId() == _poolId, "CollateralPoolConfig/wrong-price-feed-pool");
+        require(IPriceFeed(_priceFeed).isPriceOk(), "CollateralPoolConfig/unhealthy-price-feed");
 
+        IPriceFeed(_priceFeed).peekPrice();
+
+        _collateralPools[_poolId].priceFeed = _priceFeed;
+        emit LogSetPriceFeed(msg.sender, _poolId, _priceFeed);
+    }
+```
+
+Line 5~6 verifies the solvency of the new priceFeed. New priceFeed must have poolId same as the poolId of the collateral that you are trying to change priceFeed of. And also, the new priceFeed should already have its fresh price existing in it.
+
+### Simple way to initialize other priceFeeds and priceOracles
+
+`DexPriceOracle`, `DelayFathomOraclePriceFeed`, `PluginPriceOracle`, `CentralizedOraclePriceFeed`, and `SlidingWindowDexOracle`
+
+can be initialized with script below
+
+```
+scripts/migrations/priceFeed/1_initialize.js
+````
+#### To run the script with DEX as the price source, ensure that:
+
+0) The build files remain unchanged since deployment.
+1) The DEXFactory is valid and that an XDC/USD pair exists within the DEXFactory.
+
+The default PriceOracle for DelayFathomOraclePriceFeed is set as DexPriceOracle since SlidingWindowDexOracle requires more involvement of PriceBot that will periodically keep feeding prices to SlidingWindowDexOracle. 
+
+#### If you prefer to use PlugIn as the price feed, ensure that:
+
+0) The PluginPriceOracle contract's PluginInvokeOracle address (which corresponds to the key of PluginOracle in externalAddresses.json and used for initialization of PluginPriceOracle) is set up and has a price available
+
+In *scripts/migrations/priceFeed/1_initialize.js*
+ script, I commented out the CentralizedOraclePriceFeed and PluginPriceOracle initialization. Uncomment the lines if needed.
+
+This doc does not contain details about PlugIn Oracle.
+
+#### Run the init script with below command
+
+```bash
+$ coralX execute --path scripts/migrations/priceFeed/1_initialize.js
+```
+
+### DEX price feed info
+
+The DelayFathomOraclePriceFeed is designed to replace the SimplePriceFeed with DEX as the price source. To switch to the DelayFathomOraclePriceFeed, you must execute the peekPrice function on it twice.
+
+The following demonstrates the relationship between the price contracts. When the setPrice function is called in PriceOracle, the function calls flow as shown below:
+
+PriceOracle -> DelayFathomOraclePriceFeed -> DexPriceOracle -> DEX
+
+When the setPrice function is invoked in PriceOracle, or when a user opens a position, the price updates after a certain delay period has elapsed (default is set to 15 minutes). For more information, please refer to the DelayFathomOraclePriceFeed and DelayPriceFeedBase contract documentation.
+
+In practice, it is possible to test how the collateral price in the DEX is mirrored using DelayFathomOraclePriceFeed without the need for a priceBot. However, if there is insufficient activity from opening positions or if the setPrice function in PriceOracle is not called frequently enough, the price information in DelayFathomOraclePriceFeed may become outdated (with a priceLife of 30 minutes) and hinder CDP actions. In such instances, you should call peekPrice on the DelayFathomOraclePriceFeed, then proceed to call the setPrice function in PriceOracle.
