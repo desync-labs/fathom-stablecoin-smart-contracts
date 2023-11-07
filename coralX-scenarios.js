@@ -3,6 +3,10 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/deployment', '--network', 'development'],
     ['execute', '--path', 'scripts/migrations/configuration', '--network', 'development']
   ],
+  deployMainnet: [
+    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'mainnet'],
+    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'mainnet']
+  ],
   deployApothem: [
     ['execute', '--path', 'scripts/migrations/deployment', '--network', 'apothem'],
     ['execute', '--path', 'scripts/migrations/configuration', '--network', 'apothem']
@@ -14,7 +18,6 @@ module.exports = {
   addCollateralApothem: [
     ['execute', '--path', 'scripts/migrations/add-collateral/deployment', '--network', 'apothem'],
     ['execute', '--path', 'scripts/migrations/add-collateral/configuration', '--network', 'apothem']
-
   ],
   deployTokensLocal: [
     ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'development']

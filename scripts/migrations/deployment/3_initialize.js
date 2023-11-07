@@ -61,7 +61,7 @@ module.exports = async function (deployer) {
         liquidationEngine.initialize(
             bookKeeper.address,
             systemDebtEngine.address,
-            { gasLimit: 1000000 }
+            { gasLimit: 1500000 }
         ),
         stablecoinAdapter.initialize(
             bookKeeper.address,
@@ -110,7 +110,6 @@ module.exports = async function (deployer) {
         stableSwapModule.initialize(
             bookKeeper.address,
             addresses.USDSTABLE,
-            // addresses.USD,
             fathomStablecoin.address,
             dailyLimitNumerator,
             singleSwapLimitNumerator,
