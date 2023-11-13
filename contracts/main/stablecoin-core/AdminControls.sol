@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IAccessControlConfig.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IPausable.sol";
 import "../interfaces/IBookKeeper.sol";
 
-contract AdminControls is OwnableUpgradeable {
+contract AdminControls is Initializable {
     address public bookKeeper;
     address public liquidationEngine;
     address public priceOracle;
@@ -20,13 +20,13 @@ contract AdminControls is OwnableUpgradeable {
     event LogPauseProtocol();
     event LogUnpauseProtocol();
 
-    event LogSetBookKeeper(address indexed newAddress);
-    event LogSetPositionManager(address indexed newAddress);
-    event LogSetLiquidationEngine(address indexed newAddress);
-    event LogSetSystemDebtEngine(address indexed newAddress);
-    event LogSetFlashMintModule(address indexed newAddress);
-    event LogSetPriceOracle(address indexed newAddress);
-    event LogSetStablecoinAdapter(address indexed newAddress);
+    event LogSetBookKeeper(address indexed _newAddress);
+    event LogSetPositionManager(address indexed _newAddress);
+    event LogSetLiquidationEngine(address indexed _newAddress);
+    event LogSetSystemDebtEngine(address indexed _newAddress);
+    event LogSetFlashMintModule(address indexed _newAddress);
+    event LogSetPriceOracle(address indexed _newAddress);
+    event LogSetStablecoinAdapter(address indexed _newAddress);
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(IBookKeeper(bookKeeper).accessControlConfig());
@@ -47,8 +47,6 @@ contract AdminControls is OwnableUpgradeable {
         address _flashMintModule,
         address _stablecoinAdapter
     ) external initializer {
-        OwnableUpgradeable.__Ownable_init();
-
         require(_bookKeeper != address(0), "AdminControls/zero-book-keeper");
         require(_liquidationEngine != address(0), "AdminControls/zero-liquidation-engine");
         require(_priceOracle != address(0), "AdminControls/zero-price-oracle");
@@ -65,10 +63,11 @@ contract AdminControls is OwnableUpgradeable {
         systemDebtEngine = _systemDebtEngine;
         stablecoinAdapter = _stablecoinAdapter;
     }
+
     /**
-    * @notice Pause all core modules of the protocol.
-    * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are paused.
-    */
+     * @notice Pause all core modules of the protocol.
+     * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are paused.
+     */
     function pauseProtocol() external onlyOwnerOrGov {
         IPausable(bookKeeper).pause();
         IPausable(positionManager).pause();
@@ -79,10 +78,11 @@ contract AdminControls is OwnableUpgradeable {
         IPausable(stablecoinAdapter).pause();
         emit LogPauseProtocol();
     }
+
     /**
-    * @notice Unpause all core modules of the protocol.
-    * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are unpaused.
-    */
+     * @notice Unpause all core modules of the protocol.
+     * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are unpaused.
+     */
     function unpauseProtocol() external onlyOwnerOrGov {
         IPausable(bookKeeper).unpause();
         IPausable(positionManager).unpause();
@@ -123,7 +123,7 @@ contract AdminControls is OwnableUpgradeable {
         flashMintModule = _flashMintModule;
         emit LogSetFlashMintModule(_flashMintModule);
     }
- 
+
     function setPriceOracle(address _priceOracle) external onlyOwnerOrGov {
         require(_priceOracle != address(0), "AdminControls/zero-address");
         priceOracle = _priceOracle;

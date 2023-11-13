@@ -25,7 +25,7 @@ const loadFixtureHandler = async () => {
 
     await mockedShowStopper.mock.live.returns(1);
     await mockedBookKeeper.mock.totalStablecoinIssued.returns(0);
-    await mockedBookKeeper.mock.whitelist.returns();
+    await mockedBookKeeper.mock.addToWhitelist.returns();
     await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address);
     await mockedPriceOracle.mock.setPrice.returns()
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
@@ -185,55 +185,42 @@ describe("PositionManager", () => {
             it("should revert", async () => {
 
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
-                await expect(positionManager.allowManagePosition(1, AliceAddress, 1)).to.be.revertedWith("owner not allowed")
+                await expect(positionManager.allowManagePosition(1, AliceAddress, true)).to.be.revertedWith("owner not allowed")
             })
         })
         context("when _user address is zero", () => {
             it("should revert with user address zero error", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress);
-                await expect(positionManagerAsAlice.allowManagePosition(1, '0x0000000000000000000000000000000000000000', 1)).to.be.revertedWith("PositionManager/user-address(0)");
+                await expect(positionManagerAsAlice.allowManagePosition(1, '0x0000000000000000000000000000000000000000', true)).to.be.revertedWith("PositionManager/user-address(0)");
             });
-        })
-        context("ok is not valid", () => {
-            it("should revert", async () => {
-                await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
-
-                await expect(positionManagerAsAlice.allowManagePosition(1, BobAddress, 2)).to.be.revertedWith("PositionManager/invalid-ok")
-            })
         })
         context("when parameters are valid", () => {
             it("should be able to add user allowance to a position", async () => {
 
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
-                expect(await positionManager.ownerWhitelist(AliceAddress, 1, BobAddress)).to.be.equal(0)
-                await positionManagerAsAlice.allowManagePosition(1, BobAddress, 1)
-                expect(await positionManager.ownerWhitelist(AliceAddress, 1, BobAddress)).to.be.equal(1)
+                expect(await positionManager.ownerWhitelist(AliceAddress, 1, BobAddress)).to.be.equal(false)
+                await positionManagerAsAlice.allowManagePosition(1, BobAddress, true)
+                expect(await positionManager.ownerWhitelist(AliceAddress, 1, BobAddress)).to.be.equal(true)
             })
         })
     })
 
     describe("#allowMigratePosition()", () => {
-        context("ok is not valid", () => {
-            it("should revert", async () => {
-                expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(0)
-                await expect(positionManagerAsAlice.allowMigratePosition(BobAddress, 2)).to.be.revertedWith("PositionManager/invalid-ok")
-            })
-        })
         context("when _user address is zero", () => {
             it("should revert with user address zero error", async () => {
-                await expect(positionManagerAsAlice.allowMigratePosition('0x0000000000000000000000000000000000000000', 1)).to.be.revertedWith("PositionManager/user-address(0)");
+                await expect(positionManagerAsAlice.allowMigratePosition('0x0000000000000000000000000000000000000000', true)).to.be.revertedWith("PositionManager/user-address(0)");
             });
         });
         context("when parameters are valid", () => {
             it("should be able to give/revoke migration allowance to other address", async () => {
-                expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(0)
-                await positionManagerAsAlice.allowMigratePosition(BobAddress, 1)
-                expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(1)
-                await positionManagerAsAlice.allowMigratePosition(BobAddress, 0)
-                expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(0)
+                expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(false)
+                await positionManagerAsAlice.allowMigratePosition(BobAddress, true)
+                expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(true)
+                await positionManagerAsAlice.allowMigratePosition(BobAddress, false)
+                expect(await positionManager.migrationWhitelist(AliceAddress, BobAddress)).to.be.equal(false)
             })
         })
-        
+
     })
 
     describe("#list()", () => {
@@ -431,7 +418,7 @@ describe("PositionManager", () => {
         context("when _destination argument is a zero address, five args", () => {
             it("should revert with 'PositionManager/dst-address(0)' message", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
-        
+
                 await expect(
                     positionManagerAsAlice["moveCollateral(bytes32,uint256,address,uint256,bytes)"](
                         formatBytes32String("WXDC"),
@@ -443,7 +430,7 @@ describe("PositionManager", () => {
                 ).to.be.revertedWith("PositionManager/dst-address(0)")
             })
         })
-        
+
     })
 
     // This function has the purpose to take away collateral from the system that doesn't correspond to the position but was sent there wrongly.
@@ -506,7 +493,7 @@ describe("PositionManager", () => {
                     "0x"
                 )
 
-                
+
             })
         })
     })
@@ -561,7 +548,7 @@ describe("PositionManager", () => {
         context("when destination (Bob) has no migration access on caller (Alice)", () => {
             it("should revert", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
-                await positionManagerAsAlice.allowManagePosition(1, BobAddress, 1)
+                await positionManagerAsAlice.allowManagePosition(1, BobAddress, true)
                 await expect(positionManagerAsAlice.exportPosition(1, BobAddress)).to.be.revertedWith("migration not allowed")
             })
         })
@@ -591,7 +578,7 @@ describe("PositionManager", () => {
                 const positionAddress = await positionManager.positions(1)
 
                 // Alice allows Bob to manage her position#1
-                await positionManagerAsAlice.allowManagePosition(1, BobAddress, 1)
+                await positionManagerAsAlice.allowManagePosition(1, BobAddress, true)
 
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
@@ -613,8 +600,8 @@ describe("PositionManager", () => {
             it("onlyMigrationAllowed modifier will make sure zero address _destination provided fn flow will revert", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 //migrationWhiteList can never have address(0) as the first key, therefore _destination as zero address will always be reverted in the modifier
-                await positionManagerAsAlice.allowManagePosition(1, BobAddress, 1)
-                await positionManagerAsAlice.allowMigratePosition(BobAddress, 1)
+                await positionManagerAsAlice.allowManagePosition(1, BobAddress, true)
+                await positionManagerAsAlice.allowMigratePosition(BobAddress, true)
 
                 await expect(
                     positionManagerAsBob.exportPosition(
@@ -623,7 +610,7 @@ describe("PositionManager", () => {
                     )
                 ).to.be.revertedWith("migration not allowed")
             })
-        })        
+        })
     })
 
     describe("#importPosition()", () => {
@@ -637,7 +624,7 @@ describe("PositionManager", () => {
             it("should revert", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 // Alice gives Bob migration access on her address
-                await positionManagerAsAlice.allowMigratePosition(BobAddress, 1)
+                await positionManagerAsAlice.allowMigratePosition(BobAddress, true)
                 await expect(positionManagerAsBob.importPosition(AliceAddress, 1)).to.be.revertedWith("owner not allowed")
             })
         })
@@ -667,9 +654,9 @@ describe("PositionManager", () => {
                 const positionAddress = await positionManager.positions(1)
 
                 // Alice allows Bob to manage her position#1
-                await positionManagerAsAlice.allowManagePosition(1, BobAddress, 1)
+                await positionManagerAsAlice.allowManagePosition(1, BobAddress, true)
                 // Alice gives Bob migration access on her address
-                await positionManagerAsAlice.allowMigratePosition(BobAddress, 1)
+                await positionManagerAsAlice.allowMigratePosition(BobAddress, true)
 
                 await mockedBookKeeper.mock.positions.withArgs(
                     formatBytes32String("WXDC"),
@@ -710,7 +697,7 @@ describe("PositionManager", () => {
             it("should revert", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 await positionManager.open(formatBytes32String("BTC"), BobAddress)
-                await positionManagerAsBob.allowManagePosition(2, AliceAddress, 1)
+                await positionManagerAsBob.allowManagePosition(2, AliceAddress, true)
 
                 await expect(positionManagerAsAlice.movePosition(1, 2)).to.be.revertedWith("!same collateral pool")
             })
@@ -741,7 +728,7 @@ describe("PositionManager", () => {
             it("should be able to call movePosition()", async () => {
                 await positionManager.open(formatBytes32String("WXDC"), AliceAddress)
                 await positionManager.open(formatBytes32String("WXDC"), BobAddress)
-                await positionManagerAsBob.allowManagePosition(2, AliceAddress, 1)
+                await positionManagerAsBob.allowManagePosition(2, AliceAddress, true)
                 const position1Address = await positionManager.positions(1)
                 const position2Address = await positionManager.positions(2)
 

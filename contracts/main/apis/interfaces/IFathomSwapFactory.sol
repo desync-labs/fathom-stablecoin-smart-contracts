@@ -2,9 +2,9 @@
 pragma solidity 0.8.17;
 
 interface IFathomSwapFactory {
-    event PairCreated(address indexed token0, address indexed token1, address pair, uint);
+    event PairCreated(address indexed _token0, address indexed _token1, address _pair, uint);
 
-    function createPair(address tokenA, address tokenB) external returns (address pair);
+    function createPair(address _tokenA, address _tokenB) external returns (address pair);
 
     function setFeeTo(address) external;
 
@@ -14,7 +14,7 @@ interface IFathomSwapFactory {
 
     function feeToSetter() external view returns (address);
 
-    function getPair(address tokenA, address tokenB) external view returns (address pair);
+    function getPair(address _tokenA, address _tokenB) external view returns (address pair);
 
     function allPairs(uint) external view returns (address pair);
 

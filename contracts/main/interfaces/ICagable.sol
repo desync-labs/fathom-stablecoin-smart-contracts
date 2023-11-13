@@ -5,5 +5,4 @@ interface ICagable {
     event LogCage();
 
     function cage() external;
-
 }

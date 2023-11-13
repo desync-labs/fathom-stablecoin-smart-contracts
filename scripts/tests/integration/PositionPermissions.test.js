@@ -42,17 +42,17 @@ const setup = async () => {
     const GLD = await artifacts.initializeInterfaceAt("ERC20Mintable", gldAddr);
 
     await GLD.mint(AliceAddress, WeiPerWad.mul(1000), { gasLimit: 1000000 })
-    await GLD.approve(aliceProxyWallet.address, WeiPerWad.mul(1000),  { from: AliceAddress, gasLimit: 1000000 })
+    await GLD.approve(aliceProxyWallet.address, WeiPerWad.mul(1000), { from: AliceAddress, gasLimit: 1000000 })
     await GLD.mint(BobAddress, WeiPerWad.mul(1000), { gasLimit: 1000000 })
-    await GLD.approve(bobProxyWallet.address, WeiPerWad.mul(1000),  { from: BobAddress, gasLimit: 1000000 })
+    await GLD.approve(bobProxyWallet.address, WeiPerWad.mul(1000), { from: BobAddress, gasLimit: 1000000 })
 
     await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
     await collateralPoolConfig.setStabilityFeeRate(pools.XDC, WeiPerRay, { gasLimit: 1000000 });
     await collateralPoolConfig.setStabilityFeeRate(pools.GLD, WeiPerRay, { gasLimit: 1000000 });
 
-    await priceOracle.setPrice(pools.GLD, { gasLimit: 1000000})
+    await priceOracle.setPrice(pools.GLD, { gasLimit: 1000000 })
     await TimeHelpers.increase(TimeHelpers.duration.seconds(BigNumber.from("900")))
-    await priceOracle.setPrice(pools.GLD, { gasLimit: 1000000})
+    await priceOracle.setPrice(pools.GLD, { gasLimit: 1000000 })
     await priceOracle.setPrice(pools.XDC);
 
     return {
@@ -930,9 +930,9 @@ describe("PositionPermissions", () => {
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                     // 2. Alice allow Bob to manage position
-                    await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, 1)
+                    await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, true)
                     expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, bobProxyWallet.address)).to.be.equal(
-                        1
+                        true
                     )
                     // 3. Bob try to adjust Alice's position, add 2 WXDC to position
                     await PositionHelper.lockXDC(bobProxyWallet, BobAddress, 1, WeiPerWad.mul(2))
@@ -1005,10 +1005,10 @@ describe("PositionPermissions", () => {
                                 "collateralToken inside Alice's position address should be 1 WXDC, because Alice unlocked 1 WXDC into the position"
                             ).to.be.equal(WeiPerWad)
                             // 4. Alice allow Bob to manage position
-                            await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, 1)
+                            await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, true)
                             expect(
                                 await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, bobProxyWallet.address)
-                            ).to.be.equal(1)
+                            ).to.be.equal(true)
                             // 5. Bob try to move collateral to Alice position
                             await PositionHelper.moveCollateral(
                                 bobProxyWallet,
@@ -1098,10 +1098,10 @@ describe("PositionPermissions", () => {
                                 "collateralToken inside Alice's position address should be 1 WXDC, because Alice unlocked 1 WXDC at her position"
                             ).to.be.equal(WeiPerWad)
                             // 4. Alice allow Bob to manage position
-                            await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, 1)
+                            await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, true)
                             expect(
                                 await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, bobProxyWallet.address)
-                            ).to.be.equal(1)
+                            ).to.be.equal(true)
                             // 5. Bob try to move collateral to Alice position
                             await PositionHelper.moveCollateral(
                                 bobProxyWallet,
@@ -1158,9 +1158,9 @@ describe("PositionPermissions", () => {
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                     // 2. Alice allow Bob to manage position
-                    await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, 1)
+                    await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, true)
                     expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, bobProxyWallet.address)).to.be.equal(
-                        1
+                        true
                     )
                     // 3. Bob try to mint FXD at Alice position
                     await PositionHelper.draw(
@@ -1231,10 +1231,10 @@ describe("PositionPermissions", () => {
                         ).to.be.equal(0)
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                         // 3. Alice allow Bob to manage position
-                        await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, 1)
+                        await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, true)
                         expect(
                             await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, bobProxyWallet.address)
-                        ).to.be.equal(1)
+                        ).to.be.equal(true)
                         // 4. Bob try to move collateral to alice position
                         await PositionHelper.movePosition(bobProxyWallet, BobAddress, 2, 1)
                         const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
@@ -1305,10 +1305,10 @@ describe("PositionPermissions", () => {
                         ).to.be.equal(0)
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                         // 3. Alice allow Bob to manage position
-                        await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, 1)
+                        await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, true)
                         expect(
                             await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, bobProxyWallet.address)
-                        ).to.be.equal(1)
+                        ).to.be.equal(true)
                         // 4. Bob try to move position to Alice position
                         const movePositionAbi = [
                             "function movePosition(address _manager, uint256 _source, uint256 _destination)"
@@ -1753,8 +1753,8 @@ describe("PositionPermissions", () => {
                             ).to.be.equal(WeiPerWad)
 
                             // 4. Alice allow Bob to manage position
-                            await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, 1)
-                            expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, bobProxyWallet.address)).to.be.equal(1)
+                            await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, true)
+                            expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, bobProxyWallet.address)).to.be.equal(true)
 
                             // 5. Bob try to move collateral of Alice position to Bob position
                             //   await positionManager["moveCollateral(uint256,address,uint256,address,bytes)"](
@@ -1847,8 +1847,8 @@ describe("PositionPermissions", () => {
                             ).to.be.equal(WeiPerWad)
 
                             // 4. Alice allow Bob to manage her position
-                            await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, 1)
-                            expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, bobProxyWallet.address)).to.be.equal(1)
+                            await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, true)
+                            expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, bobProxyWallet.address)).to.be.equal(true)
 
                             // 5. Bob try to move collateral of Alice position to his position
                             await PositionHelper.moveCollateral(
@@ -1904,8 +1904,8 @@ describe("PositionPermissions", () => {
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                     // 2. Alice allow Bob to manage position
-                    await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, BobAddress, 1)
-                    expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, BobAddress)).to.be.equal(1)
+                    await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, BobAddress, true)
+                    expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, BobAddress)).to.be.equal(true)
                     // 3. Bob try to mint FXD at Alice position
 
                     await positionManager.adjustPosition(
@@ -1925,7 +1925,7 @@ describe("PositionPermissions", () => {
                     )
 
                     // 5. allow bob to window
-                    await bookKeeper.whitelist(stablecoinAdapter.address, { from: BobAddress })
+                    await bookKeeper.addToWhitelist(stablecoinAdapter.address, { from: BobAddress })
 
                     // 6. mint ausd
                     await stablecoinAdapter.withdraw(
@@ -1990,12 +1990,12 @@ describe("PositionPermissions", () => {
                         ).to.be.equal(0)
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                         // 3. Alice allow Bob to manage position
-                        await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, BobAddress, 1)
-                        expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, BobAddress)).to.be.equal(1)
+                        await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, BobAddress, true)
+                        expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, BobAddress)).to.be.equal(true)
 
                         // 4. bob proxy wallet allow Bob address to manage position
-                        await PositionHelper.allowManagePosition(bobProxyWallet, BobAddress, 2, BobAddress, 1)
-                        expect(await positionManager.ownerWhitelist(bobProxyWallet.address, 2, BobAddress)).to.be.equal(1)
+                        await PositionHelper.allowManagePosition(bobProxyWallet, BobAddress, 2, BobAddress, true)
+                        expect(await positionManager.ownerWhitelist(bobProxyWallet.address, 2, BobAddress)).to.be.equal(true)
 
                         // 5. Bob try to move collateral to alice position
                         await positionManager.movePosition(2, 1, { from: BobAddress })
@@ -2063,12 +2063,12 @@ describe("PositionPermissions", () => {
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
 
                         // 3. Alice allow Bob to manage position
-                        await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, BobAddress, 1)
-                        expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, BobAddress)).to.be.equal(1)
+                        await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, BobAddress, true)
+                        expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, BobAddress)).to.be.equal(true)
 
                         // 4. bob proxy wallet allow Bob address to manage position
-                        await PositionHelper.allowManagePosition(bobProxyWallet, BobAddress, 2, BobAddress, 1)
-                        expect(await positionManager.ownerWhitelist(bobProxyWallet.address, 2, BobAddress)).to.be.equal(1)
+                        await PositionHelper.allowManagePosition(bobProxyWallet, BobAddress, 2, BobAddress, true)
+                        expect(await positionManager.ownerWhitelist(bobProxyWallet.address, 2, BobAddress)).to.be.equal(true)
 
                         // 5. Bob try to move position to Alice position
                         await expect(positionManager.movePosition(2, 1, { from: BobAddress })).to.be.revertedWith("!same collateral pool")
@@ -2361,15 +2361,15 @@ describe("PositionPermissions", () => {
                 expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
 
                 // 2. alice allow manage position
-                await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, AliceAddress, 1)
-                expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, AliceAddress)).to.be.equal(1)
+                await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, AliceAddress, true)
+                expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, AliceAddress)).to.be.equal(true)
 
                 // 3. alice allow positionManage
-                await bookKeeper.whitelist(positionManager.address, { from: AliceAddress })
+                await bookKeeper.addToWhitelist(positionManager.address, { from: AliceAddress })
 
                 // 4. alice allow migration
-                await positionManager.allowMigratePosition(aliceProxyWallet.address, 1, { from: AliceAddress })
-                expect(await positionManager.migrationWhitelist(AliceAddress, aliceProxyWallet.address)).to.be.equal(1)
+                await positionManager.allowMigratePosition(aliceProxyWallet.address, true, { from: AliceAddress })
+                expect(await positionManager.migrationWhitelist(AliceAddress, aliceProxyWallet.address)).to.be.equal(true)
 
                 // 5. Alice export position
                 await PositionHelper.exportPosition(aliceProxyWallet, AliceAddress, 1, AliceAddress)

@@ -29,7 +29,7 @@ interface ICollateralPoolConfig {
         uint256 positionDebtCeiling; // [rad]
     }
 
-    function setPriceWithSafetyMargin(bytes32 collateralPoolId, uint256 priceWithSafetyMargin) external;
+    function setPriceWithSafetyMargin(bytes32 _collateralPoolId, uint256 _priceWithSafetyMargin) external;
 
     function setTotalDebtShare(bytes32 _collateralPoolId, uint256 _totalDebtShare) external;
 

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -18,17 +18,17 @@ contract FlashMintArbitrager is OwnableUpgradeable, IERC3156FlashBorrower {
         OwnableUpgradeable.__Ownable_init();
     }
 
-    function onFlashLoan(address, address token, uint256 amount, uint256 fee, bytes calldata data) external override returns (bytes32) {
-        (address router, address stableSwapToken, address stableSwapModule) = abi.decode(data, (address, address, address));
+    function onFlashLoan(address, address _token, uint256 _amount, uint256 _fee, bytes calldata _data) external override returns (bytes32) {
+        (address router, address stableSwapToken, address stableSwapModule) = abi.decode(_data, (address, address, address));
         address[] memory path = new address[](2);
-        path[0] = token;
+        path[0] = _token;
         path[1] = stableSwapToken;
 
         // 1. Swap AUSD to BUSD at a DEX
         uint256 balanceBefore = stableSwapToken.myBalance();
-        token.safeApprove(router, type(uint).max);
-        IFathomSwapRouter(router).swapExactTokensForTokens(amount, 0, path, address(this), block.timestamp);
-        token.safeApprove(router, 0);
+        _token.safeApprove(router, type(uint).max);
+        IFathomSwapRouter(router).swapExactTokensForTokens(_amount, 0, path, address(this), block.timestamp);
+        _token.safeApprove(router, 0);
         uint256 balanceAfter = stableSwapToken.myBalance();
         // 2. Swap BUSD to AUSD at StableSwapModule
         //stableSwapToken.safeApprove(address(IStableSwapModule(stableSwapModule).authTokenAdapter()), type(uint).max);
@@ -36,7 +36,7 @@ contract FlashMintArbitrager is OwnableUpgradeable, IERC3156FlashBorrower {
         //stableSwapToken.safeApprove(address(IStableSwapModule(stableSwapModule).authTokenAdapter()), 0);
 
         // 3. Approve AUSD for FlashMintModule
-        token.safeApprove(msg.sender, amount.add(fee));
+        _token.safeApprove(msg.sender, _amount.add(_fee));
 
         return keccak256("ERC3156FlashBorrower.onFlashLoan");
     }

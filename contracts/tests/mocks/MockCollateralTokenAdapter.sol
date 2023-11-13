@@ -132,15 +132,16 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
     }
 
-    function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
-        require(toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
-        whiteListed[toBeWhitelisted] = true;
+    function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
+        require(_toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
+        whiteListed[_toBeWhitelisted] = true;
     }
 
-    function blacklist(address toBeRemoved) external onlyOwnerOrGov {
-        require(toBeRemoved != address(0), "CollateralTokenAdapter/blacklist-invalidAdds");
-        whiteListed[toBeRemoved] = false;
+    function removeFromWhitelist(address _toBeRemoved) external onlyOwnerOrGov {
+        require(_toBeRemoved != address(0), "CollateralTokenAdapter/removeFromWL-invalidAdds");
+        whiteListed[_toBeRemoved] = false;
     }
+
     /// @dev Cage function halts MockCollateralTokenAdapter contract for good.
     /// Please be cautious with this function since there is no uncage function
     function cage() external override nonReentrant onlyOwner {
@@ -149,10 +150,12 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
             emit LogCage();
         }
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();

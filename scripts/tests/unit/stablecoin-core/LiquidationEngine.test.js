@@ -39,8 +39,8 @@ const loadFixtureHandler = async () => {
   liquidationEngineAsBob = getContract("LiquidationEngine", BobAddress)
 
   await liquidationEngine.initialize(mockedBookKeeper.address, mockedSystemDebtEngine.address);
-  await liquidationEngine.whitelist(DeployerAddress);
-  await liquidationEngine.whitelist(AliceAddress);
+  await liquidationEngine.addToWhitelist(DeployerAddress);
+  await liquidationEngine.addToWhitelist(AliceAddress);
 
   await mockedAccessControlConfig.mock.hasRole.returns(false)
 
@@ -86,7 +86,7 @@ describe("LiquidationEngine", () => {
   describe("#liquidate", () => {
     context("liquidator is not whitelisted", () => {
       it("should revert", async () => {
-      await expect(
+        await expect(
           liquidationEngineAsBob["liquidate(bytes32,address,uint256,uint256,address,bytes)"](
             COLLATERAL_POOL_ID,
             AliceAddress,
@@ -102,7 +102,7 @@ describe("LiquidationEngine", () => {
     context("liquidator removed from whitelist", () => {
       it("should revert", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(true)
-        await liquidationEngine.blacklist(AliceAddress);
+        await liquidationEngine.removeFromWhitelist(AliceAddress);
 
         await expect(
           liquidationEngineAsAlice["liquidate(bytes32,address,uint256,uint256,address,bytes)"](

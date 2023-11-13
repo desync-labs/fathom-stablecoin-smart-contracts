@@ -8,9 +8,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract FathomProxyFactory is Ownable {
     mapping(bytes32 => address) public proxies;
 
-    function createProxy(bytes32 proxyId, address impl, address proxyAdmin, bytes memory data) external onlyOwner {
-        require(proxies[proxyId] == address(0), "Proxy already exists");
-        FathomProxy proxy = new FathomProxy(impl, proxyAdmin, data);
-        proxies[proxyId] = address(proxy);
+    function createProxy(bytes32 _proxyId, address _impl, address _proxyAdmin, bytes memory _data) external onlyOwner {
+        require(proxies[_proxyId] == address(0), "Proxy already exists");
+        FathomProxy proxy = new FathomProxy(_impl, _proxyAdmin, _data);
+        proxies[_proxyId] = address(proxy);
     }
 }

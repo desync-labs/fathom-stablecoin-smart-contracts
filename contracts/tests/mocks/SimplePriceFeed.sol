@@ -41,8 +41,6 @@ contract SimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPric
 
     event LogSetPrice(address indexed _caller, uint256 _price, uint256 indexed _lastUpdate);
 
-    // event LogSetPriceLife(address indexed _caller, uint256 _second);
-
     /// @dev access: OWNER_ROLE
     function setPrice(uint256 _price) external onlyOwner {
         price = _price;

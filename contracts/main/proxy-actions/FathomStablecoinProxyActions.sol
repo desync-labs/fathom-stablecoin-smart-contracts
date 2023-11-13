@@ -19,31 +19,31 @@ import "../utils/CommonMath.sol";
 contract FathomStablecoinProxyActions is CommonMath {
     using SafeToken for address;
 
+    address internal immutable self = address(this);
+
     // solhint-disable
     event LogBorrowedAmount(address _positionAddress, uint256 _FXDBorrowAmount);
     event LogPaidAmount(address _positionAddress, uint256 _FXDPaidAmount);
     // solhint-enable
-
-    address immutable internal self = address(this);
 
     modifier onlyDelegateCall() {
         require(address(this) != self);
         _;
     }
 
-    function whitelist(address _bookKeeper, address _usr) external onlyDelegateCall {
-        IBookKeeper(_bookKeeper).whitelist(_usr);
+    function addToWhitelist(address _bookKeeper, address _usr) external onlyDelegateCall {
+        IBookKeeper(_bookKeeper).addToWhitelist(_usr);
     }
 
-    function blacklist(address _bookKeeper, address _usr) external onlyDelegateCall {
-        IBookKeeper(_bookKeeper).blacklist(_usr);
+    function removeFromWhitelist(address _bookKeeper, address _usr) external onlyDelegateCall {
+        IBookKeeper(_bookKeeper).removeFromWhitelist(_usr);
     }
 
-    function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok) external onlyDelegateCall{
+    function allowManagePosition(address _manager, uint256 _positionId, address _user, bool _ok) external onlyDelegateCall {
         IManager(_manager).allowManagePosition(_positionId, _user, _ok);
     }
 
-    function allowMigratePosition(address _manager, address _user, uint256 _ok) external onlyDelegateCall {
+    function allowMigratePosition(address _manager, address _user, bool _ok) external onlyDelegateCall {
         IManager(_manager).allowMigratePosition(_user, _ok);
     }
 
@@ -59,7 +59,13 @@ contract FathomStablecoinProxyActions is CommonMath {
         IManager(_manager).movePosition(_source, _destination);
     }
 
-    function safeLockXDC(address _manager, address _xdcAdapter, uint256 _positionId, address _owner, bytes calldata _data) external payable onlyDelegateCall {
+    function safeLockXDC(
+        address _manager,
+        address _xdcAdapter,
+        uint256 _positionId,
+        address _owner,
+        bytes calldata _data
+    ) external payable onlyDelegateCall {
         require(IManager(_manager).owners(_positionId) == _owner, "!owner");
         lockXDC(_manager, _xdcAdapter, _positionId, _data);
     }
@@ -88,7 +94,7 @@ contract FathomStablecoinProxyActions is CommonMath {
 
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_bookKeeper).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
-            IBookKeeper(_bookKeeper).whitelist(_stablecoinAdapter);
+            IBookKeeper(_bookKeeper).addToWhitelist(_stablecoinAdapter);
         }
 
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _amount, _data); // Withdraws Fathom Stablecoin to the user's wallet as a token
@@ -302,7 +308,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         moveStablecoin(_manager, _positionId, address(this), toRad(_stablecoinAmount));
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_bookKeeper).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
-            IBookKeeper(_bookKeeper).whitelist(_stablecoinAdapter);
+            IBookKeeper(_bookKeeper).addToWhitelist(_stablecoinAdapter);
         }
         // Withdraws Fathom Stablecoin to the user's wallet as a token
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data);
@@ -339,14 +345,14 @@ contract FathomStablecoinProxyActions is CommonMath {
         moveStablecoin(address(_manager), _positionId, address(this), toRad(_stablecoinAmount));
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_manager.bookKeeper()).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
-            IBookKeeper(_manager.bookKeeper()).whitelist(_stablecoinAdapter);
+            IBookKeeper(_manager.bookKeeper()).addToWhitelist(_stablecoinAdapter);
         }
         // Withdraws FXD to the user's wallet as a token
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data);
 
         address _positionAddress = IManager(_manager).positions(_positionId);
         IManager(_manager).updatePrice(_collateralPoolId);
-        
+
         emit LogBorrowedAmount(_positionAddress, _stablecoinAmount);
     }
 

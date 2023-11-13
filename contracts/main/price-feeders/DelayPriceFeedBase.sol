@@ -55,10 +55,12 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
     function setPoolId(bytes32 _poolId) external onlyOwner {
         poolId = _poolId;
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
@@ -68,7 +70,6 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
     function peekPrice() external override returns (uint256, bool) {
         if (block.timestamp >= lastUpdateTS + timeDelay || !this.isPriceFresh()) {
             try this.retrivePrice() returns (PriceInfo memory _priceInfo) {
-                
                 require(_priceInfo.price > 0, "DelayPriceFeed/wrong-price");
                 require(_priceInfo.lastUpdate <= block.timestamp, "DelayPriceFeed/wrong-lastUpdate");
 

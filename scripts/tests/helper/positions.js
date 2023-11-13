@@ -50,7 +50,7 @@ const openXDCPositionAndDraw = async (proxyWallet, from, collateral_pool_id, col
         stablecoin,
         "0x00",
     ])
-    await proxyWallet.execute(call, {  value: collateral,  from: from})
+    await proxyWallet.execute(call, { value: collateral, from: from })
 }
 
 const openXDCPositionAndDrawMock = async (proxyWallet, from, collateral_pool_id, collateral, stablecoin) => {
@@ -75,7 +75,7 @@ const openXDCPositionAndDrawMock = async (proxyWallet, from, collateral_pool_id,
         stablecoin,
         "0x00",
     ])
-    await proxyWallet.execute(call, {  value: collateral,  from: from})
+    await proxyWallet.execute(call, { value: collateral, from: from })
 }
 
 
@@ -139,7 +139,7 @@ const wipeAndUnlockXDC = async (proxyWallet, from, positionId, collateral, stabl
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
 
-    await proxyWallet.execute(call, {from: from })
+    await proxyWallet.execute(call, { from: from })
 }
 
 
@@ -163,7 +163,7 @@ const wipeAllAndUnlockXDC = async (proxyWallet, from, positionId, collateral) =>
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
 
-    await proxyWallet.execute(call, {from: from })
+    await proxyWallet.execute(call, { from: from })
 }
 
 const lockToken = async (proxyWallet, from, collateral_pool_id, positionId, amount) => {
@@ -204,7 +204,7 @@ const lockXDC = async (proxyWallet, from, positionId, amount) => {
         positionId,
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
-    await proxyWallet.execute(lockTokenCall, {  value: amount, from: from })
+    await proxyWallet.execute(lockTokenCall, { value: amount, from: from })
 }
 
 // function safeLockXDC(address _manager, address _xdcAdapter, uint256 _positionId, address _owner, bytes calldata _data)
@@ -225,7 +225,7 @@ const safeLockXDC = async (proxyWallet, from, positionId, amount) => {
         proxyWallet.address,
         ethers.utils.defaultAbiCoder.encode(["address"], [from]),
     ])
-    await proxyWallet.execute(lockTokenCall, {  value: amount, from: proxyWallet.address })
+    await proxyWallet.execute(lockTokenCall, { value: amount, from: proxyWallet.address })
 }
 
 const draw = async (proxyWallet, from, collateral_pool_id, positionId, amount) => {
@@ -296,7 +296,7 @@ const allowManagePosition = async (proxyWallet, from, positionId, user, ok) => {
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
 
     const allowManagePositionAbi = [
-        "function allowManagePosition(address _manager, uint256 _positionId, address _user, uint256 _ok)"
+        "function allowManagePosition(address _manager, uint256 _positionId, address _user, bool _ok)"
     ];
     const allowManagePositionIFace = new ethers.utils.Interface(allowManagePositionAbi);
     const allowManagePositionCall = allowManagePositionIFace.encodeFunctionData("allowManagePosition", [

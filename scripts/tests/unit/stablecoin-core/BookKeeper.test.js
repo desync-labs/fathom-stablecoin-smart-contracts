@@ -123,7 +123,7 @@ describe("BookKeeper", () => {
             it("should revert with zero amount error", async () => {
                 // Assuming Alice has enough collateral and the access control is mocked.
                 await mockedAccessControlConfig.mock.hasRole.returns(true);
-    
+
                 // Try moving 0 collateral from Alice to Bob
                 await expect(
                     bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, 0, { gasLimit: 1000000 })
@@ -135,17 +135,17 @@ describe("BookKeeper", () => {
             it("should revert with src and dst being the same error", async () => {
                 // Mock access control to allow the function call.
                 await mockedAccessControlConfig.mock.hasRole.returns(true);
-        
+
                 // Add some collateral to Alice so she has some to move.
                 await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad, { gasLimit: 1000000 });
-        
+
                 // Try moving collateral from Alice to Alice (same address)
                 await expect(
                     bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, WeiPerWad, { gasLimit: 1000000 })
                 ).to.be.revertedWith("bookKeeper/moveCollateral-src-dst-same");
             });
         });
-        
+
         context("when the caller is not the owner", () => {
             it("should be revert", async () => {
                 // bob call move collateral from alice to bob
@@ -167,7 +167,7 @@ describe("BookKeeper", () => {
                     expect(collateralTokenBobBefore).to.be.equal(0)
 
                     // alice allow bob to move collateral
-                    await bookKeeperAsAlice.whitelist(BobAddress)
+                    await bookKeeperAsAlice.addToWhitelist(BobAddress)
 
                     // bob call move collateral from alice to bob
                     await bookKeeperAsBob.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
@@ -219,13 +219,13 @@ describe("BookKeeper", () => {
             it("should revert with zero amount error", async () => {
                 // Assuming Alice has enough stablecoin and the access control is mocked.
                 await mockedAccessControlConfig.mock.hasRole.returns(true);
-    
+
                 // mint some stablecoin to Alice just for context, even though we are moving 0
                 await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad, { gasLimit: 1000000 });
-    
+
                 // alice allow bob to move stablecoin, so the test focuses solely on the zero amount
-                await bookKeeperAsAlice.whitelist(BobAddress);
-    
+                await bookKeeperAsAlice.addToWhitelist(BobAddress);
+
                 // Try moving 0 stablecoin from Alice to Bob
                 await expect(
                     bookKeeperAsAlice.moveStablecoin(AliceAddress, BobAddress, 0, { gasLimit: 1000000 })
@@ -237,16 +237,16 @@ describe("BookKeeper", () => {
             it("should revert with src and dst being the same error", async () => {
                 // Mock the necessary access controls to allow the function call.
                 await mockedAccessControlConfig.mock.hasRole.returns(true);
-        
+
                 // Mint some stablecoin to Alice to provide context.
                 await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad, { gasLimit: 1000000 });
-        
+
                 // Attempt to move stablecoin from Alice to Alice (i.e., same address).
                 await expect(
                     bookKeeperAsAlice.moveStablecoin(AliceAddress, AliceAddress, WeiPerRad, { gasLimit: 1000000 })
                 ).to.be.revertedWith("bookKeeper/moveStablecoin-src-dst-same");
             });
-        });        
+        });
 
         context("when the caller is not the owner", () => {
             it("should be revert", async () => {
@@ -269,7 +269,7 @@ describe("BookKeeper", () => {
                     expect(stablecoinBobBefore).to.be.equal(0)
 
                     // alice allow bob to move stablecoin
-                    await bookKeeperAsAlice.whitelist(BobAddress)
+                    await bookKeeperAsAlice.addToWhitelist(BobAddress)
 
                     // bob call move stablecoin from alice to bob
                     await expect(bookKeeperAsBob.moveStablecoin(AliceAddress, BobAddress, WeiPerRad, { gasLimit: 1000000 }))
@@ -411,7 +411,7 @@ describe("BookKeeper", () => {
                                 await mockedCollateralPoolConfig.mock.setTotalDebtShare.returns()
 
                                 // alice allow bob to move stablecoin
-                                await bookKeeperAsBob.whitelist(AliceAddress)
+                                await bookKeeperAsBob.addToWhitelist(AliceAddress)
 
                                 await expect(
                                     bookKeeperAsAlice.adjustPosition(
@@ -451,7 +451,7 @@ describe("BookKeeper", () => {
                                 await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                                 // alice allow bob to move stablecoin
-                                await bookKeeperAsBob.whitelist(AliceAddress)
+                                await bookKeeperAsBob.addToWhitelist(AliceAddress)
 
                                 const positionBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                                 expect(positionBefore.lockedCollateral).to.be.equal(0)
@@ -923,7 +923,7 @@ describe("BookKeeper", () => {
                                 expect(stablecoinAliceBefore).to.be.equal(0)
 
                                 // bob allow alice
-                                await bookKeeperAsBob.whitelist(AliceAddress)
+                                await bookKeeperAsBob.addToWhitelist(AliceAddress)
 
                                 // alice draw
                                 await bookKeeperAsAlice.adjustPosition(
@@ -1288,7 +1288,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.whitelist(AliceAddress)
+                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
@@ -1337,7 +1337,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.whitelist(AliceAddress)
+                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
@@ -1386,7 +1386,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.whitelist(AliceAddress)
+                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
@@ -1435,7 +1435,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.whitelist(AliceAddress)
+                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
@@ -1497,7 +1497,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.whitelist(AliceAddress)
+                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
@@ -1546,7 +1546,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.whitelist(AliceAddress)
+                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
 
                         const positionAliceBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                         expect(positionAliceBefore.lockedCollateral).to.be.equal(WeiPerWad.mul(10))
@@ -1771,7 +1771,7 @@ describe("BookKeeper", () => {
             it("should revert with zero amount error", async () => {
                 // Mock access control to allow the function call.
                 await mockedAccessControlConfig.mock.hasRole.returns(true);
-        
+
                 // Try to mint 0 unbacked stablecoin.
                 await expect(
                     bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, 0, { gasLimit: 1000000 })

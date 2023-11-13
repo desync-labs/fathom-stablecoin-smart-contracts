@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../../interfaces/IPriceFeed.sol";
 import "../../interfaces/IGenericTokenAdapter.sol";
@@ -13,7 +13,7 @@ import "../../interfaces/IAccessControlConfig.sol";
  * @notice A contract can add collateral pool type to the protocol and also manage settings for a specific pool type.
  */
 
-contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig {
+contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
     uint256 internal constant RAY = 10 ** 27;
 
     mapping(bytes32 => ICollateralPoolConfig.CollateralPool) private _collateralPools;
@@ -49,31 +49,29 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     function initialize(address _accessControlConfig) external initializer {
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
     }
+
     /**
     //@notice this function adds a collateral pool type to Fathom protocol
     //@dev please refer to the deployment/migration script for more detail info on units for each params.
      */
     function initCollateralPool(
         bytes32 _collateralPoolId, // Identifier for a specific collateral pool.
-        uint256 _debtCeiling, // Debt ceiling of this collateral pool                                          [rad] 
+        uint256 _debtCeiling, // Debt ceiling of this collateral pool                                          [rad]
         uint256 _debtFloor, // Position debt floor of this collateral pool                                     [rad]
         uint256 _positionDebtCeiling, // position debt ceiling of this collateral pool                         [rad]
         address _priceFeed,
         uint256 _liquidationRatio, // Liquidation ratio or Collateral ratio, inverse of LTV                    [ray]
         uint256 _stabilityFeeRate, //Collateral-specific, per-second stability fee debtAccumulatedRate or mint interest debtAccumulatedRate [ray]
-        address _adapter,   // collateralTokenAdapter address for a specific collateral pool
+        address _adapter, // collateralTokenAdapter address for a specific collateral pool
         uint256 _closeFactorBps, // Percentage (BPS) of how much  of debt could be liquidated in a single liquidation
         uint256 _liquidatorIncentiveBps, // Percentage (BPS) of how much additional collateral will be given to the liquidator incentive
         uint256 _treasuryFeesBps, // Percentage (BPS) of how much additional collateral will be transferred to the treasury
-        address _strategy  // Liquidation strategy for this collateral pool
+        address _strategy // Liquidation strategy for this collateral pool
     ) external onlyOwner {
         require(_collateralPools[_collateralPoolId].debtAccumulatedRate == 0, "CollateralPoolConfig/collateral-pool-already-init");
         require(_debtCeiling > _debtFloor, "CollateralPoolConfig/invalid-ceiliing");
-        require(
-            _positionDebtCeiling <= _debtCeiling && _positionDebtCeiling > _debtFloor, 
-            "CollateralPoolConfig/invalid-position-ceiling"
-        );
-        
+        require(_positionDebtCeiling <= _debtCeiling && _positionDebtCeiling > _debtFloor, "CollateralPoolConfig/invalid-position-ceiling");
+
         _collateralPools[_collateralPoolId].debtAccumulatedRate = RAY;
         _collateralPools[_collateralPoolId].debtCeiling = _debtCeiling;
         _collateralPools[_collateralPoolId].debtFloor = _debtFloor;
@@ -113,10 +111,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function setDebtCeiling(bytes32 _collateralPoolId, uint256 _debtCeiling) external onlyOwner {
-        require(
-            _debtCeiling >= _collateralPools[_collateralPoolId].positionDebtCeiling, 
-            "CollateralPoolConfig/invalid-debt-ceiling"
-        );
+        require(_debtCeiling >= _collateralPools[_collateralPoolId].positionDebtCeiling, "CollateralPoolConfig/invalid-debt-ceiling");
 
         _collateralPools[_collateralPoolId].debtCeiling = _debtCeiling;
         emit LogSetDebtCeiling(msg.sender, _collateralPoolId, _debtCeiling);

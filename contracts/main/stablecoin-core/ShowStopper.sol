@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/IShowStopper.sol";
@@ -20,7 +20,7 @@ import "../utils/CommonMath.sol";
  * calculate and settle bad debt, and finalize the total debt of the system after the shutdown.
  * It also calculates the redeemStablecoin price of each collateral pool and allows users to redeem their stablecoins for collateral tokens.
  */
-contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
+contract ShowStopper is CommonMath, IShowStopper, Initializable {
     IBookKeeper public bookKeeper; // CDP Engine
     ILiquidationEngine public liquidationEngine;
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
@@ -40,20 +40,20 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
     mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
 
     event LogCage(uint256 _cageCoolDown);
-    event LogCageCollateralPool(bytes32 indexed collateralPoolId);
+    event LogCageCollateralPool(bytes32 indexed _collateralPoolId);
 
-    event LogAccumulateBadDebt(bytes32 indexed collateralPoolId, address indexed positionAddress, uint256 amount, uint256 debtShare);
-    event LogRedeemLockedCollateral(bytes32 indexed collateralPoolId, address indexed positionAddress, uint256 lockedCollateral);
+    event LogAccumulateBadDebt(bytes32 indexed _collateralPoolId, address indexed _positionAddress, uint256 _amount, uint256 _debtShare);
+    event LogRedeemLockedCollateral(bytes32 indexed _collateralPoolId, address indexed _positionAddress, uint256 _lockedCollateral);
     event LogFinalizeDebt();
-    event LogFinalizeCashPrice(bytes32 indexed collateralPoolId);
-    event LogAccumulateStablecoin(address indexed ownerAddress, uint256 amount);
-    event LogRedeemStablecoin(bytes32 indexed collateralPoolId, address indexed ownerAddress, uint256 amount);
+    event LogFinalizeCashPrice(bytes32 indexed _collateralPoolId);
+    event LogAccumulateStablecoin(address indexed _ownerAddress, uint256 _amount);
+    event LogRedeemStablecoin(bytes32 indexed _collateralPoolId, address indexed _ownerAddress, uint256 _amount);
 
-    event LogSetBookKeeper(address indexed caller, address _bookKeeper);
-    event LogSetLiquidationEngine(address indexed caller, address _liquidationEngine);
-    event LogSetSystemDebtEngine(address indexed caller, address _systemDebtEngine);
-    event LogSetPriceOracle(address indexed caller, address _priceOracle);
-    event LogSetCageCoolDown(address indexed caller, uint256 _cageCoolDown);
+    event LogSetBookKeeper(address indexed _caller, address _bookKeeper);
+    event LogSetLiquidationEngine(address indexed _caller, address _liquidationEngine);
+    event LogSetSystemDebtEngine(address indexed _caller, address _systemDebtEngine);
+    event LogSetPriceOracle(address indexed _caller, address _priceOracle);
+    event LogSetCageCoolDown(address indexed _caller, uint256 _cageCoolDown);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -99,20 +99,20 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
     }
 
     /**
-    * @notice Initiates the process of emergency shutdown (cage).
-    * @dev This function can only be called by the contract owner.
-    * @param _cageCoolDown Length of the cooldown period for the emergency shutdown, in seconds.
-    *
-    * The cage function starts the emergency shutdown process, which includes the following steps:
-    *  - Start a cooldown period for the emergency shutdown.
-    *  - Pause BookKeeper: locking/unlocking collateral and mint/repay Fathom Stablecoin will not be allowed for any positions.
-    *  - Pause LiquidationEngine: positions will not be liquidated.
-    *  - Pause SystemDebtEngine: no accrual of new debt, no system debt settlement.
-    *  - Pause PriceOracle: no new price updates, no liquidation trigger.
-    */
+     * @notice Initiates the process of emergency shutdown (cage).
+     * @dev This function can only be called by the contract owner.
+     * @param _cageCoolDown Length of the cooldown period for the emergency shutdown, in seconds.
+     *
+     * The cage function starts the emergency shutdown process, which includes the following steps:
+     *  - Start a cooldown period for the emergency shutdown.
+     *  - Pause BookKeeper: locking/unlocking collateral and mint/repay Fathom Stablecoin will not be allowed for any positions.
+     *  - Pause LiquidationEngine: positions will not be liquidated.
+     *  - Pause SystemDebtEngine: no accrual of new debt, no system debt settlement.
+     *  - Pause PriceOracle: no new price updates, no liquidation trigger.
+     */
     function cage(uint256 _cageCoolDown) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
-        require(_cageCoolDown >= 1 weeks  && _cageCoolDown <= 13 weeks, "ShowStopper/invalid-cool-down" );
+        require(_cageCoolDown >= 1 weeks && _cageCoolDown <= 13 weeks, "ShowStopper/invalid-cool-down");
 
         live = 0;
         cageCoolDown = _cageCoolDown;
@@ -150,9 +150,7 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
      */
     function accumulateBadDebt(bytes32 _collateralPoolId, address _positionAddress) external {
         require(cagePrice[_collateralPoolId] != 0, "ShowStopper/cage-price-collateral-pool-id-not-defined");
-        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(
-            _collateralPoolId
-        ); // [ray]
+        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(_collateralPoolId); // [ray]
         (uint256 _lockedCollateralAmount, uint256 _debtShare) = bookKeeper.positions(_collateralPoolId, _positionAddress);
         uint256 _debtAmount = rmul(rmul(_debtShare, _debtAccumulatedRate), cagePrice[_collateralPoolId]); // find the amount of debt in the unit of collateralToken
         uint256 _amount = min(_lockedCollateralAmount, _debtAmount); // if debt > lockedCollateralAmount, that's mean bad debt occur
@@ -196,9 +194,7 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
         require(debt != 0, "ShowStopper/debt-zero");
         require(finalCashPrice[_collateralPoolId] == 0, "ShowStopper/final-cash-price-collateral-pool-id-already-defined");
 
-        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(
-            _collateralPoolId
-        ); // [ray]
+        uint256 _debtAccumulatedRate = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getDebtAccumulatedRate(_collateralPoolId); // [ray]
         uint256 _wad = rmul(rmul(totalDebtShare[_collateralPoolId], _debtAccumulatedRate), cagePrice[_collateralPoolId]);
 
         finalCashPrice[_collateralPoolId] = ((_wad - badDebtAccumulator[_collateralPoolId]) * RAY) / (debt / RAY);

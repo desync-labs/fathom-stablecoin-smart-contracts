@@ -10,7 +10,7 @@ interface IDelayPriceFeed is IPriceFeed {
     }
 
     event LogSetTimeDelay(address indexed _caller, uint256 _second);
-    
+
     event LogPeekPriceFailed(address indexed _caller, string _reason);
 
     function setTimeDelay(uint256 _second) external;

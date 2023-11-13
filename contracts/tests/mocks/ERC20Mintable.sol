@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
@@ -10,7 +10,8 @@ contract ERC20Mintable is Ownable, ERC20 {
     function mint(address _to, uint256 _amount) external onlyOwner {
         _mint(_to, _amount);
     }
-    function burn(address _address, uint256 amount) public virtual {
-        _burn(_address, amount);
+
+    function burn(address _address, uint256 _amount) public virtual {
+        _burn(_address, _amount);
     }
 }

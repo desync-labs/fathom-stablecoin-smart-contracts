@@ -50,14 +50,16 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
 
         require(_bookKeeper != address(0), "StabilityFeeCollector/zero-book-keeper");
         bookKeeper = IBookKeeper(_bookKeeper);
-        
+
         require(_systemDebtEngine != address(0), "StabilityFeeCollector/bad-system-debt-engine-address");
         systemDebtEngine = _systemDebtEngine;
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();
@@ -80,6 +82,7 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
     function collect(bytes32 _collateralPool) external override whenNotPaused nonReentrant returns (uint256 _debtAccumulatedRate) {
         _debtAccumulatedRate = _collect(_collateralPool);
     }
+
     /**
      * @dev Internal function to collect the stability fee of the specified collateral pool.
      * This function updates the `debtAccumulatedRate` of the specified collateral pool based on
@@ -89,7 +92,7 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
      */
     function _collect(bytes32 _collateralPoolId) internal returns (uint256 _debtAccumulatedRate) {
         ICollateralPoolConfig _config = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
-        
+
         uint256 _previousDebtAccumulatedRate = _config.getDebtAccumulatedRate(_collateralPoolId);
         uint256 _stabilityFeeRate = _config.getStabilityFeeRate(_collateralPoolId);
         uint256 _lastAccumulationTime = _config.getLastAccumulationTime(_collateralPoolId);

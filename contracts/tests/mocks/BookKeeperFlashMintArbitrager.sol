@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -31,20 +31,20 @@ contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBo
 
     function onBookKeeperFlashLoan(
         address, // initiator
-        uint256 loanValue, // [rad]
+        uint256 _loanValue, // [rad]
         uint256, // fee
-        bytes calldata data
+        bytes calldata _data
     ) external override returns (bytes32) {
         LocalVars memory vars;
-        (vars.router, vars.stableSwapToken, vars.stableSwapModule) = abi.decode(data, (address, address, IStableSwapModule));
+        (vars.router, vars.stableSwapToken, vars.stableSwapModule) = abi.decode(_data, (address, address, IStableSwapModule));
         address[] memory path = new address[](2);
         path[0] = stablecoin;
         path[1] = vars.stableSwapToken;
 
-        uint256 loanAmount = loanValue / RAY;
+        uint256 loanAmount = _loanValue / RAY;
 
         // 1. Swap AUSD to BUSD at a DEX
-        //    vars.stableSwapModule.stablecoinAdapter().bookKeeper().whitelist(address(vars.stableSwapModule.stablecoinAdapter()));
+        //    vars.stableSwapModule.stablecoinAdapter().bookKeeper().addToWhitelist(address(vars.stableSwapModule.stablecoinAdapter()));
         //  vars.stableSwapModule.stablecoinAdapter().withdraw(address(this), loanAmount, abi.encode(0));
         uint256 balanceBefore = vars.stableSwapToken.myBalance();
         stablecoin.safeApprove(vars.router, type(uint).max);

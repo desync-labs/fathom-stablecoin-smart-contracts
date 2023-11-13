@@ -56,9 +56,9 @@ describe("CollateralTokenAdapter", () => {
         context("when all collateral tokens are deposited by deposit function", async () => {
             it("should return the correct net asset valuation", async () => {
                 //Alice wraps XDC to WXDC
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
+                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
                 //Alice is whiteListed to directly call deposit function on CollateralTokenAdapter
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
+                await collateralTokenAdapter.addToWhitelist(AliceAddress, { gasLimit: 1000000 });
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
                 await collateralTokenAdapter.deposit(
                     AliceAddress,
@@ -82,9 +82,9 @@ describe("CollateralTokenAdapter", () => {
         context("when some one directly transfer collateral tokens to CollateralTokenAdapter", async () => {
             it("should only recognized collateral tokens from deposit function", async () => {
                 //Alice wraps XDC to WXDC
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
+                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
                 //Alice is whiteListed to directly call deposit function on CollateralTokenAdapter
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
+                await collateralTokenAdapter.addToWhitelist(AliceAddress, { gasLimit: 1000000 });
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
                 await collateralTokenAdapter.deposit(
                     AliceAddress,
@@ -93,7 +93,7 @@ describe("CollateralTokenAdapter", () => {
                     { from: AliceAddress, gasLimit: 2000000 }
                 )
                 //Bob wraps XDC to WXDC
-                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(89),  gasLimit: 1000000})
+                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(89), gasLimit: 1000000 })
                 await WXDC.transfer(collateralTokenAdapter.address, ethers.utils.parseEther("88"), { from: BobAddress })
 
                 expect(await WXDC.balanceOf(collateralTokenAdapter.address)).to.be.eq(ethers.utils.parseEther("88"))
@@ -117,7 +117,7 @@ describe("CollateralTokenAdapter", () => {
             it("should revert", async () => {
                 // Cage collateralTokenAdapter
                 await collateralTokenAdapter.cage()
-                await collateralTokenAdapter.whitelist(DeployerAddress, {gasLimit: 1000000});
+                await collateralTokenAdapter.addToWhitelist(DeployerAddress, { gasLimit: 1000000 });
                 await expect(
                     collateralTokenAdapter.deposit(
                         DeployerAddress,
@@ -131,11 +131,11 @@ describe("CollateralTokenAdapter", () => {
         context("when all parameters are valid", async () => {
             it("should work", async () => {
                 //Alice wraps XDC to WXDC
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
+                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
                 // Assuming Alice is the first one to deposit hence no rewards to be harvested yet
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("2"), { from: AliceAddress, gasLimit: 1000000 })
                 //Alice is whiteListed to directly call deposit function on CollateralTokenAdapter
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
+                await collateralTokenAdapter.addToWhitelist(AliceAddress, { gasLimit: 1000000 });
                 await collateralTokenAdapter.deposit(
                     AliceAddress,
                     ethers.utils.parseEther("1"),
@@ -165,10 +165,10 @@ describe("CollateralTokenAdapter", () => {
 
 
                 //Bob wraps XDC to WXDC
-                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4),  gasLimit: 1000000})
+                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4), gasLimit: 1000000 })
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("4"), { from: BobAddress })
                 //Alice is whiteListed to directly call deposit function on CollateralTokenAdapter
-                await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
+                await collateralTokenAdapter.addToWhitelist(BobAddress, { gasLimit: 1000000 });
                 await collateralTokenAdapter.deposit(
                     BobAddress,
                     ethers.utils.parseEther("4"),
@@ -200,9 +200,9 @@ describe("CollateralTokenAdapter", () => {
     describe("#withdraw", async () => {
         context("when withdraw more than what CollateralTokenAdapter staked", async () => {
             it("should revert", async () => {
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
+                await collateralTokenAdapter.addToWhitelist(AliceAddress, { gasLimit: 1000000 });
                 //Alice wraps XDC to WXDC
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
+                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
                 await collateralTokenAdapter.deposit(
                     AliceAddress,
@@ -224,8 +224,8 @@ describe("CollateralTokenAdapter", () => {
 
         context("when withdraw more than what he staked", async () => {
             it("should revert", async () => {
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
+                await collateralTokenAdapter.addToWhitelist(AliceAddress, { gasLimit: 1000000 });
+                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
                 await collateralTokenAdapter.deposit(
                     AliceAddress,
@@ -233,8 +233,8 @@ describe("CollateralTokenAdapter", () => {
                     ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
                     { from: AliceAddress, gasLimit: 1000000 }
                 )
-                await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
-                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4),  gasLimit: 1000000})
+                await collateralTokenAdapter.addToWhitelist(BobAddress, { gasLimit: 1000000 });
+                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4), gasLimit: 1000000 })
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("4"), { from: BobAddress })
                 await collateralTokenAdapter.deposit(
                     BobAddress,
@@ -256,9 +256,9 @@ describe("CollateralTokenAdapter", () => {
 
         context("when CollateralTokenAdapter is not live", async () => {
             it("should still allow user to withdraw", async () => {
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
+                await collateralTokenAdapter.addToWhitelist(AliceAddress, { gasLimit: 1000000 });
                 // Assuming Alice is the first one to deposit hence no rewards to be harvested yet
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
+                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
                 await collateralTokenAdapter.deposit(
                     AliceAddress,
@@ -299,8 +299,8 @@ describe("CollateralTokenAdapter", () => {
             })
 
             it("should still allow user to withdraw with pending rewards (if any)", async () => {
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
+                await collateralTokenAdapter.addToWhitelist(AliceAddress, { gasLimit: 1000000 });
+                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
 
                 // Assuming Alice is the first one to deposit hence no rewards to be harvested yet
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
@@ -317,8 +317,8 @@ describe("CollateralTokenAdapter", () => {
                 expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
 
 
-                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4),  gasLimit: 1000000})
-                await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
+                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4), gasLimit: 1000000 })
+                await collateralTokenAdapter.addToWhitelist(BobAddress, { gasLimit: 1000000 });
 
                 // Bob join the party with 4 WXDC! 2 Blocks have been passed.
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("4"), { from: BobAddress })
@@ -391,9 +391,9 @@ describe("CollateralTokenAdapter", () => {
 
         context("when all parameters are valid", async () => {
             it("should work", async () => {
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
+                await collateralTokenAdapter.addToWhitelist(AliceAddress, { gasLimit: 1000000 });
                 //Alice wraps XDC to WXDC
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
+                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
                 // Assuming Alice is the first one to deposit hence no rewards to be harvested yet
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
                 await collateralTokenAdapter.deposit(
@@ -429,8 +429,8 @@ describe("CollateralTokenAdapter", () => {
         context("when bob withdraw collateral to alice", async () => {
             context("when bob doesn't has collateral", () => {
                 it("should be revert", async () => {
-                    await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
-                    await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
+                    await collateralTokenAdapter.addToWhitelist(AliceAddress, { gasLimit: 1000000 });
+                    await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
                     // Assuming Alice is the first one to deposit hence no rewards to be harvested yet
                     await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
                     await collateralTokenAdapter.deposit(
@@ -439,7 +439,7 @@ describe("CollateralTokenAdapter", () => {
                         ethers.utils.defaultAbiCoder.encode(["address"], [AliceAddress]),
                         { from: AliceAddress, gasLimit: 1000000 }
                     )
-                    await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
+                    await collateralTokenAdapter.addToWhitelist(BobAddress, { gasLimit: 1000000 });
                     //checking with Subik-ji
                     let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
 
@@ -457,8 +457,8 @@ describe("CollateralTokenAdapter", () => {
             })
             context("when bob has collateral", async () => {
                 it("should be able to call withdraw", async () => {
-                    await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
-                    await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
+                    await collateralTokenAdapter.addToWhitelist(AliceAddress, { gasLimit: 1000000 });
+                    await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
                     await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
                     await collateralTokenAdapter.deposit(
                         AliceAddress,
@@ -472,8 +472,8 @@ describe("CollateralTokenAdapter", () => {
                     let collateralPoolIdFromAdapter = await collateralTokenAdapter.collateralPoolId();
                     expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
 
-                    await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
-                    await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
+                    await collateralTokenAdapter.addToWhitelist(BobAddress, { gasLimit: 1000000 });
+                    await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
                     await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: BobAddress })
                     await collateralTokenAdapter.deposit(
                         BobAddress,
@@ -498,8 +498,8 @@ describe("CollateralTokenAdapter", () => {
     describe("#emergencyWithdraw", async () => {
         context("when CollateralTokenAdapter is not live", async () => {
             xit("should allow users to exit with emergencyWithdraw and normal withdraw", async () => {
-                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2),  gasLimit: 1000000})
-                await collateralTokenAdapter.whitelist(AliceAddress, {gasLimit: 1000000});
+                await WXDC.deposit({ from: AliceAddress, value: ethers.constants.WeiPerEther.mul(2), gasLimit: 1000000 })
+                await collateralTokenAdapter.addToWhitelist(AliceAddress, { gasLimit: 1000000 });
                 // Assuming Alice is the first one to deposit hence no rewards to be harvested yet
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("1"), { from: AliceAddress, gasLimit: 1000000 })
                 await collateralTokenAdapter.deposit(
@@ -515,8 +515,8 @@ describe("CollateralTokenAdapter", () => {
                 expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
 
 
-                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4),  gasLimit: 1000000})
-                await collateralTokenAdapter.whitelist(BobAddress, {gasLimit: 1000000});
+                await WXDC.deposit({ from: BobAddress, value: ethers.constants.WeiPerEther.mul(4), gasLimit: 1000000 })
+                await collateralTokenAdapter.addToWhitelist(BobAddress, { gasLimit: 1000000 });
                 // Bob join the party with 4 WXDC! 2 Blocks have been passed.
                 await WXDC.approve(collateralTokenAdapter.address, ethers.utils.parseEther("4"), { from: BobAddress })
                 await collateralTokenAdapter.deposit(

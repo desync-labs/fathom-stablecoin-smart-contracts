@@ -7,17 +7,17 @@ contract MockedDexRouter {
     using SafeToken for address;
 
     function swapExactTokensForTokens(
-        uint256 amountIn,
+        uint256 _amountIn,
         uint256,
-        address[] calldata path,
+        address[] calldata _path,
         address,
         uint256
     ) external returns (uint256[] memory amounts) {
-        uint256 amountToSend = path[1].balanceOf(address(this));
-        path[0].safeTransferFrom(msg.sender, address(this), amountIn);
-        path[1].safeTransfer(msg.sender, amountToSend);
+        uint256 amountToSend = _path[1].balanceOf(address(this));
+        _path[0].safeTransferFrom(msg.sender, address(this), _amountIn);
+        _path[1].safeTransfer(msg.sender, amountToSend);
         amounts = new uint256[](2);
-        amounts[0] = amountIn;
+        amounts[0] = _amountIn;
         amounts[1] = amountToSend;
     }
 }
