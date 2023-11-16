@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../interfaces/IManager.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
@@ -14,7 +14,7 @@ error InvalidUint();
 error PositionAlreadyClosed();
 error EtherTransferFailed(address recipient);
 
-contract FathomProxyWalletOwner is Ownable {
+contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
     uint256 internal constant RAY = 10 ** 27;
 
     address public ProxyWalletRegistry;
@@ -33,7 +33,7 @@ contract FathomProxyWalletOwner is Ownable {
     event WithdrawXDC(address _to, uint256 _xdcAmount);
     event Received(address _sender, uint256 _amount);
 
-    constructor(
+    function initialize(
         address _proxyWalletRegistry,
         address _bookKeeper,
         address _collateralPoolConfig,
@@ -43,7 +43,8 @@ contract FathomProxyWalletOwner is Ownable {
         address _collateralTokenAdapter,
         address _stablecoinAdapter,
         bytes32 _collateral_pool_id
-    ) {
+    ) external initializer {
+        __Ownable_init();
         _validateAddress(_proxyWalletRegistry);
         _validateAddress(_bookKeeper);
         _validateAddress(_collateralPoolConfig);
@@ -119,7 +120,6 @@ contract FathomProxyWalletOwner is Ownable {
         _validateAddress(ProxyWallet);
         (uint256 lockedCollateral, ) = positions(_positionId);
         _positionClosureCheck(lockedCollateral);
-
         IToken(StablecoinAddress).approve(ProxyWallet, IToken(StablecoinAddress).balanceOf(address(this)));
         bytes memory closePositionFullEncoding = abi.encodeWithSignature(
             "wipeAndUnlockXDC(address,address,address,uint256,uint256,uint256,bytes)",
