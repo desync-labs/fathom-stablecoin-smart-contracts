@@ -121,7 +121,7 @@ contract FathomProxyWalletOwner is Ownable {
         _positionClosureCheck(lockedCollateral);
 
         IToken(StablecoinAddress).approve(ProxyWallet, IToken(StablecoinAddress).balanceOf(address(this)));
-        bytes memory closePositionFullEncoding = abi.encodeWithSignature(
+        bytes memory closePositionPartialEncoding = abi.encodeWithSignature(
             "wipeAndUnlockXDC(address,address,address,uint256,uint256,uint256,bytes)",
             PositionManager,
             CollateralTokenAdapter,
@@ -131,7 +131,7 @@ contract FathomProxyWalletOwner is Ownable {
             _stablecoinAmount,
             bytes(hex"00")
         );
-        IProxyWallet(ProxyWallet).execute(closePositionFullEncoding);
+        IProxyWallet(ProxyWallet).execute(closePositionPartialEncoding);
         (bool sent, ) = payable(msg.sender).call{ value: address(this).balance }("");
         _successfullXDCTransfer(sent);
         emit ClosePosition(_positionId, _collateralAmount, _stablecoinAmount, false);
