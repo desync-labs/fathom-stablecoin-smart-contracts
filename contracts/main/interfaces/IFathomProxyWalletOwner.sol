@@ -2,5 +2,5 @@
 pragma solidity 0.8.17;
 
 interface IFathomProxyWalletOwner {
-    function ProxyWallet() external view returns (address);
+    function proxyWallet() external view returns (address);
 }

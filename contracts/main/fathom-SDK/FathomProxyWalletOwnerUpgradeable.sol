@@ -2,6 +2,7 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "../interfaces/IFathomProxyWalletOwner.sol";
 import "../interfaces/IManager.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
@@ -14,19 +15,19 @@ error InvalidUint();
 error PositionAlreadyClosed();
 error EtherTransferFailed(address recipient);
 
-contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
+contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable, IFathomProxyWalletOwner {
     uint256 internal constant RAY = 10 ** 27;
 
-    address public ProxyWalletRegistry;
-    address public BookKeeper;
-    address public CollateralPoolConfig;
-    address public StablecoinAddress;
-    address public PositionManager;
-    address public StabilityFeeCollector;
-    address public CollateralTokenAdapter;
-    address public StablecoinAdapter;
-    address public ProxyWallet;
-    bytes32 public Collateral_pool_id;
+    address public proxyWalletRegistry;
+    address public bookKeeper;
+    address public collateralPoolConfig;
+    address public stablecoinAddress;
+    address public positionManager;
+    address public stabilityFeeCollector;
+    address public collateralTokenAdapter;
+    address public stablecoinAdapter;
+    address public proxyWallet;
+    bytes32 public collateral_pool_id;
     event OpenPosition(uint256 _collateralAmount, uint256 _stablecoinBorrowed);
     event ClosePosition(uint256 _positionId, uint256 _collateralAmount, uint256 _stablecoinPaid, bool _fullClosure);
     event WithdrawStablecoin(address _to, uint256 _stablecoinAmount);
@@ -54,62 +55,62 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
         _validateAddress(_collateralTokenAdapter);
         _validateAddress(_stablecoinAdapter);
         _validateUint(uint256(_collateral_pool_id));
-        ProxyWalletRegistry = _proxyWalletRegistry;
-        BookKeeper = _bookKeeper;
-        CollateralPoolConfig = _collateralPoolConfig;
-        StablecoinAddress = _stablecoinAddress;
-        PositionManager = _positionManager;
-        StabilityFeeCollector = _stabilityFeeCollector;
-        CollateralTokenAdapter = _collateralTokenAdapter;
-        StablecoinAdapter = _stablecoinAdapter;
-        Collateral_pool_id = _collateral_pool_id;
+        proxyWalletRegistry = _proxyWalletRegistry;
+        bookKeeper = _bookKeeper;
+        collateralPoolConfig = _collateralPoolConfig;
+        stablecoinAddress = _stablecoinAddress;
+        positionManager = _positionManager;
+        stabilityFeeCollector = _stabilityFeeCollector;
+        collateralTokenAdapter = _collateralTokenAdapter;
+        stablecoinAdapter = _stablecoinAdapter;
+        collateral_pool_id = _collateral_pool_id;
     }
 
     function ownerFirstPositionId() external view returns (uint256 positionId) {
-        _validateAddress(ProxyWallet);
-        _validateAddress(PositionManager);
-        return IManager(PositionManager).ownerFirstPositionId(ProxyWallet);
+        _validateAddress(proxyWallet);
+        _validateAddress(positionManager);
+        return IManager(positionManager).ownerFirstPositionId(proxyWallet);
     }
 
     function ownerLastPositionId() external view returns (uint256 positionId) {
-        _validateAddress(ProxyWallet);
-        _validateAddress(PositionManager);
-        return IManager(PositionManager).ownerLastPositionId(ProxyWallet);
+        _validateAddress(proxyWallet);
+        _validateAddress(positionManager);
+        return IManager(positionManager).ownerLastPositionId(proxyWallet);
     }
 
     function ownerPositionCount() external view returns (uint256 positionCount) {
-        _validateAddress(ProxyWallet);
-        _validateAddress(PositionManager);
-        return IManager(PositionManager).ownerPositionCount(ProxyWallet);
+        _validateAddress(proxyWallet);
+        _validateAddress(positionManager);
+        return IManager(positionManager).ownerPositionCount(proxyWallet);
     }
 
     function list(uint256 _positionId) external view returns (uint256 prev, uint256 next) {
         _validateUint(_positionId);
-        _validateAddress(ProxyWallet);
-        _validateAddress(PositionManager);
-        return IManager(PositionManager).list(_positionId);
+        _validateAddress(proxyWallet);
+        _validateAddress(positionManager);
+        return IManager(positionManager).list(_positionId);
     }
 
     function buildProxyWallet() external onlyOwner {
-        require(ProxyWallet == address(0), "ProxyWallet-already-init");
-        ProxyWallet = IProxyWalletRegistry(ProxyWalletRegistry).build(address(this));
+        require(proxyWallet == address(0), "proxyWallet-already-init");
+        proxyWallet = IProxyWalletRegistry(proxyWalletRegistry).build(address(this));
     }
 
     function openPosition(uint256 _stablecoinAmount) external payable onlyOwner {
         _validateUint(_stablecoinAmount);
-        _validateAddress(ProxyWallet);
+        _validateAddress(proxyWallet);
         bytes memory openPositionEncoding = abi.encodeWithSignature(
             "openLockXDCAndDraw(address,address,address,address,bytes32,uint256,bytes)",
-            PositionManager,
-            StabilityFeeCollector,
-            CollateralTokenAdapter,
-            StablecoinAdapter,
-            Collateral_pool_id,
+            positionManager,
+            stabilityFeeCollector,
+            collateralTokenAdapter,
+            stablecoinAdapter,
+            collateral_pool_id,
             _stablecoinAmount,
             bytes(hex"00")
         );
-        IProxyWallet(ProxyWallet).execute{ value: msg.value }(openPositionEncoding);
-        IToken(StablecoinAddress).transfer(msg.sender, IToken(StablecoinAddress).balanceOf(address(this)));
+        IProxyWallet(proxyWallet).execute{ value: msg.value }(openPositionEncoding);
+        IToken(stablecoinAddress).transfer(msg.sender, IToken(stablecoinAddress).balanceOf(address(this)));
         emit OpenPosition(msg.value, _stablecoinAmount);
     }
 
@@ -117,21 +118,21 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
         _validateUint(_positionId);
         _validateUint(_collateralAmount);
         _validateUint(_stablecoinAmount);
-        _validateAddress(ProxyWallet);
+        _validateAddress(proxyWallet);
         (uint256 lockedCollateral, ) = positions(_positionId);
         _positionClosureCheck(lockedCollateral);
-        IToken(StablecoinAddress).approve(ProxyWallet, IToken(StablecoinAddress).balanceOf(address(this)));
+        IToken(stablecoinAddress).approve(proxyWallet, IToken(stablecoinAddress).balanceOf(address(this)));
         bytes memory closePositionPartialEncoding = abi.encodeWithSignature(
             "wipeAndUnlockXDC(address,address,address,uint256,uint256,uint256,bytes)",
-            PositionManager,
-            CollateralTokenAdapter,
-            StablecoinAdapter,
+            positionManager,
+            collateralTokenAdapter,
+            stablecoinAdapter,
             _positionId,
             _collateralAmount,
             _stablecoinAmount,
             bytes(hex"00")
         );
-        IProxyWallet(ProxyWallet).execute(closePositionPartialEncoding);
+        IProxyWallet(proxyWallet).execute(closePositionPartialEncoding);
         (bool sent, ) = payable(msg.sender).call{ value: address(this).balance }("");
         _successfullXDCTransfer(sent);
         emit ClosePosition(_positionId, _collateralAmount, _stablecoinAmount, false);
@@ -139,23 +140,23 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
 
     function closePositionFull(uint256 _positionId) external onlyOwner {
         _validateUint(_positionId);
-        _validateAddress(ProxyWallet);
-        _validateAddress(BookKeeper);
+        _validateAddress(proxyWallet);
+        _validateAddress(bookKeeper);
         (uint256 lockedCollateral, ) = positions(_positionId);
         _positionClosureCheck(lockedCollateral);
-        uint256 balanceBefore = IToken(StablecoinAddress).balanceOf(address(this));
-        IToken(StablecoinAddress).approve(ProxyWallet, balanceBefore);
+        uint256 balanceBefore = IToken(stablecoinAddress).balanceOf(address(this));
+        IToken(stablecoinAddress).approve(proxyWallet, balanceBefore);
         bytes memory closePositionFullEncoding = abi.encodeWithSignature(
             "wipeAllAndUnlockXDC(address,address,address,uint256,uint256,bytes)",
-            PositionManager,
-            CollateralTokenAdapter,
-            StablecoinAdapter,
+            positionManager,
+            collateralTokenAdapter,
+            stablecoinAdapter,
             _positionId,
             lockedCollateral,
             bytes(hex"00")
         );
-        IProxyWallet(ProxyWallet).execute(closePositionFullEncoding);
-        uint256 balanceAfter = IToken(StablecoinAddress).balanceOf(address(this));
+        IProxyWallet(proxyWallet).execute(closePositionFullEncoding);
+        uint256 balanceAfter = IToken(stablecoinAddress).balanceOf(address(this));
 
         (bool sent, ) = payable(msg.sender).call{ value: address(this).balance }("");
         _successfullXDCTransfer(sent);
@@ -163,9 +164,9 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
     }
 
     function withdrawStablecoin() external onlyOwner {
-        uint256 stablecoinBalance = IToken(StablecoinAddress).balanceOf(address(this));
+        uint256 stablecoinBalance = IToken(stablecoinAddress).balanceOf(address(this));
         require(stablecoinBalance != 0, "zero-stablecoin-balance");
-        IToken(StablecoinAddress).transfer(msg.sender, stablecoinBalance);
+        IToken(stablecoinAddress).transfer(msg.sender, stablecoinBalance);
         emit WithdrawStablecoin(msg.sender, stablecoinBalance);
     }
 
@@ -183,21 +184,21 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
     }
 
     function getDebtAccumulatedRate() public view returns (uint256) {
-        _validateAddress(CollateralPoolConfig);
-        _validateUint(uint256(Collateral_pool_id));
-        return ICollateralPoolConfig(CollateralPoolConfig).getDebtAccumulatedRate(Collateral_pool_id);
+        _validateAddress(collateralPoolConfig);
+        _validateUint(uint256(collateral_pool_id));
+        return ICollateralPoolConfig(collateralPoolConfig).getDebtAccumulatedRate(collateral_pool_id);
     }
 
     function getPositionAddress(uint256 _positionId) public view returns (address positionAddress) {
         _validateUint(_positionId);
-        _validateAddress(PositionManager);
-        return IManager(PositionManager).positions(_positionId);
+        _validateAddress(positionManager);
+        return IManager(positionManager).positions(_positionId);
     }
 
     function positions(uint256 _positionId) public view returns (uint256 lockedCollateral, uint256 debtShare) {
         _validateUint(_positionId);
-        _validateAddress(BookKeeper);
-        return IBookKeeper(BookKeeper).positions(Collateral_pool_id, getPositionAddress(_positionId));
+        _validateAddress(bookKeeper);
+        return IBookKeeper(bookKeeper).positions(collateral_pool_id, getPositionAddress(_positionId));
     }
 
     function _validateAddress(address _address) internal pure {
