@@ -2,6 +2,7 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "../interfaces/IFathomProxyWalletOwner.sol";
 import "../interfaces/IManager.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
@@ -14,7 +15,7 @@ error InvalidUint();
 error PositionAlreadyClosed();
 error EtherTransferFailed(address recipient);
 
-contract FathomProxyWalletOwner is Ownable {
+contract FathomProxyWalletOwner is Ownable, IFathomProxyWalletOwner {
     uint256 internal constant RAY = 10 ** 27;
 
     address public ProxyWalletRegistry;
