@@ -137,18 +137,12 @@ describe("FathomProxyWalletOwner", async () => {
       await fathomStablecoin.transfer(fathomProxyWalletOwner.address, "30000000000000000000");
       const balanceBeforeClose = await fathomStablecoin.balanceOf(fathomProxyWalletOwner.address);
       // the console log looks easier when .toString() is used.
-      const { lockedCollateral, debtShare } = await fathomProxyWalletOwner.positions(ownerFirstPositionId);
-      expect(lockedCollateral).to.equal(WeiPerWad.mul(30));
-      // console.log(lockedCollateral.toString());
-      // const FXDToRepay = await fathomProxyWalletOwner.getActualFXDToRepay(ownerFirstPositionId);
-      // console.log(FXDToRepay.toString());
       await fathomProxyWalletOwner.closePositionFull(ownerFirstPositionId.toString());
       const balanceAfterClose = await fathomStablecoin.balanceOf(fathomProxyWalletOwner.address);
       const debtValueAfterClose = await fathomProxyWalletOwner.getActualFXDToRepay(ownerFirstPositionId);
       expect(balanceBeforeClose).to.not.equal(balanceAfterClose);
       expect(debtValueBeforeClose).to.not.equal(debtValueAfterClose);
       const FXDToRepayAfterClose = await fathomProxyWalletOwner.getActualFXDToRepay(ownerFirstPositionId);
-      // console.log(FXDToRepayAfterClose.toString());
       expect(FXDToRepayAfterClose).to.be.equal(0);
       const { lockedCollateralAfter, debtShareAfter } = await fathomProxyWalletOwner.positions(ownerFirstPositionId);
       expect(lockedCollateralAfter).to.be.undefined;

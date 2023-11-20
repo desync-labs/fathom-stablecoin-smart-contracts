@@ -1,5 +1,4 @@
 const fs = require('fs');
-// const path = require('path');
 const pools = require("../../common/collateral");
 
 
@@ -8,8 +7,6 @@ const addresses = JSON.parse(rawdata);
 
 const FathomProxyWalletOwner = artifacts.require('FathomProxyWalletOwner.sol');
 
-// const addressesPath = path.join(__dirname, '../../../addresses.json');
-// const addresses = JSON.parse(fs.readFileSync(addressesPath));
 const proxyWalletRegistry = addresses.proxyWalletRegistry;
 const bookKeeper = addresses.bookKeeper;
 const collateralPoolConfig = addresses.collateralPoolConfig;
