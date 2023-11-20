@@ -9,14 +9,15 @@ let addresses = JSON.parse(rawdata);
 
 const { formatBytes32String } = ethers.utils
 
-const { DeployerAddress, AliceAddress, BobAddress, AddressZero } = require("../../helper/address");
+const { DeployerAddress, AliceAddress, AddressZero } = require("../../helper/address");
 const { getContract, createMock } = require("../../helper/contracts");
 const { getProxy } = require("../../../common/proxies");
 const { WeiPerWad } = require("../../helper/unit");
 const { loadFixture } = require("../../helper/fixtures");
 
-const COLLATERAL_POOL_ID = formatBytes32String("XDC")
+// const provider = new ethers.providers.JsonRpcProvider('http://localhost:8545');
 
+const COLLATERAL_POOL_ID = formatBytes32String("XDC")
 const FathomProxyWalletOwner = artifacts.require('FathomProxyWalletOwner.sol');
 
 const loadFixtureHandler = async () => {
@@ -57,6 +58,10 @@ describe("FathomProxyWalletOwner", async () => {
     it("owner should be the deployer", async () => {
       const ownerAddress = await fathomProxyWalletOwner.owner();
       expect(ownerAddress).to.be.equal(DeployerAddress);
+    });
+    it("position manager address should be correct should be the deployer", async () => {
+      const positionManagerAddress = await fathomProxyWalletOwner.positionManager();
+      expect(positionManagerAddress).to.be.equal(addresses.positionManager);
     });
     it("when calling ownerLastPositionId, it should revert", async () => {
       //custom errors check are not supported for tests yet. Need to upgrade waffle version to 4.
@@ -128,13 +133,90 @@ describe("FathomProxyWalletOwner", async () => {
       await fathomProxyWalletOwner.openPosition(WeiPerWad.mul(15), { from: DeployerAddress, value: WeiPerWad.mul(30) });
       await fathomProxyWalletOwner.openPosition(WeiPerWad.mul(15), { from: DeployerAddress, value: WeiPerWad.mul(30) });
       const ownerFirstPositionId = await fathomProxyWalletOwner.ownerFirstPositionId();
-      // await fathomStablecoin.transfer(fathomProxyWalletOwner.address, WeiPerWad.mul(15));
-      await fathomStablecoin.transfer(fathomProxyWalletOwner.address, ethers.utils.parseEther("30"));
-      // await fathomStablecoin.transfer(fathomProxyWalletOwner.address, ethers.constants.WeiPerEther.mul(30));
-      // await fathomStablecoin.transfer(fathomProxyWalletOwner.address, BigNumber.from(`30${"0".repeat(18)}`));
-
-      // await fathomProxyWalletOwner.closePositionFull(ownerFirstPositionId);
-
+      const debtValueBeforeClose = await fathomProxyWalletOwner.getActualFXDToRepay(ownerFirstPositionId);
+      await fathomStablecoin.transfer(fathomProxyWalletOwner.address, "30000000000000000000");
+      const balanceBeforeClose = await fathomStablecoin.balanceOf(fathomProxyWalletOwner.address);
+      // the console log looks easier when .toString() is used.
+      const { lockedCollateral, debtShare } = await fathomProxyWalletOwner.positions(ownerFirstPositionId);
+      expect(lockedCollateral).to.equal(WeiPerWad.mul(30));
+      // console.log(lockedCollateral.toString());
+      // const FXDToRepay = await fathomProxyWalletOwner.getActualFXDToRepay(ownerFirstPositionId);
+      // console.log(FXDToRepay.toString());
+      await fathomProxyWalletOwner.closePositionFull(ownerFirstPositionId.toString());
+      const balanceAfterClose = await fathomStablecoin.balanceOf(fathomProxyWalletOwner.address);
+      const debtValueAfterClose = await fathomProxyWalletOwner.getActualFXDToRepay(ownerFirstPositionId);
+      expect(balanceBeforeClose).to.not.equal(balanceAfterClose);
+      expect(debtValueBeforeClose).to.not.equal(debtValueAfterClose);
+      const FXDToRepayAfterClose = await fathomProxyWalletOwner.getActualFXDToRepay(ownerFirstPositionId);
+      // console.log(FXDToRepayAfterClose.toString());
+      expect(FXDToRepayAfterClose).to.be.equal(0);
+      const { lockedCollateralAfter, debtShareAfter } = await fathomProxyWalletOwner.positions(ownerFirstPositionId);
+      expect(lockedCollateralAfter).to.be.undefined;
+      expect(debtShareAfter).to.be.undefined;
+    });
+  });
+  context("position closure partial", async () => {
+    it("Position full closure should work when there is enoguh FXD", async () => {
+      await fathomProxyWalletOwner.buildProxyWallet();
+      await fathomProxyWalletOwner.openPosition(WeiPerWad.mul(15), { from: DeployerAddress, value: WeiPerWad.mul(30) });
+      const ownerFirstPositionId = await fathomProxyWalletOwner.ownerFirstPositionId();
+      const debtValueBeforeClose = await fathomProxyWalletOwner.getActualFXDToRepay(ownerFirstPositionId);
+      await fathomStablecoin.transfer(fathomProxyWalletOwner.address, "15000000000000000000");
+      const balanceBeforeClose = await fathomStablecoin.balanceOf(fathomProxyWalletOwner.address);
+      await fathomProxyWalletOwner.closePositionPartial(ownerFirstPositionId, "5000000000000000000", "10000000000000000000");
+      const balanceAfterClose = await fathomStablecoin.balanceOf(fathomProxyWalletOwner.address);
+      const debtValueAfterClose = await fathomProxyWalletOwner.getActualFXDToRepay(ownerFirstPositionId);
+      expect(balanceBeforeClose).to.not.equal(balanceAfterClose);
+      expect(debtValueBeforeClose).to.not.equal(debtValueAfterClose);
+      const { lockedCollateral, debtShare } = await fathomProxyWalletOwner.positions(ownerFirstPositionId);
+      expect(lockedCollateral).to.equal(WeiPerWad.mul(25));
+    });
+  });
+  context("position counter", async () => {
+    it("Opening 3 positions should return 3 in positionCount", async () => {
+      await fathomProxyWalletOwner.buildProxyWallet();
+      await fathomProxyWalletOwner.openPosition(WeiPerWad.mul(15), { from: DeployerAddress, value: WeiPerWad.mul(30) });
+      await fathomProxyWalletOwner.openPosition(WeiPerWad.mul(15), { from: DeployerAddress, value: WeiPerWad.mul(30) });
+      const positionCountAt2 = await fathomProxyWalletOwner.ownerPositionCount();
+      expect(positionCountAt2).to.be.equal(2);
+      await fathomProxyWalletOwner.openPosition(WeiPerWad.mul(15), { from: DeployerAddress, value: WeiPerWad.mul(30) });
+      const positionCountAt3 = await fathomProxyWalletOwner.ownerPositionCount();
+      expect(positionCountAt3).to.be.equal(3);
+    });
+  });
+  context("access control", async () => {
+    it("buildProxyWallet should revert when not called by the owner", async () => {
+      await expect(fathomProxyWalletOwner.buildProxyWallet({ from: AliceAddress }))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
+    it("openPosition should revert when not called by the owner", async () => {
+      await fathomProxyWalletOwner.buildProxyWallet();
+      await expect(fathomProxyWalletOwner.openPosition(WeiPerWad.mul(15), { from: AliceAddress, value: WeiPerWad.mul(30) }))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
+    it("closePositionFull should revert when not called by the owner", async () => {
+      await fathomProxyWalletOwner.buildProxyWallet();
+      await fathomProxyWalletOwner.openPosition(WeiPerWad.mul(15), { from: DeployerAddress, value: WeiPerWad.mul(30) });
+      const ownerFirstPositionId = await fathomProxyWalletOwner.ownerFirstPositionId();
+      await fathomStablecoin.transfer(fathomProxyWalletOwner.address, "15000000000000000000");
+      await expect(fathomProxyWalletOwner.closePositionFull(ownerFirstPositionId, { from: AliceAddress }))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
+    it("closePositionPartial should revert when not called by the owner", async () => {
+      await fathomProxyWalletOwner.buildProxyWallet();
+      await fathomProxyWalletOwner.openPosition(WeiPerWad.mul(15), { from: DeployerAddress, value: WeiPerWad.mul(30) });
+      const ownerFirstPositionId = await fathomProxyWalletOwner.ownerFirstPositionId();
+      await fathomStablecoin.transfer(fathomProxyWalletOwner.address, "15000000000000000000");
+      await expect(fathomProxyWalletOwner.closePositionPartial(ownerFirstPositionId, "1000000000000000000", "15000000000000000000", { from: AliceAddress }))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
+    it("withdrawXDC should revert when not called by the owner", async () => {
+      await expect(fathomProxyWalletOwner.withdrawXDC({ from: AliceAddress }))
+        .to.be.revertedWith("Ownable: caller is not the owner");
+    });
+    it("withdrawStablecoin should revert when not called by the owner", async () => {
+      await expect(fathomProxyWalletOwner.withdrawStablecoin({ from: AliceAddress }))
+        .to.be.revertedWith("Ownable: caller is not the owner");
     });
   });
 });
