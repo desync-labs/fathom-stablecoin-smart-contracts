@@ -37,4 +37,12 @@ interface IManager {
     function positions(uint256) external view returns (address);
 
     function bookKeeper() external view returns (address);
+
+    function list(uint256 _positionId) external view returns (uint256 prev, uint256 next);
+
+    function ownerFirstPositionId(address _proxyWalletAddress) external view returns (uint256 positionId);
+
+    function ownerLastPositionId(address _proxyWalletAddress) external view returns (uint256 positionId);
+
+    function ownerPositionCount(address _proxyWalletAddress) external view returns (uint256 positionCount);
 }
