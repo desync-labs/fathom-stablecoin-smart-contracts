@@ -20,7 +20,7 @@ contract FathomPriceOracle is Initializable, IFathomCentralizedOracle {
         require(_accessControlConfig != address(0), "FathomPriceOracle: ZERO_ADDRESS");
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
 
-        (, uint256 value, , , ) = IFathomOracleAggregator(oracle).latestRoundData();
+        (, uint256 value, , , ) = IFathomOracleAggregator(_oracle).latestRoundData();
         require(value > 0, "FathomPriceOracle/invalid-oracle");
         oracle = IFathomOracleAggregator(_oracle);
     }
@@ -34,7 +34,7 @@ contract FathomPriceOracle is Initializable, IFathomCentralizedOracle {
     }
 
     function setOracle(address _oracle) external onlyOwner {
-        (, uint256 value, , , ) = IFathomOracleAggregator(oracle).latestRoundData();
+        (, uint256 value, , , ) = IFathomOracleAggregator(_oracle).latestRoundData();
         require(value > 0, "FathomPriceOracle/invalid-oracle");
         oracle = IFathomOracleAggregator(_oracle);
     }
