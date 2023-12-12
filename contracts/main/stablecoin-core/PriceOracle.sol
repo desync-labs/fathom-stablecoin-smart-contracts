@@ -28,7 +28,7 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
     uint256 internal constant MAX_REFERENCE_PRICE = 2 * (10 ** 27);
 
     IBookKeeper public bookKeeper; // CDP Engine
-    uint256 public override stableCoinReferencePrice; // ref per FUSD [ray] :: value of stablecoin in the reference asset (e.g. $1 per Fathom USD)
+    uint256 public override stableCoinReferencePrice; // ref per FXD [ray] :: value of stablecoin in the reference asset (e.g. $1 per Fathom USD)
 
     uint256 public live;
 

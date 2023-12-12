@@ -14,7 +14,7 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
     uint8 public constant decimals = 18;
 
     string public name; // Fathom USD Stablecoin
-    string public symbol; // FUSD
+    string public symbol; // FXD
     uint256 public totalSupply;
 
     mapping(address => uint256) public override balanceOf;

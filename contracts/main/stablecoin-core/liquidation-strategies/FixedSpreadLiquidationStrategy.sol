@@ -49,7 +49,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
 
     IBookKeeper public bookKeeper; // Core CDP Engine
     ILiquidationEngine public liquidationEngine; // Liquidation module
-    ISystemDebtEngine public systemDebtEngine; // Recipient of FUSD raised in auctions
+    ISystemDebtEngine public systemDebtEngine; // Recipient of FXD raised in auctions
     IPriceOracle public priceOracle; // Collateral price module
     IStablecoinAdapter public stablecoinAdapter; //StablecoinAdapter to deposit FXD to bookKeeper
 
@@ -151,9 +151,9 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
     // solhint-disable function-max-lines
     function execute(
         bytes32 _collateralPoolId,
-        uint256 _positionDebtShare, // positionDebtShare                  [wad]
-        uint256 _positionCollateralAmount, // positionLockedCollateral           [wad]
-        address _positionAddress, // Address that will receive any leftover collateral
+        uint256 _positionDebtShare, // Debt share in a position                         [wad]
+        uint256 _positionCollateralAmount, // Collateral Amount in a position           [wad]
+        address _positionAddress, // Address that will receive any leftover collateral after liquidation
         uint256 _debtShareToBeLiquidated, // The value of debt to be liquidated as specified by the liquidator [wad]
         uint256 _maxDebtShareToBeLiquidated, // The maximum value of debt to be liquidated as specified by the liquidator in case of full liquidation for slippage control [wad]
         address _liquidatorAddress,

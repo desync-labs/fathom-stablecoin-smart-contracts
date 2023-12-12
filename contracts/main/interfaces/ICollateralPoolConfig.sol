@@ -4,29 +4,29 @@ pragma solidity 0.8.17;
 interface ICollateralPoolConfig {
     struct CollateralPool {
         uint256 totalDebtShare; // Total debt share of Fathom Stablecoin of this collateral pool              [wad]
-        uint256 debtAccumulatedRate; // Accumulated rates (equivalent to ibToken Price)                       [ray]
-        uint256 priceWithSafetyMargin; // Price with safety margin (taken into account the Collateral Ratio)  [ray]
+        uint256 debtAccumulatedRate; // Accumulated rates, compounded secondly                                [ray]
+        uint256 priceWithSafetyMargin; // Price with safety margin ( OriginalPrice * LTV )                    [ray]
         uint256 debtCeiling; // Debt ceiling of this collateral pool                                          [rad]
         uint256 debtFloor; // Position debt floor of this collateral pool                                     [rad]
         address priceFeed; // Price Feed
-        uint256 liquidationRatio; // Liquidation ratio or Collateral ratio                                    [ray]
+        uint256 liquidationRatio; // Liquidation ratio or Collateral ratio, Inverse of LTV                    [ray]
         uint256 stabilityFeeRate; // Collateral-specific, per-second stability fee debtAccumulatedRate or mint interest debtAccumulatedRate [ray]
         uint256 lastAccumulationTime; // Time of last call to `collect`                                       [unix epoch time]
         address adapter;
-        uint256 closeFactorBps; // Percentage (BPS) of how much  of debt could be liquidated in a single liquidation
+        uint256 closeFactorBps; // Percentage (BPS) of how much of debt could be liquidated in a single liquidation
         uint256 liquidatorIncentiveBps; // Percentage (BPS) of how much additional collateral will be given to the liquidator incentive
         uint256 treasuryFeesBps; // Percentage (BPS) of how much additional collateral will be transferred to the treasury
         address strategy; // Liquidation strategy for this collateral pool
-        uint256 positionDebtCeiling; // position debt ceiling of this collateral pool [rad]
+        uint256 positionDebtCeiling; // position debt ceiling of this collateral pool                         [rad]
     }
 
     struct CollateralPoolInfo {
-        uint256 debtAccumulatedRate; // [ray]
-        uint256 totalDebtShare; // [wad]
-        uint256 debtCeiling; // [rad]
-        uint256 priceWithSafetyMargin; // [ray]
-        uint256 debtFloor; // [rad]
-        uint256 positionDebtCeiling; // [rad]
+        uint256 debtAccumulatedRate; //     [ray]
+        uint256 totalDebtShare; //          [wad]
+        uint256 debtCeiling; //             [rad]
+        uint256 priceWithSafetyMargin; //   [ray]
+        uint256 debtFloor; //               [rad]
+        uint256 positionDebtCeiling; //     [rad]
     }
 
     function setPriceWithSafetyMargin(bytes32 _collateralPoolId, uint256 _priceWithSafetyMargin) external;
