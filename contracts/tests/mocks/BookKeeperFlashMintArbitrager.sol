@@ -43,7 +43,7 @@ contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBo
 
         uint256 loanAmount = _loanValue / RAY;
 
-        // 1. Swap AUSD to BUSD at a DEX
+        // 1. Swap FXD to USDT at a DEX
         //    vars.stableSwapModule.stablecoinAdapter().bookKeeper().addToWhitelist(address(vars.stableSwapModule.stablecoinAdapter()));
         //  vars.stableSwapModule.stablecoinAdapter().withdraw(address(this), loanAmount, abi.encode(0));
         uint256 balanceBefore = vars.stableSwapToken.myBalance();
@@ -52,12 +52,12 @@ contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBo
         stablecoin.safeApprove(vars.router, 0);
         uint256 balanceAfter = vars.stableSwapToken.myBalance();
 
-        // 2. Swap BUSD to AUSD at StableSwapModule
+        // 2. Swap USDT to FXD at StableSwapModule
         //   vars.stableSwapToken.safeApprove(address(vars.stableSwapModule.authTokenAdapter()), type(uint).max);
         vars.stableSwapModule.swapTokenToStablecoin(address(this), balanceAfter.sub(balanceBefore));
         // vars.stableSwapToken.safeApprove(address(vars.stableSwapModule.authTokenAdapter()), 0);
 
-        // 3. Approve AUSD for FlashMintModule
+        // 3. Approve FXD for FlashMintModule
         //  stablecoin.safeApprove(address(vars.stableSwapModule.stablecoinAdapter()), loanAmount.add(fee.div(RAY)));
         //vars.stableSwapModule.stablecoinAdapter().deposit(msg.sender, loanAmount.add(fee.div(RAY)), abi.encode(0));
 

@@ -1185,7 +1185,7 @@ describe("PositionPermissions", () => {
                         "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance2, "Alice should receive 1 FXD from Alice drew 1 time").to.be.equal(WeiPerWad)
-                    expect(BobFathomStablecoinBalance, "Bob should receive 1 FXD from mint Ausd at Alice position").to.be.equal(
+                    expect(BobFathomStablecoinBalance, "Bob should receive 1 FXD from mint FXD at Alice position").to.be.equal(
                         WeiPerWad
                     )
                 })
@@ -1927,7 +1927,7 @@ describe("PositionPermissions", () => {
                     // 5. allow bob to window
                     await bookKeeper.addToWhitelist(stablecoinAdapter.address, { from: BobAddress })
 
-                    // 6. mint ausd
+                    // 6. mint FXD
                     await stablecoinAdapter.withdraw(
                         BobAddress,
                         WeiPerWad,

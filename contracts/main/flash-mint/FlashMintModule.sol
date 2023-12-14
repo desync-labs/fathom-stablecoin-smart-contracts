@@ -157,7 +157,9 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
 
         require(_receiver.onFlashLoan(msg.sender, _token, _amount, _fee, _data) == CALLBACK_SUCCESS, "FlashMintModule/callback-failed");
         address(stablecoin).safeTransferFrom(address(_receiver), address(this), _total); // The fee is also enforced here
+        address(stablecoin).safeApprove(address(stablecoinAdapter), _total);
         stablecoinAdapter.deposit(address(this), _total, abi.encode(0));
+        address(stablecoin).safeApprove(address(stablecoinAdapter), 0);
         bookKeeper.settleSystemBadDebt(_amt);
 
         return true;
