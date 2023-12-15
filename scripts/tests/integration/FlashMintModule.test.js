@@ -26,10 +26,6 @@ const loadFixtureHandler = async () => {
   const USDT = await artifacts.initializeInterfaceAt("ERC20MintableStableSwap", usdtAddr);
 
   const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
-  // const ERC20Mintable = await getProxy(proxyFactory, "ERC20Mintable");
-
-  // const usdtAddr = await authTokenAdapter.token();
-  // const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
 
   const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
   const router = await artifacts.initializeInterfaceAt("MockedDexRouter", "MockedDexRouter");
