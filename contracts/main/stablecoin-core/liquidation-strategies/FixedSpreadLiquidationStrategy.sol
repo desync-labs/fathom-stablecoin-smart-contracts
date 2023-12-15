@@ -195,11 +195,9 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
             -int256(info.collateralAmountToBeLiquidated),
             -int256(info.actualDebtShareToBeLiquidated)
         );
-
         if (info.treasuryFees > 0) {
             bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
         }
-
         if (
             flashLendingEnabled == 1 &&
             _data.length > 0 &&
@@ -207,14 +205,12 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
             _collateralRecipient != address(liquidationEngine) &&
             IERC165(_collateralRecipient).supportsInterface(FLASH_LENDING_ID)
         ) {
-            //there should be ERC165 function selector check added to above condition
             bookKeeper.moveCollateral(
                 _collateralPoolId,
                 address(this),
                 _collateralRecipient,
                 info.collateralAmountToBeLiquidated - info.treasuryFees
             );
-
             IFlashLendingCallee(_collateralRecipient).flashLendingCall(
                 msg.sender,
                 info.actualDebtValueToBeLiquidated,
@@ -232,7 +228,6 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
             _stablecoin.safeApprove(address(stablecoinAdapter), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
             stablecoinAdapter.depositRAD(_liquidatorAddress, info.actualDebtValueToBeLiquidated, _collateralPoolId, abi.encode(0));
         }
-
         bookKeeper.moveStablecoin(_liquidatorAddress, address(systemDebtEngine), info.actualDebtValueToBeLiquidated);
 
         info.positionDebtShare = _positionDebtShare;

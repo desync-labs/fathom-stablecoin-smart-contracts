@@ -10,4 +10,6 @@ contract MockFlashLendingCallee is IFlashLendingCallee {
         uint256 _collateralAmountToLiquidate, // [wad]
         bytes calldata
     ) external override {}
+    function supportsInterface(bytes4) external view returns (bool) {}
+
 }
