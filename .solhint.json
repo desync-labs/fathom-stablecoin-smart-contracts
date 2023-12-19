@@ -10,15 +10,10 @@
         "modifier-name-mixedcase": "error",
         "code-complexity": ["error",7],
         "function-max-lines": ["error",50],
-        "const-name-snakecase": "error",
-        "no-complex-fallback": "off",
         "no-inline-assembly": "off",
-        "private-vars-leading-underscore": "off",
-        "avoid-low-level-calls": "off",
         "no-empty-blocks": "off",
         "max-states-count": "off",
         "no-global-import": "off",
-        "comprehensive-interface": "off",
         "not-rely-on-time": "off",
         "reason-string": "off"
     }
