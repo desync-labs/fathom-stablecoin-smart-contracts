@@ -7,6 +7,7 @@ pragma solidity 0.8.17;
 contract MockedDexRouter {
     using SafeToken for address;
     bool public profitSwitch;
+
     function swapExactTokensForTokens(
         uint256 _amountIn,
         uint256,
@@ -14,11 +15,10 @@ contract MockedDexRouter {
         address,
         uint256
     ) external returns (uint256[] memory amounts) {
- 
         uint256 amountToSend = _amountIn / (10 ** 12);
         _path[0].safeTransferFrom(msg.sender, address(this), _amountIn);
         if (profitSwitch == true) {
-            _path[1].safeTransfer(msg.sender, amountToSend * 110 / 100);
+            _path[1].safeTransfer(msg.sender, (amountToSend * 110) / 100);
         } else {
             _path[1].safeTransfer(msg.sender, amountToSend);
         }
@@ -27,22 +27,15 @@ contract MockedDexRouter {
         amounts[1] = amountToSend;
     }
 
-    function deposit(
-        address _token,
-        uint256 _amount
-    ) external {
+    function deposit(address _token, uint256 _amount) external {
         _token.safeTransferFrom(msg.sender, address(this), _amount);
     }
 
-    function withdraw(
-        address _token
-    ) external {
+    function withdraw(address _token) external {
         _token.safeTransfer(msg.sender, _token.balanceOf(address(this)));
     }
-    
-    function setProfit(
-        bool _onOrOff
-    ) external {
+
+    function setProfit(bool _onOrOff) external {
         profitSwitch = _onOrOff;
     }
 }

@@ -26,12 +26,16 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
     address public collateralTokenAdapter;
     address public stablecoinAdapter;
     address public proxyWallet;
-    bytes32 public collateral_pool_id;
+    bytes32 public collateralPoolId;
     event OpenPosition(uint256 _collateralAmount, uint256 _stablecoinBorrowed);
     event ClosePosition(uint256 _positionId, uint256 _collateralAmount, uint256 _stablecoinPaid, bool _fullClosure);
     event WithdrawStablecoin(address _to, uint256 _stablecoinAmount);
     event WithdrawXDC(address _to, uint256 _xdcAmount);
     event Received(address _sender, uint256 _amount);
+
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
+    }
 
     function initialize(
         address _proxyWalletRegistry,
@@ -42,7 +46,7 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
         address _stabilityFeeCollector,
         address _collateralTokenAdapter,
         address _stablecoinAdapter,
-        bytes32 _collateral_pool_id
+        bytes32 _collateralPoolId
     ) external initializer {
         __Ownable_init();
         _validateAddress(_proxyWalletRegistry);
@@ -53,7 +57,7 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
         _validateAddress(_stabilityFeeCollector);
         _validateAddress(_collateralTokenAdapter);
         _validateAddress(_stablecoinAdapter);
-        _validateUint(uint256(_collateral_pool_id));
+        _validateUint(uint256(_collateralPoolId));
         proxyWalletRegistry = _proxyWalletRegistry;
         bookKeeper = _bookKeeper;
         collateralPoolConfig = _collateralPoolConfig;
@@ -62,32 +66,7 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
         stabilityFeeCollector = _stabilityFeeCollector;
         collateralTokenAdapter = _collateralTokenAdapter;
         stablecoinAdapter = _stablecoinAdapter;
-        collateral_pool_id = _collateral_pool_id;
-    }
-
-    function ownerFirstPositionId() external view returns (uint256 positionId) {
-        _validateAddress(proxyWallet);
-        _validateAddress(positionManager);
-        return IManager(positionManager).ownerFirstPositionId(proxyWallet);
-    }
-
-    function ownerLastPositionId() external view returns (uint256 positionId) {
-        _validateAddress(proxyWallet);
-        _validateAddress(positionManager);
-        return IManager(positionManager).ownerLastPositionId(proxyWallet);
-    }
-
-    function ownerPositionCount() external view returns (uint256 positionCount) {
-        _validateAddress(proxyWallet);
-        _validateAddress(positionManager);
-        return IManager(positionManager).ownerPositionCount(proxyWallet);
-    }
-
-    function list(uint256 _positionId) external view returns (uint256 prev, uint256 next) {
-        _validateUint(_positionId);
-        _validateAddress(proxyWallet);
-        _validateAddress(positionManager);
-        return IManager(positionManager).list(_positionId);
+        collateralPoolId = _collateralPoolId;
     }
 
     function buildProxyWallet() external onlyOwner {
@@ -104,7 +83,7 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
             stabilityFeeCollector,
             collateralTokenAdapter,
             stablecoinAdapter,
-            collateral_pool_id,
+            collateralPoolId,
             _stablecoinAmount,
             bytes(hex"00")
         );
@@ -177,6 +156,31 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
         emit WithdrawXDC(msg.sender, balanceXDC);
     }
 
+    function ownerFirstPositionId() external view returns (uint256 positionId) {
+        _validateAddress(proxyWallet);
+        _validateAddress(positionManager);
+        return IManager(positionManager).ownerFirstPositionId(proxyWallet);
+    }
+
+    function ownerLastPositionId() external view returns (uint256 positionId) {
+        _validateAddress(proxyWallet);
+        _validateAddress(positionManager);
+        return IManager(positionManager).ownerLastPositionId(proxyWallet);
+    }
+
+    function ownerPositionCount() external view returns (uint256 positionCount) {
+        _validateAddress(proxyWallet);
+        _validateAddress(positionManager);
+        return IManager(positionManager).ownerPositionCount(proxyWallet);
+    }
+
+    function list(uint256 _positionId) external view returns (uint256 prev, uint256 next) {
+        _validateUint(_positionId);
+        _validateAddress(proxyWallet);
+        _validateAddress(positionManager);
+        return IManager(positionManager).list(_positionId);
+    }
+
     function getActualFXDToRepay(uint256 _positionId) public view returns (uint256) {
         (, uint256 debtShare) = positions(_positionId);
         return (debtShare * getDebtAccumulatedRate()) / RAY;
@@ -184,8 +188,8 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
 
     function getDebtAccumulatedRate() public view returns (uint256) {
         _validateAddress(collateralPoolConfig);
-        _validateUint(uint256(collateral_pool_id));
-        return ICollateralPoolConfig(collateralPoolConfig).getDebtAccumulatedRate(collateral_pool_id);
+        _validateUint(uint256(collateralPoolId));
+        return ICollateralPoolConfig(collateralPoolConfig).getDebtAccumulatedRate(collateralPoolId);
     }
 
     function getPositionAddress(uint256 _positionId) public view returns (address positionAddress) {
@@ -197,7 +201,11 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
     function positions(uint256 _positionId) public view returns (uint256 lockedCollateral, uint256 debtShare) {
         _validateUint(_positionId);
         _validateAddress(bookKeeper);
-        return IBookKeeper(bookKeeper).positions(collateral_pool_id, getPositionAddress(_positionId));
+        return IBookKeeper(bookKeeper).positions(collateralPoolId, getPositionAddress(_positionId));
+    }
+
+    function _successfullXDCTransfer(bool _sent) internal view {
+        if (!_sent) revert EtherTransferFailed(msg.sender);
     }
 
     function _validateAddress(address _address) internal pure {
@@ -210,13 +218,5 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
 
     function _positionClosureCheck(uint256 _lockedCollateral) internal pure {
         if (_lockedCollateral == 0) revert PositionAlreadyClosed();
-    }
-
-    function _successfullXDCTransfer(bool _sent) internal view {
-        if (!_sent) revert EtherTransferFailed(msg.sender);
-    }
-
-    receive() external payable {
-        emit Received(msg.sender, msg.value);
     }
 }
