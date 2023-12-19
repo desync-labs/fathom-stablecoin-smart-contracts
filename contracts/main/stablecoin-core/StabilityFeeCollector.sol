@@ -71,25 +71,21 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
         emit LogSetSystemDebtEngine(msg.sender, _systemDebtEngine);
     }
 
-    /**
-     * @dev Collects the stability fee of the specified collateral pool.
-     * This function can be called by anyone.
-     * It updates the `debtAccumulatedRate` of the specified collateral pool based on
-     * the global and per-pool stability fee rates with respect to the last block that `collect` was called.
-     * @param _collateralPool Collateral pool ID for which to collect the stability fee.
-     * @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
-     */
+    /// @dev Collects the stability fee of the specified collateral pool.
+    /// This function can be called by anyone.
+    /// It updates the `debtAccumulatedRate` of the specified collateral pool based on
+    /// the global and per-pool stability fee rates with respect to the last block that `collect` was called.
+    /// @param _collateralPool Collateral pool ID for which to collect the stability fee.
+    /// @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
     function collect(bytes32 _collateralPool) external override whenNotPaused nonReentrant returns (uint256 _debtAccumulatedRate) {
         _debtAccumulatedRate = _collect(_collateralPool);
     }
 
-    /**
-     * @dev Internal function to collect the stability fee of the specified collateral pool.
-     * This function updates the `debtAccumulatedRate` of the specified collateral pool based on
-     * the global and per-pool stability fee rates with respect to the last block that `collect` was called.
-     * @param _collateralPoolId Collateral pool ID for which to collect the stability fee.
-     * @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
-     */
+    /// @dev Internal function to collect the stability fee of the specified collateral pool.
+    /// This function updates the `debtAccumulatedRate` of the specified collateral pool based on
+    /// the global and per-pool stability fee rates with respect to the last block that `collect` was called.
+    /// @param _collateralPoolId Collateral pool ID for which to collect the stability fee.
+    /// @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
     function _collect(bytes32 _collateralPoolId) internal returns (uint256 _debtAccumulatedRate) {
         ICollateralPoolConfig _config = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
 

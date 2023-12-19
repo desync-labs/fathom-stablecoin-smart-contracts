@@ -83,12 +83,10 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         _;
     }
 
-    /**
-     * @notice Initialize the contract
-     * @param _bookKeeper The address of the BookKeeper contract
-     * @param _systemDebtEngine The address of the SystemDebtEngine contract
-     * @dev The function can only be called once after contract deployment
-     */
+    /// @notice Initialize the contract
+    /// @param _bookKeeper The address of the BookKeeper contract
+    /// @param _systemDebtEngine The address of the SystemDebtEngine contract
+    /// @dev The function can only be called once after contract deployment
     // --- Init ---
     function initialize(address _bookKeeper, address _systemDebtEngine) external initializer {
         PausableUpgradeable.__Pausable_init();
@@ -101,35 +99,29 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         live = 1;
     }
 
-    /**
-     * @notice Add a new liquidator to the whitelist
-     * @param _toBeWhitelisted The address to be whitelisted
-     * @dev Can only be called by the contract owner or the governance system
-     */
+    /// @notice Add a new liquidator to the whitelist
+    /// @param _toBeWhitelisted The address to be whitelisted
+    /// @dev Can only be called by the contract owner or the governance system
     function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
         require(_toBeWhitelisted != address(0), "LiquidationEngine/whitelist-invalidAddress");
         liquidatorsWhitelist[_toBeWhitelisted] = true;
     }
 
-    /**
-     * @notice Remove a liquidator from the whitelist
-     * @param _toBeRemoved The address to be removed from the whitelist
-     * @dev Can only be called by the contract owner or the governance system
-     */
+    /// @notice Remove a liquidator from the whitelist
+    /// @param _toBeRemoved The address to be removed from the whitelist
+    /// @dev Can only be called by the contract owner or the governance system
     function removeFromWhitelist(address _toBeRemoved) external onlyOwnerOrGov {
         liquidatorsWhitelist[_toBeRemoved] = false;
     }
 
-    /**
-     * @notice Batch liquidate multiple positions
-     * @param _collateralPoolIds The ids of the collateral pools for the positions to be liquidated
-     * @param _positionAddresses The addresses of the positions to be liquidated
-     * @param _debtShareToBeLiquidateds The amount of debt to be liquidated for each position
-     * @param _maxDebtShareToBeLiquidateds The maximum amount of debt that can be liquidated for each position
-     * @param _collateralRecipients The addresses to receive the liquidated collateral
-     * @param _datas Extra data to be passed to each liquidation call
-     * @dev Can only be called by a whitelisted liquidator
-     */
+    /// @notice Batch liquidate multiple positions
+    /// @param _collateralPoolIds The ids of the collateral pools for the positions to be liquidated
+    /// @param _positionAddresses The addresses of the positions to be liquidated
+    /// @param _debtShareToBeLiquidateds The amount of debt to be liquidated for each position
+    /// @param _maxDebtShareToBeLiquidateds The maximum amount of debt that can be liquidated for each position
+    /// @param _collateralRecipients The addresses to receive the liquidated collateral
+    /// @param _datas Extra data to be passed to each liquidation call
+    /// @dev Can only be called by a whitelisted liquidator
     function batchLiquidate(
         bytes32[] calldata _collateralPoolIds,
         address[] calldata _positionAddresses,
@@ -186,16 +178,14 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
         _liquidate(_collateralPoolId, _positionAddress, _debtShareToBeLiquidated, _maxDebtShareToBeLiquidated, _collateralRecipient, _data, _sender);
     }
 
-    /**
-     * @notice Liquidate a position
-     * @param _collateralPoolId The id of the collateral pool for the position to be liquidated
-     * @param _positionAddress The address of the position to be liquidated
-     * @param _debtShareToBeLiquidated The amount of debt to be liquidated
-     * @param _maxDebtShareToBeLiquidated The maximum amount of debt that can be liquidated
-     * @param _collateralRecipient The address to receive the liquidated collateral
-     * @param _data Extra data to be passed to the liquidation call
-     * @dev Can only be called by a whitelisted liquidator
-     */
+    /// @notice Liquidate a position
+    /// @param _collateralPoolId The id of the collateral pool for the position to be liquidated
+    /// @param _positionAddress The address of the position to be liquidated
+    /// @param _debtShareToBeLiquidated The amount of debt to be liquidated
+    /// @param _maxDebtShareToBeLiquidated The maximum amount of debt that can be liquidated
+    /// @param _collateralRecipient The address to receive the liquidated collateral
+    /// @param _data Extra data to be passed to the liquidation call
+    /// @dev Can only be called by a whitelisted liquidator
     function liquidate(
         bytes32 _collateralPoolId,
         address _positionAddress,
