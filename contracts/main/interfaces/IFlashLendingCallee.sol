@@ -8,4 +8,5 @@ interface IFlashLendingCallee {
         uint256 _collateralAmountToLiquidate, // [wad]
         bytes calldata
     ) external;
+    function supportsInterface(bytes4) external view returns (bool);
 }

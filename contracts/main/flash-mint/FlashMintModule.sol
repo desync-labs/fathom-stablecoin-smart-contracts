@@ -19,7 +19,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
     IBookKeeper public bookKeeper;
     IStablecoinAdapter public stablecoinAdapter;
     IStablecoin public stablecoin;
-    address public systemDebtEngine; // systemDebtEngine intentionally set immutable to save gas
+    address public systemDebtEngine;
 
     uint256 public max; // Maximum borrowable stablecoin  [wad]
     uint256 public feeRate; // Fee                     [wad = 100%]
@@ -118,7 +118,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
     }
 
     function setMax(uint256 _data) external onlyOwner {
-        // Add an upper limit of 10^27 Stablecoin to avoid breaking technical assumptions of Stablecoin << 2^256 - 1
+        // Add an upper limit of 10^45 Stablecoin to avoid breaking technical assumptions of Stablecoin << 2^256 - 1
         require((max = _data) <= RAD, "FlashMintModule/ceiling-too-high");
         emit LogSetMax(_data);
     }
@@ -157,7 +157,9 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
 
         require(_receiver.onFlashLoan(msg.sender, _token, _amount, _fee, _data) == CALLBACK_SUCCESS, "FlashMintModule/callback-failed");
         address(stablecoin).safeTransferFrom(address(_receiver), address(this), _total); // The fee is also enforced here
+        address(stablecoin).safeApprove(address(stablecoinAdapter), _total);
         stablecoinAdapter.deposit(address(this), _total, abi.encode(0));
+        address(stablecoin).safeApprove(address(stablecoinAdapter), 0);
         bookKeeper.settleSystemBadDebt(_amt);
 
         return true;

@@ -57,7 +57,7 @@ contract PositionManager is PausableUpgradeable, IManager {
         require(msg.sender == owners[_positionId] || ownerWhitelist[owners[_positionId]][_positionId][msg.sender] == true, "owner not allowed");
         _;
     }
-    /// @dev auditor's sugesttion
+    /// @dev Require that the caller is the owner of the position.
     modifier onlyPositionOwner(uint256 _positionId) {
         require(msg.sender == owners[_positionId], "owner not allowed");
         _;

@@ -23,7 +23,7 @@ const setup = async () => {
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
-    
+
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
     await proxyWalletRegistry.setDecentralizedMode(true);
 
@@ -96,7 +96,7 @@ describe("Stability Fee", () => {
                 // position 1
                 //  a. open a new position
                 //  b. lock WXDC
-                //  c. mint FUSD
+                //  c. mint FXD
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
@@ -122,7 +122,7 @@ describe("Stability Fee", () => {
                 // position 2
                 //  a. open a new position
                 //  b. lock WXDC
-                //  c. mint FUSD
+                //  c. mint FXD
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
 
                 const positionId2 = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
@@ -169,7 +169,7 @@ describe("Stability Fee", () => {
                     "3199999999999999999325451277240274098589179020"
                 )
 
-                //  a. repay some FUSD
+                //  a. repay some FXD
                 //  b. alice unlock some WXDC
                 await PositionHelper.wipeAndUnlockXDC(
                     aliceProxyWallet,

@@ -124,7 +124,7 @@ describe("LiquidationEngine", () => {
                 await simplePriceFeed.setPrice(WeiPerRay.mul(2), { gasLimit: 1000000 });
                 await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
-                // 2. Alice open a new position with 1 XDC and draw 1 FUSD
+                // 2. Alice open a new position with 1 XDC and draw 1 FXD
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad, WeiPerWad);
                 const alicePositionAddress = await positionManager.positions(1)
 
@@ -140,14 +140,14 @@ describe("LiquidationEngine", () => {
             })
         })
 
-        context("safety buffer -0.1%, but liquidator does not have enough FUSD to liquidate", async () => {
+        context("safety buffer -0.1%, but liquidator does not have enough FXD to liquidate", async () => {
             it("should revert", async () => {
                 // 1. Set priceWithSafetyMargin for XDC to 2 USD
                 await simplePriceFeed.setPrice(WeiPerRay.mul(2), { gasLimit: 1000000 });
                 await priceOracle.setPrice(COLLATERAL_POOL_ID);
                 await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
 
-                // 2. Alice open a new position with 1 XDC and draw 1 FUSD
+                // 2. Alice open a new position with 1 XDC and draw 1 FXD
                 await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad, WeiPerWad);
                 const alicePositionAddress = await positionManager.positions(1)
 
@@ -399,7 +399,7 @@ describe("LiquidationEngine", () => {
                     await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 3000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
 
-                    // 2. Alice open a new position with 1 XDC and draw 1 FUSD
+                    // 2. Alice open a new position with 1 XDC and draw 1 FXD
                     const lockedCollateralAmount = parseEther(testParam.collateralAmount)
                     const drawStablecoinAmount = parseEther(testParam.drawStablecoinAmount)
 
@@ -493,7 +493,7 @@ describe("LiquidationEngine", () => {
                     await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 1000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
 
-                    // 2. Alice open a new position with 1 XDC and draw 1 FUSD
+                    // 2. Alice open a new position with 1 XDC and draw 1 FXD
                     const lockedCollateralAmount = parseEther(testParam.collateralAmount)
                     const drawStablecoinAmount = parseEther(testParam.drawStablecoinAmount)
                     // await XDC.approve(aliceProxyWallet.address, lockedCollateralAmount, { from: AliceAddress })
@@ -598,7 +598,7 @@ describe("LiquidationEngine", () => {
                     //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, parseUnits("294", 27), { gasLimit: 1000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseEther("100").mul(WeiPerRay), { gasLimit: 1000000 })
 
-                    // 2. Alice open a new position with 10 XDC and draw 2000 FUSD
+                    // 2. Alice open a new position with 10 XDC and draw 2000 FXD
                     const lockedCollateralAmount = parseEther("10")
                     const drawStablecoinAmount = parseEther("2000")
 
@@ -647,7 +647,7 @@ describe("LiquidationEngine", () => {
                     AssertHelpers.assertAlmostEqual(
                         (await bookKeeper.stablecoin(systemDebtEngine.address)).toString(),
                         parseEther("10").mul(WeiPerRay).toString()
-                    ) // There should be 10 FUSD left in SystemDebtEngine collected from stability fee after `settleSystemBadDebt`
+                    ) // There should be 10 FXD left in SystemDebtEngine collected from stability fee after `settleSystemBadDebt`
 
                     const bobStablecoinAfterLiquidation = await fathomStablecoin.balanceOf(BobAddress)
 
@@ -659,13 +659,13 @@ describe("LiquidationEngine", () => {
                     )
                     expect(
                         alicePositionAfterLiquidation.debtShare,
-                        "debtShare should be 1000 FUSD, because Bob liquidated 1000 FUSD from Alice's position"
+                        "debtShare should be 1000 FXD, because Bob liquidated 1000 FXD from Alice's position"
                     )
                         .to.be.equal(alicePosition.debtShare.sub(debtShareToRepay))
                         .to.be.equal(parseEther("1000"))
                     expect(
                         await bookKeeper.systemBadDebt(systemDebtEngine.address),
-                        "System bad debt should be 0 FUSD"
+                        "System bad debt should be 0 FXD"
                     ).to.be.equal(0)
 
                     AssertHelpers.assertAlmostEqual(
@@ -675,7 +675,7 @@ describe("LiquidationEngine", () => {
                     AssertHelpers.assertAlmostEqual(
                         bobStablecoinBeforeLiquidation.sub(bobStablecoinAfterLiquidation).toString(),
                         parseEther("1005").toString()
-                    ) // Bob should pay 1005 FUSD for this liquidation
+                    ) // Bob should pay 1005 FXD for this liquidation
                     AssertHelpers.assertAlmostEqual(
                         (await bookKeeper.collateralToken(COLLATERAL_POOL_ID, systemDebtEngine.address)).toString(),
                         parseEther("0.1007539").toString()
@@ -717,7 +717,7 @@ describe("LiquidationEngine", () => {
                 await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 1000000 })
                 await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
 
-                // 2. Alice open a new position with 1 XDC and draw 1 FUSD
+                // 2. Alice open a new position with 1 XDC and draw 1 FXD
                 const lockedCollateralAmount = parseEther(testParam.collateralAmount)
                 const drawStablecoinAmount = parseEther(testParam.drawStablecoinAmount)
 

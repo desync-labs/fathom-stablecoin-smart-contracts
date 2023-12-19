@@ -24,18 +24,18 @@ contract FlashMintArbitrager is OwnableUpgradeable, IERC3156FlashBorrower {
         path[0] = _token;
         path[1] = stableSwapToken;
 
-        // 1. Swap AUSD to BUSD at a DEX
+        // 1. Swap FXD to USDT at a DEX
         uint256 balanceBefore = stableSwapToken.myBalance();
         _token.safeApprove(router, type(uint).max);
         IFathomSwapRouter(router).swapExactTokensForTokens(_amount, 0, path, address(this), block.timestamp);
         _token.safeApprove(router, 0);
         uint256 balanceAfter = stableSwapToken.myBalance();
-        // 2. Swap BUSD to AUSD at StableSwapModule
-        //stableSwapToken.safeApprove(address(IStableSwapModule(stableSwapModule).authTokenAdapter()), type(uint).max);
-        IStableSwapModule(stableSwapModule).swapTokenToStablecoin(address(this), balanceAfter.sub(balanceBefore));
-        //stableSwapToken.safeApprove(address(IStableSwapModule(stableSwapModule).authTokenAdapter()), 0);
 
-        // 3. Approve AUSD for FlashMintModule
+        // 2. Swap USDT to FXD at StableSwapModule
+        stableSwapToken.safeApprove(stableSwapModule, type(uint).max);
+        IStableSwapModule(stableSwapModule).swapTokenToStablecoin(address(this), balanceAfter.sub(balanceBefore));
+        stableSwapToken.safeApprove(stableSwapModule, 0);
+        // 3. Approve FXD for FlashMintModule
         _token.safeApprove(msg.sender, _amount.add(_fee));
 
         return keccak256("ERC3156FlashBorrower.onFlashLoan");

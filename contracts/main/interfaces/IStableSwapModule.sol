@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
+import "../interfaces/IBookKeeper.sol";
+
 interface IStableSwapModule {
     function swapTokenToStablecoin(address _usr, uint256 _tokenAmount) external;
 
@@ -23,4 +25,6 @@ interface IStableSwapModule {
     function remainingFXDFeeBalance() external view returns (uint256);
 
     function remainingTokenFeeBalance() external view returns (uint256);
+
+    function bookKeeper() external view returns (IBookKeeper);
 }

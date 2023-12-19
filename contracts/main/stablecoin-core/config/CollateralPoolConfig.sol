@@ -10,7 +10,7 @@ import "../../interfaces/IAccessControlConfig.sol";
 
 /**
  * @title CollateralPoolConfig
- * @notice A contract can add collateral pool type to the protocol and also manage settings for a specific pool type.
+ * @notice A contract that can add collateral pool type to the protocol and also manage settings for a specific pool type.
  */
 
 contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
@@ -51,8 +51,8 @@ contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
     }
 
     /**
-    //@notice this function adds a collateral pool type to Fathom protocol
-    //@dev please refer to the deployment/migration script for more detail info on units for each params.
+    //@notice This function adds a collateral pool type to Fathom protocol
+    //@dev Please refer to the deployment/migration script for more detail info on units for each params.
      */
     function initCollateralPool(
         bytes32 _collateralPoolId, // Identifier for a specific collateral pool.
