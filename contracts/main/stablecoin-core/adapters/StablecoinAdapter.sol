@@ -68,21 +68,17 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         }
     }
 
-    /**
-     * @notice Deposits stablecoin from msg.sender into the BookKeeper.
-     * @param _usr Address of the user to credit the deposit to.
-     * @param _wad Amount to deposit. [wad]
-     */
+    /// @notice Deposits stablecoin from msg.sender into the BookKeeper.
+    /// @param _usr Address of the user to credit the deposit to.
+    /// @param _wad Amount to deposit. [wad]
     function deposit(address _usr, uint256 _wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         bookKeeper.moveStablecoin(address(this), _usr, _wad * RAY);
         stablecoin.burn(msg.sender, _wad);
     }
 
-    /**
-     * @notice Deposits stablecoin from msg.sender into the BookKeeper in RAD.
-     * @param _usr Address of the user to credit the deposit to.
-     * @param _rad Amount to deposit. [rad]
-     */
+    /// @notice Deposits stablecoin from msg.sender into the BookKeeper in RAD.
+    /// @param _usr Address of the user to credit the deposit to.
+    /// @param _rad Amount to deposit. [rad]
     function depositRAD(
         address _usr,
         uint256 _rad,
@@ -93,11 +89,9 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         stablecoin.burn(msg.sender, (_rad / RAY) + 1);
     }
 
-    /**
-     * @notice Withdraws stablecoin to a specified user.
-     * @param _usr Address of the user to withdraw stablecoin to.
-     * @param _wad Amount to withdraw. [wad]
-     */
+    /// @notice Withdraws stablecoin to a specified user.
+    /// @param _usr Address of the user to withdraw stablecoin to.
+    /// @param _wad Amount to withdraw. [wad]
     function withdraw(address _usr, uint256 _wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         require(live == 1, "StablecoinAdapter/not-live");
         bookKeeper.moveStablecoin(msg.sender, address(this), _wad * RAY);

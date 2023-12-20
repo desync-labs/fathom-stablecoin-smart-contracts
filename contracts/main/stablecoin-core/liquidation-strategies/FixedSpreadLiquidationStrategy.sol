@@ -89,15 +89,13 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         _;
     }
 
-    /**
-     * @notice Initializes the FixedSpreadLiquidationStrategy contract with required dependencies.
-     * @param _bookKeeper The address of the BookKeeper contract.
-     * @param _priceOracle The address of the PriceOracle contract.
-     * @param _liquidationEngine The address of the LiquidationEngine contract.
-     * @param _systemDebtEngine The address of the SystemDebtEngine contract.
-     * @param _stablecoinAdapter The address of the StablecoinAdapter contract used for depositing FXD to the BookKeeper.
-     * @dev Reverts if any of the input parameters are the zero address or invalid.
-     */
+    /// @notice Initializes the FixedSpreadLiquidationStrategy contract with required dependencies.
+    /// @param _bookKeeper The address of the BookKeeper contract.
+    /// @param _priceOracle The address of the PriceOracle contract.
+    /// @param _liquidationEngine The address of the LiquidationEngine contract.
+    /// @param _systemDebtEngine The address of the SystemDebtEngine contract.
+    /// @param _stablecoinAdapter The address of the StablecoinAdapter contract used for depositing FXD to the BookKeeper.
+    /// @dev Reverts if any of the input parameters are the zero address or invalid.
     function initialize(
         address _bookKeeper,
         address _priceOracle,
@@ -137,12 +135,10 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         _unpause();
     }
 
-    /**
-     * @notice Sets the flash lending feature to enabled or disabled.
-     * @param _flashLendingEnabled The value indicating whether flash lending should be enabled (1) or disabled (0).
-     * @dev This function can only be called by the contract owner or governance.
-     * @dev Emits a LogSetFlashLendingEnabled event upon a successful update.
-     */
+    /// @notice Sets the flash lending feature to enabled or disabled.
+    /// @param _flashLendingEnabled The value indicating whether flash lending should be enabled (1) or disabled (0).
+    /// @dev This function can only be called by the contract owner or governance.
+    /// @dev Emits a LogSetFlashLendingEnabled event upon a successful update.
     function setFlashLendingEnabled(uint256 _flashLendingEnabled) external onlyOwnerOrGov {
         flashLendingEnabled = _flashLendingEnabled;
         emit LogSetFlashLendingEnabled(msg.sender, _flashLendingEnabled);

@@ -64,10 +64,8 @@ contract AdminControls is Initializable {
         stablecoinAdapter = _stablecoinAdapter;
     }
 
-    /**
-     * @notice Pause all core modules of the protocol.
-     * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are paused.
-     */
+    /// @notice Pause all core modules of the protocol.
+    /// @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are paused.
     function pauseProtocol() external onlyOwnerOrGov {
         IPausable(bookKeeper).pause();
         IPausable(positionManager).pause();
@@ -79,10 +77,8 @@ contract AdminControls is Initializable {
         emit LogPauseProtocol();
     }
 
-    /**
-     * @notice Unpause all core modules of the protocol.
-     * @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are unpaused.
-     */
+    /// @notice Unpause all core modules of the protocol.
+    /// @dev This function can only be called by owner or governance role. All related contracts implementing IPausable interface are unpaused.
     function unpauseProtocol() external onlyOwnerOrGov {
         IPausable(bookKeeper).unpause();
         IPausable(positionManager).unpause();

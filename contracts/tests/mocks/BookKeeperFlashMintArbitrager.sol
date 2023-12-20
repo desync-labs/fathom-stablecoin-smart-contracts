@@ -50,7 +50,6 @@ contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBo
         //above is actually callling bookKeeper.addToWhiteList(stablecoinAdapterAddress);
         IStablecoinAdapterGetter(msg.sender).stablecoinAdapter().withdraw(address(this), loanAmount, abi.encode(0));
 
-
         uint256 balanceBefore = vars.stableSwapToken.myBalance();
         stablecoin.safeApprove(vars.router, type(uint).max);
         IFathomSwapRouter(vars.router).swapExactTokensForTokens(loanAmount, 0, path, address(this), block.timestamp);

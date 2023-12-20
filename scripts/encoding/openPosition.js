@@ -11,7 +11,7 @@ const COLLATERAL_POOL_ID = formatBytes32String("XDC");
 const { WeiPerWad } = require("../tests/helper/unit");
 
 
-const openPositionAndDraw = async (collateral_pool_id, stablecoinAmount) => {
+const openPositionAndDraw = async (collateralPoolId, stablecoinAmount) => {
 
     console.log("here1");
 
@@ -24,7 +24,7 @@ const openPositionAndDraw = async (collateral_pool_id, stablecoinAmount) => {
         stablecoinAddress.stabilityFeeCollector, // StabilityFeeCollector
         stablecoinAddress.collateralTokenAdapter, // CollateralTokenAdapter
         stablecoinAddress.stablecoinAdapter, // StablecoinAdapter
-        collateral_pool_id,
+        collateralPoolId,
         stablecoinAmount, // wad
         "0x00",
     ])
