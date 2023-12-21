@@ -36,6 +36,7 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
             "DelayPriceFeed/msgsender-not-owner"
         );
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
+        emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
 
     function setPriceLife(uint256 _second) external onlyOwner {

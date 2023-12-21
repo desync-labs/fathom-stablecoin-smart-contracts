@@ -147,20 +147,21 @@ contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
         _collateralPools[_poolId].liquidationRatio = _liquidationRatio;
         emit LogSetLiquidationRatio(msg.sender, _poolId, _liquidationRatio);
     }
-/// @dev Set the stability fee rate of the collateral pool.
-///      The rate to be set here is the `r` in:
-///         r^N = APR
-///      Where:
-///         r = stability fee rate
-///         N = Accumulation frequency which is per-second in this case; the value will be 60*60*24*365 = 31536000 to signify the number of seconds within a year.
-///         APR = the annual percentage rate
-///      For example, to achieve 0.5% APR for stability fee rate:
-///         r^31536000 = 1.005
-///      Find the 31536000th root of 1.005 and we will get:
-///         r = 1.000000000158153903837946258002097...
-///      The rate is in [ray] format, so the actual value of `stabilityFeeRate` will be:
-///         stabilityFeeRate = 1000000000158153903837946258
-///      The above `stabilityFeeRate` will be the value we will use in this contract.
+
+    /// @dev Set the stability fee rate of the collateral pool.
+    ///      The rate to be set here is the `r` in:
+    ///         r^N = APR
+    ///      Where:
+    ///         r = stability fee rate
+    ///         N = Accumulation frequency which is per-second in this case; the value will be 60*60*24*365 = 31536000 to signify the number of seconds within a year.
+    ///         APR = the annual percentage rate
+    ///      For example, to achieve 0.5% APR for stability fee rate:
+    ///         r^31536000 = 1.005
+    ///      Find the 31536000th root of 1.005 and we will get:
+    ///         r = 1.000000000158153903837946258002097...
+    ///      The rate is in [ray] format, so the actual value of `stabilityFeeRate` will be:
+    ///         stabilityFeeRate = 1000000000158153903837946258
+    ///      The above `stabilityFeeRate` will be the value we will use in this contract.
     function setStabilityFeeRate(bytes32 _collateralPool, uint256 _stabilityFeeRate) external onlyOwner {
         require(_stabilityFeeRate >= RAY, "CollateralPoolConfig/invalid-stability-fee-rate");
         // Maximum stability fee rate is 50% yearly
