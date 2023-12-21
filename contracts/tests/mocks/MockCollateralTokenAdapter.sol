@@ -88,6 +88,8 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     event LogDeposit(uint256 _val);
     event LogWithdraw(uint256 _val);
     event LogEmergencyWithdraw(address indexed _caller, address _to);
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -135,11 +137,13 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
         require(_toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
         whiteListed[_toBeWhitelisted] = true;
+        emit LogAddToWhitelist(_toBeWhitelisted);
     }
 
     function removeFromWhitelist(address _toBeRemoved) external onlyOwnerOrGov {
         require(_toBeRemoved != address(0), "CollateralTokenAdapter/removeFromWL-invalidAdds");
         whiteListed[_toBeRemoved] = false;
+        emit LogRemoveFromWhitelist(_toBeRemoved);
     }
 
     /// @dev Cage function halts MockCollateralTokenAdapter contract for good.

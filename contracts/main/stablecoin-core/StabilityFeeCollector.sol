@@ -27,6 +27,7 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
     address public systemDebtEngine;
 
     event LogSetSystemDebtEngine(address indexed _caller, address _data);
+    event LogNewDebtAccumulatedRate(uint256 _newDebtAccumulatedRate);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -79,6 +80,7 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
     /// @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
     function collect(bytes32 _collateralPool) external override whenNotPaused nonReentrant returns (uint256 _debtAccumulatedRate) {
         _debtAccumulatedRate = _collect(_collateralPool);
+        emit LogNewDebtAccumulatedRate(_debtAccumulatedRate);
     }
 
     /// @dev Internal function to collect the stability fee of the specified collateral pool.

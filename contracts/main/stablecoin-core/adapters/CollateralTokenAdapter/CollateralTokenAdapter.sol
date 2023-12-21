@@ -41,7 +41,8 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
 
     event LogDeposit(uint256 _val);
     event LogWithdraw(uint256 _val);
-    event LogWhitelisted(address indexed _user, bool _isWhitelisted);
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
     event LogEmergencyWithdraw(address indexed _caller, address _to);
 
     modifier onlyOwner() {
@@ -89,7 +90,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
         require(_toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
         whiteListed[_toBeWhitelisted] = true;
-        emit LogWhitelisted(_toBeWhitelisted, true);
+        emit LogAddToWhitelist(_toBeWhitelisted);
     }
 
     /// @notice Removes an address from the whitelist
@@ -98,7 +99,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     function removeFromWhitelist(address _toBeRemoved) external onlyOwnerOrGov {
         require(_toBeRemoved != address(0), "CollateralTokenAdapter/removeFromWL-invalidAdds");
         whiteListed[_toBeRemoved] = false;
-        emit LogWhitelisted(_toBeRemoved, false);
+        emit LogRemoveFromWhitelist(_toBeRemoved);
     }
 
     /// @dev The `cage` function permanently halts the `collateralTokenAdapter` contract.

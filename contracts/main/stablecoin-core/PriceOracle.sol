@@ -39,6 +39,7 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
     );
 
     event LogSetStableCoinReferencePrice(address indexed _caller, uint256 _data);
+    event LogSetBookKeeper(address indexed _newAddress);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -82,6 +83,7 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
     function setBookKeeper(address _bookKeeper) external onlyOwner isLive {
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
+        emit LogSetBookKeeper(_bookKeeper);
     }
 
     function setStableCoinReferencePrice(uint256 _referencePrice) external onlyOwner isLive {

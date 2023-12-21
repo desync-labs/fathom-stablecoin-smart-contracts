@@ -58,7 +58,8 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
     event LogAddCollateral(address indexed _caller, address indexed _usr, int256 _amount);
     event LogMoveCollateral(address indexed _caller, bytes32 indexed _collateralPoolId, address _src, address indexed _dst, uint256 _amount);
     event LogMoveStablecoin(address indexed _caller, address _src, address indexed _dst, uint256 _amount);
-
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
     event StablecoinIssuedAmount(uint256 _totalStablecoinIssued, bytes32 indexed _collateralPoolId, uint256 _poolStablecoinIssued);
 
     modifier onlyOwner() {
@@ -196,6 +197,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
     /// @dev Emits no events.
     function addToWhitelist(address _toBeWhitelistedAddress) external override whenNotPaused {
         positionWhitelist[msg.sender][_toBeWhitelistedAddress] = 1;
+        emit LogAddToWhitelist(_toBeWhitelistedAddress);
     }
 
     /// @dev Revokes the allowance from the `toBeRemovedAddress` to adjust the position address of the caller.
@@ -204,6 +206,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
     /// @dev Emits no events.
     function removeFromWhitelist(address _toBeRemovedAddress) external override whenNotPaused {
         positionWhitelist[msg.sender][_toBeRemovedAddress] = 0;
+        emit LogRemoveFromWhitelist(_toBeRemovedAddress);
     }
 
     // --- Core Logic ---

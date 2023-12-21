@@ -46,6 +46,9 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     mapping(address => bool) public liquidatorsWhitelist;
 
     event LiquidationFail(bytes32 _collateralPoolIds, address _positionAddresses, address _liquidator, string reason);
+    event LogSetBookKeeper(address indexed _newAddress);
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
 
     modifier onlyOwnerOrShowStopper() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -105,6 +108,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
         require(_toBeWhitelisted != address(0), "LiquidationEngine/whitelist-invalidAddress");
         liquidatorsWhitelist[_toBeWhitelisted] = true;
+        emit LogAddToWhitelist(_toBeWhitelisted);
     }
 
     /// @notice Remove a liquidator from the whitelist
@@ -112,6 +116,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     /// @dev Can only be called by the contract owner or the governance system
     function removeFromWhitelist(address _toBeRemoved) external onlyOwnerOrGov {
         liquidatorsWhitelist[_toBeRemoved] = false;
+        emit LogRemoveFromWhitelist(_toBeRemoved);
     }
 
     /// @notice Batch liquidate multiple positions
@@ -208,6 +213,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     function setBookKeeper(address _bookKeeper) external onlyOwner isLive {
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "LiquidationEngine/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
+        emit LogSetBookKeeper(_bookKeeper);
     }
 
     // --- Cage ---
