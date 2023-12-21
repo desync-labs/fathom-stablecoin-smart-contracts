@@ -158,7 +158,6 @@ describe("CollateralTokenAdapter", () => {
 
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("1"))
 
-                // expect(await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress).to.be.eq(ethers.utils.parseEther("1")))
                 expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
 
 
@@ -177,7 +176,6 @@ describe("CollateralTokenAdapter", () => {
                 expect(await collateralTokenAdapter.totalShare()).to.be.eq(ethers.utils.parseEther("5"))
                 expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, AliceAddress)).to.be.eq(ethers.utils.parseEther("1"))
 
-                // expect(await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress).to.be.eq(ethers.utils.parseEther("4")))
                 expect(await bookKeeper.collateralToken(collateralPoolIdFromAdapter, BobAddress)).to.be.eq(ethers.utils.parseEther("4"))
 
 
