@@ -72,7 +72,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         uint256 _treasuryFees
     );
     event LogSetFlashLendingEnabled(address indexed _caller, uint256 _flashLendingEnabled);
-    event LogSetBookKeeper(address indexed _newAddress);
+    event LogSetBookKeeper(address _newAddress);
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());

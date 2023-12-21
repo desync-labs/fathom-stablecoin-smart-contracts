@@ -39,7 +39,7 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
     );
 
     event LogSetStableCoinReferencePrice(address indexed _caller, uint256 _data);
-    event LogSetBookKeeper(address indexed _newAddress);
+    event LogSetBookKeeper(address _newAddress);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());

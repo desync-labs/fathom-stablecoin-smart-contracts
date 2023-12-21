@@ -44,7 +44,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     mapping(address => bool) public liquidatorsWhitelist;
 
     event LiquidationFail(bytes32 _collateralPoolIds, address _positionAddresses, address _liquidator, string reason);
-    event LogSetBookKeeper(address indexed _newAddress);
+    event LogSetBookKeeper(address _newAddress);
     event LogAddToWhitelist(address indexed _user);
     event LogRemoveFromWhitelist(address indexed _user);
 
