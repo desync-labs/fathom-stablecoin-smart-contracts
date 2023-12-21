@@ -72,6 +72,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         uint256 _treasuryFees
     );
     event LogSetFlashLendingEnabled(address indexed _caller, uint256 _flashLendingEnabled);
+    event LogSetBookKeeper(address _newAddress);
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -256,6 +257,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
     function setBookKeeper(address _bookKeeper) external onlyOwner {
         require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
+        emit LogSetBookKeeper(_bookKeeper);
     }
 
     function setLiquidationEngine(address _liquidationEngine) external onlyOwner {

@@ -58,7 +58,8 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
     event LogAddCollateral(address indexed _caller, address indexed _usr, int256 _amount);
     event LogMoveCollateral(address indexed _caller, bytes32 indexed _collateralPoolId, address _src, address indexed _dst, uint256 _amount);
     event LogMoveStablecoin(address indexed _caller, address _src, address indexed _dst, uint256 _amount);
-
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
     event StablecoinIssuedAmount(uint256 _totalStablecoinIssued, bytes32 indexed _collateralPoolId, uint256 _poolStablecoinIssued);
 
     modifier onlyOwner() {
@@ -156,7 +157,6 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
             IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender),
             "BookKeeper/msgsender-not-owner"
         );
-
         accessControlConfig = _accessControlConfig;
         emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
@@ -197,6 +197,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
     /// @dev Emits no events.
     function addToWhitelist(address _toBeWhitelistedAddress) external override whenNotPaused {
         positionWhitelist[msg.sender][_toBeWhitelistedAddress] = 1;
+        emit LogAddToWhitelist(_toBeWhitelistedAddress);
     }
 
     /// @dev Revokes the allowance from the `toBeRemovedAddress` to adjust the position address of the caller.
@@ -205,6 +206,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
     /// @dev Emits no events.
     function removeFromWhitelist(address _toBeRemovedAddress) external override whenNotPaused {
         positionWhitelist[msg.sender][_toBeRemovedAddress] = 0;
+        emit LogRemoveFromWhitelist(_toBeRemovedAddress);
     }
 
     // --- Core Logic ---
@@ -224,7 +226,8 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
 
     /// @notice Moves collateral tokens from one address (often a position address) to another in a specified collateral pool.
     /// @dev This function can only be called by an entity with the Collateral Manager role when the BookKeeper contract is not paused.
-    /// @dev It also requires that the entity making the call has the authority to adjust the position (or any address that holds collateralToken), as determined by `_requireAllowedPositionAdjustment`.
+    /// @dev It also requires that the entity making the call has the authority to adjust the position (or any address that holds collateralToken),
+    ///      as determined by `_requireAllowedPositionAdjustment`.
     /// @param _collateralPoolId The ID of the collateral pool from which the collateral tokens are being moved.
     /// @param _src The address from which collateral tokens are being moved.
     /// @param _dst The address to which collateral tokens are being moved.
@@ -416,14 +419,14 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
         totalUnbackedStablecoin = sub(totalUnbackedStablecoin, _debtValue);
     }
 
-   /// @notice Settles the system's bad debt of the caller.
-   /// @dev This function can be called by the SystemDebtEngine, which incurs the system debt. The BookKeeper contract must not be paused.
-   /// @dev Even though the function has no modifier that restricts access exclusively to SystemDebtEngine, 
-   ///      the action of the function—reducing the systemBadDebt of msg.sender—effectively limits the function callers to SystemDebtEngine.
-   /// @dev To execute this function, the SystemDebtEngine must have enough stablecoin, which typically comes from the protocol's surplus.
-   /// @dev A successful execution of this function removes the bad debt from the system.
-   /// @param _value The amount of bad debt to be settled.
-   ////
+    /// @notice Settles the system's bad debt of the caller.
+    /// @dev This function can be called by the SystemDebtEngine, which incurs the system debt. The BookKeeper contract must not be paused.
+    /// @dev Even though the function has no modifier that restricts access exclusively to SystemDebtEngine,
+    ///      the action of the function—reducing the systemBadDebt of msg.sender—effectively limits the function callers to SystemDebtEngine.
+    /// @dev To execute this function, the SystemDebtEngine must have enough stablecoin, which typically comes from the protocol's surplus.
+    /// @dev A successful execution of this function removes the bad debt from the system.
+    /// @param _value The amount of bad debt to be settled.
+    ////
     function settleSystemBadDebt(uint256 _value) external override nonReentrant whenNotPaused {
         systemBadDebt[msg.sender] -= _value;
         stablecoin[msg.sender] -= _value;

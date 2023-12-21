@@ -6,7 +6,7 @@ chai.use(solidity);
 const { ethers } = require("ethers");
 
 const { WeiPerWad } = require("../../helper/unit");
-const { DeployerAddress, AddressZero} = require("../../helper/address");
+const { DeployerAddress, AddressZero } = require("../../helper/address");
 const { getContract, createMock } = require("../../helper/contracts");
 const { increase, latest } = require('../../helper/time');
 const { formatBytes32String } = ethers.utils
@@ -40,7 +40,7 @@ describe("CentralizedOraclePriceFeed", () => {
             })
         })
 
-        context("sender isn't ownerfor the new accessc ontrol", async () => {
+        context("sender isn't owner for the new accessc ontrol", async () => {
             it("should revert", async () => {
                 await mockedAccessControlConfig.mock.hasRole.returns(true);
                 const mockedAccessControlConfig2 = await createMock("AccessControlConfig");
@@ -195,7 +195,7 @@ describe("CentralizedOraclePriceFeed", () => {
                 await increase(900);
                 await mockedCentralizedPriceOracle.mock.getPrice.returns(WeiPerWad.mul(4), await latest());
                 await centralizedOraclePriceFeed.peekPrice();
-;
+                ;
                 expect(await centralizedOraclePriceFeed.readPrice()).to.be.equal(WeiPerWad.mul(3));
                 expect((await centralizedOraclePriceFeed.delayedPrice()).lastUpdate).to.be.equal(expectedTS);
             })

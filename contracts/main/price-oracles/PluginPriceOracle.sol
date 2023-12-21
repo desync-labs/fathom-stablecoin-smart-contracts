@@ -31,6 +31,7 @@ contract PluginPriceOracle is Initializable, IFathomCentralizedOracle {
             "PluginPriceOracle/msgsender-not-owner"
         );
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
+        emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
 
     function setOracle(address _oracle) external onlyOwner {

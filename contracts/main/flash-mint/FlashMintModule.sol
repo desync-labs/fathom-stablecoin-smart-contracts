@@ -124,6 +124,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         emit LogSetFeeRate(_data);
     }
 
+    // To show old state from storage and the new state from call data, emits before changing state
     function setDecentralizedStatesStatus(bool _status) external onlyOwner {
         emit LogDecentralizedStateStatus(isDecentralizedState, _status);
         isDecentralizedState = _status;

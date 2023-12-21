@@ -31,6 +31,7 @@ contract FathomPriceOracle is Initializable, IFathomCentralizedOracle {
             "FathomPriceOracle/msgsender-not-owner"
         );
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
+        emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
 
     function setOracle(address _oracle) external onlyOwner {

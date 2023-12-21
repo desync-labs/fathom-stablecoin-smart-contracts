@@ -28,6 +28,7 @@ contract ParanoidDexOraclePriceFeed is PausableUpgradeable, IPriceFeed {
     address[] public verificationFeeds;
 
     event LogSetTimeDelay(address indexed _caller, uint256 _second);
+    event LogSetAccessControlConfig(address indexed _caller, address _accessControlConfig);
 
     modifier onlyOwner() {
         require(accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
@@ -83,6 +84,7 @@ contract ParanoidDexOraclePriceFeed is PausableUpgradeable, IPriceFeed {
             "FathomOraclePriceFeed/msgsender-not-owner"
         );
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
+        emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
 
     function addVerificationFeed(address _priceFeed) external onlyOwner {

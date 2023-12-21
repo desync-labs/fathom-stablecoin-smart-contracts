@@ -13,6 +13,8 @@ interface IDelayPriceFeed is IPriceFeed {
 
     event LogPeekPriceFailed(address indexed _caller, string _reason);
 
+    event LogSetAccessControlConfig(address indexed _caller, address _accessControlConfig);
+
     function setTimeDelay(uint256 _second) external;
 
     function timeDelay() external view returns (uint256);

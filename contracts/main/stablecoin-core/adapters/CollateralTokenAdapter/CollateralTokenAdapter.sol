@@ -27,21 +27,17 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
 
     IVault public vault;
 
-    /// @dev deprecated but needs to be kept to minimize storage layout confusion
-    bytes32 internal deprecated2;
     IProxyRegistry public proxyWalletFactory;
 
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
 
-    /// @dev deprecated but needs to be kept to minimize storage layout confusion
-    bytes32 internal deprecated;
-
     mapping(address => bool) public whiteListed;
 
     event LogDeposit(uint256 _val);
     event LogWithdraw(uint256 _val);
-    event LogWhitelisted(address indexed _user, bool _isWhitelisted);
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
     event LogEmergencyWithdraw(address indexed _caller, address _to);
 
     modifier onlyOwner() {
@@ -89,7 +85,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
         require(_toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
         whiteListed[_toBeWhitelisted] = true;
-        emit LogWhitelisted(_toBeWhitelisted, true);
+        emit LogAddToWhitelist(_toBeWhitelisted);
     }
 
     /// @notice Removes an address from the whitelist
@@ -98,7 +94,7 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     function removeFromWhitelist(address _toBeRemoved) external onlyOwnerOrGov {
         require(_toBeRemoved != address(0), "CollateralTokenAdapter/removeFromWL-invalidAdds");
         whiteListed[_toBeRemoved] = false;
-        emit LogWhitelisted(_toBeRemoved, false);
+        emit LogRemoveFromWhitelist(_toBeRemoved);
     }
 
     /// @dev The `cage` function permanently halts the `collateralTokenAdapter` contract.
