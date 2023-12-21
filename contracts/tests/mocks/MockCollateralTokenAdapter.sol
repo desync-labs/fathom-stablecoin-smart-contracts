@@ -80,9 +80,6 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
 
-    /// @dev deprecated but needs to be kept to minimize storage layout confusion
-    bytes32 deprecated;
-
     mapping(address => bool) public whiteListed;
 
     event LogDeposit(uint256 _val);
