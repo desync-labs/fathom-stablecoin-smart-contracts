@@ -370,14 +370,6 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         return IStableSwapRetriever(stableSwapModule).totalTokenFeeBalance();
     }
 
-    function _totalStablecoinBalanceStableswap() internal view returns (uint256) {
-        return IStableSwapModule(stableSwapModule).tokenBalance(stablecoin);
-    }
-
-    function _totalTokenBalanceStableswap() internal view returns (uint256) {
-        return IStableSwapModule(stableSwapModule).tokenBalance(token);
-    }
-
     function _convertDecimals(uint256 _amount, uint8 _fromDecimals, uint8 _toDecimals) internal pure returns (uint256 result) {
         result = _toDecimals >= _fromDecimals ? _amount * (10 ** (_toDecimals - _fromDecimals)) : _amount / (10 ** (_fromDecimals - _toDecimals));
     }
