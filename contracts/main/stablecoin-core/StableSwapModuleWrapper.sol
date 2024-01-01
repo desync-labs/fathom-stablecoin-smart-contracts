@@ -117,7 +117,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     }
 
     /// @dev _amount arg should be in 18 decimals
-    /// @dev when you withdraw tokens, you are withdrawing _amount of total tokens , ie half of stablecoin and half of token
+    /// @dev when you withdraw tokens, you are withdrawing _amount of total tokens , i.e. half of stablecoin and half of token
+    /// @dev if amount of stablecoin & tokend eposited in the Stable Swap Module are the same.
     /// @dev please consider that the withdraw of each token is not exactly half but depends upon ratio of tokens in the stableswap
     /// @notice claimFeesRewards is before deposit tracker is updated because we need to claim for all the liquidity available currently
     function withdrawTokens(uint256 _amount) external override nonReentrant whenNotPaused onlyWhitelistedIfNotDecentralized {
@@ -245,8 +246,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     }
 
     function getClaimableFeesPerUser(address _account) external view override returns (uint256, uint256) {
-        uint256 totalStablecoinLiquidity = _totalStablecoinBalanceStableswap();
-        uint256 totalTokenLiquidity = _totalTokenBalanceStableswap();
+        uint256 totalStablecoinLiquidity = totalValueDeposited / 2;
+        uint256 totalTokenLiquidity = _convertDecimals((totalValueDeposited * WAD) / (2 * WAD), 18, IToken(token).decimals());
 
         uint256 stablecoinProviderLiquidity = (depositTracker[_account] * WAD) / (2 * WAD);
         uint256 tokenProviderLiquidity = _convertDecimals((depositTracker[_account] * WAD) / (2 * WAD), 18, IToken(token).decimals());
@@ -269,8 +270,8 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
     }
 
     function _claimFeesRewards() internal {
-        uint256 totalStablecoinLiquidity = _totalStablecoinBalanceStableswap();
-        uint256 totalTokenLiquidity = _totalTokenBalanceStableswap();
+        uint256 totalStablecoinLiquidity = totalValueDeposited / 2;
+        uint256 totalTokenLiquidity = _convertDecimals((totalValueDeposited * WAD) / (2 * WAD), 18, IToken(token).decimals());
 
         uint256 stablecoinProviderLiquidity = (depositTracker[msg.sender] * WAD) / (2 * WAD);
         uint256 tokenProviderLiquidity = _convertDecimals((depositTracker[msg.sender] * WAD) / (2 * WAD), 18, IToken(token).decimals());
@@ -284,6 +285,7 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         if (totalStablecoinLiquidity > 0) {
             newFeeRewardsForStablecoin = (unclaimedStablecoinFees * stablecoinProviderLiquidity * WAD) / totalStablecoinLiquidity / WAD;
         }
+
         if (totalTokenLiquidity > 0) {
             newFeesRewardsForToken = (unclaimedTokenFees * tokenProviderLiquidity * WAD) / totalTokenLiquidity / WAD;
         }
@@ -366,14 +368,6 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
 
     function _totalTokenFeeBalance() internal view returns (uint256) {
         return IStableSwapRetriever(stableSwapModule).totalTokenFeeBalance();
-    }
-
-    function _totalStablecoinBalanceStableswap() internal view returns (uint256) {
-        return IStableSwapModule(stableSwapModule).tokenBalance(stablecoin);
-    }
-
-    function _totalTokenBalanceStableswap() internal view returns (uint256) {
-        return IStableSwapModule(stableSwapModule).tokenBalance(token);
     }
 
     function _convertDecimals(uint256 _amount, uint8 _fromDecimals, uint8 _toDecimals) internal pure returns (uint256 result) {
