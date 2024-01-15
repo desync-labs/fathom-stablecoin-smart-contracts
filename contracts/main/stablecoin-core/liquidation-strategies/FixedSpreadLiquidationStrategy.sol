@@ -57,6 +57,11 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
 
     bytes4 internal constant FLASH_LENDING_ID = 0xaf7bd142;
 
+    uint256 public vaultLendingEnabled;
+    //vaultLendingCall(address,uint256,uint256,bytes)
+    //2eccf79a3186340e98628dede5e030b3259989a3589735768de8a79f946dc5f6
+    bytes4 internal constant VAULT_LENDING_ID = 0x2eccf79a;
+
     event LogFixedSpreadLiquidate(
         bytes32 indexed _collateralPoolId,
         uint256 _positionDebtShare,
@@ -72,6 +77,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         uint256 _treasuryFees
     );
     event LogSetFlashLendingEnabled(address indexed _caller, uint256 _flashLendingEnabled);
+    event LogSetVaultLendingEnabled(address indexed _caller, uint256 _vaultLendingEnabled);
     event LogSetBookKeeper(address _newAddress);
 
     modifier onlyOwnerOrGov() {
@@ -145,6 +151,11 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         emit LogSetFlashLendingEnabled(msg.sender, _flashLendingEnabled);
     }
 
+    function setVaultLendingEnabled(uint256 _vaultLendingEnabled) external onlyOwnerOrGov {
+        vaultLendingEnabled = _vaultLendingEnabled;
+        emit LogSetVaultLendingEnabled(msg.sender, _vaultLendingEnabled);
+    }
+
     // solhint-disable function-max-lines
     function execute(
         bytes32 _collateralPoolId,
@@ -196,6 +207,30 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
             bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
         }
         if (
+            vaultLendingEnabled == 1 &&
+            _data.length > 0 &&
+            _collateralRecipient != address(bookKeeper) &&
+            _collateralRecipient != address(liquidationEngine) &&
+            IERC165(_collateralRecipient).supportsInterface(VAULT_LENDING_ID)
+        ) {
+            bookKeeper.moveCollateral(
+                _collateralPoolId,
+                address(this),
+                _collateralRecipient,
+                info.collateralAmountToBeLiquidated - info.treasuryFees
+            );
+            IVaultLendingCallee(_collateralRecipient).vaultLendingCall(
+                msg.sender,
+                info.actualDebtValueToBeLiquidated,
+                info.collateralAmountToBeLiquidated - info.treasuryFees,
+                _data
+            );
+            //below flow will be done in VaultStrategyHandler(..which can be _collateralRecipient like FlashLiquidator contract)
+            // address _stablecoin = address(stablecoinAdapter.stablecoin());
+            // _stablecoin.safeTransferFrom(_liquidatorAddress, address(this), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
+            // _stablecoin.safeApprove(address(stablecoinAdapter), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
+            // stablecoinAdapter.depositRAD(_liquidatorAddress, info.actualDebtValueToBeLiquidated, _collateralPoolId, abi.encode(0));
+        } else if (
             flashLendingEnabled == 1 &&
             _data.length > 0 &&
             _collateralRecipient != address(bookKeeper) &&
