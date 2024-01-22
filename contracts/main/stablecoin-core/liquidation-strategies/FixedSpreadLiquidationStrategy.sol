@@ -10,7 +10,7 @@ import "../../interfaces/IPriceOracle.sol";
 import "../../interfaces/ILiquidationEngine.sol";
 import "../../interfaces/ILiquidationStrategy.sol";
 import "../../interfaces/ISystemDebtEngine.sol";
-import "../../interfaces/IVaultLendingCallee.sol";
+import "../../interfaces/IFlashLendingCallee.sol";
 import "../../interfaces/IGenericTokenAdapter.sol";
 import "../../interfaces/IStablecoinAdapter.sol";
 import "../../interfaces/IERC165.sol";
@@ -53,6 +53,10 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
     IPriceOracle public priceOracle; // Collateral price module
     IStablecoinAdapter public stablecoinAdapter; //StablecoinAdapter to deposit FXD to bookKeeper
 
+    uint256 public flashLendingEnabled;
+
+    bytes4 internal constant FLASH_LENDING_ID = 0xaf7bd142;
+
     uint256 public vaultLendingEnabled;
     //vaultLendingCall(address,uint256,uint256,bytes)
     //2eccf79a3186340e98628dede5e030b3259989a3589735768de8a79f946dc5f6
@@ -72,6 +76,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         uint256 _collateralAmountToBeLiquidated,
         uint256 _treasuryFees
     );
+    event LogSetFlashLendingEnabled(address indexed _caller, uint256 _flashLendingEnabled);
     event LogSetVaultLendingEnabled(address indexed _caller, uint256 _vaultLendingEnabled);
     event LogSetBookKeeper(address _newAddress);
 
@@ -137,10 +142,15 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         _unpause();
     }
 
-    /// @notice Sets the vault lending feature to enabled or disabled.
-    /// @param _vaultLendingEnabled The value indicating whether vault lending should be enabled (1) or disabled (0).
+    /// @notice Sets the flash lending feature to enabled or disabled.
+    /// @param _flashLendingEnabled The value indicating whether flash lending should be enabled (1) or disabled (0).
     /// @dev This function can only be called by the contract owner or governance.
-    /// @dev Emits a LogSetVaultLendingEnabled event upon a successful update.
+    /// @dev Emits a LogSetFlashLendingEnabled event upon a successful update.
+    function setFlashLendingEnabled(uint256 _flashLendingEnabled) external onlyOwnerOrGov {
+        flashLendingEnabled = _flashLendingEnabled;
+        emit LogSetFlashLendingEnabled(msg.sender, _flashLendingEnabled);
+    }
+
     function setVaultLendingEnabled(uint256 _vaultLendingEnabled) external onlyOwnerOrGov {
         vaultLendingEnabled = _vaultLendingEnabled;
         emit LogSetVaultLendingEnabled(msg.sender, _vaultLendingEnabled);
@@ -215,6 +225,30 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
                 info.collateralAmountToBeLiquidated - info.treasuryFees,
                 _data
             );
+            //below flow will be done in VaultStrategyHandler(..which can be _collateralRecipient like FlashLiquidator contract)
+            // address _stablecoin = address(stablecoinAdapter.stablecoin());
+            // _stablecoin.safeTransferFrom(_liquidatorAddress, address(this), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
+            // _stablecoin.safeApprove(address(stablecoinAdapter), ((info.actualDebtValueToBeLiquidated / RAY) + 1));
+            // stablecoinAdapter.depositRAD(_liquidatorAddress, info.actualDebtValueToBeLiquidated, _collateralPoolId, abi.encode(0));
+        } else if (
+            flashLendingEnabled == 1 &&
+            _data.length > 0 &&
+            _collateralRecipient != address(bookKeeper) &&
+            _collateralRecipient != address(liquidationEngine) &&
+            IERC165(_collateralRecipient).supportsInterface(FLASH_LENDING_ID)
+        ) {
+            bookKeeper.moveCollateral(
+                _collateralPoolId,
+                address(this),
+                _collateralRecipient,
+                info.collateralAmountToBeLiquidated - info.treasuryFees
+            );
+            IFlashLendingCallee(_collateralRecipient).flashLendingCall(
+                msg.sender,
+                info.actualDebtValueToBeLiquidated,
+                info.collateralAmountToBeLiquidated - info.treasuryFees,
+                _data
+            );
         } else {
             IGenericTokenAdapter(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getAdapter(_collateralPoolId)).withdraw(
                 _collateralRecipient,
@@ -232,7 +266,6 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         info.positionCollateralAmount = _positionCollateralAmount;
         info.debtShareToBeLiquidated = _debtShareToBeLiquidated;
         info.maxDebtShareToBeLiquidated = _maxDebtShareToBeLiquidated;
-        
         emit LogFixedSpreadLiquidate(
             _collateralPoolId,
             info.positionDebtShare,
