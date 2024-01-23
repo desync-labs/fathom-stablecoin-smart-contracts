@@ -157,8 +157,8 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
             _positionAddress,
             address(this),
             address(systemDebtEngine),
-            -int256(_amount),
-            -int256(_debtShare)
+            -_safeToInt256(_amount),
+            -_safeToInt256(_debtShare)
         );
         emit LogAccumulateBadDebt(_collateralPoolId, _positionAddress, _amount, _debtShare);
     }
@@ -240,9 +240,14 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
             _positionAddress,
             _collateralReceiver,
             address(systemDebtEngine),
-            -int256(_lockedCollateralAmount),
+            -_safeToInt256(_lockedCollateralAmount),
             0
         );
         emit LogRedeemLockedCollateral(_collateralPoolId, _collateralReceiver, _lockedCollateralAmount);
+    }
+
+    function _safeToInt256(uint256 _number) internal pure returns (int256) {
+        require(int256(_number) >= 0, "ShowStopper/overflow");
+        return int256(_number);
     }
 }

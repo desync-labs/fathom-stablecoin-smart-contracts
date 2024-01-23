@@ -189,8 +189,8 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
             _positionAddress,
             address(this),
             address(systemDebtEngine),
-            -int256(info.collateralAmountToBeLiquidated),
-            -int256(info.actualDebtShareToBeLiquidated)
+            -_safeToInt256(info.collateralAmountToBeLiquidated),
+            -_safeToInt256(info.actualDebtShareToBeLiquidated)
         );
         if (info.treasuryFees > 0) {
             bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
@@ -344,6 +344,11 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         // liquidatorIncentiveCollectedFromPosition * (treasuryFeesBps) / 10000
         // 0.047619048 * 5000 / 10000
         info.treasuryFees = (liquidatorIncentiveCollectedFromPosition * _vars.treasuryFeesBps) / 10000; // [wad]
+    }
+
+    function _safeToInt256(uint256 _number) internal pure returns (int256) {
+        require(int256(_number) >= 0, "FixedSpreadLiquidationStrategy/overflow");
+        return int256(_number);
     }
     // solhint-enable function-max-lines
 }

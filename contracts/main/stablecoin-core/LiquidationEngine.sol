@@ -312,7 +312,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
                 _positionAddress,
                 address(systemDebtEngine),
                 0,
-                -int256(_vars.newPositionDebtShare)
+                -_safeToInt256(_vars.newPositionDebtShare)
             );
         }
     }
@@ -322,5 +322,10 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     function _isPriceOk(bytes32 _collateralPoolId) internal view returns (bool) {
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getPriceFeed(_collateralPoolId));
         return _priceFeed.isPriceOk();
+    }
+
+    function _safeToInt256(uint256 _number) internal pure returns (int256) {
+        require(int256(_number) >= 0, "LiquidationEngine/overflow");
+        return int256(_number);
     }
 }

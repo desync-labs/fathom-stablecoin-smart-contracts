@@ -265,8 +265,8 @@ contract PositionManager is PausableUpgradeable, IManager {
             collateralPools[_positionId],
             positions[_positionId],
             _destination,
-            int256(_lockedCollateral),
-            int256(_debtShare)
+            _safeToInt256(_lockedCollateral),
+            _safeToInt256(_debtShare)
         );
         emit LogExportPosition(_positionId, positions[_positionId], _destination, _lockedCollateral, _debtShare);
     }
@@ -285,8 +285,8 @@ contract PositionManager is PausableUpgradeable, IManager {
             collateralPools[_positionId],
             _source,
             positions[_positionId],
-            int256(_lockedCollateral),
-            int256(_debtShare)
+            _safeToInt256(_lockedCollateral),
+            _safeToInt256(_debtShare)
         );
         emit LogImportPosition(_positionId, _source, positions[_positionId], _lockedCollateral, _debtShare);
     }
@@ -305,8 +305,8 @@ contract PositionManager is PausableUpgradeable, IManager {
             collateralPools[_sourceId],
             positions[_sourceId],
             positions[_destinationId],
-            int256(_lockedCollateral),
-            int256(_debtShare)
+            _safeToInt256(_lockedCollateral),
+            _safeToInt256(_debtShare)
         );
         emit LogMovePosition(_sourceId, _destinationId, _lockedCollateral, _debtShare);
     }
@@ -354,5 +354,10 @@ contract PositionManager is PausableUpgradeable, IManager {
     function _requireHealthyPrice(bytes32 _poolId) internal view {
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_poolId));
         require(_priceFeed.isPriceOk(), "PositionManager/price-is-not-healthy");
+    }
+
+    function _safeToInt256(uint256 _number) internal pure returns (int256) {
+        require(int256(_number) >= 0, "PositionManager/overflow");
+        return int256(_number);
     }
 }
