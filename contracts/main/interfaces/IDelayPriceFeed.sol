@@ -21,5 +21,5 @@ interface IDelayPriceFeed is IPriceFeed {
 
     function nextPrice() external view returns (uint256);
 
-    function retrivePrice() external view returns (PriceInfo memory);
+    function retrievePrice() external view returns (PriceInfo memory);
 }

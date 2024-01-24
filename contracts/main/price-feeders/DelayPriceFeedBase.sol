@@ -70,7 +70,7 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
 
     function peekPrice() external override returns (uint256, bool) {
         if (block.timestamp >= lastUpdateTS + timeDelay || !this.isPriceFresh()) {
-            try this.retrivePrice() returns (PriceInfo memory _priceInfo) {
+            try this.retrievePrice() returns (PriceInfo memory _priceInfo) {
                 require(_priceInfo.price > 0, "DelayPriceFeed/wrong-price");
                 require(_priceInfo.lastUpdate <= block.timestamp, "DelayPriceFeed/wrong-lastUpdate");
 
@@ -100,5 +100,5 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
         return delayedPrice.lastUpdate >= block.timestamp - priceLife;
     }
 
-    function retrivePrice() external view virtual returns (PriceInfo memory);
+    function retrievePrice() external view virtual returns (PriceInfo memory);
 }

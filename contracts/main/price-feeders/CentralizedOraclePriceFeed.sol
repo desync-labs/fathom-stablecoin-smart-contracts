@@ -30,7 +30,7 @@ contract CentralizedOraclePriceFeed is DelayPriceFeedBase {
         this.peekPrice();
     }
 
-    function retrivePrice() external view override returns (PriceInfo memory) {
+    function retrievePrice() external view override returns (PriceInfo memory) {
         (uint256 _price, uint256 _lastUpdate) = oracle.getPrice();
         return PriceInfo(_price, _lastUpdate);
     }
