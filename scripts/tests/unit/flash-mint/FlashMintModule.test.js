@@ -107,6 +107,15 @@ describe("FlashMintModule", () => {
                 await expect(flashMintModuleAsAlice.setFeeRate(WeiPerWad.div(10))).to.be.revertedWith("!ownerRole")
             })
         })
+        context("when the caller is the owner but the rate is higher than 1 WAD", () => {
+            it("should revert", async () => {
+                const feeRate = await flashMintModule.feeRate()
+                expect(feeRate).to.be.equal(0)
+
+                await expect(flashMintModule.setFeeRate(WeiPerWad.mul(10)))
+                    .to.be.revertedWith("FlashMintModule/fee-too-high")
+            })
+        })
         context("when the caller is the owner", () => {
             it("should be able setFeeRate", async () => {
                 const maxBefore = await flashMintModule.feeRate()

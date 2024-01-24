@@ -120,6 +120,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
     }
 
     function setFeeRate(uint256 _data) external onlyOwner {
+        require(_data <= WAD, "FlashMintModule/fee-too-high");
         feeRate = _data;
         emit LogSetFeeRate(_data);
     }
