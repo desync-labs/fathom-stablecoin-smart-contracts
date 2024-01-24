@@ -413,7 +413,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                 await mockedFlashLendingCallee.mock.flashLendingCall.returns()
                 await mockedFlashLendingCallee.mock.supportsInterface.returns(true)
 
-                await fixedSpreadLiquidationStrategy.setFlashLendingEnabled(1)
+                await fixedSpreadLiquidationStrategy.setFlashLendingEnabled(true)
 
                 await expect(
                     fixedSpreadLiquidationStrategy.execute(

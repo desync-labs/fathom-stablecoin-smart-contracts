@@ -53,7 +53,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
     IPriceOracle public priceOracle; // Collateral price module
     IStablecoinAdapter public stablecoinAdapter; //StablecoinAdapter to deposit FXD to bookKeeper
 
-    uint256 public flashLendingEnabled;
+    bool public flashLendingEnabled;
 
     bytes4 internal constant FLASH_LENDING_ID = 0xaf7bd142;
 
@@ -71,7 +71,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         uint256 _collateralAmountToBeLiquidated,
         uint256 _treasuryFees
     );
-    event LogSetFlashLendingEnabled(address indexed _caller, uint256 _flashLendingEnabled);
+    event LogSetFlashLendingEnabled(address indexed _caller, bool _flashLendingEnabled);
     event LogSetBookKeeper(address _newAddress);
 
     modifier onlyOwnerOrGov() {
@@ -136,10 +136,10 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
     }
 
     /// @notice Sets the flash lending feature to enabled or disabled.
-    /// @param _flashLendingEnabled The value indicating whether flash lending should be enabled (1) or disabled (0).
+    /// @param _flashLendingEnabled The value indicating whether flash lending should be enabled (true) or disabled (false).
     /// @dev This function can only be called by the contract owner or governance.
     /// @dev Emits a LogSetFlashLendingEnabled event upon a successful update.
-    function setFlashLendingEnabled(uint256 _flashLendingEnabled) external onlyOwnerOrGov {
+    function setFlashLendingEnabled(bool _flashLendingEnabled) external onlyOwnerOrGov {
         flashLendingEnabled = _flashLendingEnabled;
         emit LogSetFlashLendingEnabled(msg.sender, _flashLendingEnabled);
     }
@@ -195,7 +195,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
             bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
         }
         if (
-            flashLendingEnabled == 1 &&
+            flashLendingEnabled == true &&
             _data.length > 0 &&
             _collateralRecipient != address(bookKeeper) &&
             _collateralRecipient != address(liquidationEngine) &&
