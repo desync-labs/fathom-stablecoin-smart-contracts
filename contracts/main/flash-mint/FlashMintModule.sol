@@ -142,6 +142,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
         require(_amount <= max, "FlashMintModule/ceiling-exceeded");
 
+        uint256 _prev = bookKeeper.stablecoin(address(this));
         uint256 _amt = _amount * RAY;
         uint256 _fee = (_amount * feeRate) / WAD;
         uint256 _total = _amount + _fee;
@@ -159,6 +160,8 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         stablecoinAdapter.deposit(address(this), _total, abi.encode(0));
         address(stablecoin).safeApprove(address(stablecoinAdapter), 0);
         bookKeeper.settleSystemBadDebt(_amt);
+
+        require(bookKeeper.stablecoin(address(this)) >= _prev + _fee, "FlashMintModule/insufficient-fee");
 
         return true;
     }
