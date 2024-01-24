@@ -74,14 +74,12 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
 
     function initialize(address _bookKeeper) external initializer {
         PausableUpgradeable.__Pausable_init();
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         stableCoinReferencePrice = RAY;
         live = 1;
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwner isLive {
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         emit LogSetBookKeeper(_bookKeeper);
     }

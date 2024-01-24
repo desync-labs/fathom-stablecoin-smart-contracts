@@ -62,14 +62,12 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
     }
 
     function initialize(address _bookKeeper) external initializer {
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         live = 1;
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         emit LogSetBookKeeper(msg.sender, _bookKeeper);
     }

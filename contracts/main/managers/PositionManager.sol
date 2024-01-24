@@ -82,7 +82,6 @@ contract PositionManager is PausableUpgradeable, IManager {
     function initialize(address _bookKeeper, address _showStopper, address _priceOracle) external initializer {
         PausableUpgradeable.__Pausable_init();
 
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "PositionManager/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = _bookKeeper;
 
         require(IShowStopper(_showStopper).live() == 1, "PositionManager/showStopper-not-live"); // Sanity Check Call
@@ -330,7 +329,6 @@ contract PositionManager is PausableUpgradeable, IManager {
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwnerOrGov {
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "PositionManager/invalid-bookKeeper"); // Sanity Check Call
         emit LogBookKeeperUpdated(bookKeeper, _bookKeeper);
         bookKeeper = _bookKeeper;
     }
