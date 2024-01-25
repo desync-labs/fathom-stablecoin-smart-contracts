@@ -3,7 +3,6 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "../interfaces/IDelayPriceFeed.sol";
 import "../interfaces/IFathomCentralizedOracle.sol";
 import "../interfaces/IAccessControlConfig.sol";
 import "./DelayPriceFeedBase.sol";

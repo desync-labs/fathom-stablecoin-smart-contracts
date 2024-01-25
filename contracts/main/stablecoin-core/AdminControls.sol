@@ -4,7 +4,6 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IAccessControlConfig.sol";
-import "../interfaces/ICollateralPoolConfig.sol";
 import "../interfaces/IPausable.sol";
 import "../interfaces/IBookKeeper.sol";
 

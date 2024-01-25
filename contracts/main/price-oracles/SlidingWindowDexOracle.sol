@@ -5,7 +5,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./lib/FathomSwapLibrary.sol";
 import "../apis/interfaces/IFathomSwapPair.sol";
-import "../apis/interfaces/IFathomSwapFactory.sol";
 import "../interfaces/IFathomDEXOracle.sol";
 import "../interfaces/IToken.sol";
 

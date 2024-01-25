@@ -8,8 +8,6 @@ import "../interfaces/IManager.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/IStablecoinAdapter.sol";
 import "../interfaces/IStabilityFeeCollector.sol";
-import "../interfaces/IProxyRegistry.sol";
-import "../interfaces/IProxy.sol";
 import "../utils/SafeToken.sol";
 import "../utils/CommonMath.sol";
 

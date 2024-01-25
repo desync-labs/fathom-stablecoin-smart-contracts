@@ -6,7 +6,6 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ISystemDebtEngine.sol";
-import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/IPausable.sol";
 import "../utils/CommonMath.sol";

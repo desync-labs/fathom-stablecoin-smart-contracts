@@ -9,7 +9,6 @@ import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/IPriceFeed.sol";
 import "../interfaces/IPriceOracle.sol";
 import "../interfaces/ISystemDebtEngine.sol";
-import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
 import "../utils/CommonMath.sol";
 
