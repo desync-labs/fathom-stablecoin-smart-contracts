@@ -161,7 +161,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
                 IAccessControlConfig(bookKeeper.accessControlConfig()).LIQUIDATION_ENGINE_ROLE(),
                 msg.sender
             ),
-            "!liquidationEngingRole"
+            "!liquidationEngineRole"
         );
 
         _validateValues(_collateralPoolId, _positionDebtShare, _positionCollateralAmount, _positionAddress);

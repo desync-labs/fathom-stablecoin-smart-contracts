@@ -121,7 +121,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                         DeployerAddress,
                         "0x"
                     )
-                ).to.be.revertedWith("!liquidationEngingRole")
+                ).to.be.revertedWith("!liquidationEngineRole")
             })
         })
         context("when input is invalid", () => {
