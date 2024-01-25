@@ -3,11 +3,11 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "../interfaces/IAccessControlConfig.sol";
-import "../interfaces/IPausable.sol";
-import "../interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IAccessControlConfig.sol";
+import "../../main/interfaces/IPausable.sol";
+import "../../main/interfaces/IBookKeeper.sol";
 
-contract AdminControls is Initializable {
+contract MockAdminControls is Initializable {
     address public bookKeeper;
     address public liquidationEngine;
     address public priceOracle;
@@ -35,10 +35,6 @@ contract AdminControls is Initializable {
             "!(ownerRole or govRole)"
         );
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(

@@ -3,15 +3,15 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "./PositionHandler.sol";
-import "../interfaces/IManager.sol";
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IShowStopper.sol";
-import "../interfaces/ISetPrice.sol";
-import "../interfaces/IPriceFeed.sol";
-import "../interfaces/IPriceOracle.sol";
+import "../../main/managers/PositionHandler.sol";
+import "../../main/interfaces/IManager.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IShowStopper.sol";
+import "../../main/interfaces/ISetPrice.sol";
+import "../../main/interfaces/IPriceFeed.sol";
+import "../../main/interfaces/IPriceOracle.sol";
 
-contract PositionManager is PausableUpgradeable, IManager {
+contract MockPositionManager is PausableUpgradeable, IManager {
     struct List {
         uint256 prev;
         uint256 next;
@@ -76,10 +76,6 @@ contract PositionManager is PausableUpgradeable, IManager {
             "!(ownerRole or govRole)"
         );
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(address _bookKeeper, address _showStopper, address _priceOracle) external initializer {

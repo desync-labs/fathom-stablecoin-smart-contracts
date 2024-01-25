@@ -3,14 +3,14 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IPriceFeed.sol";
-import "../interfaces/IPriceOracle.sol";
-import "../interfaces/ICagable.sol";
-import "../interfaces/ICollateralPoolConfig.sol";
-import "../interfaces/IPausable.sol";
-import "../interfaces/ISetPrice.sol";
-import "../utils/CommonMath.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IPriceFeed.sol";
+import "../../main/interfaces/IPriceOracle.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/interfaces/ICollateralPoolConfig.sol";
+import "../../main/interfaces/IPausable.sol";
+import "../../main/interfaces/ISetPrice.sol";
+import "../../main/utils/CommonMath.sol";
 
 /**
  * @title PriceOracle
@@ -18,7 +18,7 @@ import "../utils/CommonMath.sol";
  * The price oracle is important in reflecting the current state of the market price.
  */
 
-contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
+contract MockPriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable, IPausable, ISetPrice {
     struct CollateralPool {
         IPriceFeed priceFeed; // Price Feed
         uint256 liquidationRatio; // Liquidation ratio or Collateral ratio [ray]
@@ -70,10 +70,6 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
     modifier isLive() {
         require(live == 1, "PriceOracle/not-live");
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(address _bookKeeper) external initializer {

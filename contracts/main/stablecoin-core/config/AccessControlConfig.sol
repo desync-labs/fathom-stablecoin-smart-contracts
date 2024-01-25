@@ -21,6 +21,10 @@ contract AccessControlConfig is IAccessControlConfig, AccessControlUpgradeable {
 
     // solhint-enable var-name-mixedcase
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize() external initializer {
         AccessControlUpgradeable.__AccessControl_init();
 

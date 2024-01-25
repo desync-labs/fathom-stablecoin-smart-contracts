@@ -4,19 +4,19 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/ICagable.sol";
-import "../interfaces/ICollateralPoolConfig.sol";
-import "../interfaces/IAccessControlConfig.sol";
-import "../interfaces/IPausable.sol";
-import "../utils/CommonMath.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/interfaces/ICollateralPoolConfig.sol";
+import "../../main/interfaces/IAccessControlConfig.sol";
+import "../../main/interfaces/IPausable.sol";
+import "../../main/utils/CommonMath.sol";
 
 /**
  * @title BookKeeper
  * @notice A contract which acts as a bookkeeper of the Fathom Stablecoin protocol.
  * It has the ability to move collateral tokens and stablecoins within the accounting state variable.
  */
-contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable {
+contract MockBookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable {
     using AddressUpgradeable for address;
 
     struct Position {
@@ -121,10 +121,6 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(accessControlConfig);
         require(_accessControlConfig.hasRole(_accessControlConfig.STABILITY_FEE_COLLECTOR_ROLE(), msg.sender), "!stabilityFeeCollectorRole");
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     // --- Init ---

@@ -4,18 +4,18 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../../interfaces/IBookKeeper.sol";
-import "../../interfaces/IPriceFeed.sol";
-import "../../interfaces/IPriceOracle.sol";
-import "../../interfaces/ILiquidationEngine.sol";
-import "../../interfaces/ILiquidationStrategy.sol";
-import "../../interfaces/ISystemDebtEngine.sol";
-import "../../interfaces/IFlashLendingCallee.sol";
-import "../../interfaces/IGenericTokenAdapter.sol";
-import "../../interfaces/IStablecoinAdapter.sol";
-import "../../interfaces/IERC165.sol";
-import "../../utils/SafeToken.sol";
-import "../../utils/CommonMath.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IPriceFeed.sol";
+import "../../main/interfaces/IPriceOracle.sol";
+import "../../main/interfaces/ILiquidationEngine.sol";
+import "../../main/interfaces/ILiquidationStrategy.sol";
+import "../../main/interfaces/ISystemDebtEngine.sol";
+import "../../main/interfaces/IFlashLendingCallee.sol";
+import "../../main/interfaces/IGenericTokenAdapter.sol";
+import "../../main/interfaces/IStablecoinAdapter.sol";
+import "../../main/interfaces/IERC165.sol";
+import "../../main/utils/SafeToken.sol";
+import "../../main/utils/CommonMath.sol";
 
 /**
  * @title FixedSpreadLiquidationStrategy
@@ -24,7 +24,7 @@ import "../../utils/CommonMath.sol";
  * The strategy calculates the amount of debt and collateral to be liquidated based on current market conditions.
  * @dev The FixedSpreadLiquidationStrategy contract implements the ILiquidationStrategy interface.
  */
-contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
+contract MockFixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ILiquidationStrategy {
     using SafeToken for address;
 
     struct LiquidationInfo {
@@ -88,10 +88,6 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     /// @notice Initializes the FixedSpreadLiquidationStrategy contract with required dependencies.

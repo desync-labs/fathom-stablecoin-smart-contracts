@@ -45,7 +45,7 @@ const setup = async () => {
     await mockedFlashMintModule.mock.unpause.returns();
     await mockedBookKeeper.mock.unpause.returns();
 
-    const adminControls = getContract("AdminControls", DeployerAddress)
+    const adminControls = getContract("MockAdminControls", DeployerAddress)
 
     await adminControls.initialize(
         mockedBookKeeper.address,

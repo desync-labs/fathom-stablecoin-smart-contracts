@@ -41,8 +41,8 @@ const loadFixtureHandler = async () => {
     await mockedAccessControlConfig.mock.LIQUIDATION_ENGINE_ROLE.returns(LIQUIDATION_ENGINE_ROLE) //keccak256 of LIQUIDATION_ENGINE_ROLE
     await mockedStablecoinAdapter.mock.stablecoin.returns(mockedFathomStablecoin.address);
 
-    const fixedSpreadLiquidationStrategy = getContract("FixedSpreadLiquidationStrategy", DeployerAddress)
-    const fixedSpreadLiquidationStrategyAsAlice = getContract("FixedSpreadLiquidationStrategy", AliceAddress)
+    const fixedSpreadLiquidationStrategy = getContract("MockFixedSpreadLiquidationStrategy", DeployerAddress)
+    const fixedSpreadLiquidationStrategyAsAlice = getContract("MockFixedSpreadLiquidationStrategy", AliceAddress)
 
     await fixedSpreadLiquidationStrategy.initialize(
         mockedBookKeeper.address,

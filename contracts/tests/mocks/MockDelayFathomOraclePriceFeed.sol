@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "../interfaces/IFathomOracle.sol";
-import "../interfaces/IAccessControlConfig.sol";
-import "./DelayPriceFeedBase.sol";
+import "../../main/interfaces/IFathomOracle.sol";
+import "../../main/interfaces/IAccessControlConfig.sol";
+import "../../main/price-feeders/DelayPriceFeedBase.sol";
 
-contract DelayFathomOraclePriceFeed is DelayPriceFeedBase {
+contract MockDelayFathomOraclePriceFeed is DelayPriceFeedBase {
     address public token0;
     address public token1;
     IFathomOracle public fathomOracle;
@@ -13,10 +13,6 @@ contract DelayFathomOraclePriceFeed is DelayPriceFeedBase {
     event LogSetToken0(address indexed _token);
     event LogSetToken1(address indexed _token);
     event LogSetFathomOracle(address indexed _fathomOracle);
-    
-    constructor() {
-        _disableInitializers();
-    }
 
     function initialize(address _fathomOracle, address _token0, address _token1, address _accessControlConfig, bytes32 _poolId) external initializer {
         require(_accessControlConfig != address(0), "DelayFathomOraclePriceFeed/zero-access-control");

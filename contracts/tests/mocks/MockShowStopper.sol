@@ -3,14 +3,14 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IShowStopper.sol";
-import "../interfaces/ILiquidationEngine.sol";
-import "../interfaces/IPriceFeed.sol";
-import "../interfaces/IPriceOracle.sol";
-import "../interfaces/ISystemDebtEngine.sol";
-import "../interfaces/ICagable.sol";
-import "../utils/CommonMath.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IShowStopper.sol";
+import "../../main/interfaces/ILiquidationEngine.sol";
+import "../../main/interfaces/IPriceFeed.sol";
+import "../../main/interfaces/IPriceOracle.sol";
+import "../../main/interfaces/ISystemDebtEngine.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/utils/CommonMath.sol";
 
 /**
  * @title ShowStopper Contract
@@ -19,7 +19,7 @@ import "../utils/CommonMath.sol";
  * calculate and settle bad debt, and finalize the total debt of the system after the shutdown.
  * It also calculates the redeemStablecoin price of each collateral pool and allows users to redeem their stablecoins for collateral tokens.
  */
-contract ShowStopper is CommonMath, IShowStopper, Initializable {
+contract MockShowStopper is CommonMath, IShowStopper, Initializable {
     IBookKeeper public bookKeeper; // CDP Engine
     ILiquidationEngine public liquidationEngine;
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
@@ -58,10 +58,6 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(address _bookKeeper) external initializer {

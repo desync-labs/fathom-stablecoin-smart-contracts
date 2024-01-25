@@ -2,9 +2,9 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
-import "../interfaces/IStablecoin.sol";
+import "../../main/interfaces/IStablecoin.sol";
 
-contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
+contract MockFathomStablecoin is IStablecoin, AccessControlUpgradeable {
     bytes32 public constant OWNER_ROLE = DEFAULT_ADMIN_ROLE;
     bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
 
@@ -19,10 +19,6 @@ contract FathomStablecoin is IStablecoin, AccessControlUpgradeable {
 
     mapping(address => uint256) public override balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
-
-    constructor() {
-        _disableInitializers();
-    }
 
     function initialize(string memory _name, string memory _symbol) external initializer {
         AccessControlUpgradeable.__AccessControl_init();

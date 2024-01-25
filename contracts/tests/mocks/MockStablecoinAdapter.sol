@@ -4,19 +4,19 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../../interfaces/IStablecoin.sol";
-import "../../interfaces/IBookKeeper.sol";
-import "../../interfaces/IStablecoinAdapter.sol";
-import "../../interfaces/ICagable.sol";
-import "../../interfaces/IPausable.sol";
-import "../../utils/CommonMath.sol";
+import "../../main/interfaces/IStablecoin.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IStablecoinAdapter.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/interfaces/IPausable.sol";
+import "../../main/utils/CommonMath.sol";
 
 /**
  * @title Stablecoin Adapter contract
  * @dev Handles deposit and withdrawal of stablecoins, along with emergency shutdown (caging) functionality.
  */
 
-contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable, IPausable {
+contract MockStablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStablecoinAdapter, ICagable, IPausable {
     IBookKeeper public override bookKeeper; // CDP Engine
     IStablecoin public override stablecoin; // Stablecoin Token
     uint256 public live; // Active Flag
@@ -45,10 +45,6 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
         require(msg.sender == _collateralPoolConfig.getStrategy(_collateralPoolId), "!(LiquidationStrategy)");
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(address _bookKeeper, address _stablecoin) external initializer {

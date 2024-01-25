@@ -5,21 +5,21 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/ISystemDebtEngine.sol";
-import "../interfaces/ILiquidationEngine.sol";
-import "../interfaces/ILiquidationStrategy.sol";
-import "../interfaces/ICagable.sol";
-import "../interfaces/ISetPrice.sol";
-import "../interfaces/IPausable.sol";
-import "../interfaces/IPriceFeed.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/ISystemDebtEngine.sol";
+import "../../main/interfaces/ILiquidationEngine.sol";
+import "../../main/interfaces/ILiquidationStrategy.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/interfaces/ISetPrice.sol";
+import "../../main/interfaces/IPausable.sol";
+import "../../main/interfaces/IPriceFeed.sol";
 
 /// @title LiquidationEngine
 /** @notice A contract which is the manager for all of the liquidations of the protocol.
     LiquidationEngine will be the interface for the liquidator to trigger any positions into the liquidation process.
 */
 
-contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable, ILiquidationEngine, IPausable {
+contract MockLiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable, ILiquidationEngine, IPausable {
     struct LocalVars {
         uint256 positionLockedCollateral;
         uint256 positionDebtShare;
@@ -82,10 +82,6 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
     modifier isLive() {
         require(live == 1, "LiquidationEngine/not-live");
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     /// @notice Initialize the contract

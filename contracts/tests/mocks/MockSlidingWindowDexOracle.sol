@@ -3,14 +3,14 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "./lib/FathomSwapLibrary.sol";
-import "../apis/interfaces/IFathomSwapPair.sol";
-import "../interfaces/IFathomDEXOracle.sol";
-import "../interfaces/IToken.sol";
+import "../../main/price-oracles/lib/FathomSwapLibrary.sol";
+import "../../main/apis/interfaces/IFathomSwapPair.sol";
+import "../../main/interfaces/IFathomDEXOracle.sol";
+import "../../main/interfaces/IToken.sol";
 
 // sliding window oracle that uses observations collected over a window to provide moving price averages in the past
 // `windowSize` with a precision of `windowSize / granularity`
-contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
+contract MockSlidingWindowDexOracle is Initializable, IFathomDEXOracle {
     struct Observation {
         uint256 timestamp;
         uint256 price0Cumulative;
@@ -35,10 +35,6 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
     mapping(address => Observation[]) public pairObservations;
 
     uint8 public constant RESOLUTION = 112;
-
-    constructor() {
-        _disableInitializers();
-    }
     
     function initialize(address _factory, uint256 _windowSize, uint8 _granularity) external initializer {
         require(_factory != address(0), "SlidingWindowDexOracle/zero-factory");

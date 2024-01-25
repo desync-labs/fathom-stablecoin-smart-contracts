@@ -60,6 +60,10 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _bookKeeper, bytes32 _collateralPoolId, address _collateralToken, address _proxyWalletFactory) external initializer {
         // 1. Initialized all dependencies
         PausableUpgradeable.__Pausable_init();

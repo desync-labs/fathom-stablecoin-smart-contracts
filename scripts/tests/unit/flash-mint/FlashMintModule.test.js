@@ -32,8 +32,8 @@ const loadFixtureHandler = async () => {
 
     await mockMyFashLoan.mock.onFlashLoan.returns(formatBytes32String(1))
 
-    const flashMintModule = getContract("FlashMintModule", DeployerAddress)
-    const flashMintModuleAsAlice = getContract("FlashMintModule", AliceAddress)
+    const flashMintModule = getContract("MockFlashMintModule", DeployerAddress)
+    const flashMintModuleAsAlice = getContract("MockFlashMintModule", AliceAddress)
 
     await flashMintModule.initialize(mockStablecoinAdapter.address, mockSystemDebtEngine.address)
 

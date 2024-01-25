@@ -13,6 +13,10 @@ contract PluginPriceOracle is Initializable, IFathomCentralizedOracle {
     IPluginInvokeOracle public oracle;
     IAccessControlConfig public accessControlConfig;
 
+    constructor() {
+        _disableInitializers();
+    }
+    
     modifier onlyOwner() {
         require(accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;

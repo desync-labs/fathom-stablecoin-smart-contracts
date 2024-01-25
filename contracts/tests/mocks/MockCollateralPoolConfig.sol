@@ -3,17 +3,17 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "../../interfaces/IPriceFeed.sol";
-import "../../interfaces/IGenericTokenAdapter.sol";
-import "../../interfaces/ICollateralPoolConfig.sol";
-import "../../interfaces/IAccessControlConfig.sol";
+import "../../main/interfaces/IPriceFeed.sol";
+import "../../main/interfaces/IGenericTokenAdapter.sol";
+import "../../main/interfaces/ICollateralPoolConfig.sol";
+import "../../main/interfaces/IAccessControlConfig.sol";
 
 /**
  * @title CollateralPoolConfig
  * @notice A contract that can add collateral pool type to the protocol and also manage settings for a specific pool type.
  */
 
-contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
+contract MockCollateralPoolConfig is Initializable, ICollateralPoolConfig {
     uint256 internal constant RAY = 10 ** 27;
 
     mapping(bytes32 => ICollateralPoolConfig.CollateralPool) private _collateralPools;
@@ -44,10 +44,6 @@ contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
     modifier onlyOwner() {
         require(accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(address _accessControlConfig) external initializer {

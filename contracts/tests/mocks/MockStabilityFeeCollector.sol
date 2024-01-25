@@ -4,10 +4,10 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IStabilityFeeCollector.sol";
-import "../interfaces/IPausable.sol";
-import "../utils/CommonMath.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IStabilityFeeCollector.sol";
+import "../../main/interfaces/IPausable.sol";
+import "../../main/utils/CommonMath.sol";
 
 /**
  * @title StabilityFeeCollector
@@ -17,7 +17,7 @@ import "../utils/CommonMath.sol";
  * The contract is Pausable, meaning it can be paused by the owner or governance to prevent fee collection temporarily.
  * Stability fees are collected for each collateral pool separately.
  */
-contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStabilityFeeCollector, IPausable {
+contract MockStabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, IStabilityFeeCollector, IPausable {
     struct CollateralPool {
         uint256 stabilityFeeRate; // Collateral-specific, per-second stability fee debtAccumulatedRate or mint interest debtAccumulatedRate [ray]
         uint256 lastAccumulationTime; // Time of last call to `collect` [unix epoch time]
@@ -43,10 +43,6 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
             "!(ownerRole or govRole)"
         );
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(address _bookKeeper, address _systemDebtEngine) external initializer {

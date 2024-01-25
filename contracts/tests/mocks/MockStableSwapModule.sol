@@ -4,18 +4,18 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../interfaces/IToken.sol";
-import "../interfaces/IStablecoinAdapter.sol";
-import "../interfaces/IStablecoin.sol";
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IStableSwapModule.sol";
-import "../utils/SafeToken.sol";
-import "../interfaces/IStableSwapModuleWrapperRetriever.sol";
+import "../../main/interfaces/IToken.sol";
+import "../../main/interfaces/IStablecoinAdapter.sol";
+import "../../main/interfaces/IStablecoin.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IStableSwapModule.sol";
+import "../../main/interfaces/IStableSwapModuleWrapperRetriever.sol";
+import "../../main/utils/SafeToken.sol";
 
 // Stable Swap Module
 // Allows anyone to go between FXD and the Token by pooling the liquidity
 // An optional fee is charged for incoming and outgoing transfers
-contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModule {
+contract MockStableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModule {
     using SafeToken for address;
 
     uint256 public constant ONE_DAY = 86400;
@@ -102,10 +102,6 @@ contract StableSwapModule is PausableUpgradeable, ReentrancyGuardUpgradeable, IS
     modifier onlyStableswapWrapper() {
         require(msg.sender == stableswapWrapper, "only-stableswap-wrapper");
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(

@@ -3,17 +3,17 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "../interfaces/IERC3156FlashLender.sol";
-import "../interfaces/IERC3156FlashBorrower.sol";
-import "../interfaces/IBookKeeperFlashLender.sol";
-import "../interfaces/IStablecoin.sol";
-import "../interfaces/IStablecoinAdapter.sol";
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IPausable.sol";
-import "../utils/SafeToken.sol";
-import "../utils/CommonMath.sol";
+import "../../main/interfaces/IERC3156FlashLender.sol";
+import "../../main/interfaces/IERC3156FlashBorrower.sol";
+import "../../main/interfaces/IBookKeeperFlashLender.sol";
+import "../../main/interfaces/IStablecoin.sol";
+import "../../main/interfaces/IStablecoinAdapter.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IPausable.sol";
+import "../../main/utils/SafeToken.sol";
+import "../../main/utils/CommonMath.sol";
 
-contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender, IPausable {
+contract MockFlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender, IPausable {
     using SafeToken for address;
 
     IBookKeeper public bookKeeper;
@@ -67,10 +67,6 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         locked = 1;
         _;
         locked = 0;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(address _stablecoinAdapter, address _systemDebtEngine) external initializer {

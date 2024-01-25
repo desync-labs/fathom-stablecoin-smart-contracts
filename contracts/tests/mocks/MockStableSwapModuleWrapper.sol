@@ -4,16 +4,16 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../interfaces/IToken.sol";
-import "../interfaces/IStablecoinAdapter.sol";
-import "../interfaces/IStablecoin.sol";
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IStableSwapModule.sol";
-import "../utils/SafeToken.sol";
-import "../interfaces/IStableSwapModuleWrapper.sol";
-import "../interfaces/IStableSwapRetriever.sol";
+import "../../main/interfaces/IToken.sol";
+import "../../main/interfaces/IStablecoinAdapter.sol";
+import "../../main/interfaces/IStablecoin.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IStableSwapModule.sol";
+import "../../main/interfaces/IStableSwapModuleWrapper.sol";
+import "../../main/interfaces/IStableSwapRetriever.sol";
+import "../../main/utils/SafeToken.sol";
 
-contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModuleWrapper {
+contract MockStableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModuleWrapper {
     using SafeToken for address;
     uint256 internal constant WAD = 10 ** 18;
 
@@ -63,10 +63,6 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
             require(usersWhitelist[msg.sender], "user-not-whitelisted");
         }
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(address _bookKeeper, address _stableswapModule) external initializer {

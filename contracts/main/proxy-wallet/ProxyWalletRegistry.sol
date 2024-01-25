@@ -36,6 +36,10 @@ contract ProxyWalletRegistry is PausableUpgradeable, IPausable {
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _factory, address _bookKeeper) external initializer {
         PausableUpgradeable.__Pausable_init();
 

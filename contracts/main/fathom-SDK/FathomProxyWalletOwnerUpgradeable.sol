@@ -37,6 +37,10 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
         emit Received(msg.sender, msg.value);
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(
         address _proxyWalletRegistry,
         address _bookKeeper,

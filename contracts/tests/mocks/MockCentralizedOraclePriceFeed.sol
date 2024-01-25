@@ -3,16 +3,12 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "../interfaces/IFathomCentralizedOracle.sol";
-import "../interfaces/IAccessControlConfig.sol";
-import "./DelayPriceFeedBase.sol";
+import "../../main/interfaces/IFathomCentralizedOracle.sol";
+import "../../main/interfaces/IAccessControlConfig.sol";
+import "../../main/price-feeders/DelayPriceFeedBase.sol";
 
-contract CentralizedOraclePriceFeed is DelayPriceFeedBase {
+contract MockCentralizedOraclePriceFeed is DelayPriceFeedBase {
     IFathomCentralizedOracle public oracle;
-
-    constructor() {
-        _disableInitializers();
-    }
 
     function initialize(address _oracle, address _accessControlConfig, bytes32 _poolId) external initializer {
         PausableUpgradeable.__Pausable_init();

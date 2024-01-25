@@ -4,11 +4,11 @@ pragma solidity 0.8.17;
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/ISystemDebtEngine.sol";
-import "../interfaces/ICagable.sol";
-import "../interfaces/IPausable.sol";
-import "../utils/CommonMath.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/ISystemDebtEngine.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/interfaces/IPausable.sol";
+import "../../main/utils/CommonMath.sol";
 
 /**
  * @title SystemDebtEngine
@@ -21,7 +21,7 @@ import "../utils/CommonMath.sol";
  * The contract has an active flag, live, which allows for system shutdown.
  */
 
-contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ISystemDebtEngine, ICagable, IPausable {
+contract MockSystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable, ISystemDebtEngine, ICagable, IPausable {
     IBookKeeper public bookKeeper; // CDP Engine
     uint256 public override surplusBuffer; // Surplus buffer         [rad]
     uint256 public live; // Active Flag
@@ -52,10 +52,6 @@ contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpg
             "!(ownerRole or showStopperRole)"
         );
         _;
-    }
-
-    constructor() {
-        _disableInitializers();
     }
 
     function initialize(address _bookKeeper) external initializer {
