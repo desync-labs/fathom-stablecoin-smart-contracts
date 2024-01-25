@@ -3,8 +3,7 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts/utils/Address.sol";
-
+import "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/ICollateralPoolConfig.sol";
@@ -18,7 +17,7 @@ import "../utils/CommonMath.sol";
  * It has the ability to move collateral tokens and stablecoins within the accounting state variable.
  */
 contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpgradeable, ReentrancyGuardUpgradeable {
-    using Address for address;
+    using AddressUpgradeable for address;
 
     struct Position {
         uint256 lockedCollateral; // Locked collateral inside this position (used for minting)                  [wad]
