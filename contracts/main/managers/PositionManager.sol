@@ -94,7 +94,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @dev Allow/disallow a user to manage the position
     /// @param _positionId The position id
     /// @param _user The address to be allowed for managing the position
-    /// @param _ok Ok flag to allow/disallow. 1 for allow and 0 for disallow.
+    /// @param _ok Ok flag to allow/disallow. true for allow and false for disallow.
     function allowManagePosition(uint256 _positionId, address _user, bool _ok) external override whenNotPaused onlyPositionOwner(_positionId) {
         require(_user != address(0), "PositionManager/user-address(0)");
         ownerWhitelist[owners[_positionId]][_positionId][_user] = _ok;
