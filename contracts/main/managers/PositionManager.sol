@@ -254,7 +254,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     }
 
     /// @dev Export the positions's lockedCollateral and debtShare to a different destination address
-    /// The destination addresss can be either a contract address or an EOA but not positionHandler/positionAddress
+    /// The destination address can be either a contract address or an EOA but not positionHandler/positionAddress
     /// @param _positionId The position id to be exported
     /// @param _destination The PositionHandler to be exported to
     function exportPosition(
