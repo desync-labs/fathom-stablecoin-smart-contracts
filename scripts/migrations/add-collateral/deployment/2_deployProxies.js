@@ -12,10 +12,9 @@ module.exports = async function (deployer) {
         "SlidingWindowDexOracle",
 
     ]
-    if (config.usePluginOracle) {
-        contracts.push("PluginPriceOracle")
-        contracts.push("CentralizedOraclePriceFeed")
-    }
+
+    contracts.push("CentralizedOraclePriceFeed")
+
 
     const promises = contracts.map(contract => {
         const instance = artifacts.require(`${contract}.sol`);

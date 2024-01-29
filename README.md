@@ -77,7 +77,7 @@ The chainId 1337 addresses are required to execute the test scripts on Ganache. 
     "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
     "DEXFactory": "0x5cf9FB75278606F23b2521e77A424174d2CAA2c3",
     "USDSTABLE": "0xb9AdA6B44E4CFF8FE00443Fadf8ad006CfCc2d10",
-    "PluginOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753"
+    "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753"
   }
 }
 
@@ -101,7 +101,7 @@ You might face some tests failing with 'out of gas' error.
 
 ## Deployment
 
-The current codebase is structured so that the same set of smart contracts will be deployed, regardless of the target blockchain. By default, the protocol's price feed after deployment is set to `SimplePriceFeed`, a mock price feed that allows the protocol's deployer (owner) to freely modify prices. This default setting is based on the consideration that other price feeds for commercial use, whether sourcing from a DEX or a PlugIn oracle, require external addresses or even price-related bots for successful deployment. Consequently, the adjusted deployment/migration script will deploy `DexPriceOracle`, `DelayFathomOraclePriceFeed`, `PluginPriceOracle`, `CentralizedOraclePriceFeed`, and `SlidingWindowDexOracle` using proxy patterns, but will not initialize them. Documentation regarding price feed changes will be included in this markdown document following the deployment section.
+The current codebase is structured so that the same set of smart contracts will be deployed, regardless of the target blockchain. By default, the protocol's price feed after deployment is set to `SimplePriceFeed`, a mock price feed that allows the protocol's deployer (owner) to freely modify prices. This default setting is based on the consideration that other price feeds for commercial use, whether sourcing from a DEX or a Centralized one, require external addresses or even price-related bots for successful deployment. Consequently, the adjusted deployment/migration script will deploy `DexPriceOracle`, `DelayFathomOraclePriceFeed`, `CentralizedOraclePriceFeed`, and `SlidingWindowDexOracle` using proxy patterns, but will not initialize them. Documentation regarding price feed changes will be included in this markdown document following the deployment section.
 
 ### On Ganache
 
@@ -128,7 +128,7 @@ The format of the content can be same as in the Running test sections. Like belo
     "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
     "DEXFactory": "0x5cf9FB75278606F23b2521e77A424174d2CAA2c3",
     "USDSTABLE": "0xb9AdA6B44E4CFF8FE00443Fadf8ad006CfCc2d10",
-    "PluginOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753"
+    "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753"
   }
 }
 
@@ -302,7 +302,7 @@ Line 5~6 verifies the solvency of the new priceFeed. New priceFeed must have poo
 
 ### Simple way to initialize other priceFeeds and priceOracles
 
-`DexPriceOracle`, `DelayFathomOraclePriceFeed`, `PluginPriceOracle`, `CentralizedOraclePriceFeed`, and `SlidingWindowDexOracle`
+`DexPriceOracle`, `DelayFathomOraclePriceFeed`, `CentralizedOraclePriceFeed`, and `SlidingWindowDexOracle`
 
 can be initialized with script below
 
@@ -315,15 +315,6 @@ scripts/migrations/priceFeed/1_initialize.js
 1) The DEXFactory is valid and that an XDC/USD pair exists within the DEXFactory.
 
 The default PriceOracle for DelayFathomOraclePriceFeed is set as DexPriceOracle since SlidingWindowDexOracle requires more involvement of PriceBot that will periodically keep feeding prices to SlidingWindowDexOracle. 
-
-#### If you prefer to use PlugIn as the price feed, ensure that:
-
-0) The PluginPriceOracle contract's PluginInvokeOracle address (which corresponds to the key of PluginOracle in externalAddresses.json and used for initialization of PluginPriceOracle) is set up and has a price available
-
-In *scripts/migrations/priceFeed/1_initialize.js*
- script, I commented out the CentralizedOraclePriceFeed and PluginPriceOracle initialization. Uncomment the lines if needed.
-
-This doc does not contain details about PlugIn Oracle.
 
 #### Run the init script with below command
 

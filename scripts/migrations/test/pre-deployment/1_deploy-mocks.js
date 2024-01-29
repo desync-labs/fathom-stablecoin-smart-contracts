@@ -39,7 +39,7 @@ const WXDC = artifacts.require('WXDC.sol');
 const ERC20Stable = artifacts.require('ERC20MintableStableSwap.sol')
 const SimplePriceFeed = artifacts.require('SimplePriceFeed.sol')
 const StableswapMultipleSwapsMock = artifacts.require("StableswapMultipleSwapsMock");
-const PluginOracleMock = artifacts.require("PluginOracleMock");
+const TestOracleMock = artifacts.require("TestOracleMock");
 
 module.exports = async function (deployer) {
   const promises = [
@@ -49,7 +49,7 @@ module.exports = async function (deployer) {
     deployer.deploy(FathomToken, 88, 89, { gas: 3050000 }),
     deployer.deploy(ERC20Stable, "StableCoin", "SFC", { gas: 3050000 }),
     deployer.deploy(SimplePriceFeed, { gas: 7050000 }),
-    deployer.deploy(PluginOracleMock, 1000, { gas: 7050000 }),
+    deployer.deploy(TestOracleMock, 1000, { gas: 7050000 }),
     deployer.deploy(MockStablecoinAdapter, { gas: 7050000 }),
     deployer.deploy(MockCollateralPoolConfig, { gas: 7050000 }),
     deployer.deploy(MockFlashMintModule, { gas: 7050000 }),
@@ -80,7 +80,7 @@ module.exports = async function (deployer) {
 
   await deployer.deploy(WXDC, { gas: 3050000 }),
     addresses[chainId].WXDC = WXDC.address;
-  addresses[chainId].PluginOracle = PluginOracleMock.address;
+  addresses[chainId].testOracle = TestOracleMock.address;
 
   await deployer.deploy(StableswapMultipleSwapsMock, { gas: 3050000 })
   fs.writeFileSync('./externalAddresses.json', JSON.stringify(addresses));
