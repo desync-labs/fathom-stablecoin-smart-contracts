@@ -33,12 +33,12 @@ contract FathomProxyWalletOwnerUpgradeable is OwnableUpgradeable {
     event WithdrawXDC(address _to, uint256 _xdcAmount);
     event Received(address _sender, uint256 _amount);
 
-    receive() external payable {
-        emit Received(msg.sender, msg.value);
-    }
-
     constructor() {
         _disableInitializers();
+    }
+
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
     }
 
     function initialize(

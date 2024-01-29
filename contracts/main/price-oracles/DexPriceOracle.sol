@@ -14,7 +14,7 @@ contract DexPriceOracle is Initializable, IFathomDEXOracle {
     constructor() {
         _disableInitializers();
     }
-    
+
     function initialize(address _dexFactory) external initializer {
         require(_dexFactory != address(0), "DexPriceOracle/zero-factory");
 

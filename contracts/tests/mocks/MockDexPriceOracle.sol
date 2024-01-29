@@ -10,7 +10,7 @@ import "../../main/interfaces/IToken.sol";
 
 contract MockDexPriceOracle is Initializable, IFathomDEXOracle {
     address public dexFactory;
-    
+
     function initialize(address _dexFactory) external initializer {
         require(_dexFactory != address(0), "DexPriceOracle/zero-factory");
 

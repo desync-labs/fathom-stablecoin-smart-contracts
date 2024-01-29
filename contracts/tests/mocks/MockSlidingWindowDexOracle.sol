@@ -35,7 +35,7 @@ contract MockSlidingWindowDexOracle is Initializable, IFathomDEXOracle {
     mapping(address => Observation[]) public pairObservations;
 
     uint8 public constant RESOLUTION = 112;
-    
+
     function initialize(address _factory, uint256 _windowSize, uint8 _granularity) external initializer {
         require(_factory != address(0), "SlidingWindowDexOracle/zero-factory");
         require(_granularity > 1, "SlidingWindowDexOracle/invalid-granularity");

@@ -13,7 +13,7 @@ contract DelayFathomOraclePriceFeed is DelayPriceFeedBase {
     event LogSetToken0(address indexed _token);
     event LogSetToken1(address indexed _token);
     event LogSetFathomOracle(address indexed _fathomOracle);
-    
+
     constructor() {
         _disableInitializers();
     }

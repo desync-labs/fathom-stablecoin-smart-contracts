@@ -507,6 +507,7 @@ contract FathomStablecoinProxyActions is CommonMath {
             ? _requiredStablecoinAmount + 1
             : _requiredStablecoinAmount;
     }
+
     function _safeToInt256(uint256 _number) internal pure returns (int256) {
         require(int256(_number) >= 0, "FathomStablecoinProxyActions/overflow");
         return int256(_number);

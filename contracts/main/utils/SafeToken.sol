@@ -5,8 +5,11 @@ import "@openzeppelin/contracts/utils/Address.sol";
 
 interface ERC20Interface {
     function balanceOf(address _user) external view returns (uint256);
+
     function approve(address _to, uint256 _value) external returns (bool);
+
     function transfer(address _to, uint256 _value) external returns (bool);
+
     function transferFrom(address from, address _to, uint256 _value) external returns (bool);
 }
 
