@@ -6,7 +6,6 @@ import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "./PositionHandler.sol";
 import "../interfaces/IManager.sol";
 import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/IShowStopper.sol";
 import "../interfaces/ISetPrice.sol";
 import "../interfaces/IPriceFeed.sol";
@@ -79,10 +78,13 @@ contract PositionManager is PausableUpgradeable, IManager {
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _bookKeeper, address _showStopper, address _priceOracle) external initializer {
         PausableUpgradeable.__Pausable_init();
 
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "PositionManager/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = _bookKeeper;
 
         require(IShowStopper(_showStopper).live() == 1, "PositionManager/showStopper-not-live"); // Sanity Check Call
@@ -95,7 +97,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     /// @dev Allow/disallow a user to manage the position
     /// @param _positionId The position id
     /// @param _user The address to be allowed for managing the position
-    /// @param _ok Ok flag to allow/disallow. 1 for allow and 0 for disallow.
+    /// @param _ok Ok flag to allow/disallow. true for allow and false for disallow.
     function allowManagePosition(uint256 _positionId, address _user, bool _ok) external override whenNotPaused onlyPositionOwner(_positionId) {
         require(_user != address(0), "PositionManager/user-address(0)");
         ownerWhitelist[owners[_positionId]][_positionId][_user] = _ok;
@@ -252,7 +254,7 @@ contract PositionManager is PausableUpgradeable, IManager {
     }
 
     /// @dev Export the positions's lockedCollateral and debtShare to a different destination address
-    /// The destination addresss can be either a contract address or an EOA but not positionHandler/positionAddress
+    /// The destination address can be either a contract address or an EOA but not positionHandler/positionAddress
     /// @param _positionId The position id to be exported
     /// @param _destination The PositionHandler to be exported to
     function exportPosition(
@@ -265,8 +267,8 @@ contract PositionManager is PausableUpgradeable, IManager {
             collateralPools[_positionId],
             positions[_positionId],
             _destination,
-            int256(_lockedCollateral),
-            int256(_debtShare)
+            _safeToInt256(_lockedCollateral),
+            _safeToInt256(_debtShare)
         );
         emit LogExportPosition(_positionId, positions[_positionId], _destination, _lockedCollateral, _debtShare);
     }
@@ -285,8 +287,8 @@ contract PositionManager is PausableUpgradeable, IManager {
             collateralPools[_positionId],
             _source,
             positions[_positionId],
-            int256(_lockedCollateral),
-            int256(_debtShare)
+            _safeToInt256(_lockedCollateral),
+            _safeToInt256(_debtShare)
         );
         emit LogImportPosition(_positionId, _source, positions[_positionId], _lockedCollateral, _debtShare);
     }
@@ -305,8 +307,8 @@ contract PositionManager is PausableUpgradeable, IManager {
             collateralPools[_sourceId],
             positions[_sourceId],
             positions[_destinationId],
-            int256(_lockedCollateral),
-            int256(_debtShare)
+            _safeToInt256(_lockedCollateral),
+            _safeToInt256(_debtShare)
         );
         emit LogMovePosition(_sourceId, _destinationId, _lockedCollateral, _debtShare);
     }
@@ -330,7 +332,6 @@ contract PositionManager is PausableUpgradeable, IManager {
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwnerOrGov {
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "PositionManager/invalid-bookKeeper"); // Sanity Check Call
         emit LogBookKeeperUpdated(bookKeeper, _bookKeeper);
         bookKeeper = _bookKeeper;
     }
@@ -354,5 +355,10 @@ contract PositionManager is PausableUpgradeable, IManager {
     function _requireHealthyPrice(bytes32 _poolId) internal view {
         IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(IBookKeeper(bookKeeper).collateralPoolConfig()).getPriceFeed(_poolId));
         require(_priceFeed.isPriceOk(), "PositionManager/price-is-not-healthy");
+    }
+
+    function _safeToInt256(uint256 _number) internal pure returns (int256) {
+        require(int256(_number) >= 0, "PositionManager/overflow");
+        return int256(_number);
     }
 }

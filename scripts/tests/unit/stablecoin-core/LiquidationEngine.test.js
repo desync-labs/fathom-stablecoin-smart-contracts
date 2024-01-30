@@ -34,9 +34,9 @@ const loadFixtureHandler = async () => {
   await mockedCollateralPoolConfig.mock.getPriceFeed.returns(mockedPriceFeed.address);
   await mockedPriceFeed.mock.isPriceOk.returns(true);
 
-  liquidationEngine = getContract("LiquidationEngine", DeployerAddress)
-  liquidationEngineAsAlice = getContract("LiquidationEngine", AliceAddress)
-  liquidationEngineAsBob = getContract("LiquidationEngine", BobAddress)
+  liquidationEngine = getContract("MockLiquidationEngine", DeployerAddress)
+  liquidationEngineAsAlice = getContract("MockLiquidationEngine", AliceAddress)
+  liquidationEngineAsBob = getContract("MockLiquidationEngine", BobAddress)
 
   await liquidationEngine.initialize(mockedBookKeeper.address, mockedSystemDebtEngine.address);
   await liquidationEngine.addToWhitelist(DeployerAddress);

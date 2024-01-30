@@ -21,10 +21,9 @@ module.exports = async function (deployer) {
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy")
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig")
     const priceOracle = await getProxy(proxyFactory, "PriceOracle")
+    const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
 
-    const priceFeed = config.usePluginOracle
-        ? await getProxyById(proxyFactory, "CentralizedOraclePriceFeed", getProxyId("CentralizedOraclePriceFeed"))
-        : await getProxyById(proxyFactory, "DelayFathomOraclePriceFeed", getProxyId("DelayFathomOraclePriceFeed"));
+    const priceFeed = simplePriceFeed;
 
     await priceFeed.peekPrice({ gasLimit: 2000000 });
 

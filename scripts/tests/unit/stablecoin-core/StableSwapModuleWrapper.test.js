@@ -42,10 +42,10 @@ const loadFixtureHandler = async () => {
   await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
   await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
 
-  stableSwapModule = getContract("StableSwapModule", DeployerAddress)
-  stableSwapModuleAsAlice = getContract("StableSwapModule", AliceAddress)
-  stableSwapModuleWrapper = getContract("StableSwapModuleWrapper", DeployerAddress)
-  stableSwapModuleWrapperAsAlice = getContract("StableSwapModuleWrapper", AliceAddress)
+  stableSwapModule = getContract("MockStableSwapModule", DeployerAddress)
+  stableSwapModuleAsAlice = getContract("MockStableSwapModule", AliceAddress)
+  stableSwapModuleWrapper = getContract("MockStableSwapModuleWrapper", DeployerAddress)
+  stableSwapModuleWrapperAsAlice = getContract("MockStableSwapModuleWrapper", AliceAddress)
 
 
   await stableSwapModule.initialize(

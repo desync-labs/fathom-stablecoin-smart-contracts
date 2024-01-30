@@ -32,7 +32,6 @@ module.exports = async function (deployer) {
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const proxyActionsStorage = await getProxy(proxyFactory, "ProxyActionsStorage");
     const adminControls = await getProxy(proxyFactory, "AdminControls");
-    const pluginPriceOracle = await getProxy(proxyFactory, "PluginPriceOracle");
     const centralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed");
     const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
@@ -142,8 +141,7 @@ module.exports = async function (deployer) {
             flashMintModule.address,
             stablecoinAdapter.address
         ),
-        // pluginPriceOracle.initialize(accessControlConfig.address, addresses.PluginOracle),
-        // centralizedOraclePriceFeed.initialize(pluginPriceOracle.address, accessControlConfig.address, pools.XDC),
+        // centralizedOraclePriceFeed.initialize(priceOracleAddress, accessControlConfig.address, pools.XDC),
         stableSwapModuleWrapper.initialize(
             bookKeeper.address,
             stableSwapModule.address),
@@ -181,7 +179,6 @@ module.exports = async function (deployer) {
         collateralTokenAdapter: collateralTokenAdapter.address,
         delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address,
         adminControls: adminControls.address,
-        pluginPriceOracle: pluginPriceOracle.address,
         centralizedOraclePriceFeed: centralizedOraclePriceFeed.address,
         proxyActionsStorage: proxyActionsStorage.address,
         fathomProxyAdmin: proxyAdmin.address,

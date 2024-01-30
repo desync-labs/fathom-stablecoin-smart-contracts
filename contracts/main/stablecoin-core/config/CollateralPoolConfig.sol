@@ -46,6 +46,10 @@ contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _accessControlConfig) external initializer {
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
     }

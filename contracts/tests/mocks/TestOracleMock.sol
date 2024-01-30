@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "../../main/apis/interfaces/IPluginInvokeOracle.sol";
+import "../../main/apis/interfaces/ITestOracleOracle.sol";
 
-contract PluginOracleMock is IPluginInvokeOracle {
+contract TestOracleMock is ITestOracleOracle {
     uint256 public price;
     uint256 public requestId;
 

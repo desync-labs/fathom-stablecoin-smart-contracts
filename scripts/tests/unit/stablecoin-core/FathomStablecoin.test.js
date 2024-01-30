@@ -9,8 +9,8 @@ const { getContract } = require("../../helper/contracts");
 const { loadFixture } = require("../../helper/fixtures");
 
 const loadFixtureHandler = async () => {
-    const fathomStablecoin = getContract("FathomStablecoin", DeployerAddress)
-    const fathomStablecoinAsAlice = getContract("FathomStablecoin", AliceAddress)
+    const fathomStablecoin = getContract("MockFathomStablecoin", DeployerAddress)
+    const fathomStablecoinAsAlice = getContract("MockFathomStablecoin", AliceAddress)
 
     await fathomStablecoin.initialize("Fatom", "FXD")
 

@@ -9,7 +9,6 @@ import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/IPriceFeed.sol";
 import "../interfaces/IPriceOracle.sol";
 import "../interfaces/ISystemDebtEngine.sol";
-import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
 import "../utils/CommonMath.sol";
 
@@ -61,15 +60,17 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _bookKeeper) external initializer {
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         live = 1;
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         emit LogSetBookKeeper(msg.sender, _bookKeeper);
     }
@@ -157,8 +158,8 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
             _positionAddress,
             address(this),
             address(systemDebtEngine),
-            -int256(_amount),
-            -int256(_debtShare)
+            -_safeToInt256(_amount),
+            -_safeToInt256(_debtShare)
         );
         emit LogAccumulateBadDebt(_collateralPoolId, _positionAddress, _amount, _debtShare);
     }
@@ -240,9 +241,14 @@ contract ShowStopper is CommonMath, IShowStopper, Initializable {
             _positionAddress,
             _collateralReceiver,
             address(systemDebtEngine),
-            -int256(_lockedCollateralAmount),
+            -_safeToInt256(_lockedCollateralAmount),
             0
         );
         emit LogRedeemLockedCollateral(_collateralPoolId, _collateralReceiver, _lockedCollateralAmount);
+    }
+
+    function _safeToInt256(uint256 _number) internal pure returns (int256) {
+        require(int256(_number) >= 0, "ShowStopper/overflow");
+        return int256(_number);
     }
 }

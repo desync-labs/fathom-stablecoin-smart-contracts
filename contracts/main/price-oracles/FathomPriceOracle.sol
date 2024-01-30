@@ -16,6 +16,10 @@ contract FathomPriceOracle is Initializable, IFathomCentralizedOracle {
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _accessControlConfig, address _oracle) external initializer {
         require(_accessControlConfig != address(0), "FathomPriceOracle: ZERO_ADDRESS");
         accessControlConfig = IAccessControlConfig(_accessControlConfig);

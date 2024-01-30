@@ -30,7 +30,6 @@ module.exports = async function (deployer) {
         "CollateralTokenAdapter",
         "SlidingWindowDexOracle",
         "AdminControls",
-        "PluginPriceOracle",
         "CentralizedOraclePriceFeed",
         "StableSwapModuleWrapper",
         "SimplePriceFeed"

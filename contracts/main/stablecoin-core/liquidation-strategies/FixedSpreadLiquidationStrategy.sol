@@ -53,7 +53,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
     IPriceOracle public priceOracle; // Collateral price module
     IStablecoinAdapter public stablecoinAdapter; //StablecoinAdapter to deposit FXD to bookKeeper
 
-    uint256 public flashLendingEnabled;
+    bool public flashLendingEnabled;
 
     bytes4 internal constant FLASH_LENDING_ID = 0xaf7bd142;
 
@@ -71,7 +71,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         uint256 _collateralAmountToBeLiquidated,
         uint256 _treasuryFees
     );
-    event LogSetFlashLendingEnabled(address indexed _caller, uint256 _flashLendingEnabled);
+    event LogSetFlashLendingEnabled(address indexed _caller, bool _flashLendingEnabled);
     event LogSetBookKeeper(address _newAddress);
 
     modifier onlyOwnerOrGov() {
@@ -88,6 +88,10 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(_accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender), "!ownerRole");
         _;
+    }
+
+    constructor() {
+        _disableInitializers();
     }
 
     /// @notice Initializes the FixedSpreadLiquidationStrategy contract with required dependencies.
@@ -107,7 +111,6 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
 
         require(IPriceOracle(_priceOracle).stableCoinReferencePrice() >= 0, "FixedSpreadLiquidationStrategy/invalid-priceOracle"); // Sanity Check Call
@@ -137,10 +140,10 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
     }
 
     /// @notice Sets the flash lending feature to enabled or disabled.
-    /// @param _flashLendingEnabled The value indicating whether flash lending should be enabled (1) or disabled (0).
+    /// @param _flashLendingEnabled The value indicating whether flash lending should be enabled (true) or disabled (false).
     /// @dev This function can only be called by the contract owner or governance.
     /// @dev Emits a LogSetFlashLendingEnabled event upon a successful update.
-    function setFlashLendingEnabled(uint256 _flashLendingEnabled) external onlyOwnerOrGov {
+    function setFlashLendingEnabled(bool _flashLendingEnabled) external onlyOwnerOrGov {
         flashLendingEnabled = _flashLendingEnabled;
         emit LogSetFlashLendingEnabled(msg.sender, _flashLendingEnabled);
     }
@@ -162,7 +165,7 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
                 IAccessControlConfig(bookKeeper.accessControlConfig()).LIQUIDATION_ENGINE_ROLE(),
                 msg.sender
             ),
-            "!liquidationEngingRole"
+            "!liquidationEngineRole"
         );
 
         _validateValues(_collateralPoolId, _positionDebtShare, _positionCollateralAmount, _positionAddress);
@@ -189,14 +192,14 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
             _positionAddress,
             address(this),
             address(systemDebtEngine),
-            -int256(info.collateralAmountToBeLiquidated),
-            -int256(info.actualDebtShareToBeLiquidated)
+            -_safeToInt256(info.collateralAmountToBeLiquidated),
+            -_safeToInt256(info.actualDebtShareToBeLiquidated)
         );
         if (info.treasuryFees > 0) {
             bookKeeper.moveCollateral(_collateralPoolId, address(this), address(systemDebtEngine), info.treasuryFees);
         }
         if (
-            flashLendingEnabled == 1 &&
+            flashLendingEnabled == true &&
             _data.length > 0 &&
             _collateralRecipient != address(bookKeeper) &&
             _collateralRecipient != address(liquidationEngine) &&
@@ -255,7 +258,6 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwner {
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         emit LogSetBookKeeper(_bookKeeper);
     }
@@ -344,6 +346,11 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         // liquidatorIncentiveCollectedFromPosition * (treasuryFeesBps) / 10000
         // 0.047619048 * 5000 / 10000
         info.treasuryFees = (liquidatorIncentiveCollectedFromPosition * _vars.treasuryFeesBps) / 10000; // [wad]
+    }
+
+    function _safeToInt256(uint256 _number) internal pure returns (int256) {
+        require(int256(_number) >= 0, "FixedSpreadLiquidationStrategy/overflow");
+        return int256(_number);
     }
     // solhint-enable function-max-lines
 }

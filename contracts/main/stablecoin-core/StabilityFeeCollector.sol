@@ -45,6 +45,10 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _bookKeeper, address _systemDebtEngine) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
