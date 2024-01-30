@@ -35,7 +35,5 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/test/add-collateral/pre-deployment'],
     ['execute', '--path', 'scripts/migrations/add-collateral/deployment'],
     ['execute', '--path', 'scripts/migrations/test/add-collateral/configuration'],
-    // fathom-solidity-sdk flow
-    ['execute', '--path', 'scripts/migrations/fathom-solidity-sdk/1_deploy.js']
   ],
 }
