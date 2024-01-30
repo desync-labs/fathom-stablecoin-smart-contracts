@@ -2,12 +2,12 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "../interfaces/IManager.sol";
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/ICollateralPoolConfig.sol";
-import "../interfaces/IProxyWalletRegistry.sol";
-import "../interfaces/IProxyWallet.sol";
-import "../interfaces/IToken.sol";
+import "../main/interfaces/IManager.sol";
+import "../main/interfaces/IBookKeeper.sol";
+import "../main/interfaces/ICollateralPoolConfig.sol";
+import "../main/interfaces/IProxyWalletRegistry.sol";
+import "../main/interfaces/IProxyWallet.sol";
+import "../main/interfaces/IToken.sol";
 
 error InvalidAddress();
 error InvalidUint();
