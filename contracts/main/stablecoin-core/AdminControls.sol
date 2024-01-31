@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "../interfaces/IAccessControlConfig.sol";
 import "../interfaces/IPausable.sol";
 import "../interfaces/IBookKeeper.sol";
 
-contract AdminControls is Initializable {
+contract AdminControls is OwnableUpgradeable {
     address public bookKeeper;
     address public liquidationEngine;
     address public priceOracle;

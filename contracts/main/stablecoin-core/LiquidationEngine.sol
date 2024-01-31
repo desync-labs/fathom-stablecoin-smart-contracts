@@ -37,7 +37,7 @@ contract LiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, I
 
     // --- Math ---
     uint256 internal constant WAD = 10 ** 18;
-
+    bytes32 internal deprecated;
     IBookKeeper public bookKeeper; // CDP Engine
     ISystemDebtEngine public systemDebtEngine; // Debt Engine
     uint256 public override live; // Active Flag

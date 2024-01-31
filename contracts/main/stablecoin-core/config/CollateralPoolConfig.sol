@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
 import "../../interfaces/IPriceFeed.sol";
 import "../../interfaces/IGenericTokenAdapter.sol";
@@ -13,7 +13,7 @@ import "../../interfaces/IAccessControlConfig.sol";
  * @notice A contract that can add collateral pool type to the protocol and also manage settings for a specific pool type.
  */
 
-contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
+contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig {
     uint256 internal constant RAY = 10 ** 27;
 
     mapping(bytes32 => ICollateralPoolConfig.CollateralPool) private _collateralPools;

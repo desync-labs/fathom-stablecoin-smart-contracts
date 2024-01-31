@@ -74,12 +74,13 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     bytes32 public override collateralPoolId;
 
     IVault public vault;
+    bytes32 internal deprecated2;
     IManager public positionManager;
     IProxyRegistry public proxyWalletFactory;
 
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
-
+    bytes32 internal deprecated;
     mapping(address => bool) public whiteListed;
 
     event LogDeposit(uint256 _val);

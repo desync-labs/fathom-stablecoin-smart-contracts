@@ -25,12 +25,12 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     bytes32 public override collateralPoolId;
 
     IVault public vault;
-
+    bytes32 internal deprecated2;
     IProxyRegistry public proxyWalletFactory;
 
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
-
+    bytes32 internal deprecated;
     mapping(address => bool) public whiteListed;
 
     event LogDeposit(uint256 _val);
