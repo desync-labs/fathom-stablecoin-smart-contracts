@@ -5,9 +5,11 @@ import "../../main/interfaces/IFlashLendingCallee.sol";
 
 contract MockFlashLendingCallee is IFlashLendingCallee {
     function flashLendingCall(
-        address caller,
-        uint256 debtValueToRepay, // [rad]
-        uint256 collateralAmountToLiquidate, // [wad]
+        address _caller,
+        uint256 _debtValueToRepay, // [rad]
+        uint256 _collateralAmountToLiquidate, // [wad]
         bytes calldata
     ) external override {}
+
+    function supportsInterface(bytes4) external view returns (bool) {}
 }

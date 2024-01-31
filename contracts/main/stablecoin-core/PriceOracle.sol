@@ -28,7 +28,7 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
     uint256 internal constant MAX_REFERENCE_PRICE = 2 * (10 ** 27);
 
     IBookKeeper public bookKeeper; // CDP Engine
-    uint256 public override stableCoinReferencePrice; // ref per FUSD [ray] :: value of stablecoin in the reference asset (e.g. $1 per Fathom USD)
+    uint256 public override stableCoinReferencePrice; // ref per FXD [ray] :: value of stablecoin in the reference asset (e.g. $1 per FXD)
 
     uint256 public live;
 
@@ -39,6 +39,7 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
     );
 
     event LogSetStableCoinReferencePrice(address indexed _caller, uint256 _data);
+    event LogSetBookKeeper(address _newAddress);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -71,17 +72,20 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _bookKeeper) external initializer {
         PausableUpgradeable.__Pausable_init();
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         stableCoinReferencePrice = RAY;
         live = 1;
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwner isLive {
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
+        emit LogSetBookKeeper(_bookKeeper);
     }
 
     function setStableCoinReferencePrice(uint256 _referencePrice) external onlyOwner isLive {
@@ -108,10 +112,12 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
             emit LogCage();
         }
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();

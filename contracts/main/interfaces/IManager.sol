@@ -6,9 +6,9 @@ interface IManager {
 
     function give(uint256, address) external;
 
-    function allowManagePosition(uint256, address, uint256) external;
+    function allowManagePosition(uint256, address, bool) external;
 
-    function allowMigratePosition(address, uint256) external;
+    function allowMigratePosition(address, bool) external;
 
     function adjustPosition(uint256, int256, int256, bytes calldata) external;
 
@@ -28,7 +28,7 @@ interface IManager {
 
     function mapPositionHandlerToOwner(address) external view returns (address);
 
-    function ownerWhitelist(address, uint256, address) external view returns (uint256);
+    function ownerWhitelist(address, uint256, address) external view returns (bool);
 
     function collateralPools(uint256) external view returns (bytes32);
 
@@ -37,4 +37,12 @@ interface IManager {
     function positions(uint256) external view returns (address);
 
     function bookKeeper() external view returns (address);
+
+    function list(uint256 _positionId) external view returns (uint256 prev, uint256 next);
+
+    function ownerFirstPositionId(address _proxyWalletAddress) external view returns (uint256 positionId);
+
+    function ownerLastPositionId(address _proxyWalletAddress) external view returns (uint256 positionId);
+
+    function ownerPositionCount(address _proxyWalletAddress) external view returns (uint256 positionCount);
 }

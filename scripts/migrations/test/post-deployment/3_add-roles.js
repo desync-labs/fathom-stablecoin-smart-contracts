@@ -1,6 +1,6 @@
 const { getProxy } = require("../../../common/proxies");
 
-module.exports =  async function(deployer) {
+module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
@@ -11,8 +11,8 @@ module.exports =  async function(deployer) {
     const MockCollateralTokenAdapter = await artifacts.initializeInterfaceAt("MockCollateralTokenAdapter", "MockCollateralTokenAdapter");
     await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), MockCollateralTokenAdapter.address)
 
-    await MockCollateralTokenAdapter.whitelist(positionManager.address, { gasLimit: 1000000 });
-    await MockCollateralTokenAdapter.whitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
-    await MockCollateralTokenAdapter.whitelist(liquidationEngine.address, { gasLimit: 1000000 });
-    await MockCollateralTokenAdapter.whitelist(showStopper.address, { gasLimit: 1000000 });
+    await MockCollateralTokenAdapter.addToWhitelist(positionManager.address, { gasLimit: 1000000 });
+    await MockCollateralTokenAdapter.addToWhitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
+    await MockCollateralTokenAdapter.addToWhitelist(liquidationEngine.address, { gasLimit: 1000000 });
+    await MockCollateralTokenAdapter.addToWhitelist(showStopper.address, { gasLimit: 1000000 });
 }

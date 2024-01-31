@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../../interfaces/IPriceFeed.sol";
 import "../../interfaces/IGenericTokenAdapter.sol";
@@ -10,10 +10,10 @@ import "../../interfaces/IAccessControlConfig.sol";
 
 /**
  * @title CollateralPoolConfig
- * @notice A contract can add collateral pool type to the protocol and also manage settings for a specific pool type.
+ * @notice A contract that can add collateral pool type to the protocol and also manage settings for a specific pool type.
  */
 
-contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig {
+contract CollateralPoolConfig is Initializable, ICollateralPoolConfig {
     uint256 internal constant RAY = 10 ** 27;
 
     mapping(bytes32 => ICollateralPoolConfig.CollateralPool) private _collateralPools;
@@ -46,34 +46,34 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _accessControlConfig) external initializer {
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
     }
-    /**
-    //@notice this function adds a collateral pool type to Fathom protocol
-    //@dev please refer to the deployment/migration script for more detail info on units for each params.
-     */
+
+    //@notice This function adds a collateral pool type to Fathom protocol
+    //@dev Please refer to the deployment/migration script for more detail info on units for each params.
     function initCollateralPool(
         bytes32 _collateralPoolId, // Identifier for a specific collateral pool.
-        uint256 _debtCeiling, // Debt ceiling of this collateral pool                                          [rad] 
+        uint256 _debtCeiling, // Debt ceiling of this collateral pool                                          [rad]
         uint256 _debtFloor, // Position debt floor of this collateral pool                                     [rad]
         uint256 _positionDebtCeiling, // position debt ceiling of this collateral pool                         [rad]
         address _priceFeed,
         uint256 _liquidationRatio, // Liquidation ratio or Collateral ratio, inverse of LTV                    [ray]
         uint256 _stabilityFeeRate, //Collateral-specific, per-second stability fee debtAccumulatedRate or mint interest debtAccumulatedRate [ray]
-        address _adapter,   // collateralTokenAdapter address for a specific collateral pool
+        address _adapter, // collateralTokenAdapter address for a specific collateral pool
         uint256 _closeFactorBps, // Percentage (BPS) of how much  of debt could be liquidated in a single liquidation
         uint256 _liquidatorIncentiveBps, // Percentage (BPS) of how much additional collateral will be given to the liquidator incentive
         uint256 _treasuryFeesBps, // Percentage (BPS) of how much additional collateral will be transferred to the treasury
-        address _strategy  // Liquidation strategy for this collateral pool
+        address _strategy // Liquidation strategy for this collateral pool
     ) external onlyOwner {
         require(_collateralPools[_collateralPoolId].debtAccumulatedRate == 0, "CollateralPoolConfig/collateral-pool-already-init");
         require(_debtCeiling > _debtFloor, "CollateralPoolConfig/invalid-ceiliing");
-        require(
-            _positionDebtCeiling <= _debtCeiling && _positionDebtCeiling > _debtFloor, 
-            "CollateralPoolConfig/invalid-position-ceiling"
-        );
-        
+        require(_positionDebtCeiling <= _debtCeiling && _positionDebtCeiling > _debtFloor, "CollateralPoolConfig/invalid-position-ceiling");
+
         _collateralPools[_collateralPoolId].debtAccumulatedRate = RAY;
         _collateralPools[_collateralPoolId].debtCeiling = _debtCeiling;
         _collateralPools[_collateralPoolId].debtFloor = _debtFloor;
@@ -113,10 +113,7 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
     }
 
     function setDebtCeiling(bytes32 _collateralPoolId, uint256 _debtCeiling) external onlyOwner {
-        require(
-            _debtCeiling >= _collateralPools[_collateralPoolId].positionDebtCeiling, 
-            "CollateralPoolConfig/invalid-debt-ceiling"
-        );
+        require(_debtCeiling >= _collateralPools[_collateralPoolId].positionDebtCeiling, "CollateralPoolConfig/invalid-debt-ceiling");
 
         _collateralPools[_collateralPoolId].debtCeiling = _debtCeiling;
         emit LogSetDebtCeiling(msg.sender, _collateralPoolId, _debtCeiling);
@@ -155,21 +152,20 @@ contract CollateralPoolConfig is AccessControlUpgradeable, ICollateralPoolConfig
         emit LogSetLiquidationRatio(msg.sender, _poolId, _liquidationRatio);
     }
 
-    /** @dev Set the stability fee rate of the collateral pool.
-      The rate to be set here is the `r` in:
-          r^N = APR
-      Where:
-        r = stability fee rate
-        N = Accumulation frequency which is per-second in this case; the value will be 60*60*24*365 = 31536000 to signify the number of seconds within a year.
-        APR = the annual percentage rate
-    For example, to achieve 0.5% APR for stability fee rate:
-          r^31536000 = 1.005
-    Find the 31536000th root of 1.005 and we will get:
-          r = 1.000000000158153903837946258002097...
-    The rate is in [ray] format, so the actual value of `stabilityFeeRate` will be:
-          stabilityFeeRate = 1000000000158153903837946258
-    The above `stabilityFeeRate` will be the value we will use in this contract.
-  */
+    /// @dev Set the stability fee rate of the collateral pool.
+    ///      The rate to be set here is the `r` in:
+    ///         r^N = APR
+    ///      Where:
+    ///         r = stability fee rate
+    ///         N = Accumulation frequency which is per-second in this case; the value will be 60*60*24*365 = 31536000 to signify the number of seconds within a year.
+    ///         APR = the annual percentage rate
+    ///      For example, to achieve 0.5% APR for stability fee rate:
+    ///         r^31536000 = 1.005
+    ///      Find the 31536000th root of 1.005 and we will get:
+    ///         r = 1.000000000158153903837946258002097...
+    ///      The rate is in [ray] format, so the actual value of `stabilityFeeRate` will be:
+    ///         stabilityFeeRate = 1000000000158153903837946258
+    ///      The above `stabilityFeeRate` will be the value we will use in this contract.
     function setStabilityFeeRate(bytes32 _collateralPool, uint256 _stabilityFeeRate) external onlyOwner {
         require(_stabilityFeeRate >= RAY, "CollateralPoolConfig/invalid-stability-fee-rate");
         // Maximum stability fee rate is 50% yearly

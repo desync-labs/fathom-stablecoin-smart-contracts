@@ -16,34 +16,34 @@ const { loadFixture } = require("../../helper/fixtures");
 const { formatBytes32String } = ethers.utils
 
 const loadFixtureHandler = async () => {
-    const mockedAccessControlConfig = await createMock("AccessControlConfig")
-    const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig")
-    const mockedBookKeeper = await createMock("BookKeeper")
-    const mockedPriceFeed = await createMock("SimplePriceFeed")
+  const mockedAccessControlConfig = await createMock("AccessControlConfig")
+  const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig")
+  const mockedBookKeeper = await createMock("BookKeeper")
+  const mockedPriceFeed = await createMock("SimplePriceFeed")
 
-    await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
-    await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
-    await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
-    await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
-    await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))
-    await mockedCollateralPoolConfig.mock.getLiquidationRatio.returns(1)
-    await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
-    await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+  await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+  await mockedBookKeeper.mock.totalStablecoinIssued.returns(WeiPerRay)
+  await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
+  await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
+  await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))
+  await mockedCollateralPoolConfig.mock.getLiquidationRatio.returns(1)
+  await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+  await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
 
-    const priceOracle = getContract("PriceOracle", DeployerAddress) 
-    const priceOracleAsAlice = getContract("PriceOracle", AliceAddress)
+  const priceOracle = getContract("MockPriceOracle", DeployerAddress)
+  const priceOracleAsAlice = getContract("MockPriceOracle", AliceAddress)
 
-    await priceOracle.initialize(mockedBookKeeper.address);
+  await priceOracle.initialize(mockedBookKeeper.address);
 
-    return {
-        priceOracle,
-        priceOracleAsAlice,
-        mockedBookKeeper,
-        mockedPriceFeed,
-        mockedAccessControlConfig,
-        mockedCollateralPoolConfig
-    }
-    
+  return {
+    priceOracle,
+    priceOracleAsAlice,
+    mockedBookKeeper,
+    mockedPriceFeed,
+    mockedAccessControlConfig,
+    mockedCollateralPoolConfig
+  }
+
 }
 describe("PriceOracle", () => {
   // Contracts
@@ -61,13 +61,13 @@ describe("PriceOracle", () => {
 
   beforeEach(async () => {
     ({
-        priceOracle,
-        priceOracleAsAlice,
-        mockedBookKeeper,
-        mockedPriceFeed,
-        mockedAccessControlConfig,
-        mockedCollateralPoolConfig
-      } = await loadFixture(loadFixtureHandler))
+      priceOracle,
+      priceOracleAsAlice,
+      mockedBookKeeper,
+      mockedPriceFeed,
+      mockedAccessControlConfig,
+      mockedCollateralPoolConfig
+    } = await loadFixture(loadFixtureHandler))
   })
 
   describe("#setPrice()", () => {

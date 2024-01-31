@@ -5,12 +5,10 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "../interfaces/IFathomCentralizedOracle.sol";
 import "../interfaces/IAccessControlConfig.sol";
-import "../apis/interfaces/IPluginInvokeOracle.sol";
+import "../apis/interfaces/IFathomOracleAggregator.sol";
 
-contract PluginPriceOracle is Initializable, IFathomCentralizedOracle {
-    uint256 internal constant DECIMALS_CONVERSION_NUM = 1e14;
-
-    IPluginInvokeOracle public oracle;
+contract FathomPriceOracle is Initializable, IFathomCentralizedOracle {
+    IFathomOracleAggregator public oracle;
     IAccessControlConfig public accessControlConfig;
 
     modifier onlyOwner() {
@@ -18,33 +16,35 @@ contract PluginPriceOracle is Initializable, IFathomCentralizedOracle {
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _accessControlConfig, address _oracle) external initializer {
-        require(_accessControlConfig != address(0), "PluginPriceOracle: ZERO_ADDRESS");
+        require(_accessControlConfig != address(0), "FathomPriceOracle: ZERO_ADDRESS");
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
-        require(IPluginInvokeOracle(_oracle).latestAnswer() > 0, "PluginPriceOracle/invalid-oracle");
-        oracle = IPluginInvokeOracle(_oracle);
+
+        (, uint256 value, , , ) = IFathomOracleAggregator(_oracle).latestRoundData();
+        require(value > 0, "FathomPriceOracle/invalid-oracle");
+        oracle = IFathomOracleAggregator(_oracle);
     }
 
     function setAccessControlConfig(address _accessControlConfig) external onlyOwner {
         require(
             IAccessControlConfig(_accessControlConfig).hasRole(IAccessControlConfig(_accessControlConfig).OWNER_ROLE(), msg.sender),
-            "PluginPriceOracle/msgsender-not-owner"
+            "FathomPriceOracle/msgsender-not-owner"
         );
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
+        emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
 
     function setOracle(address _oracle) external onlyOwner {
-        require(IPluginInvokeOracle(_oracle).latestAnswer() > 0, "PluginPriceOracle/invalid-oracle");
-        oracle = IPluginInvokeOracle(_oracle);
+        (, uint256 value, , , ) = IFathomOracleAggregator(_oracle).latestRoundData();
+        require(value > 0, "FathomPriceOracle/invalid-oracle");
+        oracle = IFathomOracleAggregator(_oracle);
     }
 
     function getPrice() external view returns (uint256 price, uint256 lastUpdated) {
-        price = _toWad(uint256(oracle.latestAnswer()));
-        lastUpdated = oracle.latestTimestamp();
-    }
-
-    /// price from plugin oracle returns multiplied y 10000 and we want it in wad
-    function _toWad(uint256 amount) private pure returns (uint256) {
-        return amount * DECIMALS_CONVERSION_NUM;
+        (, price, lastUpdated, , ) = oracle.latestRoundData();
     }
 }

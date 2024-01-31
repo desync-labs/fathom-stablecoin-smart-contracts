@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 interface ISystemDebtEngine {
-    function settleSystemBadDebt(uint256 value) external; // [rad]
+    function settleSystemBadDebt(uint256 _value) external; // [rad]
 
     function surplusBuffer() external view returns (uint256); // [rad]
 }

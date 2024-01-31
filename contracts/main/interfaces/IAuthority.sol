@@ -2,5 +2,5 @@
 pragma solidity 0.8.17;
 
 interface IAuthority {
-    function canCall(address src, address dst, bytes4 sig) external view returns (bool);
+    function canCall(address _src, address _dst, bytes4 _sig) external view returns (bool);
 }

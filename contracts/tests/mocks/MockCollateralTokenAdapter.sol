@@ -80,14 +80,13 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
 
-    /// @dev deprecated but needs to be kept to minimize storage layout confusion
-    bytes32 deprecated;
-
     mapping(address => bool) public whiteListed;
 
     event LogDeposit(uint256 _val);
     event LogWithdraw(uint256 _val);
     event LogEmergencyWithdraw(address indexed _caller, address _to);
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -132,15 +131,18 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
     }
 
-    function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
-        require(toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
-        whiteListed[toBeWhitelisted] = true;
+    function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
+        require(_toBeWhitelisted != address(0), "AnkrColadapter/whitelist-invalidAdds");
+        whiteListed[_toBeWhitelisted] = true;
+        emit LogAddToWhitelist(_toBeWhitelisted);
     }
 
-    function blacklist(address toBeRemoved) external onlyOwnerOrGov {
-        require(toBeRemoved != address(0), "CollateralTokenAdapter/blacklist-invalidAdds");
-        whiteListed[toBeRemoved] = false;
+    function removeFromWhitelist(address _toBeRemoved) external onlyOwnerOrGov {
+        require(_toBeRemoved != address(0), "CollateralTokenAdapter/removeFromWL-invalidAdds");
+        whiteListed[_toBeRemoved] = false;
+        emit LogRemoveFromWhitelist(_toBeRemoved);
     }
+
     /// @dev Cage function halts MockCollateralTokenAdapter contract for good.
     /// Please be cautious with this function since there is no uncage function
     function cage() external override nonReentrant onlyOwner {
@@ -149,10 +151,12 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
             emit LogCage();
         }
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();

@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 contract FathomNote {
-    event LogNote(bytes4 indexed sig, address indexed guy, bytes32 indexed foo, bytes32 indexed bar, uint256 wad, bytes fax) anonymous;
+    event LogNote(bytes4 indexed _sig, address indexed _guy, bytes32 indexed _foo, bytes32 indexed _bar, uint256 _wad, bytes _fax) anonymous;
 
     modifier note() {
         bytes32 foo;

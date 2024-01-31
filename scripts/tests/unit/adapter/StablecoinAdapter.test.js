@@ -28,12 +28,13 @@ const loadFixtureHandler = async () => {
   await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address);
 
 
-  const stablecoinAdapter = getContract("StablecoinAdapter", DeployerAddress)
+  const stablecoinAdapter = getContract("MockStablecoinAdapter", DeployerAddress)
 
   await stablecoinAdapter.initialize(
     mockedBookKeeper.address,
     mockedToken.address
   )
+
   return {
     stablecoinAdapter,
     mockedBookKeeper,
@@ -51,33 +52,33 @@ describe("StablecoinAdapter", async () => {
     await snapshot.revertToSnapshot();
   })
 
-  beforeEach(async () => { 
-    ;({mockedCollateralPoolConfig, stablecoinAdapter, mockedBookKeeper, mockedToken} =
-        await loadFixture(loadFixtureHandler))
+  beforeEach(async () => {
+    ; ({ mockedCollateralPoolConfig, stablecoinAdapter, mockedBookKeeper, mockedToken } =
+      await loadFixture(loadFixtureHandler))
   })
 
   context("depositRAD function", async () => {
-      it("should allow deposit from a designated liquidation strategy", async () => {
-          // Set mock to return true for strategy verification
-          await mockedCollateralPoolConfig.mock.getStrategy.returns(DeployerAddress);
+    it("should allow deposit from a designated liquidation strategy", async () => {
+      // Set mock to return true for strategy verification
+      await mockedCollateralPoolConfig.mock.getStrategy.returns(DeployerAddress);
 
-          await mockedBookKeeper.mock.moveStablecoin.returns()
-          await mockedToken.mock.burn.returns()
-          // Call depositRAD function from the designated liquidation strategy
-          await expect(
-              stablecoinAdapter.depositRAD(DeployerAddress, ethers.constants.MaxUint256, COLLATERAL_POOL_ID, "0x")
-          ).to.not.be.reverted;
-      });
+      await mockedBookKeeper.mock.moveStablecoin.returns()
+      await mockedToken.mock.burn.returns()
+      // Call depositRAD function from the designated liquidation strategy
+      await expect(
+        stablecoinAdapter.depositRAD(DeployerAddress, ethers.constants.MaxUint256, COLLATERAL_POOL_ID, "0x")
+      ).to.not.be.reverted;
+    });
 
-      it("should not allow deposit from a non-designated liquidation strategy", async () => {
-          // Set mock to return another address for strategy verification
-          await mockedCollateralPoolConfig.mock.getStrategy.returns(AliceAddress);
+    it("should not allow deposit from a non-designated liquidation strategy", async () => {
+      // Set mock to return another address for strategy verification
+      await mockedCollateralPoolConfig.mock.getStrategy.returns(AliceAddress);
 
-          // Call depositRAD function from the designated liquidation strategy
-          await expect(
-            stablecoinAdapter.depositRAD(DeployerAddress, ethers.constants.MaxUint256, COLLATERAL_POOL_ID, "0x")
-          ).to.be.revertedWith("!(LiquidationStrategy)");
-      });
+      // Call depositRAD function from the designated liquidation strategy
+      await expect(
+        stablecoinAdapter.depositRAD(DeployerAddress, ethers.constants.MaxUint256, COLLATERAL_POOL_ID, "0x")
+      ).to.be.revertedWith("!(LiquidationStrategy)");
+    });
   });
 });
 
