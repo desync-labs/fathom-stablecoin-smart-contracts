@@ -25,7 +25,7 @@ const loadFixtureHandler = async () => {
 
     await mockedShowStopper.mock.live.returns(1);
     await mockedBookKeeper.mock.totalStablecoinIssued.returns(0);
-    await mockedBookKeeper.mock.addToWhitelist.returns();
+    await mockedBookKeeper.mock.whitelist.returns();
     await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address);
     await mockedPriceOracle.mock.setPrice.returns()
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)

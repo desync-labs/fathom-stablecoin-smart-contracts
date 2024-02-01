@@ -31,7 +31,7 @@ const loadFixtureHandler = async () => {
   await mockedAccessControlConfig.mock.hasRole.returns(true)
 
   await mockFathomStablecoin.mock.approve.returns(true)
-  await mockBookKeeper.mock.addToWhitelist.returns()
+  await mockBookKeeper.mock.whitelist.returns()
   await mockFathomStablecoin.mock.transferFrom.returns(true)
   await mockFathomStablecoin.mock.transfer.returns(true)
   await mockUSD.mock.transferFrom.returns(true)

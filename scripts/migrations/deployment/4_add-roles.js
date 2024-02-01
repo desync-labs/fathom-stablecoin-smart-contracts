@@ -51,7 +51,7 @@ module.exports = async function (deployer) {
 
     await accessControlConfig.grantRole(await accessControlConfig.GOV_ROLE(), adminControls.address)
 
-    await bookKeeper.addToWhitelist(stablecoinAdapter.address, { gasLimit: 1000000 });
+    await bookKeeper.whitelist(stablecoinAdapter.address, { gasLimit: 1000000 });
 
     await collateralTokenAdapter.addToWhitelist(positionManager.address, { gasLimit: 1000000 });
     await collateralTokenAdapter.addToWhitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });

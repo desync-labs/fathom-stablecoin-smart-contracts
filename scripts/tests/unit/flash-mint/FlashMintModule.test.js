@@ -25,7 +25,7 @@ const loadFixtureHandler = async () => {
     await mockStablecoinAdapter.mock.bookKeeper.returns(mockBookKeeper.address)
     await mockStablecoinAdapter.mock.stablecoin.returns(mockFathomStablecoin.address)
     await mockFathomStablecoin.mock.approve.returns(true)
-    await mockBookKeeper.mock.addToWhitelist.returns()
+    await mockBookKeeper.mock.whitelist.returns()
     await mockedAccessControlConfig.mock.hasRole.returns(true)
     await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
     await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))

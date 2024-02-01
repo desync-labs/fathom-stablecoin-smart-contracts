@@ -5,6 +5,6 @@ import "../interfaces/IBookKeeper.sol";
 
 contract PositionHandler {
     constructor(address _bookKeeper) {
-        IBookKeeper(_bookKeeper).addToWhitelist(msg.sender);
+        IBookKeeper(_bookKeeper).whitelist(msg.sender);
     }
 }

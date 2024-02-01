@@ -60,7 +60,7 @@ interface IBookKeeper {
 
     function settleSystemBadDebt(uint256 _value) external; // [rad]
 
-    function addToWhitelist(address _toBeWhitelistedAddress) external;
+    function whitelist(address _toBeWhitelistedAddress) external;
 
     function removeFromWhitelist(address _toBeRemovedAddress) external;
 

@@ -46,8 +46,8 @@ contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBo
         uint256 loanAmount = _loanValue / RAY;
 
         // 1. Swap FXD to USDT at a DEX
-        vars.stableSwapModule.bookKeeper().addToWhitelist(address(IStablecoinAdapterGetter(msg.sender).stablecoinAdapter()));
-        //above is actually callling bookKeeper.addToWhiteList(stablecoinAdapterAddress);
+        vars.stableSwapModule.bookKeeper().whitelist(address(IStablecoinAdapterGetter(msg.sender).stablecoinAdapter()));
+        //above is actually callling bookKeeper.whitelist(stablecoinAdapterAddress);
         IStablecoinAdapterGetter(msg.sender).stablecoinAdapter().withdraw(address(this), loanAmount, abi.encode(0));
 
         uint256 balanceBefore = vars.stableSwapToken.myBalance();

@@ -167,7 +167,7 @@ describe("BookKeeper", () => {
                     expect(collateralTokenBobBefore).to.be.equal(0)
 
                     // alice allow bob to move collateral
-                    await bookKeeperAsAlice.addToWhitelist(BobAddress)
+                    await bookKeeperAsAlice.whitelist(BobAddress)
 
                     // bob call move collateral from alice to bob
                     await bookKeeperAsBob.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
@@ -224,7 +224,7 @@ describe("BookKeeper", () => {
                 await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad, { gasLimit: 1000000 });
 
                 // alice allow bob to move stablecoin, so the test focuses solely on the zero amount
-                await bookKeeperAsAlice.addToWhitelist(BobAddress);
+                await bookKeeperAsAlice.whitelist(BobAddress);
 
                 // Try moving 0 stablecoin from Alice to Bob
                 await expect(
@@ -269,7 +269,7 @@ describe("BookKeeper", () => {
                     expect(stablecoinBobBefore).to.be.equal(0)
 
                     // alice allow bob to move stablecoin
-                    await bookKeeperAsAlice.addToWhitelist(BobAddress)
+                    await bookKeeperAsAlice.whitelist(BobAddress)
 
                     // bob call move stablecoin from alice to bob
                     await expect(bookKeeperAsBob.moveStablecoin(AliceAddress, BobAddress, WeiPerRad, { gasLimit: 1000000 }))
@@ -411,7 +411,7 @@ describe("BookKeeper", () => {
                                 await mockedCollateralPoolConfig.mock.setTotalDebtShare.returns()
 
                                 // alice allow bob to move stablecoin
-                                await bookKeeperAsBob.addToWhitelist(AliceAddress)
+                                await bookKeeperAsBob.whitelist(AliceAddress)
 
                                 await expect(
                                     bookKeeperAsAlice.adjustPosition(
@@ -451,7 +451,7 @@ describe("BookKeeper", () => {
                                 await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                                 // alice allow bob to move stablecoin
-                                await bookKeeperAsBob.addToWhitelist(AliceAddress)
+                                await bookKeeperAsBob.whitelist(AliceAddress)
 
                                 const positionBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                                 expect(positionBefore.lockedCollateral).to.be.equal(0)
@@ -923,7 +923,7 @@ describe("BookKeeper", () => {
                                 expect(stablecoinAliceBefore).to.be.equal(0)
 
                                 // bob allow alice
-                                await bookKeeperAsBob.addToWhitelist(AliceAddress)
+                                await bookKeeperAsBob.whitelist(AliceAddress)
 
                                 // alice draw
                                 await bookKeeperAsAlice.adjustPosition(
@@ -1288,7 +1288,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
+                        await bookKeeperAsBob.whitelist(AliceAddress)
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
@@ -1337,7 +1337,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
+                        await bookKeeperAsBob.whitelist(AliceAddress)
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
@@ -1386,7 +1386,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
+                        await bookKeeperAsBob.whitelist(AliceAddress)
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
@@ -1435,7 +1435,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
+                        await bookKeeperAsBob.whitelist(AliceAddress)
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
@@ -1497,7 +1497,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
+                        await bookKeeperAsBob.whitelist(AliceAddress)
 
                         await expect(
                             bookKeeperAsAlice.movePosition(
@@ -1546,7 +1546,7 @@ describe("BookKeeper", () => {
                         )
 
                         // bob allow alice to manage a position
-                        await bookKeeperAsBob.addToWhitelist(AliceAddress)
+                        await bookKeeperAsBob.whitelist(AliceAddress)
 
                         const positionAliceBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
                         expect(positionAliceBefore.lockedCollateral).to.be.equal(WeiPerWad.mul(10))

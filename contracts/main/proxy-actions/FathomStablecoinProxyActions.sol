@@ -29,8 +29,8 @@ contract FathomStablecoinProxyActions is CommonMath {
         _;
     }
 
-    function addToWhitelist(address _bookKeeper, address _usr) external onlyDelegateCall {
-        IBookKeeper(_bookKeeper).addToWhitelist(_usr);
+    function whitelist(address _bookKeeper, address _usr) external onlyDelegateCall {
+        IBookKeeper(_bookKeeper).whitelist(_usr);
     }
 
     function removeFromWhitelist(address _bookKeeper, address _usr) external onlyDelegateCall {
@@ -92,7 +92,7 @@ contract FathomStablecoinProxyActions is CommonMath {
 
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_bookKeeper).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
-            IBookKeeper(_bookKeeper).addToWhitelist(_stablecoinAdapter);
+            IBookKeeper(_bookKeeper).whitelist(_stablecoinAdapter);
         }
 
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _amount, _data); // Withdraws Fathom Stablecoin to the user's wallet as a token
@@ -306,7 +306,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         moveStablecoin(_manager, _positionId, address(this), toRad(_stablecoinAmount));
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_bookKeeper).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
-            IBookKeeper(_bookKeeper).addToWhitelist(_stablecoinAdapter);
+            IBookKeeper(_bookKeeper).whitelist(_stablecoinAdapter);
         }
         // Withdraws Fathom Stablecoin to the user's wallet as a token
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data);
@@ -343,7 +343,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         moveStablecoin(address(_manager), _positionId, address(this), toRad(_stablecoinAmount));
         // Allows adapter to access to proxy's Fathom Stablecoin balance in the bookKeeper
         if (IBookKeeper(_manager.bookKeeper()).positionWhitelist(address(this), address(_stablecoinAdapter)) == 0) {
-            IBookKeeper(_manager.bookKeeper()).addToWhitelist(_stablecoinAdapter);
+            IBookKeeper(_manager.bookKeeper()).whitelist(_stablecoinAdapter);
         }
         // Withdraws FXD to the user's wallet as a token
         IStablecoinAdapter(_stablecoinAdapter).withdraw(msg.sender, _stablecoinAmount, _data);

@@ -375,7 +375,7 @@ describe("ShowStopper", () => {
                     { from: AliceAddress, gasLimit: 1000000 }
                 )
 
-                await bookKeeper.addToWhitelist(showStopper.address, { from: AliceAddress })
+                await bookKeeper.whitelist(showStopper.address, { from: AliceAddress })
 
                 await showStopper.accumulateStablecoin(WeiPerWad.mul(5), { from: AliceAddress })
 
@@ -496,7 +496,7 @@ describe("ShowStopper", () => {
                     { from: AliceAddress, gasLimit: 1000000 }
                 )
 
-                await bookKeeper.addToWhitelist(showStopper.address, { from: AliceAddress })
+                await bookKeeper.whitelist(showStopper.address, { from: AliceAddress })
 
                 await showStopper.accumulateStablecoin(WeiPerWad.mul(5), { from: AliceAddress })
 

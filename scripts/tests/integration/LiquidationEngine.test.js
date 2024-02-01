@@ -57,8 +57,8 @@ const setup = async () => {
     await collateralPoolConfig.setCloseFactorBps(pools.XDC, CLOSE_FACTOR_BPS, { gasLimit: 1000000 });
     await collateralPoolConfig.setTreasuryFeesBps(pools.XDC, TREASURY_FEE_BPS, { gasLimit: 1000000 });
 
-    await bookKeeper.addToWhitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 3000000 })
-    await bookKeeper.addToWhitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 3000000 })
+    await bookKeeper.whitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 3000000 })
+    await bookKeeper.whitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 3000000 })
     await liquidationEngineAsAdmin.addToWhitelist(BobAddress);
 
     return {
@@ -157,7 +157,7 @@ describe("LiquidationEngine", () => {
 
                 // 4. Bob liquidate Alice's position up to full close factor successfully
                 const debtShareToRepay = parseEther("0.5")
-                await bookKeeper.addToWhitelist(liquidationEngine.address, { gasLimit: 1000000 })
+                await bookKeeper.whitelist(liquidationEngine.address, { gasLimit: 1000000 })
 
                 await expect(
                     liquidationEngine["liquidate(bytes32,address,uint256,uint256,address,bytes)"](

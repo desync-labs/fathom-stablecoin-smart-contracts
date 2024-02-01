@@ -1925,7 +1925,7 @@ describe("PositionPermissions", () => {
                     )
 
                     // 5. allow bob to window
-                    await bookKeeper.addToWhitelist(stablecoinAdapter.address, { from: BobAddress })
+                    await bookKeeper.whitelist(stablecoinAdapter.address, { from: BobAddress })
 
                     // 6. mint FXD
                     await stablecoinAdapter.withdraw(
@@ -2365,7 +2365,7 @@ describe("PositionPermissions", () => {
                 expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, AliceAddress)).to.be.equal(true)
 
                 // 3. alice allow positionManage
-                await bookKeeper.addToWhitelist(positionManager.address, { from: AliceAddress })
+                await bookKeeper.whitelist(positionManager.address, { from: AliceAddress })
 
                 // 4. alice allow migration
                 await positionManager.allowMigratePosition(aliceProxyWallet.address, true, { from: AliceAddress })
