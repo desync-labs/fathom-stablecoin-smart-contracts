@@ -90,10 +90,6 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         _;
     }
 
-    constructor() {
-        _disableInitializers();
-    }
-
     /// @notice Initializes the FixedSpreadLiquidationStrategy contract with required dependencies.
     /// @param _bookKeeper The address of the BookKeeper contract.
     /// @param _priceOracle The address of the PriceOracle contract.
