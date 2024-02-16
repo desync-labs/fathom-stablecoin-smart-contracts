@@ -4,9 +4,9 @@ pragma solidity 0.8.17;
 interface IGenericTokenAdapter {
     function decimals() external returns (uint256);
 
-    function deposit(address positionAddress, uint256 wad, bytes calldata data) external;
+    function deposit(address _positionAddress, uint256 _wad, bytes calldata _data) external;
 
-    function withdraw(address positionAddress, uint256 wad, bytes calldata data) external;
+    function withdraw(address _positionAddress, uint256 _wad, bytes calldata _data) external;
 
     function emergencyWithdraw(address _to) external;
 

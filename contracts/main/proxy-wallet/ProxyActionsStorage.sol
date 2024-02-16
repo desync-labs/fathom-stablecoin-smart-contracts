@@ -24,6 +24,10 @@ contract ProxyActionsStorage is PausableUpgradeable {
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _proxyAction, address _bookKeeper) external initializer {
         require(_proxyAction != address(0) && _bookKeeper != address(0), "ProxyActionsStorage/zero-address");
 

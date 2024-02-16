@@ -9,7 +9,17 @@ module.exports = {
       gasPrice: '0x3b9aca00',
     },
     apothem: {
+      // Please check the status of RPC URL in below link.
+      // https://chainlist.org/?search=xdc
       host: "https://erpc.apothem.network/",
+      // host: "https://rpc.apothem.network/",
+      private_key: fs.readFileSync("./privateKey").toString(),
+      gasPrice: '0x3b9aca00',
+    },
+    mainnet: {
+      // Please check the status of RPC URL in below link.
+      // https://chainlist.org/?search=xdc
+      host: "https://erpc.xdcrpc.com/",
       private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },

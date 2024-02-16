@@ -42,12 +42,12 @@ const loadFixtureHandler = async () => {
   await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
   await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
 
-  stableSwapModule = getContract("StableSwapModule", DeployerAddress)
-  stableSwapModuleAsAlice = getContract("StableSwapModule", AliceAddress)
-  stableSwapModuleWrapper = getContract("StableSwapModuleWrapper", DeployerAddress)
-  stableSwapModuleWrapperAsAlice = getContract("StableSwapModuleWrapper", AliceAddress)
-  
-  
+  stableSwapModule = getContract("MockStableSwapModule", DeployerAddress)
+  stableSwapModuleAsAlice = getContract("MockStableSwapModule", AliceAddress)
+  stableSwapModuleWrapper = getContract("MockStableSwapModuleWrapper", DeployerAddress)
+  stableSwapModuleWrapperAsAlice = getContract("MockStableSwapModuleWrapper", AliceAddress)
+
+
   await stableSwapModule.initialize(
     mockBookKeeper.address,
     mockUSD.address,
@@ -194,14 +194,14 @@ describe("StableSwapModuleWrapper", () => {
       })
     })
 
-    context("zero amount", async() => {
-      it("Should revert", async() => {
+    context("zero amount", async () => {
+      it("Should revert", async () => {
         await expect(stableSwapModuleWrapper.withdrawTokens(BigNumber.from("0"))).to.be.revertedWith("withdrawTokens/amount-zero")
       })
     })
 
-    context("not enough deposit", async() => {
-      it("Should revert", async() => {
+    context("not enough deposit", async () => {
+      it("Should revert", async () => {
         await expect(stableSwapModuleWrapper.withdrawTokens(WeiPerWad.mul(10000))).to.be.revertedWith("withdrawTokens/amount-exceeds-users-deposit")
       })
     })

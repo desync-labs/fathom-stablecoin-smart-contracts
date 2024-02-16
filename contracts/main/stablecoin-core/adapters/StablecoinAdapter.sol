@@ -43,11 +43,12 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
 
     modifier onlyLiquidationStrategy(bytes32 _collateralPoolId) {
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
-        require(
-            msg.sender == _collateralPoolConfig.getStrategy(_collateralPoolId),
-            "!(LiquidationStrategy)"
-        );
+        require(msg.sender == _collateralPoolConfig.getStrategy(_collateralPoolId), "!(LiquidationStrategy)");
         _;
+    }
+
+    constructor() {
+        _disableInitializers();
     }
 
     function initialize(address _bookKeeper, address _stablecoin) external initializer {
@@ -71,38 +72,41 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         }
     }
 
-    /**
-     * @notice Deposits stablecoin from msg.sender into the BookKeeper.
-     * @param usr Address of the user to credit the deposit to.
-     * @param wad Amount to deposit. [wad]
-     */
-    function deposit(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
-        bookKeeper.moveStablecoin(address(this), usr, wad * RAY);
-        stablecoin.burn(msg.sender, wad);
+    /// @notice Deposits stablecoin from msg.sender into the BookKeeper.
+    /// @param _usr Address of the user to credit the deposit to.
+    /// @param _wad Amount to deposit. [wad]
+    function deposit(address _usr, uint256 _wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
+        bookKeeper.moveStablecoin(address(this), _usr, _wad * RAY);
+        stablecoin.burn(msg.sender, _wad);
     }
-    /**
-     * @notice Deposits stablecoin from msg.sender into the BookKeeper in RAD.
-     * @param usr Address of the user to credit the deposit to.
-     * @param rad Amount to deposit. [rad]
-     */
-    function depositRAD(address usr, uint256 rad, bytes32 collateralPoolId, bytes calldata /* data */) external override nonReentrant whenNotPaused onlyLiquidationStrategy(collateralPoolId) {
-        bookKeeper.moveStablecoin(address(this), usr, rad);
-        stablecoin.burn(msg.sender, (rad / RAY) + 1);
+
+    /// @notice Deposits stablecoin from msg.sender into the BookKeeper in RAD.
+    /// @param _usr Address of the user to credit the deposit to.
+    /// @param _rad Amount to deposit. [rad]
+    function depositRAD(
+        address _usr,
+        uint256 _rad,
+        bytes32 _collateralPoolId,
+        bytes calldata /* data */
+    ) external override nonReentrant whenNotPaused onlyLiquidationStrategy(_collateralPoolId) {
+        bookKeeper.moveStablecoin(address(this), _usr, _rad);
+        stablecoin.burn(msg.sender, (_rad / RAY) + 1);
     }
-    /**
-     * @notice Withdraws stablecoin to a specified user.
-     * @param usr Address of the user to withdraw stablecoin to.
-     * @param wad Amount to withdraw. [wad]
-     */
-    function withdraw(address usr, uint256 wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
+
+    /// @notice Withdraws stablecoin to a specified user.
+    /// @param _usr Address of the user to withdraw stablecoin to.
+    /// @param _wad Amount to withdraw. [wad]
+    function withdraw(address _usr, uint256 _wad, bytes calldata /* data */) external override nonReentrant whenNotPaused {
         require(live == 1, "StablecoinAdapter/not-live");
-        bookKeeper.moveStablecoin(msg.sender, address(this), wad * RAY);
-        stablecoin.mint(usr, wad);
+        bookKeeper.moveStablecoin(msg.sender, address(this), _wad * RAY);
+        stablecoin.mint(_usr, _wad);
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();

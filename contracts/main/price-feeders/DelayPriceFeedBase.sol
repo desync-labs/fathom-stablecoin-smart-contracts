@@ -36,6 +36,7 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
             "DelayPriceFeed/msgsender-not-owner"
         );
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
+        emit LogSetAccessControlConfig(msg.sender, _accessControlConfig);
     }
 
     function setPriceLife(uint256 _second) external onlyOwner {
@@ -55,10 +56,12 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
     function setPoolId(bytes32 _poolId) external onlyOwner {
         poolId = _poolId;
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
@@ -67,8 +70,7 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
 
     function peekPrice() external override returns (uint256, bool) {
         if (block.timestamp >= lastUpdateTS + timeDelay || !this.isPriceFresh()) {
-            try this.retrivePrice() returns (PriceInfo memory _priceInfo) {
-                
+            try this.retrievePrice() returns (PriceInfo memory _priceInfo) {
                 require(_priceInfo.price > 0, "DelayPriceFeed/wrong-price");
                 require(_priceInfo.lastUpdate <= block.timestamp, "DelayPriceFeed/wrong-lastUpdate");
 
@@ -98,5 +100,5 @@ abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
         return delayedPrice.lastUpdate >= block.timestamp - priceLife;
     }
 
-    function retrivePrice() external view virtual returns (PriceInfo memory);
+    function retrievePrice() external view virtual returns (PriceInfo memory);
 }

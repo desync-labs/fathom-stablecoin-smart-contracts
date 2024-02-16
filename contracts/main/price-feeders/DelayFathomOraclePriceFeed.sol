@@ -10,9 +10,13 @@ contract DelayFathomOraclePriceFeed is DelayPriceFeedBase {
     address public token1;
     IFathomOracle public fathomOracle;
 
-    event LogSetToken0(address indexed token);
-    event LogSetToken1(address indexed token);
-    event LogSetFathomOracle(address indexed fathomOracle);
+    event LogSetToken0(address indexed _token);
+    event LogSetToken1(address indexed _token);
+    event LogSetFathomOracle(address indexed _fathomOracle);
+
+    constructor() {
+        _disableInitializers();
+    }
 
     function initialize(address _fathomOracle, address _token0, address _token1, address _accessControlConfig, bytes32 _poolId) external initializer {
         require(_accessControlConfig != address(0), "DelayFathomOraclePriceFeed/zero-access-control");
@@ -51,7 +55,7 @@ contract DelayFathomOraclePriceFeed is DelayPriceFeedBase {
         emit LogSetFathomOracle(_oracle);
     }
 
-    function retrivePrice() external view override returns (PriceInfo memory) {
+    function retrievePrice() external view override returns (PriceInfo memory) {
         (uint256 _price, uint256 _lastUpdate) = IFathomOracle(fathomOracle).getPrice(token0, token1);
         return PriceInfo(_price, _lastUpdate);
     }

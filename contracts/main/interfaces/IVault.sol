@@ -6,5 +6,5 @@ interface IVault {
 
     function withdraw(uint256 _amount) external;
 
-    function collateralAdapter() external view returns(address);
+    function collateralAdapter() external view returns (address);
 }

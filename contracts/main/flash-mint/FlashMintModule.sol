@@ -19,7 +19,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
     IBookKeeper public bookKeeper;
     IStablecoinAdapter public stablecoinAdapter;
     IStablecoin public stablecoin;
-    address public systemDebtEngine; // systemDebtEngine intentionally set immutable to save gas
+    address public systemDebtEngine;
 
     uint256 public max; // Maximum borrowable stablecoin  [wad]
     uint256 public feeRate; // Fee                     [wad = 100%]
@@ -69,6 +69,10 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         locked = 0;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _stablecoinAdapter, address _systemDebtEngine) external initializer {
         // 1. Initialized all dependencies
         PausableUpgradeable.__Pausable_init();
@@ -83,11 +87,9 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         address(stablecoin).safeApprove(_stablecoinAdapter, type(uint256).max);
     }
 
-    /**
-     * @notice Add an address to the whitelist
-     * @param _toBeWhitelisted The address to be whitelisted
-     * @dev Can only be called by the contract owner or the governance system
-     */
+    /// @notice Add an address to the whitelist
+    /// @param _toBeWhitelisted The address to be whitelisted
+    /// @dev Can only be called by the contract owner or the governance system
     function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
         require(_toBeWhitelisted != address(0), "FlashMintModule/whitelist-invalidAddress");
         require(flashMintWhitelist[_toBeWhitelisted] == false, "FlashMintModule/user-already-whitelisted");
@@ -95,11 +97,9 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         emit LogAddToWhitelist(_toBeWhitelisted);
     }
 
-    /**
-     * @notice remove an address from the whitelist
-     * @param _usr The address to be removed from the whitelist
-     * @dev Can only be called by the contract owner or the governance system
-     */
+    /// @notice remove an address from the whitelist
+    /// @param _usr The address to be removed from the whitelist
+    /// @dev Can only be called by the contract owner or the governance system
     function removeFromWhitelist(address _usr) external onlyOwnerOrGov {
         require(_usr != address(0), "FlashMintModule/removeWL-invalidAddress");
         require(flashMintWhitelist[_usr] == true, "FlashMintModule/user-not-whitelisted");
@@ -118,16 +118,18 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
     }
 
     function setMax(uint256 _data) external onlyOwner {
-        // Add an upper limit of 10^27 Stablecoin to avoid breaking technical assumptions of Stablecoin << 2^256 - 1
+        // Add an upper limit of 10^45 Stablecoin to avoid breaking technical assumptions of Stablecoin << 2^256 - 1
         require((max = _data) <= RAD, "FlashMintModule/ceiling-too-high");
         emit LogSetMax(_data);
     }
 
     function setFeeRate(uint256 _data) external onlyOwner {
+        require(_data <= WAD, "FlashMintModule/fee-too-high");
         feeRate = _data;
         emit LogSetFeeRate(_data);
     }
 
+    // To show old state from storage and the new state from call data, emits before changing state
     function setDecentralizedStatesStatus(bool _status) external onlyOwner {
         emit LogDecentralizedStateStatus(isDecentralizedState, _status);
         isDecentralizedState = _status;
@@ -144,6 +146,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         require(_token == address(stablecoin), "FlashMintModule/token-unsupported");
         require(_amount <= max, "FlashMintModule/ceiling-exceeded");
 
+        uint256 _prev = bookKeeper.stablecoin(address(this));
         uint256 _amt = _amount * RAY;
         uint256 _fee = (_amount * feeRate) / WAD;
         uint256 _total = _amount + _fee;
@@ -157,8 +160,12 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
 
         require(_receiver.onFlashLoan(msg.sender, _token, _amount, _fee, _data) == CALLBACK_SUCCESS, "FlashMintModule/callback-failed");
         address(stablecoin).safeTransferFrom(address(_receiver), address(this), _total); // The fee is also enforced here
+        address(stablecoin).safeApprove(address(stablecoinAdapter), _total);
         stablecoinAdapter.deposit(address(this), _total, abi.encode(0));
+        address(stablecoin).safeApprove(address(stablecoinAdapter), 0);
         bookKeeper.settleSystemBadDebt(_amt);
+
+        require(bookKeeper.stablecoin(address(this)) >= _prev + _fee, "FlashMintModule/insufficient-fee");
 
         return true;
     }

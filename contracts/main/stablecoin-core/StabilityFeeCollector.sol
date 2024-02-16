@@ -27,6 +27,7 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
     address public systemDebtEngine;
 
     event LogSetSystemDebtEngine(address indexed _caller, address _data);
+    event LogNewDebtAccumulatedRate(uint256 _newDebtAccumulatedRate);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -44,20 +45,26 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _bookKeeper, address _systemDebtEngine) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
         require(_bookKeeper != address(0), "StabilityFeeCollector/zero-book-keeper");
         bookKeeper = IBookKeeper(_bookKeeper);
-        
+
         require(_systemDebtEngine != address(0), "StabilityFeeCollector/bad-system-debt-engine-address");
         systemDebtEngine = _systemDebtEngine;
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external override onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();
@@ -69,27 +76,25 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
         emit LogSetSystemDebtEngine(msg.sender, _systemDebtEngine);
     }
 
-    /**
-     * @dev Collects the stability fee of the specified collateral pool.
-     * This function can be called by anyone.
-     * It updates the `debtAccumulatedRate` of the specified collateral pool based on
-     * the global and per-pool stability fee rates with respect to the last block that `collect` was called.
-     * @param _collateralPool Collateral pool ID for which to collect the stability fee.
-     * @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
-     */
+    /// @dev Collects the stability fee of the specified collateral pool.
+    /// This function can be called by anyone.
+    /// It updates the `debtAccumulatedRate` of the specified collateral pool based on
+    /// the global and per-pool stability fee rates with respect to the last block that `collect` was called.
+    /// @param _collateralPool Collateral pool ID for which to collect the stability fee.
+    /// @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
     function collect(bytes32 _collateralPool) external override whenNotPaused nonReentrant returns (uint256 _debtAccumulatedRate) {
         _debtAccumulatedRate = _collect(_collateralPool);
+        emit LogNewDebtAccumulatedRate(_debtAccumulatedRate);
     }
-    /**
-     * @dev Internal function to collect the stability fee of the specified collateral pool.
-     * This function updates the `debtAccumulatedRate` of the specified collateral pool based on
-     * the global and per-pool stability fee rates with respect to the last block that `collect` was called.
-     * @param _collateralPoolId Collateral pool ID for which to collect the stability fee.
-     * @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
-     */
+
+    /// @dev Internal function to collect the stability fee of the specified collateral pool.
+    /// This function updates the `debtAccumulatedRate` of the specified collateral pool based on
+    /// the global and per-pool stability fee rates with respect to the last block that `collect` was called.
+    /// @param _collateralPoolId Collateral pool ID for which to collect the stability fee.
+    /// @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
     function _collect(bytes32 _collateralPoolId) internal returns (uint256 _debtAccumulatedRate) {
         ICollateralPoolConfig _config = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
-        
+
         uint256 _previousDebtAccumulatedRate = _config.getDebtAccumulatedRate(_collateralPoolId);
         uint256 _stabilityFeeRate = _config.getStabilityFeeRate(_collateralPoolId);
         uint256 _lastAccumulationTime = _config.getLastAccumulationTime(_collateralPoolId);

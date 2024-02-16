@@ -43,16 +43,6 @@ module.exports = async function (deployer) {
         )
     ];
 
-    if (config.usePluginOracle) {
-        const pluginPriceOracle = await getProxyById(proxyFactory, "PluginPriceOracle", getProxyId("PluginPriceOracle"));
-        const centralizedOraclePriceFeed = await getProxyById(proxyFactory, "CentralizedOraclePriceFeed", getProxyId("CentralizedOraclePriceFeed"));
-
-        promises.push(pluginPriceOracle.initialize(accessControlConfig.address, config.pluginOracle))
-        promises.push(centralizedOraclePriceFeed.initialize(pluginPriceOracle.address, accessControlConfig.address, poolId))
-
-        newAddresses.pluginPriceOracle = pluginPriceOracle.address,
-            newAddresses.centralizedOraclePriceFeed = centralizedOraclePriceFeed.address
-    }
 
     await Promise.all(promises);
 

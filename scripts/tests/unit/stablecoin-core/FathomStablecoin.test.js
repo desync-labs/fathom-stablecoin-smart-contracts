@@ -9,8 +9,8 @@ const { getContract } = require("../../helper/contracts");
 const { loadFixture } = require("../../helper/fixtures");
 
 const loadFixtureHandler = async () => {
-    const fathomStablecoin = getContract("FathomStablecoin", DeployerAddress)
-    const fathomStablecoinAsAlice = getContract("FathomStablecoin", AliceAddress)
+    const fathomStablecoin = getContract("MockFathomStablecoin", DeployerAddress)
+    const fathomStablecoinAsAlice = getContract("MockFathomStablecoin", AliceAddress)
 
     await fathomStablecoin.initialize("Fatom", "FXD")
 
@@ -200,7 +200,7 @@ describe("FathomStablecoin", () => {
                 const totalSupplyBefore = await fathomStablecoin.totalSupply()
                 expect(totalSupplyBefore).to.be.equal(0)
 
-                // mint 100 FUSD
+                // mint 100 FXD
                 await expect(fathomStablecoin.mint(AliceAddress, WeiPerWad.mul(100)))
                     .to.emit(fathomStablecoin, "Transfer")
                     .withArgs(AddressZero, AliceAddress, WeiPerWad.mul(100))

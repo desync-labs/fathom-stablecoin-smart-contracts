@@ -6,73 +6,73 @@ import "../interfaces/IAccessControlConfig.sol";
 
 interface IBookKeeper {
     function addCollateral(
-        bytes32 collateralPoolId,
-        address ownerAddress,
-        int256 amount // [wad]
+        bytes32 _collateralPoolId,
+        address _ownerAddress,
+        int256 _amount // [wad]
     ) external;
 
-    function movePosition(bytes32 collateralPoolId, address src, address dst, int256 collateralAmount, int256 debtShare) external;
+    function movePosition(bytes32 _collateralPoolId, address _src, address _dst, int256 _collateralAmount, int256 _debtShare) external;
 
     function adjustPosition(
-        bytes32 collateralPoolId,
-        address positionAddress,
-        address collateralOwner,
-        address stablecoinOwner,
-        int256 collateralValue,
-        int256 debtShare
+        bytes32 _collateralPoolId,
+        address _positionAddress,
+        address _collateralOwner,
+        address _stablecoinOwner,
+        int256 _collateralValue,
+        int256 _debtShare
     ) external;
 
     function totalStablecoinIssued() external returns (uint256);
 
     function moveStablecoin(
-        address src,
-        address dst,
-        uint256 value // [rad]
+        address _src,
+        address _dst,
+        uint256 _value // [rad]
     ) external;
 
     function moveCollateral(
-        bytes32 collateralPoolId,
-        address src,
-        address dst,
-        uint256 amount // [wad]
+        bytes32 _collateralPoolId,
+        address _src,
+        address _dst,
+        uint256 _amount // [wad]
     ) external;
 
     function confiscatePosition(
-        bytes32 collateralPoolId,
-        address positionAddress,
-        address collateralCreditor,
-        address stablecoinDebtor,
-        int256 collateralAmount, // [wad]
-        int256 debtShare // [wad]
+        bytes32 _collateralPoolId,
+        address _positionAddress,
+        address _collateralCreditor,
+        address _stablecoinDebtor,
+        int256 _collateralAmount, // [wad]
+        int256 _debtShare // [wad]
     ) external;
 
     function mintUnbackedStablecoin(
-        address from,
-        address to,
-        uint256 value // [rad]
+        address _from,
+        address _to,
+        uint256 _value // [rad]
     ) external;
 
     function accrueStabilityFee(
-        bytes32 collateralPoolId,
-        address stabilityFeeRecipient,
-        int256 debtAccumulatedRate // [ray]
+        bytes32 _collateralPoolId,
+        address _stabilityFeeRecipient,
+        int256 _debtAccumulatedRate // [ray]
     ) external;
 
-    function settleSystemBadDebt(uint256 value) external; // [rad]
+    function settleSystemBadDebt(uint256 _value) external; // [rad]
 
-    function whitelist(address toBeWhitelistedAddress) external;
+    function whitelist(address _toBeWhitelistedAddress) external;
 
-    function blacklist(address toBeBlacklistedAddress) external;
+    function removeFromWhitelist(address _toBeRemovedAddress) external;
 
-    function collateralToken(bytes32 collateralPoolId, address ownerAddress) external view returns (uint256);
+    function collateralToken(bytes32 _collateralPoolId, address _ownerAddress) external view returns (uint256);
 
-    function positionWhitelist(address positionAddress, address whitelistedAddress) external view returns (uint256);
+    function positionWhitelist(address _positionAddress, address _whitelistedAddress) external view returns (uint256);
 
-    function stablecoin(address ownerAddress) external view returns (uint256);
+    function stablecoin(address _ownerAddress) external view returns (uint256);
 
     function positions(
-        bytes32 collateralPoolId,
-        address positionAddress
+        bytes32 _collateralPoolId,
+        address _positionAddress
     )
         external
         view
@@ -81,9 +81,9 @@ interface IBookKeeper {
             uint256 debtShare // [wad]
         );
 
-    function systemBadDebt(address ownerAddress) external view returns (uint256); // [rad]
+    function systemBadDebt(address _ownerAddress) external view returns (uint256); // [rad]
 
-    function poolStablecoinIssued(bytes32 collateralPoolId) external view returns (uint256); // [rad]
+    function poolStablecoinIssued(bytes32 _collateralPoolId) external view returns (uint256); // [rad]
 
     function collateralPoolConfig() external view returns (address);
 

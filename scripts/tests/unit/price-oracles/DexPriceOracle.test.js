@@ -12,7 +12,7 @@ const { BigNumber, ethers } = require('ethers');
 const { parseUnits } = ethers.utils
 
 const setup = async () => {
-    const dexPriceOracle = getContract("DexPriceOracle", DeployerAddress);
+    const dexPriceOracle = getContract("MockDexPriceOracle", DeployerAddress);
     const mockedFactory = await createMock("IFathomSwapFactory")
     const mockedPair = await createMock("IFathomSwapPair")
     const mockedToken = await createMock("ERC20Mintable");
@@ -52,12 +52,12 @@ describe("DexPriceOracle", () => {
                 await mockedToken.mock.decimals.returns(BigNumber.from("18"));
                 await mockedUSD.mock.decimals.returns(BigNumber.from("18"));
 
-                if(BigNumber.from(mockedToken.address).lt(BigNumber.from(mockedUSD.address))){
+                if (BigNumber.from(mockedToken.address).lt(BigNumber.from(mockedUSD.address))) {
                     await mockedPair.mock.getReserves.returns(WeiPerWad, WeiPerWad.mul(2), await latest());
                 } else {
                     await mockedPair.mock.getReserves.returns(WeiPerWad.mul(2), WeiPerWad, await latest());
                 }
-                
+
                 const price0 = await dexPriceOracle.getPrice(mockedToken.address, mockedUSD.address);
                 const price1 = await dexPriceOracle.getPrice(mockedUSD.address, mockedToken.address);
 
@@ -72,12 +72,12 @@ describe("DexPriceOracle", () => {
                 await mockedToken.mock.decimals.returns(BigNumber.from("20"));
                 await mockedUSD.mock.decimals.returns(BigNumber.from("6"));
 
-                if(BigNumber.from(mockedToken.address).lt(BigNumber.from(mockedUSD.address))){
+                if (BigNumber.from(mockedToken.address).lt(BigNumber.from(mockedUSD.address))) {
                     await mockedPair.mock.getReserves.returns(parseUnits("1205", 20), parseUnits("49", 6), await latest());
                 } else {
                     await mockedPair.mock.getReserves.returns(parseUnits("49", 6), parseUnits("1205", 20), await latest());
                 }
-                
+
                 const price0 = await dexPriceOracle.getPrice(mockedToken.address, mockedUSD.address);
                 const price1 = await dexPriceOracle.getPrice(mockedUSD.address, mockedToken.address);
 

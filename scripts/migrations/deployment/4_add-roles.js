@@ -1,7 +1,7 @@
 const { getProxy } = require("../../common/proxies");
 const pools = require("../../common/collateral");
 
-module.exports =  async function(deployer) {
+module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
@@ -44,17 +44,17 @@ module.exports =  async function(deployer) {
 
     await accessControlConfig.grantRole(await accessControlConfig.POSITION_MANAGER_ROLE(), stableSwapModule.address)
     await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), stableSwapModule.address)
-    
+
     await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), systemDebtEngine.address)
 
     await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), stablecoinAdapter.address);
- 
+
     await accessControlConfig.grantRole(await accessControlConfig.GOV_ROLE(), adminControls.address)
 
     await bookKeeper.whitelist(stablecoinAdapter.address, { gasLimit: 1000000 });
 
-    await collateralTokenAdapter.whitelist(positionManager.address, { gasLimit: 1000000 });
-    await collateralTokenAdapter.whitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
-    await collateralTokenAdapter.whitelist(liquidationEngine.address, { gasLimit: 1000000 });
-    await collateralTokenAdapter.whitelist(showStopper.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(positionManager.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(liquidationEngine.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(showStopper.address, { gasLimit: 1000000 });
 }

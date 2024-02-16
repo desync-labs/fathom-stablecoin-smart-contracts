@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -7,6 +7,8 @@ import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "../../main/interfaces/IBookKeeperFlashBorrower.sol";
 import "../../main/interfaces/IStableSwapModule.sol";
 import "../../main/interfaces/IStablecoinAdapter.sol";
+import "../../main/interfaces/IStablecoinAdapterGetter.sol";
+
 import "../../main/utils/SafeToken.sol";
 import "../../main/apis/interfaces/IFathomSwapRouter.sol";
 
@@ -30,36 +32,38 @@ contract BookKeeperFlashMintArbitrager is OwnableUpgradeable, IBookKeeperFlashBo
     uint256 constant RAY = 10 ** 27;
 
     function onBookKeeperFlashLoan(
-        address, // initiator
-        uint256 loanValue, // [rad]
-        uint256, // fee
-        bytes calldata data
+        address, //initiator
+        uint256 _loanValue, // [rad]
+        uint256 fee,
+        bytes calldata _data
     ) external override returns (bytes32) {
         LocalVars memory vars;
-        (vars.router, vars.stableSwapToken, vars.stableSwapModule) = abi.decode(data, (address, address, IStableSwapModule));
+        (vars.router, vars.stableSwapToken, vars.stableSwapModule) = abi.decode(_data, (address, address, IStableSwapModule));
         address[] memory path = new address[](2);
         path[0] = stablecoin;
         path[1] = vars.stableSwapToken;
 
-        uint256 loanAmount = loanValue / RAY;
+        uint256 loanAmount = _loanValue / RAY;
 
-        // 1. Swap AUSD to BUSD at a DEX
-        //    vars.stableSwapModule.stablecoinAdapter().bookKeeper().whitelist(address(vars.stableSwapModule.stablecoinAdapter()));
-        //  vars.stableSwapModule.stablecoinAdapter().withdraw(address(this), loanAmount, abi.encode(0));
+        // 1. Swap FXD to USDT at a DEX
+        vars.stableSwapModule.bookKeeper().whitelist(address(IStablecoinAdapterGetter(msg.sender).stablecoinAdapter()));
+        //above is actually callling bookKeeper.whitelist(stablecoinAdapterAddress);
+        IStablecoinAdapterGetter(msg.sender).stablecoinAdapter().withdraw(address(this), loanAmount, abi.encode(0));
+
         uint256 balanceBefore = vars.stableSwapToken.myBalance();
         stablecoin.safeApprove(vars.router, type(uint).max);
         IFathomSwapRouter(vars.router).swapExactTokensForTokens(loanAmount, 0, path, address(this), block.timestamp);
         stablecoin.safeApprove(vars.router, 0);
         uint256 balanceAfter = vars.stableSwapToken.myBalance();
 
-        // 2. Swap BUSD to AUSD at StableSwapModule
-        //   vars.stableSwapToken.safeApprove(address(vars.stableSwapModule.authTokenAdapter()), type(uint).max);
+        // 2. Swap USDT to FXD at StableSwapModule
+        vars.stableSwapToken.safeApprove(address(vars.stableSwapModule), type(uint).max);
         vars.stableSwapModule.swapTokenToStablecoin(address(this), balanceAfter.sub(balanceBefore));
-        // vars.stableSwapToken.safeApprove(address(vars.stableSwapModule.authTokenAdapter()), 0);
+        vars.stableSwapToken.safeApprove(address(vars.stableSwapModule), 0);
 
-        // 3. Approve AUSD for FlashMintModule
-        //  stablecoin.safeApprove(address(vars.stableSwapModule.stablecoinAdapter()), loanAmount.add(fee.div(RAY)));
-        //vars.stableSwapModule.stablecoinAdapter().deposit(msg.sender, loanAmount.add(fee.div(RAY)), abi.encode(0));
+        // 3. Approve FXD for FlashMintModule
+        stablecoin.safeApprove(address(IStablecoinAdapterGetter(msg.sender).stablecoinAdapter()), loanAmount.add(fee.div(RAY)));
+        IStablecoinAdapterGetter(msg.sender).stablecoinAdapter().deposit(msg.sender, loanAmount.add(fee.div(RAY)), abi.encode(0));
 
         return keccak256("BookKeeperFlashBorrower.onBookKeeperFlashLoan");
     }
