@@ -149,6 +149,95 @@ describe("PriceOracle", () => {
     })
   })
 
+  describe("#setPriceBatch()", () => {
+    context("when price from price feed is 1", () => {
+      context("and price with safety margin is 0", () => {
+        it("should be success", async () => {
+          await mockedPriceFeed.mock.peekPrice.returns(formatBytes32BigNumber(One), false)
+          await mockedBookKeeper.mock.accessControlConfig.returns(mockedCollateralPoolConfig.address)
+
+          await mockedCollateralPoolConfig.mock.collateralPools.returns({
+            totalDebtShare: 0,
+            debtAccumulatedRate: WeiPerRay,
+            priceWithSafetyMargin: WeiPerRay,
+            debtCeiling: 0,
+            debtFloor: 0,
+            priceFeed: mockedPriceFeed.address,
+            liquidationRatio: WeiPerRay,
+            stabilityFeeRate: WeiPerRay,
+            lastAccumulationTime: 0,
+            adapter: AddressZero,
+            closeFactorBps: 5000,
+            liquidatorIncentiveBps: 10250,
+            treasuryFeesBps: 5000,
+            strategy: AddressZero,
+            positionDebtCeiling: WeiPerRad.mul(1000000)
+
+          })
+          await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+          await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
+            formatBytes32String("WXDC"),
+            BigNumber.from("0")
+          ).returns()
+          await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
+            formatBytes32String("JEJU"),
+            BigNumber.from("0")
+          ).returns()
+
+          await expect(priceOracle.setPriceForBatch([formatBytes32String("WXDC"), formatBytes32String("JEJU")]))
+            .to.emit(priceOracle, "LogSetPriceForBatch")
+            .withArgs([formatBytes32String("WXDC"), formatBytes32String("JEJU")])
+        })
+      })
+    })
+
+    context("when price from price feed is 7 * 10^11", () => {
+      context("and price with safety margin is 0", () => {
+        it("should be success", async () => {
+          await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+          await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+          await mockedAccessControlConfig.mock.hasRole.returns(true)
+
+          await mockedCollateralPoolConfig.mock.collateralPools.returns({
+            totalDebtShare: 0,
+            debtAccumulatedRate: WeiPerRay,
+            priceWithSafetyMargin: WeiPerRay,
+            debtCeiling: 0,
+            debtFloor: 0,
+            priceFeed: mockedPriceFeed.address,
+            liquidationRatio: 10 ** 10,
+            stabilityFeeRate: WeiPerRay,
+            lastAccumulationTime: 0,
+            adapter: AddressZero,
+            closeFactorBps: 5000,
+            liquidatorIncentiveBps: 10250,
+            treasuryFeesBps: 5000,
+            strategy: AddressZero,
+            positionDebtCeiling: WeiPerRad.mul(1000000)
+          })
+
+          await mockedPriceFeed.mock.peekPrice.returns(
+            formatBytes32BigNumber(BigNumber.from("700000000000")),
+            false,
+          )
+
+          await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
+            formatBytes32String("WXDC"),
+            BigNumber.from("0")
+          ).returns()
+          await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
+            formatBytes32String("JEJU"),
+            BigNumber.from("0")
+          ).returns()
+          await expect(priceOracle.setPriceForBatch([formatBytes32String("WXDC"), formatBytes32String("JEJU")]))
+            .to.emit(priceOracle, "LogSetPriceForBatch")
+            .withArgs([formatBytes32String("WXDC"), formatBytes32String("JEJU")])
+        })
+      })
+    })
+  })
+
+
   describe("#setStableCoinReferencePrice", () => {
     context("when the caller is not the owner", async () => {
       it("should revert", async () => {
