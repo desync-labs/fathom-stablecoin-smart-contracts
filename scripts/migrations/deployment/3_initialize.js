@@ -106,16 +106,16 @@ module.exports = async function (deployer) {
             { gasLimit: 1000000 }
         ),
 
-        stableSwapModule.initialize(
-            bookKeeper.address,
-            addresses.USDSTABLE,
-            fathomStablecoin.address,
-            dailyLimitNumerator,
-            singleSwapLimitNumerator,
-            numberOfSwapsLimitPerUser,
-            blocksPerLimit,
-            { gasLimit: 1000000 }
-        ),
+        // stableSwapModule.initialize(
+        //     bookKeeper.address,
+        //     addresses.USDSTABLE,
+        //     fathomStablecoin.address,
+        //     dailyLimitNumerator,
+        //     singleSwapLimitNumerator,
+        //     numberOfSwapsLimitPerUser,
+        //     blocksPerLimit,
+        //     { gasLimit: 1000000 }
+        // ),
         flashMintArbitrager.initialize({ gasLimit: 1000000 }),
         bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
         // dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),

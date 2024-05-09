@@ -11,6 +11,10 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/deployment', '--network', 'apothem'],
     ['execute', '--path', 'scripts/migrations/configuration', '--network', 'apothem']
   ],
+  deployHolesky: [
+    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'holesky'],
+    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'holesky']
+  ],
   addCollateralLocal: [
     ['execute', '--path', 'scripts/migrations/add-collateral/deployment', '--network', 'development'],
     ['execute', '--path', 'scripts/migrations/add-collateral/configuration', '--network', 'development']

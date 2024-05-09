@@ -6,5 +6,6 @@ const WXDC = formatBytes32String("WXDC")
 const XDC = formatBytes32String("XDC")
 const GLD = formatBytes32String("GLD")
 const USD_COL = formatBytes32String("USD-COL")
+const ETH = formatBytes32String("ETH")
 
-module.exports = { XDC, FTHM, WXDC, USD_COL, USD_STABLE, GLD }
+module.exports = { XDC, FTHM, WXDC, USD_COL, USD_STABLE, GLD, ETH }
