@@ -13,7 +13,7 @@ console.log("continuing from configure fees");
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-    const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule")
+    // const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule")
     const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
 
     // await stableSwapModule.setFeeIn(SSM_FEE_IN, { gasLimit: 1000000 })
