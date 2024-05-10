@@ -142,9 +142,9 @@ module.exports = async function (deployer) {
             stablecoinAdapter.address
         ),
         // centralizedOraclePriceFeed.initialize(priceOracleAddress, accessControlConfig.address, pools.XDC),
-        stableSwapModuleWrapper.initialize(
-            bookKeeper.address,
-            stableSwapModule.address),
+        // stableSwapModuleWrapper.initialize(
+        //     bookKeeper.address,
+        //     stableSwapModule.address),
         simplePriceFeed.initialize(
             accessControlConfig.address,
         ),
