@@ -7,4 +7,6 @@ interface IFathomOracleAggregator {
     ) external view returns (uint80 roundId, uint256 value, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
 
     function latestRoundData() external view returns (uint80 roundId, uint256 value, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
+   
+    function supportsInterface(bytes4 interfaceId) external view returns (bool);
 }
