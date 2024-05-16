@@ -7,7 +7,6 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "../../../interfaces/IBookKeeper.sol";
 import "../../../interfaces/ICollateralAdapter.sol";
 import "../../../interfaces/ICagable.sol";
-import "../../../interfaces/IManager.sol";
 import "../../../interfaces/IProxyRegistry.sol";
 import "../../../interfaces/IVault.sol";
 import "../../../utils/SafeToken.sol";
@@ -59,6 +58,10 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
             "!(ownerRole or govRole)"
         );
         _;
+    }
+
+    constructor() {
+        _disableInitializers();
     }
 
     function initialize(address _bookKeeper, bytes32 _collateralPoolId, address _collateralToken, address _proxyWalletFactory) external initializer {

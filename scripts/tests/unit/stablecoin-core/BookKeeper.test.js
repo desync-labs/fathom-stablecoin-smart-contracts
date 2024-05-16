@@ -29,9 +29,9 @@ const loadFixtureHandler = async () => {
     await mockedAccessControlConfig.mock.hasRole.returns(true)
     await mockedCollateralPoolConfig.mock.setTotalDebtShare.returns()
 
-    const bookKeeper = getContract("BookKeeper", DeployerAddress)
-    const bookKeeperAsAlice = getContract("BookKeeper", AliceAddress)
-    const bookKeeperAsBob = getContract("BookKeeper", BobAddress)
+    const bookKeeper = getContract("MockBookKeeper", DeployerAddress)
+    const bookKeeperAsAlice = getContract("MockBookKeeper", AliceAddress)
+    const bookKeeperAsBob = getContract("MockBookKeeper", BobAddress)
 
     await bookKeeper.initialize(mockedCollateralPoolConfig.address, mockedAccessControlConfig.address)
 

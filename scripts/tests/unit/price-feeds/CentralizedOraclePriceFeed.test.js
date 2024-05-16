@@ -18,7 +18,7 @@ describe("CentralizedOraclePriceFeed", () => {
     let mockedCentralizedPriceOracle
     let mockedAccessControlConfig
 
-    const centralizedOraclePriceFeed = getContract("CentralizedOraclePriceFeed", DeployerAddress);
+    const centralizedOraclePriceFeed = getContract("MockCentralizedOraclePriceFeed", DeployerAddress);
 
     beforeEach(async () => {
         await snapshot.revertToSnapshot();

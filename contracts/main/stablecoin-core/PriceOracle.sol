@@ -38,6 +38,8 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
         uint256 _priceWithSafetyMargin // Price with safety margin [ray]
     );
 
+    event LogSetPriceForBatch(bytes32[] _poolIds);
+
     event LogSetStableCoinReferencePrice(address indexed _caller, uint256 _data);
     event LogSetBookKeeper(address _newAddress);
 
@@ -72,16 +74,18 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _bookKeeper) external initializer {
         PausableUpgradeable.__Pausable_init();
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "FixedSpreadLiquidationStrategy/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         stableCoinReferencePrice = RAY;
         live = 1;
     }
 
     function setBookKeeper(address _bookKeeper) external onlyOwner isLive {
-        require(IBookKeeper(_bookKeeper).totalStablecoinIssued() >= 0, "ShowStopper/invalid-bookKeeper"); // Sanity Check Call
         bookKeeper = IBookKeeper(_bookKeeper);
         emit LogSetBookKeeper(_bookKeeper);
     }
@@ -93,13 +97,14 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
     }
 
     function setPrice(bytes32 _collateralPoolId) external override whenNotPaused isLive {
-        IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).collateralPools(_collateralPoolId).priceFeed);
-        uint256 _liquidationRatio = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLiquidationRatio(_collateralPoolId);
-        (uint256 _rawPrice, bool _hasPrice) = _priceFeed.peekPrice();
-        uint256 _priceWithSafetyMargin = _hasPrice ? rdiv(rdiv(_rawPrice * (10 ** 9), stableCoinReferencePrice), _liquidationRatio) : 0;
-        address _collateralPoolConfig = address(bookKeeper.collateralPoolConfig());
-        ICollateralPoolConfig(_collateralPoolConfig).setPriceWithSafetyMargin(_collateralPoolId, _priceWithSafetyMargin);
-        emit LogSetPrice(_collateralPoolId, _rawPrice, _priceWithSafetyMargin);
+        _setPrice(_collateralPoolId);
+    }
+
+    function setPriceForBatch(bytes32[] calldata _collateralPoolIds) external override whenNotPaused isLive {
+        for (uint256 i = 0; i < _collateralPoolIds.length; i++) {
+            _setPrice(_collateralPoolIds[i]);
+        }
+        emit LogSetPriceForBatch(_collateralPoolIds);
     }
 
     /// @dev Cage function halts priceOracle contract for good.
@@ -119,5 +124,15 @@ contract PriceOracle is CommonMath, PausableUpgradeable, IPriceOracle, ICagable,
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external override onlyOwnerOrGov {
         _unpause();
+    }
+
+    function _setPrice(bytes32 _collateralPoolId) internal {
+        IPriceFeed _priceFeed = IPriceFeed(ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).collateralPools(_collateralPoolId).priceFeed);
+        uint256 _liquidationRatio = ICollateralPoolConfig(bookKeeper.collateralPoolConfig()).getLiquidationRatio(_collateralPoolId);
+        (uint256 _rawPrice, bool _hasPrice) = _priceFeed.peekPrice();
+        uint256 _priceWithSafetyMargin = _hasPrice ? rdiv(rdiv(_rawPrice * (10 ** 9), stableCoinReferencePrice), _liquidationRatio) : 0;
+        address _collateralPoolConfig = address(bookKeeper.collateralPoolConfig());
+        ICollateralPoolConfig(_collateralPoolConfig).setPriceWithSafetyMargin(_collateralPoolId, _priceWithSafetyMargin);
+        emit LogSetPrice(_collateralPoolId, _rawPrice, _priceWithSafetyMargin);
     }
 }

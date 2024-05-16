@@ -5,7 +5,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./lib/FathomSwapLibrary.sol";
 import "../apis/interfaces/IFathomSwapPair.sol";
-import "../apis/interfaces/IFathomSwapFactory.sol";
 import "../interfaces/IFathomDEXOracle.sol";
 import "../interfaces/IToken.sol";
 
@@ -36,6 +35,10 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
     mapping(address => Observation[]) public pairObservations;
 
     uint8 public constant RESOLUTION = 112;
+
+    constructor() {
+        _disableInitializers();
+    }
 
     function initialize(address _factory, uint256 _windowSize, uint8 _granularity) external initializer {
         require(_factory != address(0), "SlidingWindowDexOracle/zero-factory");

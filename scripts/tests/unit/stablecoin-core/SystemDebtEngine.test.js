@@ -11,32 +11,32 @@ const UnitHelpers = require("../../helper/unit");
 const { loadFixture } = require("../../helper/fixtures");
 
 const loadFixtureHandler = async () => {
-    mockedAccessControlConfig = await createMock("AccessControlConfig");
-    mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
-    mockedBookKeeper = await createMock("BookKeeper");
-    mockedCollateralTokenAdapter = await createMock("TokenAdapter");
+  mockedAccessControlConfig = await createMock("AccessControlConfig");
+  mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
+  mockedBookKeeper = await createMock("BookKeeper");
+  mockedCollateralTokenAdapter = await createMock("TokenAdapter");
 
-    systemDebtEngine = getContract("SystemDebtEngine", DeployerAddress)
-    systemDebtEngineAsAlice = getContract("SystemDebtEngine", AliceAddress)
+  systemDebtEngine = getContract("MockSystemDebtEngine", DeployerAddress)
+  systemDebtEngineAsAlice = getContract("MockSystemDebtEngine", AliceAddress)
 
-    await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
-    await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
-    await mockedBookKeeper.mock.stablecoin.returns(0)
-    await mockedBookKeeper.mock.systemBadDebt.returns(0)
+  await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
+  await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
+  await mockedBookKeeper.mock.stablecoin.returns(0)
+  await mockedBookKeeper.mock.systemBadDebt.returns(0)
 
-    await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
-    await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
-    await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))
+  await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
+  await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
+  await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))
 
-    await systemDebtEngine.initialize(mockedBookKeeper.address);
+  await systemDebtEngine.initialize(mockedBookKeeper.address);
 
-    return {
-        systemDebtEngine,
-        systemDebtEngineAsAlice,
-        mockedBookKeeper,
-        mockedCollateralTokenAdapter,
-        mockedAccessControlConfig
-    }
+  return {
+    systemDebtEngine,
+    systemDebtEngineAsAlice,
+    mockedBookKeeper,
+    mockedCollateralTokenAdapter,
+    mockedAccessControlConfig
+  }
 }
 describe("SystemDebtEngine", () => {
   // Contracts
@@ -53,13 +53,13 @@ describe("SystemDebtEngine", () => {
 
   beforeEach(async () => {
     ({
-        systemDebtEngine,
-        systemDebtEngineAsAlice,
-        mockedBookKeeper,
-        mockedCollateralTokenAdapter,
-        mockedAccessControlConfig
-      } = await loadFixture(loadFixtureHandler))
-    
+      systemDebtEngine,
+      systemDebtEngineAsAlice,
+      mockedBookKeeper,
+      mockedCollateralTokenAdapter,
+      mockedAccessControlConfig
+    } = await loadFixture(loadFixtureHandler))
+
   })
 
   describe("#settleSystemBadDebt", () => {

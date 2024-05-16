@@ -65,6 +65,10 @@ contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradea
         _;
     }
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _bookKeeper, address _stableswapModule) external initializer {
         require(AddressUpgradeable.isContract(_stableswapModule), "stableswapModule-not-contract");
         require(AddressUpgradeable.isContract(_bookKeeper), "bookkeeper-not-contract");

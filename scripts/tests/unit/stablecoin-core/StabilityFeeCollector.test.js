@@ -20,8 +20,8 @@ const loadFixtureHandler = async () => {
     mockedBookKeeper = await createMock("BookKeeper");
     mockedSystemDebtEngine = await createMock("SystemDebtEngine");
 
-    stabilityFeeCollector = getContract("StabilityFeeCollector", DeployerAddress)
-    stabilityFeeCollectorAsAlice = getContract("StabilityFeeCollector", AliceAddress)
+    stabilityFeeCollector = getContract("MockStabilityFeeCollector", DeployerAddress)
+    stabilityFeeCollectorAsAlice = getContract("MockStabilityFeeCollector", AliceAddress)
 
     await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
     await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))

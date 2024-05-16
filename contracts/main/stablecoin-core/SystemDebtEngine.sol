@@ -6,7 +6,6 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 
 import "../interfaces/IBookKeeper.sol";
 import "../interfaces/ISystemDebtEngine.sol";
-import "../interfaces/IGenericTokenAdapter.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/IPausable.sol";
 import "../utils/CommonMath.sol";
@@ -53,6 +52,10 @@ contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpg
             "!(ownerRole or showStopperRole)"
         );
         _;
+    }
+
+    constructor() {
+        _disableInitializers();
     }
 
     function initialize(address _bookKeeper) external initializer {

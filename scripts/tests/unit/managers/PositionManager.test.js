@@ -52,9 +52,9 @@ const loadFixtureHandler = async () => {
         positionDebtCeiling: WeiPerRay.mul(10000)
     })
 
-    const positionManager = getContract("PositionManager", DeployerAddress)
-    const positionManagerAsAlice = getContract("PositionManager", AliceAddress)
-    const positionManagerAsBob = getContract("PositionManager", BobAddress)
+    const positionManager = getContract("MockPositionManager", DeployerAddress)
+    const positionManagerAsAlice = getContract("MockPositionManager", AliceAddress)
+    const positionManagerAsBob = getContract("MockPositionManager", BobAddress)
 
     await positionManager.initialize(mockedBookKeeper.address, mockedShowStopper.address, mockedPriceOracle.address)
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-interface IPluginInvokeOracle {
+interface ITestOracleOracle {
     function requestData(address _caller) external returns (uint256);
 
     function depositPLI(uint256 _value) external returns (bool);

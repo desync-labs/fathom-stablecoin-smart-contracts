@@ -41,8 +41,8 @@ const loadFixtureHandler = async () => {
     await mockedAccessControlConfig.mock.LIQUIDATION_ENGINE_ROLE.returns(LIQUIDATION_ENGINE_ROLE) //keccak256 of LIQUIDATION_ENGINE_ROLE
     await mockedStablecoinAdapter.mock.stablecoin.returns(mockedFathomStablecoin.address);
 
-    const fixedSpreadLiquidationStrategy = getContract("FixedSpreadLiquidationStrategy", DeployerAddress)
-    const fixedSpreadLiquidationStrategyAsAlice = getContract("FixedSpreadLiquidationStrategy", AliceAddress)
+    const fixedSpreadLiquidationStrategy = getContract("MockFixedSpreadLiquidationStrategy", DeployerAddress)
+    const fixedSpreadLiquidationStrategyAsAlice = getContract("MockFixedSpreadLiquidationStrategy", AliceAddress)
 
     await fixedSpreadLiquidationStrategy.initialize(
         mockedBookKeeper.address,
@@ -121,7 +121,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                         DeployerAddress,
                         "0x"
                     )
-                ).to.be.revertedWith("!liquidationEngingRole")
+                ).to.be.revertedWith("!liquidationEngineRole")
             })
         })
         context("when input is invalid", () => {
@@ -413,7 +413,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                 await mockedFlashLendingCallee.mock.flashLendingCall.returns()
                 await mockedFlashLendingCallee.mock.supportsInterface.returns(true)
 
-                await fixedSpreadLiquidationStrategy.setFlashLendingEnabled(1)
+                await fixedSpreadLiquidationStrategy.setFlashLendingEnabled(true)
 
                 await expect(
                     fixedSpreadLiquidationStrategy.execute(
