@@ -8,6 +8,8 @@ import "../interfaces/IAccessControlConfig.sol";
 import "../apis/interfaces/IFathomOracleAggregator.sol";
 
 contract FathomPriceOracle is Initializable, IFathomCentralizedOracle {
+    bytes4 private constant ORACLE_INTERFACE_ID = 0x85036ae8; // IAggregator interface id from Fathom Oracle Aggregator
+
     IFathomOracleAggregator public oracle;
     IAccessControlConfig public accessControlConfig;
 
@@ -20,8 +22,7 @@ contract FathomPriceOracle is Initializable, IFathomCentralizedOracle {
         require(_accessControlConfig != address(0), "FathomPriceOracle: ZERO_ADDRESS");
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
 
-        (, uint256 value, , , ) = IFathomOracleAggregator(_oracle).latestRoundData();
-        require(value > 0, "FathomPriceOracle/invalid-oracle");
+        require(IFathomOracleAggregator(_oracle).supportsInterface(ORACLE_INTERFACE_ID), "FathomPriceOracle/invalid-oracle");
         oracle = IFathomOracleAggregator(_oracle);
     }
 

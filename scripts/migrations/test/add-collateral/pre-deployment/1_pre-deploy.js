@@ -21,7 +21,7 @@ module.exports =  async function(deployer) {
   const chainId = deployer.networkId(ERC20.address);
   addCollateral[chainId].fathomProxyFactory = addresses.proxyFactory;
   addCollateral[chainId].fathomProxyAdmin = addresses.proxyAdmin;
-  addCollateral[chainId].pluginOracle = PluginOracleMock.address;
+  addCollateral[chainId].fathomOracle = PluginOracleMock.address;
   addCollateral[chainId].tokenAddress = ERC20.address;
   addCollateral[chainId].usePluginOracle = true;
 
