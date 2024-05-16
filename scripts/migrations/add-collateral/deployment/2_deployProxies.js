@@ -1,4 +1,4 @@
-const { getConfig, getProxyId, token } = require("../../../common/add-collateral-helper")
+const { getConfig, getProxyId } = require("../../../common/add-collateral-helper")
 
 module.exports = async function (deployer) {
     const config = getConfig(deployer.networkId());
@@ -6,15 +6,10 @@ module.exports = async function (deployer) {
     const proxyAdmin = await artifacts.initializeInterfaceAt("FathomProxyAdmin", config.fathomProxyAdmin);
 
     const contracts = [
-        "DelayFathomOraclePriceFeed",
-        "DexPriceOracle",
         "CollateralTokenAdapter",
-        "SlidingWindowDexOracle",
-
+        "FathomPriceOracle",
+        "CentralizedOraclePriceFeed"
     ]
-
-    contracts.push("CentralizedOraclePriceFeed")
-
 
     const promises = contracts.map(contract => {
         const instance = artifacts.require(`${contract}.sol`);
