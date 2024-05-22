@@ -9,9 +9,10 @@ module.exports = async function (deployer) {
   const addresses = getAddresses(deployer.networkId())
 
   const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", config.fathomProxyFactory);
-  const collateralTokenAdapter = await getProxyById(proxyFactory, "CollateralTokenAdapter", getProxyId("CollateralTokenAdapter"));
+  const collateralTokenAdapterCGO = await getProxyById(proxyFactory, "CollateralTokenAdapterCGO", getProxyId("CollateralTokenAdapterCGO"));
 
-  await deployer.deploy(Vault, formatBytes32String(token), config.tokenAddress, collateralTokenAdapter.address, { gas: 7050000 });
-  await collateralTokenAdapter.setVault(Vault.address);
+  await deployer.deploy(Vault, formatBytes32String(token), config.tokenAddress, collateralTokenAdapterCGO.address, { gas: 7050000 });
+  await collateralTokenAdapterCGO.setVault(Vault.address);
 
+  console.log("VaultCGO address : " Vault.address);
 };

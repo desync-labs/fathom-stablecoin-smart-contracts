@@ -6,11 +6,11 @@ module.exports = async function (deployer) {
     const proxyAdmin = await artifacts.initializeInterfaceAt("FathomProxyAdmin", config.fathomProxyAdmin);
 
     const contracts = [
-        "CollateralTokenAdapter",
-        "FathomPriceOracle",
-        "CentralizedOraclePriceFeed"
+        "CollateralTokenAdapterCGO",
+        "FathomPriceOracleCGO",
+        "CentralizedOraclePriceFeedCGO"
     ]
-
+    
     const promises = contracts.map(contract => {
         const instance = artifacts.require(`${contract}.sol`);
         return proxyFactory.createProxy(getProxyId(contract), instance.address, proxyAdmin.address, "0x", { gasLimit: 2000000 })
