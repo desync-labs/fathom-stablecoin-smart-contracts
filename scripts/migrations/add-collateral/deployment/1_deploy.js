@@ -1,22 +1,15 @@
-const DexPriceOracle = artifacts.require('DexPriceOracle.sol');
-const SlidingWindowDexOracle = artifacts.require('SlidingWindowDexOracle.sol');
-const DelayFathomOraclePriceFeed = artifacts.require('DelayFathomOraclePriceFeed.sol');
-const CollateralTokenAdapter = artifacts.require('CollateralTokenAdapter.sol');
-const CentralizedOraclePriceFeed = artifacts.require('CentralizedOraclePriceFeed.sol');
-
-const { usePlugin } = require("../../../common/add-collateral-helper")
+const FathomPriceOracleCGO = artifacts.require('FathomPriceOracleCGO.sol');
+const CollateralTokenAdapterCGO = artifacts.require('CollateralTokenAdapterCGO.sol');
+const CentralizedOraclePriceFeedCGO = artifacts.require('CentralizedOraclePriceFeedCGO.sol');
+const SimplePriceFeedCGO = artifacts.require('SimplePriceFeedCGO.sol');
 
 module.exports = async function (deployer) {
   let promises = [
-    deployer.deploy(DexPriceOracle, { gas: 7050000 }),
-    deployer.deploy(DelayFathomOraclePriceFeed, { gas: 7050000 }),
-    deployer.deploy(CollateralTokenAdapter, { gas: 7050000 }),
-    deployer.deploy(SlidingWindowDexOracle, { gas: 7050000 }),
+    deployer.deploy(CollateralTokenAdapterCGO, { gas: 7050000 }),
+    deployer.deploy(FathomPriceOracleCGO, { gas: 7050000 }),
+    deployer.deploy(CentralizedOraclePriceFeedCGO, { gas: 7050000 }),
+    deployer.deploy(SimplePriceFeedCGO, { gas: 7050000 }),
   ];
-
-  if (usePlugin(deployer.networkId())) {
-    promises.push(deployer.deploy(CentralizedOraclePriceFeed, { gas: 7050000 }))
-  }
 
   await Promise.all(promises);
 };

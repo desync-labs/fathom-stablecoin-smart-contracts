@@ -1,6 +1,7 @@
 const { getProxy, getProxyById } = require("../../../common/proxies");
 
 const { BigNumber } = require("ethers");
+const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
 const WeiPerRay = BigNumber.from(`1${"0".repeat(27)}`)
 const WeiPerRad = BigNumber.from(`1${"0".repeat(45)}`)
 
@@ -17,11 +18,17 @@ module.exports = async function (deployer) {
     const config = getConfig(deployer.networkId());
 
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", config.fathomProxyFactory);
-    const collateralTokenAdapter = await getProxyById(proxyFactory, "CollateralTokenAdapter", getProxyId("CollateralTokenAdapter"));
-    const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy")
+    const collateralTokenAdapter = await getProxyById(proxyFactory, "CollateralTokenAdapterCGO", getProxyId("CollateralTokenAdapterCGO"));
+    const fixedSpreadLiquidationStrategy = "0xfe5037504E0EF5eC2DfBEEA03f9d9cB43580EF23";
+    // above FSLS better be hardcoded
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig")
     const priceOracle = await getProxy(proxyFactory, "PriceOracle")
-    const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
+    const simplePriceFeedCGO = await getProxy(proxyFactory, "SimplePriceFeedCGO");
+    const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
+
+    await simplePriceFeedCGO.initialize(accessControlConfig.address);
+    await simplePriceFeedCGO.setPoolId(poolId);
+    await simplePriceFeedCGO.setPrice(WeiPerWad.toString());
 
     const priceFeed = simplePriceFeed;
 
@@ -39,7 +46,7 @@ module.exports = async function (deployer) {
         CLOSE_FACTOR_BPS.mul(2),
         LIQUIDATOR_INCENTIVE_BPS,
         TREASURY_FEE_BPS,
-        fixedSpreadLiquidationStrategy.address,
+        fixedSpreadLiquidationStrategy,
         { gas: 5000000 }
     )
 
