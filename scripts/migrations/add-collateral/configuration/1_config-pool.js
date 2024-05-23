@@ -18,18 +18,20 @@ module.exports = async function (deployer) {
     const config = getConfig(deployer.networkId());
 
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", config.fathomProxyFactory);
-    const collateralTokenAdapter = await getProxyById(proxyFactory, "CollateralTokenAdapterCGO", getProxyId("CollateralTokenAdapterCGO"));
+    const collateralTokenAdapter = await getProxyById(proxyFactory, "CollateralTokenAdapter", getProxyId("CollateralTokenAdapter"));
     const fixedSpreadLiquidationStrategy = "0xfe5037504E0EF5eC2DfBEEA03f9d9cB43580EF23";
     // above FSLS better be hardcoded
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig")
     const priceOracle = await getProxy(proxyFactory, "PriceOracle")
-=
-    const simplePriceFeedCGO = await getProxy(proxyFactory, "SimplePriceFeedCGO");
+
+    // const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
+    // 2024.05.23 simplePriceFeed should be the one that's been recently deployed. so use below line instead of getProxy
+    const simplePriceFeed = await artifacts.initializeInterfaceAt("SimplePriceFeed", "SimplePriceFeed");
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
 
-    await simplePriceFeedCGO.initialize(accessControlConfig.address);
-    await simplePriceFeedCGO.setPoolId(poolId);
-    await simplePriceFeedCGO.setPrice(WeiPerWad.toString());
+    await simplePriceFeed.initialize(accessControlConfig.address);
+    await simplePriceFeed.setPoolId(poolId);
+    await simplePriceFeed.setPrice(WeiPerWad.toString());
 
     const priceFeed = simplePriceFeed;
 =

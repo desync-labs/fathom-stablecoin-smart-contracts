@@ -12,12 +12,12 @@ module.exports = async function (deployer) {
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const liquidationEngine = await getProxy(proxyFactory, "LiquidationEngine");
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
-    const collateralTokenAdapterCGO = await getProxyById(proxyFactory, "CollateralTokenAdapterCGO", getProxyId("CollateralTokenAdapterCGO"));
+    const collateralTokenAdapter = await getProxyById(proxyFactory, "CollateralTokenAdapter", getProxyId("CollateralTokenAdapter"));
 
-    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapterCGO.address)
+    await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapter.address)
 
-    await collateralTokenAdapterCGO.addToWhitelist(positionManager.address, { gasLimit: 1000000 });
-    await collateralTokenAdapterCGO.addToWhitelist(fixedSpreadLiquidationStrategy, { gasLimit: 1000000 });
-    await collateralTokenAdapterCGO.addToWhitelist(liquidationEngine.address, { gasLimit: 1000000 });
-    await collateralTokenAdapterCGO.addToWhitelist(showStopper.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(positionManager.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(fixedSpreadLiquidationStrategy, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(liquidationEngine.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(showStopper.address, { gasLimit: 1000000 });
 }
