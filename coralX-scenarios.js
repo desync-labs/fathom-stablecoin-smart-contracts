@@ -19,6 +19,10 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/add-collateral/deployment', '--network', 'apothem'],
     ['execute', '--path', 'scripts/migrations/add-collateral/configuration', '--network', 'apothem']
   ],
+  addCollateralMainnet: [
+    ['execute', '--path', 'scripts/migrations/add-collateral/deployment', '--network', 'mainnet'],
+    ['execute', '--path', 'scripts/migrations/add-collateral/configuration', '--network', 'mainnet']
+  ],
   deployTokensLocal: [
     ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'development']
   ],
