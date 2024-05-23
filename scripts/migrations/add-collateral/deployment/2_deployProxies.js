@@ -6,9 +6,9 @@ module.exports = async function (deployer) {
     const proxyAdmin = await artifacts.initializeInterfaceAt("FathomProxyAdmin", config.fathomProxyAdmin);
 
     const contracts = [
-        "CollateralTokenAdapterCGO",
-        "FathomPriceOracleCGO",
-        "CentralizedOraclePriceFeedCGO"
+        "CollateralTokenAdapter",
+        "FathomPriceOracle",
+        "CentralizedOraclePriceFeed"
     ]
     
     const promises = contracts.map(contract => {

@@ -12,25 +12,25 @@ module.exports = async function (deployer) {
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
 
-    const collateralTokenAdapterCGO = await getProxyById(proxyFactory, "CollateralTokenAdapterCGO", getProxyId("CollateralTokenAdapterCGO"));
-    const fathomPriceOracleCGO = await getProxyById(proxyFactory, "FathomPriceOracleCGO", getProxyId("FathomPriceOracleCGO"));
-    const centralizedOraclePriceFeedCGO = await getProxyById(proxyFactory, "CentralizedOraclePriceFeedCGO", getProxyId("CentralizedOraclePriceFeedCGO"));
+    const collateralTokenAdapter = await getProxyById(proxyFactory, "CollateralTokenAdapter", getProxyId("CollateralTokenAdapter"));
+    const fathomPriceOracle = await getProxyById(proxyFactory, "FathomPriceOracle", getProxyId("FathomPriceOracle"));
+    const centralizedOraclePriceFeed = await getProxyById(proxyFactory, "CentralizedOraclePriceFeed", getProxyId("CentralizedOraclePriceFeed"));
 
     const newAddresses = {
-        fathomPriceOracleCGO: fathomPriceOracleCGO.address,
-        collateralTokenAdapterCGO: collateralTokenAdapterCGO.address,
-        centralizedOraclePriceFeedCGO: centralizedOraclePriceFeedCGO.address,
+        fathomPriceOracle: fathomPriceOracle.address,
+        collateralTokenAdapter: collateralTokenAdapter.address,
+        centralizedOraclePriceFeed: centralizedOraclePriceFeed.address,
     }
 
     const promises = [
-        collateralTokenAdapterCGO.initialize(
+        collateralTokenAdapter.initialize(
             bookKeeper.address,
             poolId,
             config.tokenAddress,
             proxyWalletFactory.address
         ),
-        fathomPriceOracleCGO.initialize(accessControlConfig.address, config.fathomOracle),
-        centralizedOraclePriceFeedCGO.initialize(fathomPriceOracleCGO.address, accessControlConfig.address, poolId)
+        // fathomPriceOracle.initialize(accessControlConfig.address, config.fathomOracle),
+        centralizedOraclePriceFeed.initialize(fathomPriceOracle.address, accessControlConfig.address, poolId)
     ];
 
     await Promise.all(promises);
