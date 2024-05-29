@@ -315,6 +315,19 @@ contract FathomStablecoinProxyActions is CommonMath {
         emit LogBorrowedAmount(_positionAddress, _stablecoinAmount);
     }
 
+    function lockToken(
+        address _manager,
+        address _tokenAdapter,
+        uint256 _positionId,
+        uint256 _collateralAmount, // [in token decimal]
+        bool _transferFrom,
+        bytes calldata _data
+    ) public onlyDelegateCall {
+        address _positionAddress = IManager(_manager).positions(_positionId);
+        tokenAdapterDeposit(_tokenAdapter, _positionAddress, _collateralAmount, _transferFrom, _data);
+        adjustPosition(_manager, _positionId, int256(_convertTo18(_tokenAdapter, _collateralAmount)), 0, _data);
+    }
+
     function lockTokenAndDraw(
         IManager _manager,
         address _stabilityFeeCollector,
