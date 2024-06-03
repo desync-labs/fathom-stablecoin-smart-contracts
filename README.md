@@ -2,7 +2,7 @@
 
 FXD is a stablecoin intended to maintain a soft peg to the US Dollar. Its value is meant to stay stable, with minor fluctuations permitted around the target price.
 
-Users may borrow FXD once they obtain the necessary borrowing power via the collateralization mechanism. The primary source of borrowing power in the Fathom Protocol comes from depositing XDC (the native coin of the XDC Network) as collateral.
+Users may borrow FXD once they obtain the necessary borrowing power via the collateralization mechanism. The primary source of borrowing power in the Fathom Protocol comes from depositing Native coin as collateral.
 
 Various mechanisms, including price oracles, Stable Swap, and a risk management system, preserve the stability of FXD.
 
