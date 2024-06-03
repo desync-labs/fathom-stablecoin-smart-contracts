@@ -11,7 +11,7 @@ const { getContract, createMock } = require("../../helper/contracts");
 const { increase, latest } = require('../../helper/time');
 const { formatBytes32String } = ethers.utils
 
-const COLLATERAL_POOL_ID = formatBytes32String("XDC")
+const COLLATERAL_POOL_ID = formatBytes32String("NATIVE")
 
 describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () => {
   let mockedBookKeeper //  <- bookKeeper.collateralPoolConfig() should return the address of mockCollateralPoolConfig

@@ -21,6 +21,9 @@ module.exports = async function (deployer) {
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig")
     const priceOracle = await getProxy(proxyFactory, "PriceOracle")
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
+    // CentralizedOraclePriceFeed is commented since it can be used only when Price Aggregator is available
+    // For CentralizedOraclePriceFeed to be in use, below apps should be deployed and be active.
+    // CentralizedOraclePriceFeed - FathomPrieOracle - Price Aggregator for an Asset - Fathom Oracle infra's price feeder
     // const centralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed");
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
 
@@ -29,18 +32,17 @@ module.exports = async function (deployer) {
 
     // initial collateral price as 1 USD
     await simplePriceFeed.setPrice(WeiPerWad.toString());
-    await simplePriceFeed.setPoolId(pools.XDC);
+    await simplePriceFeed.setPoolId(pools.NATIVE);
     await simplePriceFeed.peekPrice();
     // await centralizedOraclePriceFeed.peekPrice({ gasLimit: 2000000 });
 
     const promises = [
-        initPool(pools.XDC, collateralTokenAdapter.address, simplePriceFeed.address, LIQUIDATIONRATIO_75),
+        initPool(pools.NATIVE, collateralTokenAdapter.address, simplePriceFeed.address, LIQUIDATIONRATIO_75),
     ]
 
     await Promise.all(promises);
 
     await bookKeeper.setTotalDebtCeiling(debtCeilingSetUpTotal, { gasLimit: 2000000 });
-
 
     async function initPool(poolId, adapter, priceFeed, liquidationRatio) {
         await collateralPoolConfig.initCollateralPool(

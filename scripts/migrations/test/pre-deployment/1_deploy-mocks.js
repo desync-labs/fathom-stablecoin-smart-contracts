@@ -35,7 +35,7 @@ const MockSystemDebtEngine = artifacts.require('MockSystemDebtEngine.sol');
 const TokenAdapter = artifacts.require('TokenAdapter.sol');
 const FathomToken = artifacts.require('FathomToken.sol');
 const ERC20 = artifacts.require('ERC20Mintable.sol');
-const WXDC = artifacts.require('WXDC.sol');
+const WNATIVE = artifacts.require('WNATIVE.sol');
 const ERC20Stable = artifacts.require('ERC20MintableStableSwap.sol')
 const SimplePriceFeed = artifacts.require('SimplePriceFeed.sol')
 const StableswapMultipleSwapsMock = artifacts.require("StableswapMultipleSwapsMock");
@@ -78,8 +78,8 @@ module.exports = async function (deployer) {
   addresses[chainId].USD = ERC20.address;
   addresses[chainId].USDSTABLE = ERC20Stable.address;
 
-  await deployer.deploy(WXDC, { gas: 3050000 }),
-    addresses[chainId].WXDC = WXDC.address;
+  await deployer.deploy(WNATIVE, { gas: 3050000 }),
+    addresses[chainId].WNATIVE = WNATIVE.address;
   addresses[chainId].testOracle = TestOracleMock.address;
 
   await deployer.deploy(StableswapMultipleSwapsMock, { gas: 3050000 })

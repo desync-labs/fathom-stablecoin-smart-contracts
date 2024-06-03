@@ -72,7 +72,7 @@ The chainId 1337 addresses are required to execute the test scripts on Ganache. 
 ```JSON
 {
   "1337": {
-    "WXDC": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
+    "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
     "USD": "0xce75A95160D96F5388437993aB5825F322426E04",
     "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
     "DEXFactory": "0x5cf9FB75278606F23b2521e77A424174d2CAA2c3",
@@ -123,7 +123,7 @@ The format of the content can be same as in the Running test sections. Like belo
 ```JSON
 {
   "1337": {
-    "WXDC": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
+    "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
     "USD": "0xce75A95160D96F5388437993aB5825F322426E04",
     "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
     "DEXFactory": "0x5cf9FB75278606F23b2521e77A424174d2CAA2c3",
@@ -134,7 +134,7 @@ The format of the content can be same as in the Running test sections. Like belo
 
 ```
 
-If you want to see the protocol in action by depositing test ETH and borrowing FXD, I recommend that you first deploy WXDC||WETH on Ganache. After that, update the WXDC address in the externalAddresses.json file with the address of the WXDC you deployed. Additionally, if you aim to thoroughly test the StableSwapModule post-deployment, you must deploy an ERC20 token that can subsequently be deposited into the StableSwapModule. Therefore, please deploy an ERC20 token to substitute for the USD token, and update the USD value in the aforementioned JSON file.
+If you want to see the protocol in action by depositing test ETH and borrowing FXD, I recommend that you first deploy WNATIVE||WETH on Ganache. After that, update the WNATIVE address in the externalAddresses.json file with the address of the WNATIVE you deployed. Additionally, if you aim to thoroughly test the StableSwapModule post-deployment, you must deploy an ERC20 token that can subsequently be deposited into the StableSwapModule. Therefore, please deploy an ERC20 token to substitute for the USD token, and update the USD value in the aforementioned JSON file.
 
 #### 3) Compile contracts
 
@@ -154,7 +154,7 @@ $ coralX scenario --run deployLocal
 
 After deployment, addresses.json gets updated with addresses of proxies.
 
-### On apothem (XDC Testnet)
+### On apothem (NATIVE Testnet)
 
 #### 1) Create file called "privateKey" in the root directory (PRIVATE_KEY_WITHOUT_0x_PREFIX of the EOA that you would like to deploy contracts from):
 
@@ -169,7 +169,7 @@ ChainID of apothem is 51. Therefore, the externalAddresses.json need to have the
 ```JSON
 {
     "51": {
-      "WXDC": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
+      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
       "USD": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
       "DEXFactory": "0x6FfcE1bb8fB4841B42C8ee5e91398068723ba80D",
       "USDSTABLE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f"
@@ -177,7 +177,7 @@ ChainID of apothem is 51. Therefore, the externalAddresses.json need to have the
 }
 ```
 
-The WXDC address above is officially deployed on the Apothem network. Therefore, I recommend using this address unless you have already deployed or are willing to deploy a new WXDC address for your testing purposes.
+The WNATIVE address above is officially deployed on the Apothem network. Therefore, I recommend using this address unless you have already deployed or are willing to deploy a new WNATIVE address for your testing purposes.
 
 For USD addresses, you may use the contract addresses of ERC20 tokens that you deployed yourself, or if you have balances of any USD-pegged stablecoin on Apothem, you can use its address.
 
@@ -203,7 +203,7 @@ $ coralX scenario --run deployApothem
 
 After deployment, addresses.json gets updated with addresses of proxies.
 
-### On XDC mainnet (chainID 50)
+### On NATIVE mainnet (chainID 50)
 
 #### 1) Create file called "privateKey" in the root directory (PRIVATE_KEY_WITHOUT_0x_PREFIX of the EOA that you would like to deploy contracts from):
 
@@ -213,12 +213,12 @@ $ echo -n PRIVATE_KEY_WITHOUT_0x_PREFIX > privateKey
 
 #### 2) Create externalAddresses.json in root directory.:
 
-ChainID of XDC mainnet is 50. Therefore, the externalAddresses.json need to have the sets of addresses having 51 as key. For example, like below.
+ChainID of NATIVE mainnet is 50. Therefore, the externalAddresses.json need to have the sets of addresses having 51 as key. For example, like below.
 
 ```JSON
 {
     "50": {
-      "WXDC": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
+      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
       "USD": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
       "DEXFactory": "0x6FfcE1bb8fB4841B42C8ee5e91398068723ba80D",
       "USDSTABLE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f"
@@ -226,9 +226,9 @@ ChainID of XDC mainnet is 50. Therefore, the externalAddresses.json need to have
 }
 ```
 
-WXDC is recommended to have the official WXDC address unless you would like to use other wrapper contracts.
+WNATIVE is recommended to have the official WNATIVE address unless you would like to use other wrapper contracts.
 
-For USD addresses, I recommend USDTx, however, if you have other stable token on XDC that you would like to use, no problem.
+For USD addresses, I recommend USDTx, however, if you have other stable token on NATIVE that you would like to use, no problem.
 
 The USDSTABLE will be the USD address used for the StableSwapModule. You may keep the same address as the USD address.
 
@@ -255,7 +255,7 @@ After deployment, addresses.json gets updated with addresses of proxies.
 # PriceFeed
 
 ## How to use SimplePriceFeed
-The default configuration for deployment specifies that SimplePriceFeed acts as the price feed for XDC collateral. To alter the price of the collateral, you must first establish the price within SimplePriceFeed and then set the Loan-to-Value (LTV) discounted price in the protocol via the PriceOracle contract.
+The default configuration for deployment specifies that SimplePriceFeed acts as the price feed for NATIVE collateral. To alter the price of the collateral, you must first establish the price within SimplePriceFeed and then set the Loan-to-Value (LTV) discounted price in the protocol via the PriceOracle contract.
 
 ```Solidity=
 //In SimplePriceFeed contract
@@ -263,7 +263,7 @@ The default configuration for deployment specifies that SimplePriceFeed acts as 
 function setPrice(uint256 _price) external onlyOwner {}
 
 ```
-You can establish the collateral price using the setPrice function mentioned above. To set the price of XDC to 2 USD, call the setPrice function with an argument of 2*10^18.
+You can establish the collateral price using the setPrice function mentioned above. To set the price of NATIVE to 2 USD, call the setPrice function with an argument of 2*10^18.
 
 Once the price is set in SimplePriceFeed, it is necessary to input the LTV discounted price into the protocol. This can be accomplished by calling the function provided below.
 
@@ -273,11 +273,11 @@ Once the price is set in SimplePriceFeed, it is necessary to input the LTV disco
     function setPrice(bytes32 _collateralPoolId) external override {}
 
 ```
-The setPrice function of the PriceOracle should be called with an argument, which is the collateralPoolId. This is a padded bytes32 value converted from the string 'XDC'.
+The setPrice function of the PriceOracle should be called with an argument, which is the collateralPoolId. This is a padded bytes32 value converted from the string 'NATIVE'.
 
 0x5844430000000000000000000000000000000000000000000000000000000000
 
-For example, if the price of XDC set by SimplePriceFeed is 1 USD and the Loan-to-Value (LTV) ratio is 70%, then the LTV discounted price would be 0.7 USD.
+For example, if the price of NATIVE set by SimplePriceFeed is 1 USD and the Loan-to-Value (LTV) ratio is 70%, then the LTV discounted price would be 0.7 USD.
 
 ## How to change priceFeed for the protocol
 
@@ -312,7 +312,7 @@ scripts/migrations/priceFeed/1_initialize.js
 #### To run the script with DEX as the price source, ensure that:
 
 0) The build files remain unchanged since deployment.
-1) The DEXFactory is valid and that an XDC/USD pair exists within the DEXFactory.
+1) The DEXFactory is valid and that an NATIVE/USD pair exists within the DEXFactory.
 
 The default PriceOracle for DelayFathomOraclePriceFeed is set as DexPriceOracle since SlidingWindowDexOracle requires more involvement of PriceBot that will periodically keep feeding prices to SlidingWindowDexOracle. 
 

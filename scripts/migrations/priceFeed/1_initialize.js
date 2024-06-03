@@ -19,12 +19,12 @@ module.exports = async function (deployer) {
         slidingWindowDexOracle.initialize(addresses.DEXFactory, 1800, 15),
         delayFathomOraclePriceFeed.initialize(
             dexPriceOracle.address,
-            addresses.WXDC,
+            addresses.WNATIVE,
             addresses.USD,
             accessControlConfig.address,
-            pools.XDC
+            pools.NATIVE
         ),
-        // centralizedOraclePriceFeed.initialize(priceOracleAddress, accessControlConfig.address, pools.XDC),
+        // centralizedOraclePriceFeed.initialize(priceOracleAddress, accessControlConfig.address, pools.NATIVE),
     ];
 
     await Promise.all(promises);

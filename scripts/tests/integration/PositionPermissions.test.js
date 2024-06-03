@@ -47,13 +47,13 @@ const setup = async () => {
     await GLD.approve(bobProxyWallet.address, WeiPerWad.mul(1000), { from: BobAddress, gasLimit: 1000000 })
 
     await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
-    await collateralPoolConfig.setStabilityFeeRate(pools.XDC, WeiPerRay, { gasLimit: 1000000 });
+    await collateralPoolConfig.setStabilityFeeRate(pools.NATIVE, WeiPerRay, { gasLimit: 1000000 });
     await collateralPoolConfig.setStabilityFeeRate(pools.GLD, WeiPerRay, { gasLimit: 1000000 });
 
     await priceOracle.setPrice(pools.GLD, { gasLimit: 1000000 })
     await TimeHelpers.increase(TimeHelpers.duration.seconds(BigNumber.from("900")))
     await priceOracle.setPrice(pools.GLD, { gasLimit: 1000000 })
-    await priceOracle.setPrice(pools.XDC);
+    await priceOracle.setPrice(pools.NATIVE);
 
     return {
         bookKeeper,
@@ -109,41 +109,41 @@ describe("PositionPermissions", () => {
         context("position owner is able to", async () => {
             context("lock collateral into their own position", async () => {
                 it("should success", async () => {
-                    // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                    // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                     const alicePositionAddress = await positionManager.positions(1)
                     const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                    const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
 
                     expect(
                         alicePosition.lockedCollateral,
-                        "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                        "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                     ).to.be.equal(WeiPerWad)
                     expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                         WeiPerWad
                     )
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                    // 2. Alice try to adjust position, add 2 WXDC to position
+                    // 2. Alice try to adjust position, add 2 WNATIVE to position
                     const posId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                     const own = await positionManager.owners(1)
-                    await PositionHelper.lockXDC(aliceProxyWallet, AliceAddress, 1, WeiPerWad.mul(2))
-                    const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    await PositionHelper.lockNATIVE(aliceProxyWallet, AliceAddress, 1, WeiPerWad.mul(2))
+                    const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                     expect(
                         aliceAdjustPosition.lockedCollateral,
-                        "lockedCollateral should be 3 WXDC, because Alice locked 2 more WXDC"
+                        "lockedCollateral should be 3 WNATIVE, because Alice locked 2 more WNATIVE"
                     ).to.be.equal(WeiPerWad.mul(3))
                     expect(
                         aliceAdjustPosition.debtShare,
                         "debtShare should be 1 FXD, because Alice didn't draw more"
                     ).to.be.equal(WeiPerWad)
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                 })
@@ -155,47 +155,47 @@ describe("PositionPermissions", () => {
                         "call openLockTokenAndDraw, unlock collateral and move the collateral from one position to another position within the same collateral pool",
                         async () => {
                             it("should success", async () => {
-                                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                                 const alicePositionAddress = await positionManager.positions(1)
                                 const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                                const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                                 expect(
                                     alicePosition.lockedCollateral,
-                                    "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                    "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                                 ).to.be.equal(0)
                                 expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
-                                // 2. Alice open a second new position with 2 WXDC and draw 1 FXD at same collateral pool
-                                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                                // 2. Alice open a second new position with 2 WNATIVE and draw 1 FXD at same collateral pool
+                                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
 
                                 const alicePositionAddress2 = await positionManager.positions(2)
                                 const fathomStablecoinBalance2 = await fathomStablecoin.balanceOf(AliceAddress)
-                                const alicePosition2 = await bookKeeper.positions(pools.XDC, alicePositionAddress2)
+                                const alicePosition2 = await bookKeeper.positions(pools.NATIVE, alicePositionAddress2)
                                 expect(
                                     alicePosition2.lockedCollateral,
-                                    "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                                    "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                                 ).to.be.equal(WeiPerWad.mul(2))
                                 expect(alicePosition2.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress2),
-                                    "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress2),
+                                    "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                                 ).to.be.equal(0)
                                 expect(
                                     fathomStablecoinBalance2,
                                     "Alice should receive 2 FXD from drawing FXD 2 times form 2 positions"
                                 ).to.be.equal(WeiPerWad.mul(2))
-                                // 3. Alice try to unlock 1 WXDC at second position
+                                // 3. Alice try to unlock 1 WNATIVE at second position
                                 await PositionHelper.adjustPosition(
                                     aliceProxyWallet,
                                     AliceAddress,
@@ -203,18 +203,18 @@ describe("PositionPermissions", () => {
                                     WeiPerWad.mul(-1),
                                     0
                                 );
-                                const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress2)
+                                const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress2)
                                 expect(
                                     aliceAdjustPosition.lockedCollateral,
-                                    "Position #2's lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC from it"
+                                    "Position #2's lockedCollateral should be 1 WNATIVE, because Alice unlocked 1 WNATIVE from it"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     aliceAdjustPosition.debtShare,
                                     "debtShare should be 1 FXD, because Alice didn't draw more"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress2),
-                                    "collateralToken inside Alice's Position#2 address should be 1 WXDC, because Alice unlocked 1 WXDC from the position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress2),
+                                    "collateralToken inside Alice's Position#2 address should be 1 WNATIVE, because Alice unlocked 1 WNATIVE from the position"
                                 ).to.be.equal(WeiPerWad)
                                 // 4. Alice try to move collateral from second position to first position
                                 await PositionHelper.moveCollateral(
@@ -224,19 +224,19 @@ describe("PositionPermissions", () => {
                                     alicePositionAddress,
                                     WeiPerWad
                                 );
-                                const aliceMoveCollateral = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const aliceMoveCollateral = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                                 const fathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                                 expect(
                                     aliceMoveCollateral.lockedCollateral,
-                                    "Alice's Position #1 lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                    "Alice's Position #1 lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     aliceMoveCollateral.debtShare,
                                     "Alice's Position #1 debtShare should be 1 FXD, because Alice doesn't draw more"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken inside Alice's Position #1 address should be 1 WXDC, because Alice moved 1 WXDC from Position #2 to Position #1."
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken inside Alice's Position #1 address should be 1 WNATIVE, because Alice moved 1 WNATIVE from Position #2 to Position #1."
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     fathomStablecoinBalancefinal,
@@ -249,45 +249,45 @@ describe("PositionPermissions", () => {
                         "open position, deposit collateral and move collateral from one position to another position",
                         async () => {
                             it("should success", async () => {
-                                // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                                // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                                 const alicePositionAddress = await positionManager.positions(1)
                                 const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                                const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                                 expect(
                                     alicePosition.lockedCollateral,
-                                    "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                    "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                                 ).to.be.equal(0)
                                 expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
                                 // 2. Alice open a second new position at same collateral pool
-                                await PositionHelper.openPosition(aliceProxyWallet, AliceAddress, pools.XDC)
+                                await PositionHelper.openPosition(aliceProxyWallet, AliceAddress, pools.NATIVE)
                                 const alicePositionAddress2 = await positionManager.positions(2)
-                                const alicePosition2 = await bookKeeper.positions(pools.XDC, alicePositionAddress2)
+                                const alicePosition2 = await bookKeeper.positions(pools.NATIVE, alicePositionAddress2)
                                 expect(
                                     alicePosition2.lockedCollateral,
-                                    "lockedCollateral should be 0 WXDC, because Alice doesn't locked WXDC"
+                                    "lockedCollateral should be 0 WNATIVE, because Alice doesn't locked WNATIVE"
                                 ).to.be.equal(0)
                                 expect(alicePosition2.debtShare, "debtShare should be 0 FXD, because doesn't drew FXD").to.be.equal(0)
-                                // 3. Alice deposit 3 WXDC to new position
-                                await PositionHelper.xdcAdapterDeposit(
+                                // 3. Alice deposit 3 WNATIVE to new position
+                                await PositionHelper.nativeAdapterDeposit(
                                     aliceProxyWallet,
                                     AliceAddress,
                                     await positionManager.positions(2),
                                     WeiPerWad.mul(3),
                                 );
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress2),
-                                    "collateralToken inside Alice's second position address should be 3 WXDC, because Alice deposit 3 WXDC into the second position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress2),
+                                    "collateralToken inside Alice's second position address should be 3 WNATIVE, because Alice deposit 3 WNATIVE into the second position"
                                 ).to.be.equal(WeiPerWad.mul(3))
                                 // 4. Alice try to move collateral from second position to first position
                                 await PositionHelper.moveCollateral(
@@ -297,23 +297,23 @@ describe("PositionPermissions", () => {
                                     alicePositionAddress,
                                     WeiPerWad
                                 );
-                                const aliceMoveCollateral = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const aliceMoveCollateral = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                                 const fathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                                 expect(
                                     aliceMoveCollateral.lockedCollateral,
-                                    "Alice's Position #1 lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                    "Alice's Position #1 lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     aliceMoveCollateral.debtShare,
                                     "Alice's Position #1 debtShare should be 1 FXD, because Alice doesn't draw more"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken inside Alice's Position #1 address should be 1 WXDC, because Alice moved 1 WXDC from Position #2 to Position #1."
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken inside Alice's Position #1 address should be 1 WNATIVE, because Alice moved 1 WNATIVE from Position #2 to Position #1."
                                 ).to.be.equal(WeiPerWad)
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress2),
-                                    "collateralToken inside Alice's Position #2 address should be 2 WXDC, because Alice moved 1 WXDC to Position #1"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress2),
+                                    "collateralToken inside Alice's Position #2 address should be 2 WNATIVE, because Alice moved 1 WNATIVE to Position #1"
                                 ).to.be.equal(WeiPerWad.mul(2))
                                 expect(
                                     fathomStablecoinBalancefinal,
@@ -325,41 +325,41 @@ describe("PositionPermissions", () => {
                     context("Alice open a position, lock collateral and move collateral to Bob's position", async () => {
                         it("should success", async () => {
                             // 1. Alice open position
-                            await PositionHelper.openPosition(aliceProxyWallet, AliceAddress, pools.XDC)
+                            await PositionHelper.openPosition(aliceProxyWallet, AliceAddress, pools.NATIVE)
                             const alicePositionAddress = await positionManager.positions(1)
-                            const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 alicePosition.lockedCollateral,
-                                "lockedCollateral should be 0 WXDC, because Alice doesn't locked WXDC"
+                                "lockedCollateral should be 0 WNATIVE, because Alice doesn't locked WNATIVE"
                             ).to.be.equal(0)
                             expect(alicePosition.debtShare, "debtShare should be 0 FXD, because doesn't drew FXD").to.be.equal(0)
-                            // 2. Alice deposit 3 WXDC to new position
-                            await PositionHelper.xdcAdapterDeposit(
+                            // 2. Alice deposit 3 WNATIVE to new position
+                            await PositionHelper.nativeAdapterDeposit(
                                 aliceProxyWallet,
                                 AliceAddress,
                                 await positionManager.positions(1),
                                 WeiPerWad.mul(3),
                             );
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's second position address should be 3 WXDC, because Alice deposit 3 WXDC into the second position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's second position address should be 3 WNATIVE, because Alice deposit 3 WNATIVE into the second position"
                             ).to.be.equal(WeiPerWad.mul(3))
-                            // 3. Bob open a position with 1 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                            // 3. Bob open a position with 1 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(bobProxyWallet, BobAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                             const bobPositionAddress = await positionManager.positions(2)
                             const fathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
-                            const bobPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress)
+                            const bobPosition = await bookKeeper.positions(pools.NATIVE, bobPositionAddress)
                             expect(
                                 bobPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(fathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                             // 4. Alice try to move collateral to bob position
@@ -373,12 +373,12 @@ describe("PositionPermissions", () => {
                             const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                             const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's Position address should be 2 WXDC, because Alice move 1 WXDC from Alice's Position to Bob's Position."
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's Position address should be 2 WNATIVE, because Alice move 1 WNATIVE from Alice's Position to Bob's Position."
                             ).to.be.equal(WeiPerWad.mul(2))
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's Position address should be 1 WXDC, because Alice moved 1 WXDC from Alice's Position to Bob's position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's Position address should be 1 WNATIVE, because Alice moved 1 WNATIVE from Alice's Position to Bob's position"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 aliceFathomStablecoinBalancefinal,
@@ -395,27 +395,27 @@ describe("PositionPermissions", () => {
                         "Alice opens 2 positions on 2 collateral pools (one position for each collateral pool) and Alice move collateral from one position to another position by calling openLockTokenAndDraw() twice",
                         async () => {
                             it("should success", async () => {
-                                // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                                // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                                 const alicePositionAddress = await positionManager.positions(1)
                                 const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                                const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                                 expect(
                                     alicePosition.lockedCollateral,
-                                    "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                    "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                                 ).to.be.equal(0)
                                 expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
-                                // 2. Alice open a second new position with 2 WXDC and draw 1 FXD at new collateral pool
+                                // 2. Alice open a second new position with 2 WNATIVE and draw 1 FXD at new collateral pool
                                 await PositionHelper.openPositionAndDraw(aliceProxyWallet, AliceAddress, pools.GLD, WeiPerWad.mul(2), WeiPerWad);
 
                                 const alicePositionAddress2 = await positionManager.positions(2)
@@ -423,20 +423,20 @@ describe("PositionPermissions", () => {
                                 const alicePosition2 = await bookKeeper.positions(pools.GLD, alicePositionAddress2)
                                 expect(
                                     alicePosition2.lockedCollateral,
-                                    "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                                    "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                                 ).to.be.equal(WeiPerWad.mul(2))
                                 expect(alicePosition2.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
                                 expect(
                                     await bookKeeper.collateralToken(pools.GLD, alicePositionAddress2),
-                                    "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                    "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                                 ).to.be.equal(0)
                                 expect(
                                     fathomStablecoinBalance2,
                                     "Alice should receive 2 FXD from drawing 1 FXD 2 times form 2 positions"
                                 ).to.be.equal(WeiPerWad.mul(2))
-                                // 3. Alice try to unlock 1 WXDC at second position
+                                // 3. Alice try to unlock 1 WNATIVE at second position
                                 await PositionHelper.adjustPosition(
                                     aliceProxyWallet,
                                     AliceAddress,
@@ -448,7 +448,7 @@ describe("PositionPermissions", () => {
                                 const aliceAdjustPosition = await bookKeeper.positions(pools.GLD, alicePositionAddress2)
                                 expect(
                                     aliceAdjustPosition.lockedCollateral,
-                                    "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC"
+                                    "lockedCollateral should be 1 WNATIVE, because Alice unlocked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     aliceAdjustPosition.debtShare,
@@ -456,7 +456,7 @@ describe("PositionPermissions", () => {
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     await bookKeeper.collateralToken(pools.GLD, alicePositionAddress2),
-                                    "collateralToken inside Alice's position address should be 1 WXDC, because Alice unlocked 1 WXDC into the position"
+                                    "collateralToken inside Alice's position address should be 1 WNATIVE, because Alice unlocked 1 WNATIVE into the position"
                                 ).to.be.equal(WeiPerWad)
                                 // 4. Alice try to move collateral from second position to first position
                                 await PositionHelper.moveCollateral(
@@ -467,27 +467,27 @@ describe("PositionPermissions", () => {
                                     WeiPerWad,
                                     collateralTokenAdapter2.address,
                                 );
-                                const aliceMoveCollateral = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const aliceMoveCollateral = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                                 const fathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                                 expect(
                                     aliceMoveCollateral.lockedCollateral,
-                                    "Alice's Position #1 lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                    "Alice's Position #1 lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     aliceMoveCollateral.debtShare,
                                     "Alice's Position #1 debtShare should be 1 FXD, because Alice didn't draw more"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken from Collateral Pool #1 inside Alice's Position #1 address should be 0 WXDC, because Alice can't move collateral from Position #2 to Position #1 as they are not from the same Collateral Pool."
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken from Collateral Pool #1 inside Alice's Position #1 address should be 0 WNATIVE, because Alice can't move collateral from Position #2 to Position #1 as they are not from the same Collateral Pool."
                                 ).to.be.equal(0)
                                 expect(
                                     await bookKeeper.collateralToken(pools.GLD, alicePositionAddress2),
-                                    "collateralToken from Collateral Pool #2 inside Alice's position #2 address should be 0 WXDC, because Alice moved 1 WXDC into Collateral Pool #2 inside Alice's position #1"
+                                    "collateralToken from Collateral Pool #2 inside Alice's position #2 address should be 0 WNATIVE, because Alice moved 1 WNATIVE into Collateral Pool #2 inside Alice's position #1"
                                 ).to.be.equal(0)
                                 expect(
                                     await bookKeeper.collateralToken(pools.GLD, alicePositionAddress),
-                                    "collateralToken from Collateral Pool #2 inside Alice's position #1 address should be 1 WXDC, because Alice moved 1 WXDC form Alice's position #2 to Collateral Pool #2 inside Alice's position #1"
+                                    "collateralToken from Collateral Pool #2 inside Alice's position #1 address should be 1 WNATIVE, because Alice moved 1 WNATIVE form Alice's position #2 to Collateral Pool #2 inside Alice's position #1"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     fathomStablecoinBalancefinal,
@@ -500,22 +500,22 @@ describe("PositionPermissions", () => {
                         "Alice opens 2 positions on 2 collateral pools (one position for each collateral pool) and Alice move collateral from one position to another position",
                         async () => {
                             it("should success", async () => {
-                                // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                                // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                                 const alicePositionAddress = await positionManager.positions(1)
                                 const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                                const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                                 expect(
                                     alicePosition.lockedCollateral,
-                                    "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                    "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                                 ).to.be.equal(0)
                                 expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(
                                     WeiPerWad
@@ -527,10 +527,10 @@ describe("PositionPermissions", () => {
                                 const alicePosition2 = await bookKeeper.positions(pools.GLD, alicePositionAddress2)
                                 expect(
                                     alicePosition2.lockedCollateral,
-                                    "lockedCollateral should be 0 WXDC, because Alice doesn't locked WXDC"
+                                    "lockedCollateral should be 0 WNATIVE, because Alice doesn't locked WNATIVE"
                                 ).to.be.equal(0)
                                 expect(alicePosition2.debtShare, "debtShare should be 0 FXD, because doesn't drew FXD").to.be.equal(0)
-                                // 3. Alice deposit 3 WXDC to second position
+                                // 3. Alice deposit 3 WNATIVE to second position
                                 await PositionHelper.tokenAdapterDeposit(
                                     aliceProxyWallet,
                                     AliceAddress,
@@ -540,7 +540,7 @@ describe("PositionPermissions", () => {
                                 );
                                 expect(
                                     await bookKeeper.collateralToken(pools.GLD, alicePositionAddress2),
-                                    "collateralToken inside Alice's second position address should be 3 WXDC, because Alice deposit 3 WXDC into the second position"
+                                    "collateralToken inside Alice's second position address should be 3 WNATIVE, because Alice deposit 3 WNATIVE into the second position"
                                 ).to.be.equal(WeiPerWad.mul(3))
                                 // 4. Alice try to move collateral from second position to first position
                                 await PositionHelper.moveCollateral(
@@ -551,27 +551,27 @@ describe("PositionPermissions", () => {
                                     WeiPerWad,
                                     collateralTokenAdapter2.address,
                                 );
-                                const aliceMoveCollateral = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const aliceMoveCollateral = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                                 const fathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                                 expect(
                                     aliceMoveCollateral.lockedCollateral,
-                                    "Alice's Position #1 lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                    "Alice's Position #1 lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     aliceMoveCollateral.debtShare,
                                     "Alice's Position #1 debtShare should be 1 FXD, because Alice doesn't draw more"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken from Collateral Pool #1 inside Alice's Position #1 address should be 0 WXDC, because Alice can't move collateral from Position #2 to Position #1 as they are not from the same Collateral Pool."
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken from Collateral Pool #1 inside Alice's Position #1 address should be 0 WNATIVE, because Alice can't move collateral from Position #2 to Position #1 as they are not from the same Collateral Pool."
                                 ).to.be.equal(0)
                                 expect(
                                     await bookKeeper.collateralToken(pools.GLD, alicePositionAddress2),
-                                    "collateralToken from Collateral Pool #2 inside Alice's Position #2 address should be 2 WXDC, because Alice move 1 WXDC into Collateral Pool #2 inside Alice's position #1"
+                                    "collateralToken from Collateral Pool #2 inside Alice's Position #2 address should be 2 WNATIVE, because Alice move 1 WNATIVE into Collateral Pool #2 inside Alice's position #1"
                                 ).to.be.equal(WeiPerWad.mul(2))
                                 expect(
                                     await bookKeeper.collateralToken(pools.GLD, alicePositionAddress),
-                                    "collateralToken from Collateral Pool #2 inside Alice's Position #1 address should be 1 WXDC, because Alice move 1 WXDC form Alice's position #2 to Collateral Pool #2 inside Alice's position #1"
+                                    "collateralToken from Collateral Pool #2 inside Alice's Position #1 address should be 1 WNATIVE, because Alice move 1 WNATIVE form Alice's position #2 to Collateral Pool #2 inside Alice's position #1"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     fathomStablecoinBalancefinal,
@@ -585,19 +585,19 @@ describe("PositionPermissions", () => {
                         async () => {
                             it("should success", async () => {
                                 // 1. Alice open position
-                                await PositionHelper.openPosition(aliceProxyWallet, AliceAddress, pools.XDC)
+                                await PositionHelper.openPosition(aliceProxyWallet, AliceAddress, pools.NATIVE)
                                 const alicePositionAddress = await positionManager.positions(1)
-                                const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                                 expect(
                                     alicePosition.lockedCollateral,
-                                    "Alice's Position #1 lockedCollateral should be 0 WXDC, because Alice didn't lock WXDC"
+                                    "Alice's Position #1 lockedCollateral should be 0 WNATIVE, because Alice didn't lock WNATIVE"
                                 ).to.be.equal(0)
                                 expect(
                                     alicePosition.debtShare,
                                     "Alice's Position #1 debtShare should be 0 FXD, because didn't draw FXD"
                                 ).to.be.equal(0)
-                                // 2. Alice deposit 3 WXDC to her position
-                                await PositionHelper.xdcAdapterDeposit(
+                                // 2. Alice deposit 3 WNATIVE to her position
+                                await PositionHelper.nativeAdapterDeposit(
                                     aliceProxyWallet,
                                     AliceAddress,
                                     await positionManager.positions(1),
@@ -605,10 +605,10 @@ describe("PositionPermissions", () => {
                                     collateralTokenAdapter.address
                                 );
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken from Collateral Pool #1 inside Alice's Position #1 address should be 3 WXDC, because Alice deposit 3 WXDC into the her position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken from Collateral Pool #1 inside Alice's Position #1 address should be 3 WNATIVE, because Alice deposit 3 WNATIVE into the her position"
                                 ).to.be.equal(WeiPerWad.mul(3))
-                                // 3. Bob open a position with 1 WXDC and draw 1 FXD at another collateral pool
+                                // 3. Bob open a position with 1 WNATIVE and draw 1 FXD at another collateral pool
                                 await PositionHelper.openPositionAndDraw(bobProxyWallet, BobAddress, pools.GLD, WeiPerWad, WeiPerWad);
 
                                 const bobPositionAddress = await positionManager.positions(2)
@@ -616,7 +616,7 @@ describe("PositionPermissions", () => {
                                 const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress)
                                 expect(
                                     bobPosition.lockedCollateral,
-                                    "lockedCollateral from Collateral Pool #2 inside Bob's Position #1 address should be 1 WXDC, because Bob locked 1 WXDC"
+                                    "lockedCollateral from Collateral Pool #2 inside Bob's Position #1 address should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     bobPosition.debtShare,
@@ -624,7 +624,7 @@ describe("PositionPermissions", () => {
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                                    "collateralToken from Collateral Pool #2 inside Bob's Position #1 address should be 0 WXDC, because Bob locked all WXDC into the position"
+                                    "collateralToken from Collateral Pool #2 inside Bob's Position #1 address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                                 ).to.be.equal(0)
                                 expect(fathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                                 // 4. Alice try to move collateral to Bob's position across collateral pool
@@ -639,16 +639,16 @@ describe("PositionPermissions", () => {
                                 const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                                 const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken from Collateral Pool #1 inside Alice's Position #1 address should be 2 WXDC, because Alice move 1 WXDC to Bob's position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken from Collateral Pool #1 inside Alice's Position #1 address should be 2 WNATIVE, because Alice move 1 WNATIVE to Bob's position"
                                 ).to.be.equal(WeiPerWad.mul(2))
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                    "collateralToken from Collateral Pool #1 inside new Bob's Position address should be 1 WXDC, because System auto create Bob's position at Collateral Pool #1, so Alice can move 1 WXDC into the new Bob's position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                    "collateralToken from Collateral Pool #1 inside new Bob's Position address should be 1 WNATIVE, because System auto create Bob's position at Collateral Pool #1, so Alice can move 1 WNATIVE into the new Bob's position"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                                    "collateralToken from Collateral Pool #2 inside Bob's Position #1 address should be 0 WXDC, because Alice can't move WXDC across collateral pool"
+                                    "collateralToken from Collateral Pool #2 inside Bob's Position #1 address should be 0 WNATIVE, because Alice can't move WNATIVE across collateral pool"
                                 ).to.be.equal(0)
                                 expect(
                                     aliceFathomStablecoinBalancefinal,
@@ -666,23 +666,23 @@ describe("PositionPermissions", () => {
 
             context("mint FXD", async () => {
                 it("should success", async () => {
-                    // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                    // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
 
                     const alicePositionAddress = await positionManager.positions(1)
                     const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                    const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
 
                     expect(
                         alicePosition.lockedCollateral,
-                        "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                        "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                     ).to.be.equal(WeiPerWad.mul(2))
                     expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                         WeiPerWad
                     )
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
 
@@ -690,22 +690,22 @@ describe("PositionPermissions", () => {
                     await PositionHelper.draw(
                         aliceProxyWallet,
                         AliceAddress,
-                        pools.XDC,
+                        pools.NATIVE,
                         await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                         WeiPerWad
                     );
                     const fathomStablecoinBalance2 = await fathomStablecoin.balanceOf(AliceAddress)
-                    const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                     expect(
                         aliceAdjustPosition.lockedCollateral,
-                        "lockedCollateral should be 2 WXDC, because Alice doesn't add WXDC"
+                        "lockedCollateral should be 2 WNATIVE, because Alice doesn't add WNATIVE"
                     ).to.be.equal(WeiPerWad.mul(2))
                     expect(aliceAdjustPosition.debtShare, "debtShare should be 2 FXD, because Alice drew more").to.be.equal(
                         WeiPerWad.mul(2)
                     )
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance2, "Alice should receive 2 FXD from drawing 2 FXD").to.be.equal(
                         WeiPerWad.mul(2)
@@ -719,52 +719,52 @@ describe("PositionPermissions", () => {
                         "call openLockTokenAndDraw, unlock collateral and move the collateral from one position to another position within the same collateral pool",
                         async () => {
                             it("should success", async () => {
-                                // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                                // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                                 const alicePositionAddress = await positionManager.positions(1)
                                 const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                                const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
 
                                 expect(
                                     alicePosition.lockedCollateral,
-                                    "Alice's Position #1 lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                    "Alice's Position #1 lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "Alice's Position #1 collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "Alice's Position #1 collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                                 ).to.be.equal(0)
                                 expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
 
-                                // 2. Alice open a second new position with 2 WXDC and draw 1 FXD at same collateral pool
-                                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                                // 2. Alice open a second new position with 2 WNATIVE and draw 1 FXD at same collateral pool
+                                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
 
                                 const alicePositionAddress2 = await positionManager.positions(2)
                                 const fathomStablecoinBalance2 = await fathomStablecoin.balanceOf(AliceAddress)
-                                const alicePosition2 = await bookKeeper.positions(pools.XDC, alicePositionAddress2)
+                                const alicePosition2 = await bookKeeper.positions(pools.NATIVE, alicePositionAddress2)
 
                                 expect(
                                     alicePosition2.lockedCollateral,
-                                    "Alice's Position #2 lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                                    "Alice's Position #2 lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                                 ).to.be.equal(WeiPerWad.mul(2))
                                 expect(alicePosition2.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress2),
-                                    "Alice's Position #2 collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress2),
+                                    "Alice's Position #2 collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                                 ).to.be.equal(0)
                                 expect(
                                     fathomStablecoinBalance2,
                                     "Alice should receive 2 FXD, because Alice drew FXD 2 times form 2 positions"
                                 ).to.be.equal(WeiPerWad.mul(2))
 
-                                // 3. Alice try to unlock 1 WXDC at second position
+                                // 3. Alice try to unlock 1 WNATIVE at second position
                                 await PositionHelper.adjustPosition(
                                     aliceProxyWallet,
                                     AliceAddress,
@@ -772,39 +772,39 @@ describe("PositionPermissions", () => {
                                     WeiPerWad.mul(-1),
                                     0
                                 );
-                                const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress2)
+                                const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress2)
                                 expect(
                                     aliceAdjustPosition.lockedCollateral,
-                                    "Alice's Position #2 lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC"
+                                    "Alice's Position #2 lockedCollateral should be 1 WNATIVE, because Alice unlocked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     aliceAdjustPosition.debtShare,
                                     "Alice's Position #2 debtShare should be 1 FXD, because Alice didn't draw more"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress2),
-                                    "Alice's Position #2 collateralToken should be 1 WXDC, because Alice unlocked 1 WXDC into the position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress2),
+                                    "Alice's Position #2 collateralToken should be 1 WNATIVE, because Alice unlocked 1 WNATIVE into the position"
                                 ).to.be.equal(WeiPerWad)
 
                                 // 4. Alice try to move position from second position to first position
                                 await PositionHelper.movePosition(aliceProxyWallet, AliceAddress, 2, 1)
-                                const alicemovePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const alicemovePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                                 const fathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                                 expect(
                                     alicemovePosition.lockedCollateral,
-                                    "Alice's Position #1 lockedCollateral should be 2 WXDC, because Alice move form Position #2 to Position #1"
+                                    "Alice's Position #1 lockedCollateral should be 2 WNATIVE, because Alice move form Position #2 to Position #1"
                                 ).to.be.equal(WeiPerWad.mul(2))
                                 expect(
                                     alicemovePosition.debtShare,
                                     "Alice's Position #1 debtShare should be 2 FXD, because Alice move form Position #2 to Position #1"
                                 ).to.be.equal(WeiPerWad.mul(2))
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress2),
-                                    "collateralToken inside Alice's Position #2 address should still be 1 WXDC, because Alice moving position will not move collateral"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress2),
+                                    "collateralToken inside Alice's Position #2 address should still be 1 WNATIVE, because Alice moving position will not move collateral"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken inside Alice's Position #1 address should still be 0 WXDC, because Alice moving position will not move collateral"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken inside Alice's Position #1 address should still be 0 WNATIVE, because Alice moving position will not move collateral"
                                 ).to.be.equal(0)
                                 expect(
                                     fathomStablecoinBalancefinal,
@@ -819,30 +819,30 @@ describe("PositionPermissions", () => {
                         "Alice opens 2 positions on 2 collateral pools (one position for each collateral pool) and Alice move collateral from one position to another position",
                         async () => {
                             it("should revert", async () => {
-                                // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                                // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                                 const alicePositionAddress = await positionManager.positions(1)
                                 const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                                const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                                const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
 
                                 expect(
                                     alicePosition.lockedCollateral,
-                                    "Collateral Pool #1 inside Bob's Position #1 lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                    "Collateral Pool #1 inside Bob's Position #1 lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     alicePosition.debtShare,
                                     "Collateral Pool #1 inside Bob's Position #1 debtShare should be 1 FXD, because Alice drew 1 FXD"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
-                                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                    "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                    "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                                 ).to.be.equal(0)
                                 expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(
                                     WeiPerWad
                                 )
 
-                                // 2. Alice open a second new position with 2 WXDC and draw 1 FXD at new collateral pool
+                                // 2. Alice open a second new position with 2 WNATIVE and draw 1 FXD at new collateral pool
                                 await PositionHelper.openPositionAndDraw(aliceProxyWallet, AliceAddress, pools.GLD, WeiPerWad.mul(2), WeiPerWad);
                                 const alicePositionAddress2 = await positionManager.positions(2)
                                 const fathomStablecoinBalance2 = await fathomStablecoin.balanceOf(AliceAddress)
@@ -850,7 +850,7 @@ describe("PositionPermissions", () => {
 
                                 expect(
                                     alicePosition2.lockedCollateral,
-                                    "Collateral Pool #2 inside Bob's Position #2 lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                                    "Collateral Pool #2 inside Bob's Position #2 lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                                 ).to.be.equal(WeiPerWad.mul(2))
                                 expect(
                                     alicePosition2.debtShare,
@@ -858,14 +858,14 @@ describe("PositionPermissions", () => {
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     await bookKeeper.collateralToken(pools.GLD, alicePositionAddress2),
-                                    "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                    "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                                 ).to.be.equal(0)
                                 expect(
                                     fathomStablecoinBalance2,
                                     "Alice should receive 2 FXD from drawing 1 FXD 2 times form 2 positions"
                                 ).to.be.equal(WeiPerWad.mul(2))
 
-                                // 3. Alice try to unlock 1 WXDC at second position
+                                // 3. Alice try to unlock 1 WNATIVE at second position
                                 await PositionHelper.adjustPosition(
                                     aliceProxyWallet,
                                     AliceAddress,
@@ -877,7 +877,7 @@ describe("PositionPermissions", () => {
                                 const aliceAdjustPosition = await bookKeeper.positions(pools.GLD, alicePositionAddress2)
                                 expect(
                                     aliceAdjustPosition.lockedCollateral,
-                                    "Collateral Pool #2 inside Bob's Position #2 lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC"
+                                    "Collateral Pool #2 inside Bob's Position #2 lockedCollateral should be 1 WNATIVE, because Alice unlocked 1 WNATIVE"
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     aliceAdjustPosition.debtShare,
@@ -885,7 +885,7 @@ describe("PositionPermissions", () => {
                                 ).to.be.equal(WeiPerWad)
                                 expect(
                                     await bookKeeper.collateralToken(pools.GLD, alicePositionAddress2),
-                                    "collateralToken inside Alice's position address should be 1 WXDC, because Alice unlocked 1 WXDC into the position"
+                                    "collateralToken inside Alice's position address should be 1 WNATIVE, because Alice unlocked 1 WNATIVE into the position"
                                 ).to.be.equal(WeiPerWad)
 
                                 // 4. Alice try to move collateral from second position to first position
@@ -911,22 +911,22 @@ describe("PositionPermissions", () => {
         context("position owner allow other user to manage position with proxy wallet", async () => {
             context("lock collateral into their own position", async () => {
                 it("should success", async () => {
-                    // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                    // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                     const alicePositionAddress = await positionManager.positions(1)
                     const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                    const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                     expect(
                         alicePosition.lockedCollateral,
-                        "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                        "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                     ).to.be.equal(WeiPerWad)
                     expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                         WeiPerWad
                     )
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                     // 2. Alice allow Bob to manage position
@@ -934,13 +934,13 @@ describe("PositionPermissions", () => {
                     expect(await positionManager.ownerWhitelist(aliceProxyWallet.address, 1, bobProxyWallet.address)).to.be.equal(
                         true
                     )
-                    // 3. Bob try to adjust Alice's position, add 2 WXDC to position
-                    await PositionHelper.lockXDC(bobProxyWallet, BobAddress, 1, WeiPerWad.mul(2))
+                    // 3. Bob try to adjust Alice's position, add 2 WNATIVE to position
+                    await PositionHelper.lockNATIVE(bobProxyWallet, BobAddress, 1, WeiPerWad.mul(2))
 
-                    const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                     expect(
                         aliceAdjustPosition.lockedCollateral,
-                        "lockedCollateral should be 3 WXDC, because Bob add locked 2 WXDC"
+                        "lockedCollateral should be 3 WNATIVE, because Bob add locked 2 WNATIVE"
                     ).to.be.equal(WeiPerWad.mul(3))
                 })
             })
@@ -948,42 +948,42 @@ describe("PositionPermissions", () => {
                 context("same collateral pool", async () => {
                     context("and Bob move collateral of Alice to himself", async () => {
                         it("should success", async () => {
-                            // 1. Alice open a new position with 2 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                            // 1. Alice open a new position with 2 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
 
                             const alicePositionAddress = await positionManager.positions(1)
                             const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                            const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 alicePosition.lockedCollateral,
-                                "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                                "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                             ).to.be.equal(WeiPerWad.mul(2))
                             expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 2. Bob open a position with 1 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                            // 2. Bob open a position with 1 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(bobProxyWallet, BobAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                             const bobPositionAddress = await positionManager.positions(2)
                             const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
-                            const bobPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress)
+                            const bobPosition = await bookKeeper.positions(pools.NATIVE, bobPositionAddress)
                             expect(
                                 bobPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 3. Alice try to unlock 1 WXDC at her position
+                            // 3. Alice try to unlock 1 WNATIVE at her position
                             await PositionHelper.adjustPosition(
                                 aliceProxyWallet,
                                 AliceAddress,
@@ -991,18 +991,18 @@ describe("PositionPermissions", () => {
                                 WeiPerWad.mul(-1),
                                 0
                             );
-                            const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 aliceAdjustPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Alice unlocked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 aliceAdjustPosition.debtShare,
                                 "debtShare should be 1 FXD, because Alice doesn't draw more"
                             ).to.be.equal(WeiPerWad)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 1 WXDC, because Alice unlocked 1 WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 1 WNATIVE, because Alice unlocked 1 WNATIVE into the position"
                             ).to.be.equal(WeiPerWad)
                             // 4. Alice allow Bob to manage position
                             await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, true)
@@ -1020,12 +1020,12 @@ describe("PositionPermissions", () => {
                             const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                             const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Bob move 1 WXDC of Alice's position to his position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Bob move 1 WNATIVE of Alice's position to his position"
                             ).to.be.equal(0)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob move 1 WXDC of Alice's position to his position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob move 1 WNATIVE of Alice's position to his position"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 aliceFathomStablecoinBalancefinal,
@@ -1040,42 +1040,42 @@ describe("PositionPermissions", () => {
                 context("between collateral pool", async () => {
                     context("and Bob move collateral of Alice to himself", async () => {
                         it("should success", async () => {
-                            // 1. Alice open a new position with 2 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                            // 1. Alice open a new position with 2 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
 
                             const alicePositionAddress = await positionManager.positions(1)
                             const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                            const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 alicePosition.lockedCollateral,
-                                "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                                "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                             ).to.be.equal(WeiPerWad.mul(2))
                             expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 2. Bob open a position at collateral pool 2 with 1 WXDC and draw 1 FXD
+                            // 2. Bob open a position at collateral pool 2 with 1 WNATIVE and draw 1 FXD
                             await PositionHelper.openPositionAndDraw(bobProxyWallet, BobAddress, pools.GLD, WeiPerWad, WeiPerWad);
                             const bobPositionAddress = await positionManager.positions(2)
                             const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
                             const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress)
                             expect(
                                 bobPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
                                 await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 3. Alice try to unlock 1 WXDC at her position
+                            // 3. Alice try to unlock 1 WNATIVE at her position
                             await PositionHelper.adjustPosition(
                                 aliceProxyWallet,
                                 AliceAddress,
@@ -1084,18 +1084,18 @@ describe("PositionPermissions", () => {
                                 0,
                                 collateralTokenAdapter.address
                             );
-                            const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 aliceAdjustPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Alice unlocked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 aliceAdjustPosition.debtShare,
                                 "debtShare should be 1 FXD, because Alice didn't draw more"
                             ).to.be.equal(WeiPerWad)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 1 WXDC, because Alice unlocked 1 WXDC at her position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 1 WNATIVE, because Alice unlocked 1 WNATIVE at her position"
                             ).to.be.equal(WeiPerWad)
                             // 4. Alice allow Bob to manage position
                             await PositionHelper.allowManagePosition(aliceProxyWallet, AliceAddress, 1, bobProxyWallet.address, true)
@@ -1115,16 +1115,16 @@ describe("PositionPermissions", () => {
                             const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                             const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Bob move 1 WXDC of Alice's position to himself"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Bob move 1 WNATIVE of Alice's position to himself"
                             ).to.be.equal(0)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 1 WXDC, because Bob move 1 WXDC of Alice's position to himself"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's position address should be 1 WNATIVE, because Bob move 1 WNATIVE of Alice's position to himself"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob move 1 WXDC of Alice's position to himself"
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob move 1 WNATIVE of Alice's position to himself"
                             ).to.be.equal(0)
                             expect(
                                 aliceFathomStablecoinBalancefinal,
@@ -1139,22 +1139,22 @@ describe("PositionPermissions", () => {
             })
             context("mint FXD", async () => {
                 it("should success", async () => {
-                    // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                    // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
 
                     const alicePositionAddress = await positionManager.positions(1)
                     const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                    const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                     expect(
                         alicePosition.lockedCollateral,
-                        "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                        "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                     ).to.be.equal(WeiPerWad.mul(2))
                     expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                         WeiPerWad
                     )
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                     // 2. Alice allow Bob to manage position
@@ -1166,23 +1166,23 @@ describe("PositionPermissions", () => {
                     await PositionHelper.draw(
                         bobProxyWallet,
                         BobAddress,
-                        pools.XDC,
+                        pools.NATIVE,
                         await positionManager.ownerLastPositionId(aliceProxyWallet.address),
                         WeiPerWad
                     )
                     const fathomStablecoinBalance2 = await fathomStablecoin.balanceOf(AliceAddress)
                     const BobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
-                    const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                     expect(
                         aliceAdjustPosition.lockedCollateral,
-                        "lockedCollateral should be 2 WXDC, because Alice didn't add WXDC"
+                        "lockedCollateral should be 2 WNATIVE, because Alice didn't add WNATIVE"
                     ).to.be.equal(WeiPerWad.mul(2))
                     expect(aliceAdjustPosition.debtShare, "debtShare should be 2 FXD, because Alice drew more").to.be.equal(
                         WeiPerWad.mul(2)
                     )
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance2, "Alice should receive 1 FXD from Alice drew 1 time").to.be.equal(WeiPerWad)
                     expect(BobFathomStablecoinBalance, "Bob should receive 1 FXD from mint FXD at Alice position").to.be.equal(
@@ -1193,41 +1193,41 @@ describe("PositionPermissions", () => {
             context("move position", async () => {
                 context("same collateral pool", async () => {
                     it("should success", async () => {
-                        // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                         const alicePositionAddress = await positionManager.positions(1)
                         const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                        const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                        const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                         expect(
                             alicePosition.lockedCollateral,
-                            "Collateral Pool #1 inside Alice's Position #1 lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                            "Collateral Pool #1 inside Alice's Position #1 lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(
                             alicePosition.debtShare,
                             "Collateral Pool #1 inside Alice's Position #1 debtShare should be 1 FXD, because Alice drew 1 FXD"
                         ).to.be.equal(WeiPerWad)
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                            "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                            "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                        // 2. Bob open a position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 2. Bob open a position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(bobProxyWallet, BobAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                         const bobPositionAddress = await positionManager.positions(2)
                         const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
-                        const bobPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress)
+                        const bobPosition = await bookKeeper.positions(pools.NATIVE, bobPositionAddress)
                         expect(
                             bobPosition.lockedCollateral,
-                            "Collateral Pool #1 inside Bob's Position #1 lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                            "Collateral Pool #1 inside Bob's Position #1 lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(
                             bobPosition.debtShare,
                             "Collateral Pool #1 inside Bob's Position #1 debtShare should be 1 FXD, because Bob drew 1 FXD"
                         ).to.be.equal(WeiPerWad)
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                            "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                            "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                         // 3. Alice allow Bob to manage position
@@ -1239,22 +1239,22 @@ describe("PositionPermissions", () => {
                         await PositionHelper.movePosition(bobProxyWallet, BobAddress, 2, 1)
                         const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                         const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
-                        const alicePositionAfterMovePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                        const alicePositionAfterMovePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                         expect(
                             alicePositionAfterMovePosition.lockedCollateral,
-                            "Collateral Pool #1 inside Alice's Position #1 lockedCollateral should be 2 WXDC, because Bob move locked 1 WXDC to Alice"
+                            "Collateral Pool #1 inside Alice's Position #1 lockedCollateral should be 2 WNATIVE, because Bob move locked 1 WNATIVE to Alice"
                         ).to.be.equal(WeiPerWad.mul(2))
                         expect(
                             alicePositionAfterMovePosition.debtShare,
                             "Collateral Pool #1 inside Alice's Position #1 debtShare should be 1 FXD, because Bob move DebtShare to Alice"
                         ).to.be.equal(WeiPerWad.mul(2))
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                            "collateralToken inside Alice's position address should be 0 WXDC, because Alice all lock collateral"
+                            await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                            "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice all lock collateral"
                         ).to.be.equal(0)
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                            "collateralToken inside Bob's position address should be 0 WXDC, because Bob all lock collateral"
+                            await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                            "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob all lock collateral"
                         ).to.be.equal(0)
                         expect(
                             aliceFathomStablecoinBalancefinal,
@@ -1267,33 +1267,33 @@ describe("PositionPermissions", () => {
                 })
                 context("between 2 collateral pool", async () => {
                     it("should revert", async () => {
-                        // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                         const alicePositionAddress = await positionManager.positions(1)
                         const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                        const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                        const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                         expect(
                             alicePosition.lockedCollateral,
-                            "Collateral Pool #1 inside Alice's Position #1 lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                            "Collateral Pool #1 inside Alice's Position #1 lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(
                             alicePosition.debtShare,
                             "Collateral Pool #1 inside Bob's Position #1 debtShare should be 1 FXD, because Alice drew 1 FXD"
                         ).to.be.equal(WeiPerWad)
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                            "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                            "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                        // 2. Bob open a position with 1 WXDC and draw 1 FXD at collateral pool id 2
+                        // 2. Bob open a position with 1 WNATIVE and draw 1 FXD at collateral pool id 2
                         await PositionHelper.openPositionAndDraw(bobProxyWallet, BobAddress, pools.GLD, WeiPerWad, WeiPerWad);
                         const bobPositionAddress = await positionManager.positions(2)
                         const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
                         const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress)
                         expect(
                             bobPosition.lockedCollateral,
-                            "Collateral Pool #1 inside Bob's Position #1 lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                            "Collateral Pool #1 inside Bob's Position #1 lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(
                             bobPosition.debtShare,
@@ -1301,7 +1301,7 @@ describe("PositionPermissions", () => {
                         ).to.be.equal(WeiPerWad)
                         expect(
                             await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                            "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                            "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                         // 3. Alice allow Bob to manage position
@@ -1330,31 +1330,31 @@ describe("PositionPermissions", () => {
         context("position owner not allow other user to manage position with proxy wallet", async () => {
             context("lock collateral into their own position", async () => {
                 it("should revert", async () => {
-                    // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                    // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                     const alicePositionAddress = await positionManager.positions(1)
                     const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                    const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                     expect(
                         alicePosition.lockedCollateral,
-                        "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                        "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                     ).to.be.equal(WeiPerWad)
                     expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                         WeiPerWad
                     )
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
 
-                    // 2. Bob try to adjust Alice's position, add 2 WXDC to position
+                    // 2. Bob try to adjust Alice's position, add 2 WNATIVE to position
                     const lockAbi = [
-                        "function lockXDC(address _manager, address _xdcAdapter, uint256 _positionId, bytes calldata _data)"
+                        "function lockNATIVE(address _manager, address _nativeAdapter, uint256 _positionId, bytes calldata _data)"
                     ];
                     let lockIFace = new ethers.utils.Interface(lockAbi);
-                    const lockTokenCall = lockIFace.encodeFunctionData("lockXDC", [
+                    const lockTokenCall = lockIFace.encodeFunctionData("lockNATIVE", [
                         positionManager.address,
                         collateralTokenAdapter.address,
                         await positionManager.ownerLastPositionId(aliceProxyWallet.address),
@@ -1370,42 +1370,42 @@ describe("PositionPermissions", () => {
                 context("same collateral pool", async () => {
                     context("and Bob move collateral to Alice", async () => {
                         it("should success", async () => {
-                            // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                            // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                             const alicePositionAddress = await positionManager.positions(1)
                             const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                            const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 alicePosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 2. Bob open a position with 2 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                            // 2. Bob open a position with 2 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(bobProxyWallet, BobAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
                             const bobPositionAddress = await positionManager.positions(2)
                             const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
-                            const bobPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress)
+                            const bobPosition = await bookKeeper.positions(pools.NATIVE, bobPositionAddress)
                             expect(
                                 bobPosition.lockedCollateral,
-                                "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC"
+                                "lockedCollateral should be 2 WNATIVE, because Bob locked 2 WNATIVE"
                             ).to.be.equal(WeiPerWad.mul(2))
                             expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 3. Bob try to unlock 1 WXDC at second position
+                            // 3. Bob try to unlock 1 WNATIVE at second position
                             await PositionHelper.adjustPosition(
                                 bobProxyWallet,
                                 BobAddress,
@@ -1413,18 +1413,18 @@ describe("PositionPermissions", () => {
                                 WeiPerWad.mul(-1),
                                 0
                             );
-                            const bobAdjustPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress)
+                            const bobAdjustPosition = await bookKeeper.positions(pools.NATIVE, bobPositionAddress)
                             expect(
                                 bobAdjustPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Bob unlocked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Bob unlocked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 bobAdjustPosition.debtShare,
                                 "debtShare should be 1 FXD, because Bob doesn't draw more"
                             ).to.be.equal(WeiPerWad)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 1 WXDC, because Bob unlocked 1 WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's position address should be 1 WNATIVE, because Bob unlocked 1 WNATIVE into the position"
                             ).to.be.equal(WeiPerWad)
                             // 4. Bob try to move collateral to Alice position
                             await PositionHelper.moveCollateral(
@@ -1437,12 +1437,12 @@ describe("PositionPermissions", () => {
                             const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                             const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 1 WXDC, because Bob move 1 WXDC to Alice's position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 1 WNATIVE, because Bob move 1 WNATIVE to Alice's position"
                             ).to.be.equal(WeiPerWad)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob move 1 WXDC to Alice's position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob move 1 WNATIVE to Alice's position"
                             ).to.be.equal(0)
                             expect(
                                 aliceFathomStablecoinBalancefinal,
@@ -1457,42 +1457,42 @@ describe("PositionPermissions", () => {
                 context("between collateral pool", async () => {
                     context("and Bob move collateral to Alice", async () => {
                         it("should success", async () => {
-                            // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                            // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
 
                             const alicePositionAddress = await positionManager.positions(1)
                             const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                            const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 alicePosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 2. Bob open a position at collateral pool 2 with 2 WXDC and draw 1 FXD
+                            // 2. Bob open a position at collateral pool 2 with 2 WNATIVE and draw 1 FXD
                             await PositionHelper.openPositionAndDraw(bobProxyWallet, BobAddress, pools.GLD, WeiPerWad.mul(2), WeiPerWad);
                             const bobPositionAddress = await positionManager.positions(2)
                             const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
                             const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress)
                             expect(
                                 bobPosition.lockedCollateral,
-                                "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC"
+                                "lockedCollateral should be 2 WNATIVE, because Bob locked 2 WNATIVE"
                             ).to.be.equal(WeiPerWad.mul(2))
                             expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
                                 await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 3. Bob try to unlock 1 WXDC at second position
+                            // 3. Bob try to unlock 1 WNATIVE at second position
                             await PositionHelper.adjustPosition(
                                 bobProxyWallet,
                                 BobAddress,
@@ -1504,7 +1504,7 @@ describe("PositionPermissions", () => {
                             const bobAdjustPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress)
                             expect(
                                 bobAdjustPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Bob unlocked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Bob unlocked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 bobAdjustPosition.debtShare,
@@ -1512,7 +1512,7 @@ describe("PositionPermissions", () => {
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 1 WXDC, because Bob unlocked 1 WXDC into the position"
+                                "collateralToken inside Bob's position address should be 1 WNATIVE, because Bob unlocked 1 WNATIVE into the position"
                             ).to.be.equal(WeiPerWad)
                             // 4. Bob try to move collateral to Alice position
                             await PositionHelper.moveCollateral(
@@ -1526,17 +1526,17 @@ describe("PositionPermissions", () => {
                             const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                             const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Bob move 1 WXDC to Alice's position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Bob move 1 WNATIVE to Alice's position"
                             ).to.be.equal(0)
                             expect(
                                 await bookKeeper.collateralToken(pools.GLD, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 1 WXDC, because Bob move 1 WXDC to Alice's position"
+                                "collateralToken inside Alice's position address should be 1 WNATIVE, because Bob move 1 WNATIVE to Alice's position"
                             ).to.be.equal(WeiPerWad)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob move 1 WXDC to Alice's position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob move 1 WNATIVE to Alice's position"
                             ).to.be.equal(0)
                             expect(
                                 aliceFathomStablecoinBalancefinal,
@@ -1551,22 +1551,22 @@ describe("PositionPermissions", () => {
             })
             context("mint FXD", async () => {
                 it("should revert", async () => {
-                    // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                    // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
 
                     const alicePositionAddress = await positionManager.positions(1)
                     const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                    const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                     expect(
                         alicePosition.lockedCollateral,
-                        "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                        "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                     ).to.be.equal(WeiPerWad.mul(2))
                     expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                         WeiPerWad
                     )
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                     // 2. Bob try to mint FXD at Alice position
@@ -1590,36 +1590,36 @@ describe("PositionPermissions", () => {
             context("move position", async () => {
                 context("same collateral pool", async () => {
                     it("should revert", async () => {
-                        // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                         const alicePositionAddress = await positionManager.positions(1)
                         const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                        const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                        const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                         expect(
                             alicePosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                             WeiPerWad
                         )
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                            "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                            "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                        // 2. Bob open a position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 2. Bob open a position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(bobProxyWallet, BobAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                         const bobPositionAddress = await positionManager.positions(2)
                         const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
-                        const bobPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress)
+                        const bobPosition = await bookKeeper.positions(pools.NATIVE, bobPositionAddress)
                         expect(
                             bobPosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(WeiPerWad)
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                            "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                            "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                         // 3. Bob try to move collateral to alice position
@@ -1639,37 +1639,37 @@ describe("PositionPermissions", () => {
                 })
                 context("between 2 collateral pool", async () => {
                     it("should revert", async () => {
-                        // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                         const alicePositionAddress = await positionManager.positions(1)
                         const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                        const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                        const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                         expect(
                             alicePosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                             WeiPerWad
                         )
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                            "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                            "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
 
-                        // 2. Bob open a position with 1 WXDC and draw 1 FXD at collateral pool id 2
+                        // 2. Bob open a position with 1 WNATIVE and draw 1 FXD at collateral pool id 2
                         await PositionHelper.openPositionAndDraw(bobProxyWallet, BobAddress, pools.GLD, WeiPerWad, WeiPerWad);
                         const bobPositionAddress = await positionManager.positions(2)
                         const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
                         const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress)
                         expect(
                             bobPosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(WeiPerWad)
                         expect(
                             await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                            "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                            "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
 
@@ -1696,41 +1696,41 @@ describe("PositionPermissions", () => {
                 context("same collateral pool", async () => {
                     context("and Bob move collateral of Alice to himself", async () => {
                         it("should success", async () => {
-                            // 1. Alice open a new position with 2 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                            // 1. Alice open a new position with 2 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
                             const alicePositionAddress = await positionManager.positions(1)
                             const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                            const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 alicePosition.lockedCollateral,
-                                "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                                "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                             ).to.be.equal(WeiPerWad.mul(2))
                             expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 2. Bob open a position with 1 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                            // 2. Bob open a position with 1 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(bobProxyWallet, BobAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                             const bobPositionAddress = await positionManager.positions(2)
                             const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
-                            const bobPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress)
+                            const bobPosition = await bookKeeper.positions(pools.NATIVE, bobPositionAddress)
                             expect(
                                 bobPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 3. Alice try to unlock 1 WXDC at her position
+                            // 3. Alice try to unlock 1 WNATIVE at her position
                             await PositionHelper.adjustPosition(
                                 aliceProxyWallet,
                                 AliceAddress,
@@ -1738,18 +1738,18 @@ describe("PositionPermissions", () => {
                                 WeiPerWad.mul(-1),
                                 0
                             );
-                            const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 aliceAdjustPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Alice unlocked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 aliceAdjustPosition.debtShare,
                                 "debtShare should be 1 FXD, because Alice didn't draw more"
                             ).to.be.equal(WeiPerWad)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 1 WXDC, because Alice unlocked 1 WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 1 WNATIVE, because Alice unlocked 1 WNATIVE into the position"
                             ).to.be.equal(WeiPerWad)
 
                             // 4. Alice allow Bob to manage position
@@ -1769,12 +1769,12 @@ describe("PositionPermissions", () => {
                             const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                             const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Bob move 1 WXDC to his position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Bob move 1 WNATIVE to his position"
                             ).to.be.equal(0)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Alice's position address should be 1 WXDC, because Bob move 1 WXDC to his position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Alice's position address should be 1 WNATIVE, because Bob move 1 WNATIVE to his position"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 aliceFathomStablecoinBalancefinal,
@@ -1789,41 +1789,41 @@ describe("PositionPermissions", () => {
                 context("between collateral pool", async () => {
                     context("and Bob move collateral of Alice to himself", async () => {
                         it("should success", async () => {
-                            // 1. Alice open a new position with 2 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                            // 1. Alice open a new position with 2 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
                             const alicePositionAddress = await positionManager.positions(1)
                             const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                            const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 alicePosition.lockedCollateral,
-                                "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                                "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                             ).to.be.equal(WeiPerWad.mul(2))
                             expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 2. Bob open a position at collateral pool 2 with 2 WXDC and draw 1 FXD
+                            // 2. Bob open a position at collateral pool 2 with 2 WNATIVE and draw 1 FXD
                             await PositionHelper.openPositionAndDraw(bobProxyWallet, BobAddress, pools.GLD, WeiPerWad.mul(2), WeiPerWad);
                             const bobPositionAddress = await positionManager.positions(2)
                             const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
                             const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress)
                             expect(
                                 bobPosition.lockedCollateral,
-                                "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC"
+                                "lockedCollateral should be 2 WNATIVE, because Bob locked 2 WNATIVE"
                             ).to.be.equal(WeiPerWad.mul(2))
                             expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
                                 await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 3. Alice try to unlock 1 WXDC at her position
+                            // 3. Alice try to unlock 1 WNATIVE at her position
                             await PositionHelper.adjustPosition(
                                 aliceProxyWallet,
                                 AliceAddress,
@@ -1832,18 +1832,18 @@ describe("PositionPermissions", () => {
                                 0,
                                 collateralTokenAdapter.address
                             );
-                            const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 aliceAdjustPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Alice unlocked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 aliceAdjustPosition.debtShare,
                                 "debtShare should be 1 FXD, because Alice didn't draw more"
                             ).to.be.equal(WeiPerWad)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 1 WXDC, because Alice unlocked 1 WXDC"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 1 WNATIVE, because Alice unlocked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
 
                             // 4. Alice allow Bob to manage her position
@@ -1862,16 +1862,16 @@ describe("PositionPermissions", () => {
                             const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                             const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Bob move 1 WXDC to his position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Bob move 1 WNATIVE to his position"
                             ).to.be.equal(0)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 1 WXDC at collater pool 1, because Bob move 1 WXDC to his position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's position address should be 1 WNATIVE at collater pool 1, because Bob move 1 WNATIVE to his position"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC at collater pool 2, because Bob move 1 WXDC to his position at collateral pool 1"
+                                "collateralToken inside Bob's position address should be 0 WNATIVE at collater pool 2, because Bob move 1 WNATIVE to his position at collateral pool 1"
                             ).to.be.equal(0)
                             expect(
                                 aliceFathomStablecoinBalancefinal,
@@ -1886,21 +1886,21 @@ describe("PositionPermissions", () => {
             })
             context("mint FXD", async () => {
                 it("should success", async () => {
-                    // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                    // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
                     const alicePositionAddress = await positionManager.positions(1)
                     const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                    const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                     expect(
                         alicePosition.lockedCollateral,
-                        "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                        "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                     ).to.be.equal(WeiPerWad.mul(2))
                     expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                         WeiPerWad
                     )
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                     // 2. Alice allow Bob to manage position
@@ -1936,17 +1936,17 @@ describe("PositionPermissions", () => {
                     )
                     const fathomStablecoinBalance2 = await fathomStablecoin.balanceOf(AliceAddress)
                     const BobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
-                    const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                     expect(
                         aliceAdjustPosition.lockedCollateral,
-                        "lockedCollateral should be 2 WXDC, because Alice doesn't add WXDC"
+                        "lockedCollateral should be 2 WNATIVE, because Alice doesn't add WNATIVE"
                     ).to.be.equal(WeiPerWad.mul(2))
                     expect(aliceAdjustPosition.debtShare, "debtShare should be 2 FXD, because Alice drew more").to.be.equal(
                         WeiPerWad.mul(2)
                     )
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance2, "Alice should receive 1 FXD, because Alice drew 1 time").to.be.equal(
                         WeiPerWad
@@ -1957,36 +1957,36 @@ describe("PositionPermissions", () => {
             context("move position", async () => {
                 context("same collateral pool", async () => {
                     it("should success", async () => {
-                        // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                         const alicePositionAddress = await positionManager.positions(1)
                         const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                        const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                        const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                         expect(
                             alicePosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                             WeiPerWad
                         )
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                            "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                            "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                        // 2. Bob open a position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 2. Bob open a position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(bobProxyWallet, BobAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                         const bobPositionAddress = await positionManager.positions(2)
                         const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
-                        const bobPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress)
+                        const bobPosition = await bookKeeper.positions(pools.NATIVE, bobPositionAddress)
                         expect(
                             bobPosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(WeiPerWad)
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                            "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                            "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
                         // 3. Alice allow Bob to manage position
@@ -2001,22 +2001,22 @@ describe("PositionPermissions", () => {
                         await positionManager.movePosition(2, 1, { from: BobAddress })
                         const aliceFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(AliceAddress)
                         const bobFathomStablecoinBalancefinal = await fathomStablecoin.balanceOf(BobAddress)
-                        const alicePositionAfterMovePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                        const alicePositionAfterMovePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                         expect(
                             alicePositionAfterMovePosition.lockedCollateral,
-                            "lockedCollateral should be 2 WXDC, because Bob move locked 1 WXDC to Alice"
+                            "lockedCollateral should be 2 WNATIVE, because Bob move locked 1 WNATIVE to Alice"
                         ).to.be.equal(WeiPerWad.mul(2))
                         expect(
                             alicePositionAfterMovePosition.debtShare,
                             "debtShare should be 1 FXD, because Bob move DebtShare to Alice"
                         ).to.be.equal(WeiPerWad.mul(2))
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                            "collateralToken inside Alice's position address should be 0 WXDC, because Alice all lock collateral"
+                            await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                            "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice all lock collateral"
                         ).to.be.equal(0)
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                            "collateralToken inside Bob's position address should be 0 WXDC, because Bob all lock collateral"
+                            await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                            "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob all lock collateral"
                         ).to.be.equal(0)
                         expect(
                             aliceFathomStablecoinBalancefinal,
@@ -2029,36 +2029,36 @@ describe("PositionPermissions", () => {
                 })
                 context("between 2 collateral pool", async () => {
                     it("should revert", async () => {
-                        // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                         const alicePositionAddress = await positionManager.positions(1)
                         const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                        const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                        const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                         expect(
                             alicePosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                             WeiPerWad
                         )
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                            "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                            "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                        // 2. Bob open a position with 1 WXDC and draw 1 FXD at collateral pool id 2
+                        // 2. Bob open a position with 1 WNATIVE and draw 1 FXD at collateral pool id 2
                         await PositionHelper.openPositionAndDraw(bobProxyWallet, BobAddress, pools.GLD, WeiPerWad, WeiPerWad);
                         const bobPositionAddress = await positionManager.positions(2)
                         const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
                         const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress)
                         expect(
                             bobPosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(WeiPerWad)
                         expect(
                             await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                            "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                            "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
 
@@ -2082,41 +2082,41 @@ describe("PositionPermissions", () => {
                 context("same collateral pool", async () => {
                     context("and Bob move collateral of Alice to himself", async () => {
                         it("should revert", async () => {
-                            // 1. Alice open a new position with 2 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                            // 1. Alice open a new position with 2 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
                             const alicePositionAddress = await positionManager.positions(1)
                             const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                            const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 alicePosition.lockedCollateral,
-                                "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                                "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                             ).to.be.equal(WeiPerWad.mul(2))
                             expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 2. Bob open a position with 1 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                            // 2. Bob open a position with 1 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(bobProxyWallet, BobAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                             const bobPositionAddress = await positionManager.positions(2)
                             const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
-                            const bobPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress)
+                            const bobPosition = await bookKeeper.positions(pools.NATIVE, bobPositionAddress)
                             expect(
                                 bobPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 3. Alice try to unlock 1 WXDC at her position
+                            // 3. Alice try to unlock 1 WNATIVE at her position
                             await PositionHelper.adjustPosition(
                                 aliceProxyWallet,
                                 AliceAddress,
@@ -2124,18 +2124,18 @@ describe("PositionPermissions", () => {
                                 WeiPerWad.mul(-1),
                                 0
                             );
-                            const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 aliceAdjustPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Alice unlocked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 aliceAdjustPosition.debtShare,
                                 "debtShare should be 1 FXD, because Alice didn't draw more"
                             ).to.be.equal(WeiPerWad)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 1 WXDC, because Alice unlocked 1 WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 1 WNATIVE, because Alice unlocked 1 WNATIVE into the position"
                             ).to.be.equal(WeiPerWad)
 
                             // 4. Bob try to move collateral of Alice position to Bob position
@@ -2154,41 +2154,41 @@ describe("PositionPermissions", () => {
                 context("between collateral pool", async () => {
                     context("and Bob move collateral of Alice to himself", async () => {
                         it("should revert", async () => {
-                            // 1. Alice open a new position with 2 WXDC and draw 1 FXD
-                            await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                            // 1. Alice open a new position with 2 WNATIVE and draw 1 FXD
+                            await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
                             const alicePositionAddress = await positionManager.positions(1)
                             const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                            const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 alicePosition.lockedCollateral,
-                                "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                                "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                             ).to.be.equal(WeiPerWad.mul(2))
                             expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 2. Bob open a position at collateral pool 2 with 2 WXDC and draw 1 FXD
+                            // 2. Bob open a position at collateral pool 2 with 2 WNATIVE and draw 1 FXD
                             await PositionHelper.openPositionAndDraw(bobProxyWallet, BobAddress, pools.GLD, WeiPerWad.mul(2), WeiPerWad);
                             const bobPositionAddress = await positionManager.positions(2)
                             const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
                             const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress)
                             expect(
                                 bobPosition.lockedCollateral,
-                                "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC"
+                                "lockedCollateral should be 2 WNATIVE, because Bob locked 2 WNATIVE"
                             ).to.be.equal(WeiPerWad.mul(2))
                             expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(
                                 WeiPerWad
                             )
                             expect(
                                 await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                                "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                                "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                             ).to.be.equal(0)
                             expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                            // 3. Alice try to unlock 1 WXDC at her position
+                            // 3. Alice try to unlock 1 WNATIVE at her position
                             await PositionHelper.adjustPosition(
                                 aliceProxyWallet,
                                 AliceAddress,
@@ -2197,18 +2197,18 @@ describe("PositionPermissions", () => {
                                 0,
                                 collateralTokenAdapter.address
                             );
-                            const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                            const aliceAdjustPosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                             expect(
                                 aliceAdjustPosition.lockedCollateral,
-                                "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC"
+                                "lockedCollateral should be 1 WNATIVE, because Alice unlocked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
                             expect(
                                 aliceAdjustPosition.debtShare,
                                 "debtShare should be 1 FXD, because Alice didn't draw more"
                             ).to.be.equal(WeiPerWad)
                             expect(
-                                await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                                "collateralToken inside Alice's position address should be 1 WXDC, because Alice unlocked 1 WXDC"
+                                await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                                "collateralToken inside Alice's position address should be 1 WNATIVE, because Alice unlocked 1 WNATIVE"
                             ).to.be.equal(WeiPerWad)
 
                             // 4. Bob try to move collateral of Alice position to his position
@@ -2229,21 +2229,21 @@ describe("PositionPermissions", () => {
 
             context("mint FXD", async () => {
                 it("should revert", async () => {
-                    // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2), WeiPerWad);
+                    // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2), WeiPerWad);
                     const alicePositionAddress = await positionManager.positions(1)
                     const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                    const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                    const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                     expect(
                         alicePosition.lockedCollateral,
-                        "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC"
+                        "lockedCollateral should be 2 WNATIVE, because Alice locked 2 WNATIVE"
                     ).to.be.equal(WeiPerWad.mul(2))
                     expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                         WeiPerWad
                     )
                     expect(
-                        await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                        "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                        await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                        "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                     ).to.be.equal(0)
                     expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
 
@@ -2263,36 +2263,36 @@ describe("PositionPermissions", () => {
             context("move position", async () => {
                 context("same collateral pool", async () => {
                     it("should revert", async () => {
-                        // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                         const alicePositionAddress = await positionManager.positions(1)
                         const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                        const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                        const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                         expect(
                             alicePosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                             WeiPerWad
                         )
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                            "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                            "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                        // 2. Bob open a position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(bobProxyWallet, BobAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 2. Bob open a position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(bobProxyWallet, BobAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                         const bobPositionAddress = await positionManager.positions(2)
                         const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
-                        const bobPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress)
+                        const bobPosition = await bookKeeper.positions(pools.NATIVE, bobPositionAddress)
                         expect(
                             bobPosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(WeiPerWad)
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
-                            "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, bobPositionAddress),
+                            "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
 
@@ -2302,36 +2302,36 @@ describe("PositionPermissions", () => {
                 })
                 context("between 2 collateral pool", async () => {
                     it("should revert", async () => {
-                        // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                        await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                        // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                        await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                         const alicePositionAddress = await positionManager.positions(1)
                         const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                        const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                        const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                         expect(
                             alicePosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(
                             WeiPerWad
                         )
                         expect(
-                            await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                            "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                            await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                            "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
-                        // 2. Bob open a position with 1 WXDC and draw 1 FXD at collateral pool id 2
+                        // 2. Bob open a position with 1 WNATIVE and draw 1 FXD at collateral pool id 2
                         await PositionHelper.openPositionAndDraw(bobProxyWallet, BobAddress, pools.GLD, WeiPerWad, WeiPerWad);
                         const bobPositionAddress = await positionManager.positions(2)
                         const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress)
                         const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress)
                         expect(
                             bobPosition.lockedCollateral,
-                            "lockedCollateral should be 1 WXDC, because Bob locked 1 WXDC"
+                            "lockedCollateral should be 1 WNATIVE, because Bob locked 1 WNATIVE"
                         ).to.be.equal(WeiPerWad)
                         expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(WeiPerWad)
                         expect(
                             await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
-                            "collateralToken inside Bob's position address should be 0 WXDC, because Bob locked all WXDC into the position"
+                            "collateralToken inside Bob's position address should be 0 WNATIVE, because Bob locked all WNATIVE into the position"
                         ).to.be.equal(0)
                         expect(bobFathomStablecoinBalance, "Bob should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
 
@@ -2344,19 +2344,19 @@ describe("PositionPermissions", () => {
 
         context("position owner can export and can import", async () => {
             it("should success", async () => {
-                // 1. Alice open a new position with 1 WXDC and draw 1 FXD
-                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad, WeiPerWad);
+                // 1. Alice open a new position with 1 WNATIVE and draw 1 FXD
+                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad, WeiPerWad);
                 const alicePositionAddress = await positionManager.positions(1)
                 const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
-                const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress)
+                const alicePosition = await bookKeeper.positions(pools.NATIVE, alicePositionAddress)
                 expect(
                     alicePosition.lockedCollateral,
-                    "lockedCollateral should be 1 WXDC, because Alice locked 1 WXDC"
+                    "lockedCollateral should be 1 WNATIVE, because Alice locked 1 WNATIVE"
                 ).to.be.equal(WeiPerWad)
                 expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad)
                 expect(
-                    await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
-                    "collateralToken inside Alice's position address should be 0 WXDC, because Alice locked all WXDC into the position"
+                    await bookKeeper.collateralToken(pools.NATIVE, alicePositionAddress),
+                    "collateralToken inside Alice's position address should be 0 WNATIVE, because Alice locked all WNATIVE into the position"
                 ).to.be.equal(0)
                 expect(fathomStablecoinBalance, "Alice should receive 1 FXD from drawing 1 FXD").to.be.equal(WeiPerWad)
 
@@ -2373,21 +2373,21 @@ describe("PositionPermissions", () => {
 
                 // 5. Alice export position
                 await PositionHelper.exportPosition(aliceProxyWallet, AliceAddress, 1, AliceAddress)
-                const alicePositionAfterExport = await bookKeeper.positions(pools.XDC, AliceAddress)
+                const alicePositionAfterExport = await bookKeeper.positions(pools.NATIVE, AliceAddress)
                 expect(
                     alicePositionAfterExport.lockedCollateral,
-                    "lockedCollateral should be 1 WXDC, because Alice export"
+                    "lockedCollateral should be 1 WNATIVE, because Alice export"
                 ).to.be.equal(WeiPerWad)
                 expect(alicePositionAfterExport.debtShare, "debtShare should be 1 FXD, because Alice export").to.be.equal(
                     WeiPerWad
                 )
                 const alicePositionWalletPositionAfterExport = await bookKeeper.positions(
-                    pools.XDC,
+                    pools.NATIVE,
                     alicePositionAddress
                 )
                 expect(
                     alicePositionWalletPositionAfterExport.lockedCollateral,
-                    "lockedCollateral should be 0 WXDC, because Alice export"
+                    "lockedCollateral should be 0 WNATIVE, because Alice export"
                 ).to.be.equal(0)
                 expect(
                     alicePositionWalletPositionAfterExport.debtShare,
@@ -2396,19 +2396,19 @@ describe("PositionPermissions", () => {
 
                 //6. alice import position back
                 await PositionHelper.importPosition(aliceProxyWallet, AliceAddress, AliceAddress, 1);
-                const alicePositionAfterImport = await bookKeeper.positions(pools.XDC, AliceAddress)
+                const alicePositionAfterImport = await bookKeeper.positions(pools.NATIVE, AliceAddress)
                 expect(
                     alicePositionAfterImport.lockedCollateral,
-                    "lockedCollateral should be 0 WXDC, because Alice Import"
+                    "lockedCollateral should be 0 WNATIVE, because Alice Import"
                 ).to.be.equal(0)
                 expect(alicePositionAfterImport.debtShare, "debtShare should be 0 FXD, because Alice Import").to.be.equal(0)
                 const alicePositionWalletPositionAfterImport = await bookKeeper.positions(
-                    pools.XDC,
+                    pools.NATIVE,
                     alicePositionAddress
                 )
                 expect(
                     alicePositionWalletPositionAfterImport.lockedCollateral,
-                    "lockedCollateral should be 1 WXDC, because Alice Import"
+                    "lockedCollateral should be 1 WNATIVE, because Alice Import"
                 ).to.be.equal(WeiPerWad)
                 expect(
                     alicePositionWalletPositionAfterImport.debtShare,
@@ -2422,14 +2422,14 @@ describe("PositionPermissions", () => {
                     await simplePriceFeed.setPrice(WeiPerRay.div(1000), { gasLimit: 1000000 });
 
                     await expect(
-                        PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2000), WeiPerWad.mul(1000001))
+                        PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2000), WeiPerWad.mul(1000001))
                     ).to.be.revertedWith("BookKeeper/position-debt-ceiling-exceeded")
                 })
             })
             context("adjust position exceeds position ceiling", async () => {
                 it("should revert", async () => {
                     await simplePriceFeed.setPrice(WeiPerRay.div(1000), { gasLimit: 1000000 });
-                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2000), WeiPerWad.mul(1000000))
+                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(2000), WeiPerWad.mul(1000000))
                     await expect(
                         PositionHelper.adjustPosition(
                             aliceProxyWallet,

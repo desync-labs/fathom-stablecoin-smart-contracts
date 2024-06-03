@@ -16,7 +16,8 @@ const setup = async () => {
     const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
     const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
     const priceOracle = await getProxy(proxyFactory, "PriceOracle");
-    const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
+    // To be sunsetted on xdc mainnet, then to be deprecated
+    // const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
     const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
 
@@ -28,7 +29,7 @@ const setup = async () => {
         priceOracle,
         stablecoinAdapter,
         positionManager,
-        stableSwapModule,
+        // stableSwapModule,
         flashMintModule
     }
 }
@@ -42,7 +43,7 @@ describe("AdminControls", () => {
     let systemDebtEngine
     let priceOracle
     let stablecoinAdapter
-    let stableSwapModule
+    // let stableSwapModule
     let flashMintModule
 
     before(async () => {
@@ -58,7 +59,7 @@ describe("AdminControls", () => {
             priceOracle,
             stablecoinAdapter,
             positionManager,
-            stableSwapModule,
+            // stableSwapModule,
             flashMintModule
         } = await loadFixture(setup));
     })

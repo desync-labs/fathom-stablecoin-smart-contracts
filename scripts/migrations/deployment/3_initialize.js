@@ -24,7 +24,8 @@ module.exports = async function (deployer) {
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
-    const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
+    // To be sunsetted on xdc mainnet, then to be deprecated
+    // const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
     const flashMintArbitrager = await getProxy(proxyFactory, "FlashMintArbitrager");
     const bookKeeperFlashMintArbitrager = await getProxy(proxyFactory, "BookKeeperFlashMintArbitrager");
     const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
@@ -33,7 +34,8 @@ module.exports = async function (deployer) {
     const proxyActionsStorage = await getProxy(proxyFactory, "ProxyActionsStorage");
     const adminControls = await getProxy(proxyFactory, "AdminControls");
     const centralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed");
-    const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
+    // To be sunsetted on xdc mainnet, then to be deprecated
+    // const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
     const slidingWindowDexOracle = await getProxy(proxyFactory, "SlidingWindowDexOracle");
 
@@ -106,31 +108,32 @@ module.exports = async function (deployer) {
             { gasLimit: 1000000 }
         ),
 
-        stableSwapModule.initialize(
-            bookKeeper.address,
-            addresses.USDSTABLE,
-            fathomStablecoin.address,
-            dailyLimitNumerator,
-            singleSwapLimitNumerator,
-            numberOfSwapsLimitPerUser,
-            blocksPerLimit,
-            { gasLimit: 1000000 }
-        ),
+        // To be sunsetted on xdc mainnet, then to be deprecated
+        // stableSwapModule.initialize(
+        //     bookKeeper.address,
+        //     addresses.USDSTABLE,
+        //     fathomStablecoin.address,
+        //     dailyLimitNumerator,
+        //     singleSwapLimitNumerator,
+        //     numberOfSwapsLimitPerUser,
+        //     blocksPerLimit,
+        //     { gasLimit: 1000000 }
+        // ),
         flashMintArbitrager.initialize({ gasLimit: 1000000 }),
         bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
         // dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
         collateralTokenAdapter.initialize(
             bookKeeper.address,
-            pools.XDC,
-            addresses.WXDC,
+            pools.NATIVE,
+            addresses.WNATIVE,
             proxyWalletFactory.address
         ),
         // delayFathomOraclePriceFeed.initialize(
         //     dexPriceOracle.address,
-        //     addresses.WXDC,
+        //     addresses.WNATIVE,
         //     addresses.USD,
         //     accessControlConfig.address,
-        //     pools.XDC
+        //     pools.NATIVE
         // ),
         adminControls.initialize(
             bookKeeper.address,
@@ -141,10 +144,11 @@ module.exports = async function (deployer) {
             flashMintModule.address,
             stablecoinAdapter.address
         ),
-        // centralizedOraclePriceFeed.initialize(priceOracleAddress, accessControlConfig.address, pools.XDC),
-        stableSwapModuleWrapper.initialize(
-            bookKeeper.address,
-            stableSwapModule.address),
+        // centralizedOraclePriceFeed.initialize(priceOracleAddress, accessControlConfig.address, pools.NATIVE),
+        // To be sunsetted on xdc mainnet, then to be deprecated
+        // stableSwapModuleWrapper.initialize(
+        //     bookKeeper.address,
+        //     stableSwapModule.address),
         simplePriceFeed.initialize(
             accessControlConfig.address,
         ),
@@ -170,7 +174,8 @@ module.exports = async function (deployer) {
         collateralPoolConfig: collateralPoolConfig.address,
         accessControlConfig: accessControlConfig.address,
         flashMintModule: flashMintModule.address,
-        stableSwapModule: stableSwapModule.address,
+        // To be sunsetted on xdc mainnet, then to be deprecated
+        // stableSwapModule: stableSwapModule.address,
         flashMintArbitrager: flashMintArbitrager.address,
         bookKeeperFlashMintArbitrager: bookKeeperFlashMintArbitrager.address,
         dexPriceOracle: dexPriceOracle.address,
