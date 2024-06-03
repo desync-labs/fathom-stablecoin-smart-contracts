@@ -26,8 +26,8 @@ module.exports = async function (deployer) {
     const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
     // To be sunsetted on xdc mainnet, then to be deprecated
     // const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
-    const flashMintArbitrager = await getProxy(proxyFactory, "FlashMintArbitrager");
-    const bookKeeperFlashMintArbitrager = await getProxy(proxyFactory, "BookKeeperFlashMintArbitrager");
+    // const flashMintArbitrager = await getProxy(proxyFactory, "FlashMintArbitrager");
+    // const bookKeeperFlashMintArbitrager = await getProxy(proxyFactory, "BookKeeperFlashMintArbitrager");
     const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
     const dexPriceOracle = await getProxy(proxyFactory, "DexPriceOracle");
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
@@ -119,8 +119,8 @@ module.exports = async function (deployer) {
         //     blocksPerLimit,
         //     { gasLimit: 1000000 }
         // ),
-        flashMintArbitrager.initialize({ gasLimit: 1000000 }),
-        bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
+        // flashMintArbitrager.initialize({ gasLimit: 1000000 }),
+        // bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
         // dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
         collateralTokenAdapter.initialize(
             bookKeeper.address,
@@ -176,8 +176,8 @@ module.exports = async function (deployer) {
         flashMintModule: flashMintModule.address,
         // To be sunsetted on xdc mainnet, then to be deprecated
         // stableSwapModule: stableSwapModule.address,
-        flashMintArbitrager: flashMintArbitrager.address,
-        bookKeeperFlashMintArbitrager: bookKeeperFlashMintArbitrager.address,
+        // flashMintArbitrager: flashMintArbitrager.address,
+        // bookKeeperFlashMintArbitrager: bookKeeperFlashMintArbitrager.address,
         dexPriceOracle: dexPriceOracle.address,
         proxyWalletFactory: proxyWalletFactory.address,
         fathomStablecoinProxyActions: FathomStablecoinProxyActions.address,

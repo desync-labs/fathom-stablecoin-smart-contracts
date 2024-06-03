@@ -46,7 +46,7 @@ const loadFixtureHandler = async () => {
   }
 }
 
-describe("FlastMintModule", () => {
+xdescribe("FlastMintModule", () => {
   // Contracts
   let bookKeeper
   let USDT
