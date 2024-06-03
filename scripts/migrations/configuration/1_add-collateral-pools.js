@@ -15,7 +15,6 @@ const LIQUIDATIONRATIO_75 = WeiPerRay.mul(133).div(100).toString(); // LTV 75%
 
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
-
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy")
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper")
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig")

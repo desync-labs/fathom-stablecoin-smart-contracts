@@ -102,6 +102,7 @@ module.exports = async function (deployer) {
             { gasLimit: 1000000 }
         ),
         proxyWalletRegistry.initialize(proxyWalletFactory.address, bookKeeper.address, { gasLimit: 1000000 }),
+        proxyWalletRegistry.setDecentralizedMode(true),
         flashMintModule.initialize(
             stablecoinAdapter.address,
             systemDebtEngine.address,
