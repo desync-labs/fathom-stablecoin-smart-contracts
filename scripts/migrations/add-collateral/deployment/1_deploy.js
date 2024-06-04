@@ -1,7 +1,6 @@
 const FathomPriceOracle = artifacts.require('FathomPriceOracle.sol');
 const CollateralTokenAdapter = artifacts.require('CollateralTokenAdapter.sol');
 const CentralizedOraclePriceFeed = artifacts.require('CentralizedOraclePriceFeed.sol');
-
 const SimplePriceFeedNewCol = artifacts.require('SimplePriceFeedNewCol.sol');
 
 module.exports = async function (deployer) {
