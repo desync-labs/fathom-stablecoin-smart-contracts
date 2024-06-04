@@ -5,8 +5,9 @@ const FathomStablecoin = artifacts.require('FathomStablecoin.sol');
 const SystemDebtEngine = artifacts.require('SystemDebtEngine.sol');
 // To be sunsetted on xdc mainnet, then to be deprecated
 // const StableSwapModule = artifacts.require('StableSwapModule.sol');
-const DexPriceOracle = artifacts.require('DexPriceOracle.sol');
-const SlidingWindowDexOracle = artifacts.require('SlidingWindowDexOracle.sol');
+// Contracts that get prices from DEX are not longer in need
+// const DexPriceOracle = artifacts.require('DexPriceOracle.sol');
+// const SlidingWindowDexOracle = artifacts.require('SlidingWindowDexOracle.sol');
 const ProxyWalletRegistry = artifacts.require('ProxyWalletRegistry.sol');
 const ProxyWalletFactory = artifacts.require('ProxyWalletFactory.sol');
 const StabilityFeeCollector = artifacts.require('StabilityFeeCollector.sol');
@@ -22,7 +23,7 @@ const FlashMintModule = artifacts.require('FlashMintModule.sol');
 // const BookKeeperFlashMintArbitrager = artifacts.require('BookKeeperFlashMintArbitrager.sol');
 const FathomProxyFactory = artifacts.require('FathomProxyFactory.sol');
 const FathomProxyAdmin = artifacts.require('FathomProxyAdmin.sol');
-const DelayFathomOraclePriceFeed = artifacts.require('DelayFathomOraclePriceFeed.sol');
+// const DelayFathomOraclePriceFeed = artifacts.require('DelayFathomOraclePriceFeed.sol');
 const CollateralTokenAdapter = artifacts.require('CollateralTokenAdapter.sol');
 const ProxyActionsStorage = artifacts.require('ProxyActionsStorage.sol');
 const AdminControls = artifacts.require('AdminControls.sol');
@@ -48,17 +49,17 @@ module.exports = async function (deployer) {
     deployer.deploy(StabilityFeeCollector, { gas: 7050000 }),
     deployer.deploy(ProxyWalletFactory, { gas: 7050000 }),
     deployer.deploy(ProxyWalletRegistry, { gas: 7050000 }),
-    deployer.deploy(DexPriceOracle, { gas: 7050000 }),
+    // deployer.deploy(DexPriceOracle, { gas: 7050000 }),
     // deployer.deploy(StableSwapModule, { gas: 7050000 }),
     deployer.deploy(FlashMintModule, { gas: 7050000 }),
     // deployer.deploy(FlashMintArbitrager, { gas: 7050000 }),
     // deployer.deploy(BookKeeperFlashMintArbitrager, { gas: 7050000 }),
     deployer.deploy(FathomProxyFactory, { gas: 7050000 }),
     deployer.deploy(FathomProxyAdmin, { gas: 7050000 }),
-    deployer.deploy(DelayFathomOraclePriceFeed, { gas: 7050000 }),
+    // deployer.deploy(DelayFathomOraclePriceFeed, { gas: 7050000 }),
     deployer.deploy(CollateralTokenAdapter, { gas: 7050000 }),
     deployer.deploy(ProxyActionsStorage, { gas: 7050000 }),
-    deployer.deploy(SlidingWindowDexOracle, { gas: 7050000 }),
+    // deployer.deploy(SlidingWindowDexOracle, { gas: 7050000 }),
     deployer.deploy(AdminControls, { gas: 7050000 }),
     deployer.deploy(CentralizedOraclePriceFeed, { gas: 7050000 }),
     // deployer.deploy(StableSwapModuleWrapper, { gas: 7050000 }),

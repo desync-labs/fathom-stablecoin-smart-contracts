@@ -26,10 +26,10 @@ module.exports = async function (deployer) {
         // "StableSwapModule",
         // "FlashMintArbitrager",
         // "BookKeeperFlashMintArbitrager",
-        "DelayFathomOraclePriceFeed",
-        "DexPriceOracle",
+        // "DelayFathomOraclePriceFeed",
+        // "DexPriceOracle",
         "CollateralTokenAdapter",
-        "SlidingWindowDexOracle",
+        // "SlidingWindowDexOracle",
         "AdminControls",
         "CentralizedOraclePriceFeed",
         // To be sunsetted on xdc mainnet, then to be deprecated

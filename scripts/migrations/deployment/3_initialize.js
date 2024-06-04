@@ -28,8 +28,8 @@ module.exports = async function (deployer) {
     // const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
     // const flashMintArbitrager = await getProxy(proxyFactory, "FlashMintArbitrager");
     // const bookKeeperFlashMintArbitrager = await getProxy(proxyFactory, "BookKeeperFlashMintArbitrager");
-    const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
-    const dexPriceOracle = await getProxy(proxyFactory, "DexPriceOracle");
+    // const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
+    // const dexPriceOracle = await getProxy(proxyFactory, "DexPriceOracle");
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const proxyActionsStorage = await getProxy(proxyFactory, "ProxyActionsStorage");
     const adminControls = await getProxy(proxyFactory, "AdminControls");
@@ -37,7 +37,7 @@ module.exports = async function (deployer) {
     // To be sunsetted on xdc mainnet, then to be deprecated
     // const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
-    const slidingWindowDexOracle = await getProxy(proxyFactory, "SlidingWindowDexOracle");
+    // const slidingWindowDexOracle = await getProxy(proxyFactory, "SlidingWindowDexOracle");
 
 
 
@@ -177,18 +177,19 @@ module.exports = async function (deployer) {
         flashMintModule: flashMintModule.address,
         // To be sunsetted on xdc mainnet, then to be deprecated
         // stableSwapModule: stableSwapModule.address,
+        // No longer needed in deployments
         // flashMintArbitrager: flashMintArbitrager.address,
         // bookKeeperFlashMintArbitrager: bookKeeperFlashMintArbitrager.address,
-        dexPriceOracle: dexPriceOracle.address,
+        // dexPriceOracle: dexPriceOracle.address,
         proxyWalletFactory: proxyWalletFactory.address,
         fathomStablecoinProxyActions: FathomStablecoinProxyActions.address,
         collateralTokenAdapter: collateralTokenAdapter.address,
-        delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address,
+        // delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address,
         adminControls: adminControls.address,
         centralizedOraclePriceFeed: centralizedOraclePriceFeed.address,
         proxyActionsStorage: proxyActionsStorage.address,
         fathomProxyAdmin: proxyAdmin.address,
-        slidingWindowDexOracle: slidingWindowDexOracle.address,
+        // slidingWindowDexOracle: slidingWindowDexOracle.address,
     }
 
     fs.writeFileSync('./addresses.json', JSON.stringify(newAddresses));

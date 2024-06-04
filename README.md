@@ -74,9 +74,6 @@ The chainId 1337 addresses are required to execute the test scripts on Ganache. 
   "1337": {
     "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
     "USD": "0xce75A95160D96F5388437993aB5825F322426E04",
-    "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
-    "DEXFactory": "0x5cf9FB75278606F23b2521e77A424174d2CAA2c3",
-    "USDSTABLE": "0xb9AdA6B44E4CFF8FE00443Fadf8ad006CfCc2d10",
     "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753"
   }
 }
@@ -125,9 +122,6 @@ The format of the content can be same as in the Running test sections. Like belo
   "1337": {
     "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
     "USD": "0xce75A95160D96F5388437993aB5825F322426E04",
-    "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
-    "DEXFactory": "0x5cf9FB75278606F23b2521e77A424174d2CAA2c3",
-    "USDSTABLE": "0xb9AdA6B44E4CFF8FE00443Fadf8ad006CfCc2d10",
     "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753"
   }
 }
@@ -171,8 +165,6 @@ ChainID of apothem is 51. Therefore, the externalAddresses.json need to have the
     "51": {
       "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
       "USD": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
-      "DEXFactory": "0x6FfcE1bb8fB4841B42C8ee5e91398068723ba80D",
-      "USDSTABLE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f"
     }
 }
 ```
