@@ -24,7 +24,7 @@
   "license": "",
   "dependencies": {
     "@openzeppelin/contracts": "4.9.2",
-    "@openzeppelin/contracts-upgradeable": "4.9.2",
+    "@openzeppelin/contracts-upgradeable": "4.9.6",
     "@truffle/hdwallet-provider": "^1.4.1",
     "bignumber.js": "7.2.1",
     "solc": "0.8.13"
