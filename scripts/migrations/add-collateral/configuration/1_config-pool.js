@@ -22,6 +22,16 @@ module.exports = async function (deployer) {
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig")
     const priceOracle = await getProxy(proxyFactory, "PriceOracle")
 
+    // const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
+    // 2024.05.23 simplePriceFeed should be the one that's been recently deployed. so use below line instead of getProxy
+    const simplePriceFeedNewCol = await artifacts.initializeInterfaceAt("SimplePriceFeedNewCol", "SimplePriceFeedNewCol");
+    const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
+
+    await simplePriceFeedNewCol.initialize(accessControlConfig.address);
+    await simplePriceFeedNewCol.setPoolId(poolId);
+    await simplePriceFeedNewCol.setPrice(WeiPerWad.toString());
+
+    const priceFeed = simplePriceFeedNewCol;
     const priceFeed = await getProxyById(proxyFactory, "CentralizedOraclePriceFeed", getProxyId("CentralizedOraclePriceFeed"));
     await priceFeed.peekPrice({ gasLimit: 2000000 });
 
