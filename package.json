@@ -23,7 +23,7 @@
   "author": "",
   "license": "",
   "dependencies": {
-    "@openzeppelin/contracts": "4.9.2",
+    "@openzeppelin/contracts": "4.9.6",
     "@openzeppelin/contracts-upgradeable": "4.9.2",
     "@truffle/hdwallet-provider": "^1.4.1",
     "bignumber.js": "7.2.1",
