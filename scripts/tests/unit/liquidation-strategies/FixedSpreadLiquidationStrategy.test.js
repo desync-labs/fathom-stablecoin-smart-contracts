@@ -25,6 +25,8 @@ const loadFixtureHandler = async () => {
     const mockedFlashLendingCallee = await createMock("IFlashLendingCallee");
     const mockedPriceFeed = await createMock("SimplePriceFeed");
     const mockedStablecoinAdapter = await createMock("StablecoinAdapter")
+    const mockedFathomStablecoin = await createMock("FathomStablecoin")
+
 
     await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
     await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
@@ -35,12 +37,12 @@ const loadFixtureHandler = async () => {
     await mockedSystemDebtEngine.mock.surplusBuffer.returns(BigNumber.from("0"))
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(BigNumber.from("0"))
     await mockedAccessControlConfig.mock.hasRole.returns(true)
-    
-    await mockedAccessControlConfig.mock.LIQUIDATION_ENGINE_ROLE.returns(LIQUIDATION_ENGINE_ROLE) //keccak256 of LIQUIDATION_ENGINE_ROLE
-    await mockedStablecoinAdapter.mock.stablecoin.returns(DeployerAddress);
 
-    const fixedSpreadLiquidationStrategy = getContract("FixedSpreadLiquidationStrategy", DeployerAddress)
-    const fixedSpreadLiquidationStrategyAsAlice = getContract("FixedSpreadLiquidationStrategy", AliceAddress)
+    await mockedAccessControlConfig.mock.LIQUIDATION_ENGINE_ROLE.returns(LIQUIDATION_ENGINE_ROLE) //keccak256 of LIQUIDATION_ENGINE_ROLE
+    await mockedStablecoinAdapter.mock.stablecoin.returns(mockedFathomStablecoin.address);
+
+    const fixedSpreadLiquidationStrategy = getContract("MockFixedSpreadLiquidationStrategy", DeployerAddress)
+    const fixedSpreadLiquidationStrategyAsAlice = getContract("MockFixedSpreadLiquidationStrategy", AliceAddress)
 
     await fixedSpreadLiquidationStrategy.initialize(
         mockedBookKeeper.address,
@@ -60,7 +62,9 @@ const loadFixtureHandler = async () => {
         mockedFlashLendingCallee,
         mockedCollateralTokenAdapter,
         mockedCollateralPoolConfig,
-        mockedAccessControlConfig
+        mockedAccessControlConfig,
+        mockedFathomStablecoin,
+        mockedStablecoinAdapter
     }
 }
 
@@ -74,7 +78,8 @@ describe("FixedSpreadLiquidationStrategy", () => {
     let mockedCollateralTokenAdapter
     let mockedCollateralPoolConfig
     let mockedAccessControlConfig
-
+    let mockedFathomStablecoin
+    let mockedStablecoinAdapter
     let fixedSpreadLiquidationStrategy
     let fixedSpreadLiquidationStrategyAsAlice
 
@@ -94,6 +99,8 @@ describe("FixedSpreadLiquidationStrategy", () => {
             mockedCollateralTokenAdapter,
             mockedCollateralPoolConfig,
             mockedAccessControlConfig,
+            mockedFathomStablecoin,
+            mockedStablecoinAdapter
         } = await loadFixture(loadFixtureHandler))
     })
 
@@ -114,7 +121,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                         DeployerAddress,
                         "0x"
                     )
-                ).to.be.revertedWith("!liquidationEngingRole")
+                ).to.be.revertedWith("!liquidationEngineRole")
             })
         })
         context("when input is invalid", () => {
@@ -231,7 +238,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
         context("when contract doesn't call FlashLending", () => {
             context("when feedprice == 1", () => {
                 context("and debtAccumulatedRate == 2", () => {
-                    xit("should be success", async () => {
+                    it("should be success", async () => {
                         await mockedAccessControlConfig.mock.hasRole.returns(true)
                         await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(UnitHelpers.WeiPerRay.mul(2))
                         await mockedCollateralPoolConfig.mock.getPriceWithSafetyMargin.returns(UnitHelpers.WeiPerRay)
@@ -241,6 +248,10 @@ describe("FixedSpreadLiquidationStrategy", () => {
                         await mockedCollateralPoolConfig.mock.getTreasuryFeesBps.returns(2500)
                         await mockedCollateralPoolConfig.mock.getDebtFloor.returns(10)
                         await mockedCollateralPoolConfig.mock.getAdapter.returns(mockedCollateralTokenAdapter.address)
+                        await mockedCollateralTokenAdapter.mock.withdraw.returns();
+                        await mockedStablecoinAdapter.mock.depositRAD.returns();
+                        await mockedFathomStablecoin.mock.transferFrom.returns(true);
+                        await mockedFathomStablecoin.mock.approve.returns(true);
 
                         await mockedBookKeeper.mock.confiscatePosition.withArgs(
                             formatBytes32String("WXDC"),
@@ -298,7 +309,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
                 })
 
                 context("and debtAccumulatedRate == 12345", () => {
-                    xit("should be success", async () => {
+                    it("should be success", async () => {
                         await mockedAccessControlConfig.mock.hasRole.returns(true)
                         await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(UnitHelpers.WeiPerRay.mul(12345))
                         await mockedCollateralPoolConfig.mock.getPriceWithSafetyMargin.returns(UnitHelpers.WeiPerRay)
@@ -308,6 +319,10 @@ describe("FixedSpreadLiquidationStrategy", () => {
                         await mockedCollateralPoolConfig.mock.getTreasuryFeesBps.returns(700)
                         await mockedCollateralPoolConfig.mock.getDebtFloor.returns(10)
                         await mockedCollateralPoolConfig.mock.getAdapter.returns(mockedCollateralTokenAdapter.address)
+                        await mockedCollateralTokenAdapter.mock.withdraw.returns();
+                        await mockedStablecoinAdapter.mock.depositRAD.returns();
+                        await mockedFathomStablecoin.mock.transferFrom.returns(true);
+                        await mockedFathomStablecoin.mock.approve.returns(true);
 
                         await mockedBookKeeper.mock.confiscatePosition.withArgs(
                             formatBytes32String("WXDC"),
@@ -353,7 +368,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
         })
 
         context("when contract call FlashLending", () => {
-            xit("should be success", async () => {
+            it("should be success", async () => {
                 await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address)
                 await mockedAccessControlConfig.mock.hasRole.returns(true)
                 await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32BigNumber(BigNumber.from("1")))
@@ -366,6 +381,10 @@ describe("FixedSpreadLiquidationStrategy", () => {
                 await mockedCollateralPoolConfig.mock.getTreasuryFeesBps.returns(17)
                 await mockedCollateralPoolConfig.mock.getDebtFloor.returns(10)
                 await mockedCollateralPoolConfig.mock.getAdapter.returns(mockedCollateralTokenAdapter.address)
+                await mockedCollateralTokenAdapter.mock.withdraw.returns();
+                await mockedStablecoinAdapter.mock.depositRAD.returns();
+                await mockedFathomStablecoin.mock.transferFrom.returns(true);
+                await mockedFathomStablecoin.mock.approve.returns(true);
 
                 await mockedBookKeeper.mock.confiscatePosition.withArgs(
                     formatBytes32String("WXDC"),
@@ -392,8 +411,9 @@ describe("FixedSpreadLiquidationStrategy", () => {
 
                 await mockedPriceFeed.mock.peekPrice.returns(formatBytes32BigNumber(UnitHelpers.WeiPerWad), true)
                 await mockedFlashLendingCallee.mock.flashLendingCall.returns()
+                await mockedFlashLendingCallee.mock.supportsInterface.returns(true)
 
-                await fixedSpreadLiquidationStrategy.setFlashLendingEnabled(1)
+                await fixedSpreadLiquidationStrategy.setFlashLendingEnabled(true)
 
                 await expect(
                     fixedSpreadLiquidationStrategy.execute(

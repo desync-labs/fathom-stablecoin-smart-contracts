@@ -7,7 +7,6 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "../../../interfaces/IBookKeeper.sol";
 import "../../../interfaces/ICollateralAdapter.sol";
 import "../../../interfaces/ICagable.sol";
-import "../../../interfaces/IManager.sol";
 import "../../../interfaces/IProxyRegistry.sol";
 import "../../../interfaces/IVault.sol";
 import "../../../utils/SafeToken.sol";
@@ -26,22 +25,18 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
     bytes32 public override collateralPoolId;
 
     IVault public vault;
-    
-    /// @dev deprecated but needs to be kept to minimize storage layout confusion
-    bytes32 internal deprecated2;
+
     IProxyRegistry public proxyWalletFactory;
 
     /// @dev Total CollateralTokens that has been staked in WAD
     uint256 public totalShare;
 
-    /// @dev deprecated but needs to be kept to minimize storage layout confusion
-    bytes32 internal deprecated;
-
     mapping(address => bool) public whiteListed;
 
     event LogDeposit(uint256 _val);
     event LogWithdraw(uint256 _val);
-    event LogWhitelisted(address indexed user, bool isWhitelisted);
+    event LogAddToWhitelist(address indexed _user);
+    event LogRemoveFromWhitelist(address indexed _user);
     event LogEmergencyWithdraw(address indexed _caller, address _to);
 
     modifier onlyOwner() {
@@ -65,12 +60,11 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         _;
     }
 
-    function initialize(
-        address _bookKeeper,
-        bytes32 _collateralPoolId,
-        address _collateralToken,
-        address _proxyWalletFactory
-    ) external initializer {
+    constructor() {
+        _disableInitializers();
+    }
+
+    function initialize(address _bookKeeper, bytes32 _collateralPoolId, address _collateralToken, address _proxyWalletFactory) external initializer {
         // 1. Initialized all dependencies
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
@@ -87,22 +81,25 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
         bookKeeper = IBookKeeper(_bookKeeper);
         proxyWalletFactory = IProxyRegistry(_proxyWalletFactory);
     }
+
     /// @notice Adds an address to the whitelist, allowing it to interact with the contract
     /// @dev Only the contract owner or a governance address can execute this function. The provided address cannot be the zero address.
-    /// @param toBeWhitelisted The address to be added to the whitelist
-    function whitelist(address toBeWhitelisted) external onlyOwnerOrGov {
-        require(toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
-        whiteListed[toBeWhitelisted] = true;
-        emit LogWhitelisted(toBeWhitelisted, true);
+    /// @param _toBeWhitelisted The address to be added to the whitelist
+    function addToWhitelist(address _toBeWhitelisted) external onlyOwnerOrGov {
+        require(_toBeWhitelisted != address(0), "CollateralTokenAdapter/whitelist-invalidAdds");
+        whiteListed[_toBeWhitelisted] = true;
+        emit LogAddToWhitelist(_toBeWhitelisted);
     }
+
     /// @notice Removes an address from the whitelist
     /// @dev Only the contract owner or a governance address can execute this function.
-    /// @param toBeRemoved The address to be removed from the whitelist
-    function blacklist(address toBeRemoved) external onlyOwnerOrGov {
-        require(toBeRemoved != address(0), "CollateralTokenAdapter/blacklist-invalidAdds");
-        whiteListed[toBeRemoved] = false;
-        emit LogWhitelisted(toBeRemoved, false);
+    /// @param _toBeRemoved The address to be removed from the whitelist
+    function removeFromWhitelist(address _toBeRemoved) external onlyOwnerOrGov {
+        require(_toBeRemoved != address(0), "CollateralTokenAdapter/removeFromWL-invalidAdds");
+        whiteListed[_toBeRemoved] = false;
+        emit LogRemoveFromWhitelist(_toBeRemoved);
     }
+
     /// @dev The `cage` function permanently halts the `collateralTokenAdapter` contract.
     /// Please exercise caution when using this function as there is no corresponding `uncage` function.
     /// The `cage` function in this contract is unique because it must be called before users can initiate `emergencyWithdraw` in the `collateralTokenAdapter`.
@@ -113,14 +110,17 @@ contract CollateralTokenAdapter is CommonMath, ICollateralAdapter, PausableUpgra
             emit LogCage();
         }
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function pause() external onlyOwnerOrGov {
         _pause();
     }
+
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
     }
+
     /// @dev The `setVault` function stores the address of the vault contract that holds the collateral.
     /// @param _vault the address of vault smart contract
     function setVault(address _vault) external onlyOwner {

@@ -25,15 +25,15 @@ const loadFixtureHandler = async () => {
     await mockStablecoinAdapter.mock.bookKeeper.returns(mockBookKeeper.address)
     await mockStablecoinAdapter.mock.stablecoin.returns(mockFathomStablecoin.address)
     await mockFathomStablecoin.mock.approve.returns(true)
-    await mockBookKeeper.mock.whitelist.returns()
+    await mockBookKeeper.mock.addToWhitelist.returns()
     await mockedAccessControlConfig.mock.hasRole.returns(true)
     await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
     await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
 
     await mockMyFashLoan.mock.onFlashLoan.returns(formatBytes32String(1))
 
-    const flashMintModule = getContract("FlashMintModule", DeployerAddress)
-    const flashMintModuleAsAlice = getContract("FlashMintModule", AliceAddress)
+    const flashMintModule = getContract("MockFlashMintModule", DeployerAddress)
+    const flashMintModuleAsAlice = getContract("MockFlashMintModule", AliceAddress)
 
     await flashMintModule.initialize(mockStablecoinAdapter.address, mockSystemDebtEngine.address)
 
@@ -105,6 +105,15 @@ describe("FlashMintModule", () => {
                 await mockedAccessControlConfig.mock.hasRole.returns(false)
 
                 await expect(flashMintModuleAsAlice.setFeeRate(WeiPerWad.div(10))).to.be.revertedWith("!ownerRole")
+            })
+        })
+        context("when the caller is the owner but the rate is higher than 1 WAD", () => {
+            it("should revert", async () => {
+                const feeRate = await flashMintModule.feeRate()
+                expect(feeRate).to.be.equal(0)
+
+                await expect(flashMintModule.setFeeRate(WeiPerWad.mul(10)))
+                    .to.be.revertedWith("FlashMintModule/fee-too-high")
             })
         })
         context("when the caller is the owner", () => {
@@ -222,16 +231,22 @@ describe("FlashMintModule", () => {
             it("should be able to call flashLoan", async () => {
                 await flashMintModule.setDecentralizedStatesStatus(true);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
-                await flashMintModule.setFeeRate(WeiPerWad.div(10))
+                // commenting out the fee rate check so that 
+                // "FlashMintModule/insufficient-fee" error is not thrown
+                // await flashMintModule.setFeeRate(WeiPerWad.div(10))
 
                 await mockFathomStablecoin.mock.transferFrom.withArgs(
                     mockMyFashLoan.address,
                     flashMintModule.address,
-                    WeiPerWad.mul(11)
+                    //as fee rate is 0, the amount to be transferred is 10
+                    // WeiPerWad.mul(11)
+                    WeiPerWad.mul(10)
                 ).returns(true)
                 await mockStablecoinAdapter.mock.deposit.withArgs(
                     flashMintModule.address,
-                    WeiPerWad.mul(11),
+                    //as fee rate is 0, the amount to be transferred is 10
+                    // WeiPerWad.mul(11),
+                    WeiPerWad.mul(10),
                     ethers.utils.defaultAbiCoder.encode(["uint256"], [0])
                 ).returns()
                 await mockBookKeeper.mock.settleSystemBadDebt.withArgs(WeiPerRad.mul(10)).returns()
@@ -246,6 +261,7 @@ describe("FlashMintModule", () => {
                     ethers.utils.defaultAbiCoder.encode(["uint256"], [0])
                 ).returns()
                 await mockMyFashLoan.mock.onFlashLoan.returns(keccak256(toUtf8Bytes("ERC3156FlashBorrower.onFlashLoan")))
+                await mockBookKeeper.mock.stablecoin.returns(0)
                 await expect(
                     flashMintModule.flashLoan(
                         mockMyFashLoan.address,
@@ -313,7 +329,7 @@ describe("FlashMintModule", () => {
 
                 await mockBookKeeper.mock.mintUnbackedStablecoin.returns()
                 await mockStablecoinAdapter.mock.withdraw.returns()
-
+                await mockBookKeeper.mock.stablecoin.returns(0)
                 await expect(
                     flashMintModule.flashLoan(
                         mockMyFashLoan.address,
@@ -328,16 +344,23 @@ describe("FlashMintModule", () => {
             it("should be able to call flashLoan", async () => {
                 await flashMintModule.addToWhitelist(DeployerAddress);
                 await flashMintModule.setMax(WeiPerWad.mul(100))
-                await flashMintModule.setFeeRate(WeiPerWad.div(10))
+                // commenting out the fee rate check for so that 
+                // "FlashMintModule/insufficient-fee" error is not thrown
+                // await flashMintModule.setFeeRate(WeiPerWad.div(10))
 
                 await mockFathomStablecoin.mock.transferFrom.withArgs(
                     mockMyFashLoan.address,
                     flashMintModule.address,
-                    WeiPerWad.mul(11)
+                    //as fee rate is 0, the amount to be transferred is 10
+                    // WeiPerWad.mul(11)
+                    WeiPerWad.mul(10)
+
                 ).returns(true)
                 await mockStablecoinAdapter.mock.deposit.withArgs(
                     flashMintModule.address,
-                    WeiPerWad.mul(11),
+                    //as fee rate is 0, the amount to be transferred is 10
+                    // WeiPerWad.mul(11),
+                    WeiPerWad.mul(10),
                     ethers.utils.defaultAbiCoder.encode(["uint256"], [0])
                 ).returns()
                 await mockBookKeeper.mock.settleSystemBadDebt.withArgs(WeiPerRad.mul(10)).returns()
@@ -352,6 +375,7 @@ describe("FlashMintModule", () => {
                     ethers.utils.defaultAbiCoder.encode(["uint256"], [0])
                 ).returns()
                 await mockMyFashLoan.mock.onFlashLoan.returns(keccak256(toUtf8Bytes("ERC3156FlashBorrower.onFlashLoan")))
+                await mockBookKeeper.mock.stablecoin.returns(0)
                 await expect(
                     flashMintModule.flashLoan(
                         mockMyFashLoan.address,

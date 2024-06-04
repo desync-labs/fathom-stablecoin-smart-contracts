@@ -1,13 +1,16 @@
 const chai = require('chai');
 const { ethers } = require("ethers");
 const { parseEther } = require("ethers/lib/utils");
+const { MaxUint256 } = require("@ethersproject/constants");
 
 const { solidity } = require("ethereum-waffle");
 chai.use(solidity);
 const { expect } = chai
 
-const { WeiPerRay } = require("../helper/unit");
+const { WeiPerRay, WeiPerRad } = require("../helper/unit");
 const { loadFixture } = require("../helper/fixtures");
+const { DeployerAddress } = require("../helper/address");
+
 const { getProxy } = require("../../common/proxies");
 
 const loadFixtureHandler = async () => {
@@ -15,11 +18,14 @@ const loadFixtureHandler = async () => {
 
   const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
   const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
-  const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
-  const authTokenAdapter = await getProxy(proxyFactory, "AuthTokenAdapter");
+  const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
+  const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
 
-  const usdtAddr = await authTokenAdapter.token();
-  const USDT = await artifacts.initializeInterfaceAt("ERC20Mintable", usdtAddr);
+
+  const usdtAddr = await stableSwapModule.token()
+  const USDT = await artifacts.initializeInterfaceAt("ERC20MintableStableSwap", usdtAddr);
+
+  const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
 
   const fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
   const router = await artifacts.initializeInterfaceAt("MockedDexRouter", "MockedDexRouter");
@@ -34,7 +40,9 @@ const loadFixtureHandler = async () => {
     flashMintArbitrager,
     router,
     stableSwapModule,
-    bookKeeperFlashMintArbitrager
+    bookKeeperFlashMintArbitrager,
+    stableSwapModuleWrapper,
+    stablecoinAdapter
   }
 }
 
@@ -47,7 +55,9 @@ describe("FlastMintModule", () => {
   let fathomStablecoin
   let router
   let stableSwapModule
+  let stableSwapModuleWrapper
   let bookKeeperFlashMintArbitrager
+  let stablecoinAdapter
 
   before(async () => {
     await snapshot.revertToSnapshot();
@@ -62,15 +72,25 @@ describe("FlastMintModule", () => {
       flashMintArbitrager,
       router,
       stableSwapModule,
-      bookKeeperFlashMintArbitrager
+      bookKeeperFlashMintArbitrager,
+      stableSwapModuleWrapper,
+      stablecoinAdapter
     } = await loadFixture(loadFixtureHandler))
   })
   describe("#flashLoan", async () => {
     context("receiver doesn't have enough tokens to return the loan + fee", async () => {
-      xit("should revert", async () => {
-        // mocked router will return all tokens it has
-        await USDT.mint(router.address, parseEther("100"), { gasLimit: 1000000 })
+      it("should revert", async () => {
+        await fathomStablecoin.mint(DeployerAddress, parseEther("3000"), { gasLimit: 1000000 })
+        await bookKeeper.mintUnbackedStablecoin(stablecoinAdapter.address, stablecoinAdapter.address, WeiPerRad.mul(3500), { gasLimit: 1000000 });
+        await fathomStablecoin.approve(stableSwapModuleWrapper.address, parseEther("3000"), { gasLimit: 1000000 })
+        await USDT.mint(DeployerAddress, parseEther("3500"), { gasLimit: 1000000 })
+        await USDT.approve(stableSwapModuleWrapper.address, parseEther("3000"), { gasLimit: 1000000 })
+        await stableSwapModuleWrapper.depositTokens(parseEther("3000"), { gasLimit: 1000000 })
 
+        await flashMintModule.addToWhitelist(DeployerAddress);
+        await stableSwapModule.addToWhitelist(flashMintArbitrager.address);
+        await USDT.approve(router.address, parseEther('500'), { gasLimit: 1000000 });
+        await router.deposit(USDT.address, parseEther('500'), { gasLimit: 1000000 });
         await expect(
           flashMintModule.flashLoan(
             flashMintArbitrager.address,
@@ -87,10 +107,19 @@ describe("FlastMintModule", () => {
     })
 
     context("receiver has enough tokens to return the loan + fee", async () => {
-      xit("should success", async () => {
-        // mocked router will return all tokens it has
-        await USDT.mint(router.address, parseEther("110"), { gasLimit: 1000000 })
+      it("should success", async () => {
+        await fathomStablecoin.mint(DeployerAddress, parseEther("3500"), { gasLimit: 1000000 })
+        await bookKeeper.mintUnbackedStablecoin(stablecoinAdapter.address, stablecoinAdapter.address, WeiPerRad.mul(3500), { gasLimit: 1000000 });
+        await fathomStablecoin.approve(stableSwapModuleWrapper.address, parseEther("3000"), { gasLimit: 1000000 })
+        await USDT.mint(DeployerAddress, parseEther("3500"), { gasLimit: 1000000 })
+        await USDT.approve(stableSwapModuleWrapper.address, parseEther("3000"), { gasLimit: 1000000 })
+        await stableSwapModuleWrapper.depositTokens(parseEther("3000"), { gasLimit: 1000000 })
 
+        await flashMintModule.addToWhitelist(DeployerAddress);
+        await stableSwapModule.addToWhitelist(flashMintArbitrager.address);
+        await USDT.approve(router.address, parseEther('500'), { gasLimit: 1000000 });
+        await router.deposit(USDT.address, parseEther('500'), { gasLimit: 1000000 });
+        await router.setProfit(true);
         await flashMintModule.flashLoan(
           flashMintArbitrager.address,
           fathomStablecoin.address,
@@ -103,7 +132,7 @@ describe("FlastMintModule", () => {
         )
 
         const profitFromArbitrage = await fathomStablecoin.balanceOf(flashMintArbitrager.address)
-        expect(profitFromArbitrage).to.be.equal(parseEther("8.5"))
+        expect(profitFromArbitrage).to.be.equal(parseEther("9.49"))
 
         const feeCollectedFromFlashMint = await bookKeeper.stablecoin(flashMintModule.address)
         expect(feeCollectedFromFlashMint).to.be.equal(parseEther("0.4").mul(WeiPerRay))
@@ -113,9 +142,18 @@ describe("FlastMintModule", () => {
 
   describe("#bookKeeperFlashLoan", async () => {
     context("receiver doesn't have enough tokens to return the loan + fee", async () => {
-      xit("should revert", async () => {
-        // mocked router will return all tokens it has
-        await USDT.mint(router.address, parseEther("100"), { gasLimit: 1000000 })
+      it("should revert", async () => {
+        await fathomStablecoin.mint(DeployerAddress, parseEther("3500"), { gasLimit: 1000000 })
+        await bookKeeper.mintUnbackedStablecoin(stablecoinAdapter.address, stablecoinAdapter.address, WeiPerRad.mul(3500), { gasLimit: 1000000 });
+        await fathomStablecoin.approve(stableSwapModuleWrapper.address, parseEther("3000"), { gasLimit: 1000000 })
+        await USDT.mint(DeployerAddress, parseEther("3500"), { gasLimit: 1000000 })
+        await USDT.approve(stableSwapModuleWrapper.address, parseEther("3000"), { gasLimit: 1000000 })
+        await stableSwapModuleWrapper.depositTokens(parseEther("3000"), { gasLimit: 1000000 })
+
+        await flashMintModule.addToWhitelist(DeployerAddress);
+        await stableSwapModule.addToWhitelist(bookKeeperFlashMintArbitrager.address);
+        await USDT.approve(router.address, parseEther('500'), { gasLimit: 1000000 });
+        await router.deposit(USDT.address, parseEther('500'), { gasLimit: 1000000 });
 
         await expect(
           flashMintModule.bookKeeperFlashLoan(
@@ -131,9 +169,19 @@ describe("FlastMintModule", () => {
     })
 
     context("receiver has enough tokens to return the loan + fee", async () => {
-     xit("should success", async () => {
-        // mocked router will return all tokens it has
-        await USDT.mint(router.address, parseEther("110"), { gasLimit: 1000000 })
+      it("should success", async () => {
+        await fathomStablecoin.mint(DeployerAddress, parseEther("3500"), { gasLimit: 1000000 })
+        await bookKeeper.mintUnbackedStablecoin(stablecoinAdapter.address, stablecoinAdapter.address, WeiPerRad.mul(3500), { gasLimit: 1000000 });
+        await fathomStablecoin.approve(stableSwapModuleWrapper.address, parseEther("3000"), { gasLimit: 1000000 })
+        await USDT.mint(DeployerAddress, parseEther("3500"), { gasLimit: 1000000 })
+        await USDT.approve(stableSwapModuleWrapper.address, parseEther("3000"), { gasLimit: 1000000 })
+        await stableSwapModuleWrapper.depositTokens(parseEther("3000"), { gasLimit: 1000000 })
+
+        await flashMintModule.addToWhitelist(DeployerAddress);
+        await stableSwapModule.addToWhitelist(bookKeeperFlashMintArbitrager.address);
+        await USDT.approve(router.address, parseEther('500'), { gasLimit: 1000000 });
+        await router.deposit(USDT.address, parseEther('500'), { gasLimit: 1000000 });
+        await router.setProfit(true);
 
         // Perform flash mint
         await flashMintModule.bookKeeperFlashLoan(
@@ -146,7 +194,7 @@ describe("FlastMintModule", () => {
         )
 
         const profitFromArbitrage = await fathomStablecoin.balanceOf(bookKeeperFlashMintArbitrager.address)
-        expect(profitFromArbitrage).to.be.equal(parseEther("8.5"))
+        expect(profitFromArbitrage).to.be.equal(parseEther("9.49"))
 
         const feeCollectedFromFlashMint = await bookKeeper.stablecoin(flashMintModule.address)
         expect(feeCollectedFromFlashMint).to.be.equal(parseEther("0.4").mul(WeiPerRay))

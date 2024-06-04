@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./ProxyWallet.sol";
 
 /// @dev This factory deploys new proxy instances through build(). Deployed proxy addresses are logged
-contract ProxyWalletFactory is OwnableUpgradeable {
+contract ProxyWalletFactory is Initializable {
     mapping(address => bool) public isProxy;
     address public proxyActionStorage;
     address public proxyWalletRegistry;
@@ -18,9 +18,11 @@ contract ProxyWalletFactory is OwnableUpgradeable {
         _;
     }
 
-    function initialize(address _proxyActionStorage, address _proxyWalletRegistry) external initializer {
-        OwnableUpgradeable.__Ownable_init();
+    constructor() {
+        _disableInitializers();
+    }
 
+    function initialize(address _proxyActionStorage, address _proxyWalletRegistry) external initializer {
         require(_proxyActionStorage != address(0), "ProxyWalletFactory/zero-storage");
         require(_proxyWalletRegistry != address(0), "ProxyWalletFactory/zero-Registry");
 

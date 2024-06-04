@@ -5,7 +5,6 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 import "./lib/FathomSwapLibrary.sol";
 import "../apis/interfaces/IFathomSwapPair.sol";
-import "../apis/interfaces/IFathomSwapFactory.sol";
 import "../interfaces/IFathomDEXOracle.sol";
 import "../interfaces/IToken.sol";
 
@@ -37,6 +36,10 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
 
     uint8 public constant RESOLUTION = 112;
 
+    constructor() {
+        _disableInitializers();
+    }
+
     function initialize(address _factory, uint256 _windowSize, uint8 _granularity) external initializer {
         require(_factory != address(0), "SlidingWindowDexOracle/zero-factory");
         require(_granularity > 1, "SlidingWindowDexOracle/invalid-granularity");
@@ -49,10 +52,10 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
 
     // update the cumulative price for the observation at the current timestamp. each observation is updated at most
     // once per epoch period.
-    function update(address tokenA, address tokenB) external {
-        require(tokenA != tokenB, "SlidingWindowDexOracle/same-tokens");
+    function update(address _tokenA, address _tokenB) external {
+        require(_tokenA != _tokenB, "SlidingWindowDexOracle/same-tokens");
 
-        address pair = FathomSwapLibrary.pairFor(factory, tokenA, tokenB);
+        address pair = FathomSwapLibrary.pairFor(factory, _tokenA, _tokenB);
 
         // populate the array with empty observations (first call only)
         for (uint256 i = pairObservations[pair].length; i < granularity; i++) {
@@ -75,10 +78,10 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
 
     // range [now - [windowSize, windowSize - periodSize * 2], now]
     // update must have been called for the bucket corresponding to timestamp `now - windowSize`
-    function getPrice(address tokenA, address tokenB) external view override returns (uint256 price, uint256 blockTimestampLast) {
-        require(tokenA != tokenB, "SlidingWindowDexOracle/same-tokens");
+    function getPrice(address _tokenA, address _tokenB) external view override returns (uint256 price, uint256 blockTimestampLast) {
+        require(_tokenA != _tokenB, "SlidingWindowDexOracle/same-tokens");
 
-        address pair = FathomSwapLibrary.pairFor(factory, tokenA, tokenB);
+        address pair = FathomSwapLibrary.pairFor(factory, _tokenA, _tokenB);
         Observation memory firstObservation = getFirstObservationInWindow(pair);
 
         uint256 timeElapsed = block.timestamp - firstObservation.timestamp;
@@ -87,11 +90,11 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
         require(timeElapsed >= windowSize - periodSize * 2, "SlidingWindowDexOracle/unexpected-time-elapsed");
 
         (uint256 price0Cumulative, uint256 price1Cumulative) = currentCumulativePrice(pair);
-        (address token0, ) = FathomSwapLibrary.sortTokens(tokenA, tokenB);
+        (address token0, ) = FathomSwapLibrary.sortTokens(_tokenA, _tokenB);
 
-        uint256 decimalsA = IToken(tokenA).decimals();
-        uint256 decimalsB = IToken(tokenB).decimals();
-        uint256 rawPrice = tokenA == token0
+        uint256 decimalsA = IToken(_tokenA).decimals();
+        uint256 decimalsB = IToken(_tokenB).decimals();
+        uint256 rawPrice = _tokenA == token0
             ? ((price0Cumulative - firstObservation.price0Cumulative) / timeElapsed)
             : ((price1Cumulative - firstObservation.price1Cumulative) / timeElapsed);
 
@@ -100,25 +103,25 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
     }
 
     // returns the index of the observation corresponding to the given timestamp
-    function observationIndexOf(uint256 timestamp) public view returns (uint8 index) {
-        uint256 epochPeriod = timestamp / periodSize;
+    function observationIndexOf(uint256 _timestamp) public view returns (uint8 index) {
+        uint256 epochPeriod = _timestamp / periodSize;
         return uint8(epochPeriod % granularity);
     }
 
     // returns the observation from the oldest epoch (at the beginning of the window) relative to the current time
-    function getFirstObservationInWindow(address pair) public view returns (Observation memory firstObservation) {
+    function getFirstObservationInWindow(address _pair) public view returns (Observation memory firstObservation) {
         uint8 observationIndex = observationIndexOf(block.timestamp);
         uint8 firstObservationIndex = (observationIndex + 1) % granularity;
-        firstObservation = pairObservations[pair][firstObservationIndex];
+        firstObservation = pairObservations[_pair][firstObservationIndex];
     }
 
-    function currentCumulativePrice(address pair) public view returns (uint256 price0Cumulative, uint256 price1Cumulative) {
+    function currentCumulativePrice(address _pair) public view returns (uint256 price0Cumulative, uint256 price1Cumulative) {
         uint32 blockTimestamp = uint32(block.timestamp % 2 ** 32);
-        price0Cumulative = IFathomSwapPair(pair).price0CumulativeLast();
-        price1Cumulative = IFathomSwapPair(pair).price1CumulativeLast();
+        price0Cumulative = IFathomSwapPair(_pair).price0CumulativeLast();
+        price1Cumulative = IFathomSwapPair(_pair).price1CumulativeLast();
 
         // if time has elapsed since the last update on the pair, mock the accumulated price values
-        (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast) = IFathomSwapPair(pair).getReserves();
+        (uint112 reserve0, uint112 reserve1, uint32 blockTimestampLast) = IFathomSwapPair(_pair).getReserves();
         if (blockTimestampLast != blockTimestamp) {
             uint32 timeElapsed = blockTimestamp - blockTimestampLast;
             price0Cumulative += _fraction(reserve1, reserve0) * timeElapsed;
@@ -126,8 +129,8 @@ contract SlidingWindowDexOracle is Initializable, IFathomDEXOracle {
         }
     }
 
-    function _fraction(uint256 a, uint256 b) private pure returns (uint256 result) {
-        result = (a << RESOLUTION) / b;
+    function _fraction(uint256 _a, uint256 _b) private pure returns (uint256 result) {
+        result = (_a << RESOLUTION) / _b;
     }
 
     function _toDecimals18(uint256 _amount, uint _fromDecimals) private pure returns (uint256 result) {

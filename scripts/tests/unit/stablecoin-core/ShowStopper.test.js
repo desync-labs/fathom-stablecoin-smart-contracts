@@ -16,35 +16,35 @@ const { formatBytes32String } = ethers.utils
 const WeekInSeconds = 604800;
 
 const loadFixtureHandler = async () => {
-    const mockedAccessControlConfig = await createMock("AccessControlConfig");
-    const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
-    const mockedBookKeeper = await createMock("BookKeeper");
-    const mockedSystemDebtEngine = await createMock("SystemDebtEngine");
-    const mockedLiquidationEngine = await createMock("LiquidationEngine");
-    const mockedPriceFeed = await createMock("SimplePriceFeed");
-    const mockedPriceOracle = await createMock("PriceOracle");
-    const mockedTokenAdapter = await createMock("TokenAdapter");
+  const mockedAccessControlConfig = await createMock("AccessControlConfig");
+  const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
+  const mockedBookKeeper = await createMock("BookKeeper");
+  const mockedSystemDebtEngine = await createMock("SystemDebtEngine");
+  const mockedLiquidationEngine = await createMock("LiquidationEngine");
+  const mockedPriceFeed = await createMock("SimplePriceFeed");
+  const mockedPriceOracle = await createMock("PriceOracle");
+  const mockedTokenAdapter = await createMock("TokenAdapter");
 
-    await mockedBookKeeper.mock.totalStablecoinIssued.returns(0)
-    await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
+  await mockedBookKeeper.mock.totalStablecoinIssued.returns(0)
+  await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
 
-    const showStopper = getContract("ShowStopper", DeployerAddress)
-    const showStopperAsAlice = getContract("ShowStopper", AliceAddress)
+  const showStopper = getContract("MockShowStopper", DeployerAddress)
+  const showStopperAsAlice = getContract("MockShowStopper", AliceAddress)
 
-    await showStopper.initialize(mockedBookKeeper.address);
+  await showStopper.initialize(mockedBookKeeper.address);
 
-    return {
-        showStopper,
-        showStopperAsAlice,
-        mockedBookKeeper,
-        mockedLiquidationEngine,
-        mockedSystemDebtEngine,
-        mockedPriceOracle,
-        mockedPriceFeed,
-        mockedTokenAdapter,
-        mockedAccessControlConfig,
-        mockedCollateralPoolConfig
-    }
+  return {
+    showStopper,
+    showStopperAsAlice,
+    mockedBookKeeper,
+    mockedLiquidationEngine,
+    mockedSystemDebtEngine,
+    mockedPriceOracle,
+    mockedPriceFeed,
+    mockedTokenAdapter,
+    mockedAccessControlConfig,
+    mockedCollateralPoolConfig
+  }
 }
 describe("ShowStopper", () => {
   // Contracts
@@ -83,7 +83,7 @@ describe("ShowStopper", () => {
     await mockedPriceFeed.mock.isPriceOk.returns(true);
     await mockedPriceOracle.mock.stableCoinReferencePrice.returns(WeiPerRay)
     await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRad);
-    
+
     await showStopper.cagePool(formatBytes32String("XDC"))
     await mockedBookKeeper.mock.positionWhitelist.returns(BigNumber.from(0))
     await mockedBookKeeper.mock.stablecoin.returns(0)
@@ -96,17 +96,17 @@ describe("ShowStopper", () => {
 
   beforeEach(async () => {
     ({
-        showStopper,
-        showStopperAsAlice,
-        mockedBookKeeper,
-        mockedLiquidationEngine,
-        mockedSystemDebtEngine,
-        mockedPriceOracle,
-        mockedPriceFeed,
-        mockedTokenAdapter,
-        mockedAccessControlConfig,
-        mockedCollateralPoolConfig
-      } = await loadFixture(loadFixtureHandler))
+      showStopper,
+      showStopperAsAlice,
+      mockedBookKeeper,
+      mockedLiquidationEngine,
+      mockedSystemDebtEngine,
+      mockedPriceOracle,
+      mockedPriceFeed,
+      mockedTokenAdapter,
+      mockedAccessControlConfig,
+      mockedCollateralPoolConfig
+    } = await loadFixture(loadFixtureHandler))
 
   })
 
@@ -142,7 +142,7 @@ describe("ShowStopper", () => {
         await mockedAccessControlConfig.mock.hasRole.returns(true)
 
         // less than 1 week
-        await expect(showStopper.cage(WeekInSeconds-1)).to.be.revertedWith("ShowStopper/invalid-cool-down")
+        await expect(showStopper.cage(WeekInSeconds - 1)).to.be.revertedWith("ShowStopper/invalid-cool-down")
 
         // more than three months
         await expect(showStopper.cage(7862401)).to.be.revertedWith("ShowStopper/invalid-cool-down")
@@ -322,7 +322,7 @@ describe("ShowStopper", () => {
         })
 
         context("and lockedCollateral is overflow (> MaxInt256)", () => {
-           it("should revert", async () => {
+          it("should revert", async () => {
             await setup()
 
             await mockedBookKeeper.mock.positions.returns(ethers.constants.MaxUint256, BigNumber.from("0"))
@@ -339,7 +339,7 @@ describe("ShowStopper", () => {
         })
 
         context("when the caller has no access to the position", () => {
-           it("should revert", async () => {
+          it("should revert", async () => {
             await setup()
 
             await mockedBookKeeper.mock.positions.returns(WeiPerRay, BigNumber.from("0"))
@@ -355,7 +355,7 @@ describe("ShowStopper", () => {
         })
 
         context("and debtShare is 0 and lockedCollateral is 1 ray", () => {
-           it("should be success", async () => {
+          it("should be success", async () => {
             await setup()
 
             await mockedBookKeeper.mock.positions.withArgs(
@@ -387,7 +387,7 @@ describe("ShowStopper", () => {
         context(
           "and debtShare is 0 and lockedCollateral is 1 ray, but the caller does not have access to the position",
           () => {
-             it("should be success", async () => {
+            it("should be success", async () => {
               await setup()
 
               await mockedBookKeeper.mock.positions.returns(WeiPerRay, BigNumber.from("0"))
@@ -408,7 +408,7 @@ describe("ShowStopper", () => {
         context(
           "and debtShare is 0 and lockedCollateral is 1 ray, the caller is not the owner of the address but has access to",
           () => {
-             it("should be success", async () => {
+            it("should be success", async () => {
               await setup()
 
               await mockedAccessControlConfig.mock.hasRole.returns(false)
@@ -446,7 +446,7 @@ describe("ShowStopper", () => {
       })
 
       context("pool is active", () => {
-         it("should revert", async () => {
+        it("should revert", async () => {
           await expect(
             showStopper.redeemLockedCollateral(
               formatBytes32String("XDC"),
@@ -662,7 +662,7 @@ describe("ShowStopper", () => {
             await mockedBookKeeper.mock.poolStablecoinIssued.returns(WeiPerRad.mul(100))
 
             await showStopper.finalizeCashPrice(formatBytes32String("XDC"))
-            
+
             await mockedBookKeeper.mock.moveStablecoin.returns()
             await showStopper.accumulateStablecoin(WeiPerWad.mul(2))
             // await mockedBookKeeper.mock.moveCollateral.withArgs(
@@ -671,7 +671,7 @@ describe("ShowStopper", () => {
             //   DeployerAddress,
             //   WeiPerRad
             // ).returns()
-            
+
             //waffle has some issue dealing with mock function with args that does not return value
             await mockedBookKeeper.mock.moveCollateral.returns()
 

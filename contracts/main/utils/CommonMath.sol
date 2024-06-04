@@ -7,28 +7,28 @@ contract CommonMath {
     uint256 internal constant RAY = 10 ** 27; // one
     uint256 internal constant RAD = 10 ** 45;
 
-    function add(uint256 x, int256 y) internal pure returns (uint256 z) {
+    function add(uint256 _x, int256 _y) internal pure returns (uint256 z) {
         unchecked {
-            z = x + uint256(y);
+            z = _x + uint256(_y);
         }
-        require(y >= 0 || z <= x);
-        require(y <= 0 || z >= x);
+        require(_y >= 0 || z <= _x);
+        require(_y <= 0 || z >= _x);
     }
 
-    function sub(uint256 x, int256 y) internal pure returns (uint256 z) {
+    function sub(uint256 _x, int256 _y) internal pure returns (uint256 z) {
         unchecked {
-            z = x - uint256(y);
+            z = _x - uint256(_y);
         }
-        require(y <= 0 || z <= x);
-        require(y >= 0 || z >= x);
+        require(_y <= 0 || z <= _x);
+        require(_y >= 0 || z >= _x);
     }
 
-    function mul(uint256 x, int256 y) internal pure returns (int256 z) {
+    function mul(uint256 _x, int256 _y) internal pure returns (int256 z) {
         unchecked {
-            z = int256(x) * y;
+            z = int256(_x) * _y;
         }
-        require(int256(x) >= 0);
-        require(y == 0 || z / y == int256(x));
+        require(int256(_x) >= 0);
+        require(_y == 0 || z / _y == int256(_x));
     }
 
     function divup(uint256 _x, uint256 _y) internal pure returns (uint256 _z) {
@@ -83,51 +83,51 @@ contract CommonMath {
         }
     }
 
-    function rpow(uint256 x, uint256 n, uint256 b) internal pure returns (uint256 z) {
+    function rpow(uint256 _x, uint256 _n, uint256 _b) internal pure returns (uint256 z) {
         assembly {
-            switch x
+            switch _x
             case 0 {
-                switch n
+                switch _n
                 case 0 {
-                    z := b
+                    z := _b
                 }
                 default {
                     z := 0
                 }
             }
             default {
-                switch mod(n, 2)
+                switch mod(_n, 2)
                 case 0 {
-                    z := b
+                    z := _b
                 }
                 default {
-                    z := x
+                    z := _x
                 }
-                let half := div(b, 2) // for rounding.
+                let half := div(_b, 2) // for rounding.
                 for {
-                    n := div(n, 2)
-                } n {
-                    n := div(n, 2)
+                    _n := div(_n, 2)
+                } _n {
+                    _n := div(_n, 2)
                 } {
-                    let xx := mul(x, x)
-                    if iszero(eq(div(xx, x), x)) {
+                    let xx := mul(_x, _x)
+                    if iszero(eq(div(xx, _x), _x)) {
                         revert(0, 0)
                     }
                     let xxRound := add(xx, half)
                     if lt(xxRound, xx) {
                         revert(0, 0)
                     }
-                    x := div(xxRound, b)
-                    if mod(n, 2) {
-                        let zx := mul(z, x)
-                        if and(iszero(iszero(x)), iszero(eq(div(zx, x), z))) {
+                    _x := div(xxRound, _b)
+                    if mod(_n, 2) {
+                        let zx := mul(z, _x)
+                        if and(iszero(iszero(_x)), iszero(eq(div(zx, _x), z))) {
                             revert(0, 0)
                         }
                         let zxRound := add(zx, half)
                         if lt(zxRound, zx) {
                             revert(0, 0)
                         }
-                        z := div(zxRound, b)
+                        z := div(zxRound, _b)
                     }
                 }
             }

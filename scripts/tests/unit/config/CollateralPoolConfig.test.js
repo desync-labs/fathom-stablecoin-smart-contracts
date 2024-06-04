@@ -24,35 +24,35 @@ const nHoursAgoInSec = (now, n) => {
 }
 
 const loadFixtureHandler = async () => {
-    const collateralPoolConfig = getContract("CollateralPoolConfig", DeployerAddress)
-    const collateralPoolConfigAsAlice = getContract("CollateralPoolConfig", AliceAddress)
+  const collateralPoolConfig = getContract("MockCollateralPoolConfig", DeployerAddress)
+  const collateralPoolConfigAsAlice = getContract("MockCollateralPoolConfig", AliceAddress)
 
-    const mockedAccessControlConfig = await createMock("AccessControlConfig");
-    const mockedSimplePriceFeed = await createMock("SimplePriceFeed");
-    const mockedCollateralTokenAdapter = await createMock("TokenAdapter");
+  const mockedAccessControlConfig = await createMock("AccessControlConfig");
+  const mockedSimplePriceFeed = await createMock("SimplePriceFeed");
+  const mockedCollateralTokenAdapter = await createMock("TokenAdapter");
 
-    await mockedAccessControlConfig.mock.PRICE_ORACLE_ROLE.returns(formatBytes32String("PRICE_ORACLE_ROLE"))
-    await mockedAccessControlConfig.mock.BOOK_KEEPER_ROLE.returns(formatBytes32String("BOOK_KEEPER_ROLE"))
-    await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
-    await mockedAccessControlConfig.mock.STABILITY_FEE_COLLECTOR_ROLE.returns(formatBytes32String("STABILITY_FEE_COLLECTOR_ROLE"))
-    await mockedAccessControlConfig.mock.hasRole.returns(true)
+  await mockedAccessControlConfig.mock.PRICE_ORACLE_ROLE.returns(formatBytes32String("PRICE_ORACLE_ROLE"))
+  await mockedAccessControlConfig.mock.BOOK_KEEPER_ROLE.returns(formatBytes32String("BOOK_KEEPER_ROLE"))
+  await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
+  await mockedAccessControlConfig.mock.STABILITY_FEE_COLLECTOR_ROLE.returns(formatBytes32String("STABILITY_FEE_COLLECTOR_ROLE"))
+  await mockedAccessControlConfig.mock.hasRole.returns(true)
 
-    // await mockedAccessControlConfig.mock.collateralPoolId.returns(COLLATERAL_POOL_ID)
+  // await mockedAccessControlConfig.mock.collateralPoolId.returns(COLLATERAL_POOL_ID)
 
-    await mockedSimplePriceFeed.mock.peekPrice.returns(formatBytes32BigNumber(BigNumber.from("0")), true);
-    await mockedCollateralTokenAdapter.mock.decimals.returns(0);
-    await mockedCollateralTokenAdapter.mock.collateralPoolId.returns(COLLATERAL_POOL_ID)
+  await mockedSimplePriceFeed.mock.peekPrice.returns(formatBytes32BigNumber(BigNumber.from("0")), true);
+  await mockedCollateralTokenAdapter.mock.decimals.returns(0);
+  await mockedCollateralTokenAdapter.mock.collateralPoolId.returns(COLLATERAL_POOL_ID)
 
-    await collateralPoolConfig.initialize(mockedAccessControlConfig.address)
-    return {
-      collateralPoolConfig,
-      collateralPoolConfigAsAlice,
-      mockedAccessControlConfig,
-      mockedSimplePriceFeed,
-      mockedCollateralTokenAdapter,
-    }
+  await collateralPoolConfig.initialize(mockedAccessControlConfig.address)
+  return {
+    collateralPoolConfig,
+    collateralPoolConfigAsAlice,
+    mockedAccessControlConfig,
+    mockedSimplePriceFeed,
+    mockedCollateralTokenAdapter,
   }
-  
+}
+
 
 describe("CollateralPoolConfig", () => {
   // Contracts
@@ -67,9 +67,9 @@ describe("CollateralPoolConfig", () => {
     await snapshot.revertToSnapshot();
   })
 
-  beforeEach(async () => { 
-    ;({ collateralPoolConfig,collateralPoolConfigAsAlice, mockedAccessControlConfig, mockedSimplePriceFeed, mockedCollateralTokenAdapter } =
-        await loadFixture(loadFixtureHandler))
+  beforeEach(async () => {
+    ; ({ collateralPoolConfig, collateralPoolConfigAsAlice, mockedAccessControlConfig, mockedSimplePriceFeed, mockedCollateralTokenAdapter } =
+      await loadFixture(loadFixtureHandler))
   })
 
   describe("#initCollateralPool", () => {
@@ -300,7 +300,7 @@ describe("CollateralPoolConfig", () => {
       it("should success", async () => {
         await mockedSimplePriceFeed.mock.poolId.returns(COLLATERAL_POOL_ID)
         await mockedSimplePriceFeed.mock.isPriceOk.returns(true)
-        
+
         await collateralPoolConfig.initCollateralPool(
           COLLATERAL_POOL_ID,
           WeiPerRad.mul(10000000),
@@ -535,7 +535,7 @@ describe("CollateralPoolConfig", () => {
       })
       it("should be revert when collateralPoolId is wrong)", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(true)
-        
+
         await expect(
           collateralPoolConfigAsAlice.setAdapter(ethers.constants.HashZero, mockedCollateralTokenAdapter.address)
         ).to.be.revertedWith("CollateralPoolConfig/setAdapter-wrongPoolId")
