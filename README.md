@@ -165,7 +165,7 @@ ChainID of apothem is 51. Therefore, the externalAddresses.json need to have the
 }
 ```
 
-The WXDC address above is officially deployed on the Apothem network. Therefore, I recommend using this address unless you have already deployed or are willing to deploy a new WXDC address for your testing purposes.
+The WNATIVE address above is officially deployed on the Apothem network. Therefore, I recommend using this address unless you have already deployed or are willing to deploy a new WNATIVE address for your testing purposes.
 
 #### 4) Compile contracts
 
@@ -205,7 +205,7 @@ ChainID of XDC mainnet is 50. Therefore, the externalAddresses.json need to have
 }
 ```
 
-WXDC is recommended to have the official WXDC address unless you would like to use other wrapper contracts.
+WNATIVE is recommended to have the official WNATIVE address unless you would like to use other wrapper contracts.
 
 #### 4) Compile contracts
 
