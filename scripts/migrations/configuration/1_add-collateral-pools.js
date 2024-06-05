@@ -1,9 +1,7 @@
 const pools = require("../../common/collateral");
 const { getAddresses } = require("../../common/addresses");
 const { getProxy } = require("../../common/proxies");
-const { 
-    getConfig
-} = require("../../common/collateral-setup-helper");
+const { getConfigInitialCollateral } = require("../../common/collateral-setup-helper");
 
 const { BigNumber } = require("ethers");
 const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
@@ -11,7 +9,7 @@ const WeiPerRay = BigNumber.from(`1${"0".repeat(27)}`)
 const WeiPerRad = BigNumber.from(`1${"0".repeat(45)}`)
 
 module.exports = async function (deployer) {
-    const config = getConfig(deployer.networkId());
+    const config = getConfigInitialCollateral(deployer.networkId());
     const CLOSE_FACTOR_BPS = BigNumber.from(config.CLOSE_FACTOR_BPS)   // <- 0.25
     const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(config.LIQUIDATOR_INCENTIVE_BPS)  // <- 1.05
     const TREASURY_FEE_BPS = BigNumber.from(config.TREASURY_FEE_BPS) // <- 0.8
