@@ -73,7 +73,6 @@ The chainId 1337 addresses are required to execute the test scripts on Ganache. 
 {
   "1337": {
     "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
-    "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753"
   }
 }
 
@@ -97,7 +96,7 @@ You might face some tests failing with 'out of gas' error.
 
 ## Deployment
 
-The current codebase is structured so that the same set of smart contracts will be deployed, regardless of the target blockchain. By default, the protocol's price feed after deployment is set to `SimplePriceFeed`, a mock price feed that allows the protocol's deployer (owner) to freely modify prices. This default setting is based on the consideration that other price feeds for commercial use, whether sourcing from a DEX or a Centralized one, require external addresses or even price-related bots for successful deployment. Consequently, the adjusted deployment/migration script will deploy `DexPriceOracle`, `DelayFathomOraclePriceFeed`, `CentralizedOraclePriceFeed`, and `SlidingWindowDexOracle` using proxy patterns, but will not initialize them. Documentation regarding price feed changes will be included in this markdown document following the deployment section.
+The current codebase is structured so that the same set of smart contracts will be deployed, regardless of the target blockchain. By default, the protocol's price feed after deployment is set to `SimplePriceFeed`, a mock price feed that allows the protocol's deployer (owner) to freely modify prices. This default setting is based on the consideration that other price feeds for commercial use require external addresses or even price-related bots for successful deployment. Consequently, the adjusted deployment/migration script will deploy `CentralizedOraclePriceFeed`, 'FathomPriceOracle' using proxy patterns, but only CentralizedOraclePriceFeed will be initialize. Documentation regarding price feed changes will be included in this markdown document following the deployment section.
 
 ### On Ganache
 
@@ -115,18 +114,18 @@ $ echo -n PRIVATE_KEY_WITHOUT_0x_PREFIX > privateKey
 #### 2) Create externalAddresses.json in root directory. 
 
 The format of the content can be same as in the Running test sections. Like below
+WNATIVE address will be the collateralToken address for the initial collateral NAITVE coin of the network that you deploy fathomStablecoin to.
 
 ```JSON
 {
   "1337": {
-    "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
-    "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753"
+    "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714"
   }
 }
 
 ```
 
-If you want to see the protocol in action by depositing test ETH and borrowing FXD, I recommend that you first deploy WNATIVE||WETH on Ganache. After that, update the WNATIVE address in the externalAddresses.json file with the address of the WNATIVE you deployed. Additionally, if you aim to thoroughly test the StableSwapModule post-deployment, you must deploy an ERC20 token that can subsequently be deposited into the StableSwapModule. Therefore, please deploy an ERC20 token to substitute for the USD token, and update the USD value in the aforementioned JSON file.
+If you want to see the protocol in action by depositing test ETH and borrowing FXD, I recommend that you first deploy WNATIVE||WETH on Ganache. After that, update the WNATIVE address in the externalAddresses.json file with the address of the WNATIVE you deployed.
 
 #### 3) Compile contracts
 
@@ -161,18 +160,12 @@ ChainID of apothem is 51. Therefore, the externalAddresses.json need to have the
 ```JSON
 {
     "51": {
-      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
+      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce"
     }
 }
 ```
 
 The WNATIVE address above is officially deployed on the Apothem network. Therefore, I recommend using this address unless you have already deployed or are willing to deploy a new WNATIVE address for your testing purposes.
-
-For USD addresses, you may use the contract addresses of ERC20 tokens that you deployed yourself, or if you have balances of any USD-pegged stablecoin on Apothem, you can use its address.
-
-The USDSTABLE will be the USD address used for the StableSwapModule. You may keep the same address as the USD address.
-
-DEXFactory refers to the factory address of UniswapV2 fork. In this deployment, you can use the FathomSwap factory address provided above, or you can use your own factory address if you prefer. DEXFactory address was used for the priceOracle and priceFeed that use a DEX as the source of truth, but the default deployment setting does not use the address
 
 #### 4) Compile contracts
 
@@ -207,21 +200,12 @@ ChainID of NATIVE mainnet is 50. Therefore, the externalAddresses.json need to h
 ```JSON
 {
     "50": {
-      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
-      "USD": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
-      "DEXFactory": "0x6FfcE1bb8fB4841B42C8ee5e91398068723ba80D",
-      "USDSTABLE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f"
+      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce"
     }
 }
 ```
 
 WNATIVE is recommended to have the official WNATIVE address unless you would like to use other wrapper contracts.
-
-For USD addresses, I recommend USDTx, however, if you have other stable token on NATIVE that you would like to use, no problem.
-
-The USDSTABLE will be the USD address used for the StableSwapModule. You may keep the same address as the USD address.
-
-DEXFactory refers to the factory address of UniswapV2. In this deployment, you can find and use the FathomSwap factory address or you can use your own factory address if you prefer. DEXFactory address was used for the priceOracle and priceFeed that use a DEX as the source of truth, but the default deployment setting does not use this address.
 
 #### 4) Compile contracts
 
@@ -264,7 +248,7 @@ Once the price is set in SimplePriceFeed, it is necessary to input the LTV disco
 ```
 The setPrice function of the PriceOracle should be called with an argument, which is the collateralPoolId. This is a padded bytes32 value converted from the string 'NATIVE'.
 
-0x5844430000000000000000000000000000000000000000000000000000000000
+0x4e41544956452000000000000000000000000000000000000000000000000000
 
 For example, if the price of NATIVE set by SimplePriceFeed is 1 USD and the Loan-to-Value (LTV) ratio is 70%, then the LTV discounted price would be 0.7 USD.
 
@@ -291,34 +275,43 @@ Line 5~6 verifies the solvency of the new priceFeed. New priceFeed must have poo
 
 ### Simple way to initialize other priceFeeds and priceOracles
 
-`DexPriceOracle`, `DelayFathomOraclePriceFeed`, `CentralizedOraclePriceFeed`, and `SlidingWindowDexOracle`
+`CentralizedOraclePriceFeed`
 
 can be initialized with script below
 
 ```
-scripts/migrations/priceFeed/1_initialize.js
+scripts/migrations/priceFeed/1_setFathomPriceOracle.js
 ````
-#### To run the script with DEX as the price source, ensure that:
+#### To run the script for the price feed, ensure that the build files remain unchanged since deployment.
 
-0) The build files remain unchanged since deployment.
-1) The DEXFactory is valid and that an NATIVE/USD pair exists within the DEXFactory.
+The default is set as CentralizedOraclePriceFeed
 
-The default PriceOracle for DelayFathomOraclePriceFeed is set as DexPriceOracle since SlidingWindowDexOracle requires more involvement of PriceBot that will periodically keep feeding prices to SlidingWindowDexOracle. 
+### Please prepare setFathomPriceOracle.json file in the root. The file looks like below
+```JSON=
+{
+"51":
+{
+    "PriceAggregator":"0x0000000000000000000000000000000000000000",
+    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+    "CollateralSymbol":"CGO",
+},
+"1337":
+{
+    "PriceAggregator":"0x0000000000000000000000000000000000000000",
+    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+    "CollateralSymbol":"CGO",
+},
+"17000":
+{
+    "PriceAggregator":"0x0000000000000000000000000000000000000000",
+    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+    "CollateralSymbol":"CGO",
+}
+}
+```
 
 #### Run the init script with below command
 
 ```bash
-$ coralX execute --path scripts/migrations/priceFeed/1_initialize.js
+$ coralX execute --path scripts/migrations/priceFeed/1_setFathomPriceOracle.js --network anyConfiguredNetwork
 ```
-
-### DEX price feed info
-
-The DelayFathomOraclePriceFeed is designed to replace the SimplePriceFeed with DEX as the price source. To switch to the DelayFathomOraclePriceFeed, you must execute the peekPrice function on DelayFathomOraclePriceFeed twice.
-
-The following demonstrates the relationship between the price contracts. When the setPrice function is called in PriceOracle, the function calls flow as shown below:
-
-PriceOracle -> DelayFathomOraclePriceFeed -> DexPriceOracle -> DEX
-
-When the setPrice function is invoked in PriceOracle, or when a user opens a position, the price updates after a certain delay period has elapsed (default is set to 15 minutes). For more information, please refer to the DelayFathomOraclePriceFeed and DelayPriceFeedBase contract documentation.
-
-In practice, it is possible to test how the collateral price in the DEX is mirrored using DelayFathomOraclePriceFeed without the need for a priceBot. However, if there is insufficient activity from opening positions or if the setPrice function in PriceOracle is not called frequently enough, the price information in DelayFathomOraclePriceFeed may become outdated (with a priceLife of 30 minutes) and hinder CDP actions. In such instances, you should call peekPrice on the DelayFathomOraclePriceFeed, then proceed to call the setPrice function in PriceOracle.

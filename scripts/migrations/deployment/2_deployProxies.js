@@ -32,6 +32,7 @@ module.exports = async function (deployer) {
         // "SlidingWindowDexOracle",
         "AdminControls",
         "CentralizedOraclePriceFeed",
+        "FathomPriceOracle",
         // To be sunsetted on xdc mainnet, then to be deprecated
         // "StableSwapModuleWrapper",
         "SimplePriceFeed"

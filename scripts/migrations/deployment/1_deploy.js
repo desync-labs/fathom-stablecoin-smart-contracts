@@ -16,6 +16,7 @@ const FixedSpreadLiquidationStrategy = artifacts.require('FixedSpreadLiquidation
 const PositionManager = artifacts.require('PositionManager.sol');
 const ShowStopper = artifacts.require('ShowStopper.sol');
 const PriceOracle = artifacts.require('PriceOracle.sol');
+const FathomPriceOracle = artifacts.require('FathomPriceOracle.sol');
 const StablecoinAdapter = artifacts.require('StablecoinAdapter.sol');
 const LiquidationEngine = artifacts.require('LiquidationEngine.sol');
 const FlashMintModule = artifacts.require('FlashMintModule.sol');
@@ -52,6 +53,7 @@ module.exports = async function (deployer) {
     // deployer.deploy(DexPriceOracle, { gas: 7050000 }),
     // deployer.deploy(StableSwapModule, { gas: 7050000 }),
     deployer.deploy(FlashMintModule, { gas: 7050000 }),
+    deployer.deploy(FathomPriceOracle, { gas: 7050000 }),
     // deployer.deploy(FlashMintArbitrager, { gas: 7050000 }),
     // deployer.deploy(BookKeeperFlashMintArbitrager, { gas: 7050000 }),
     deployer.deploy(FathomProxyFactory, { gas: 7050000 }),

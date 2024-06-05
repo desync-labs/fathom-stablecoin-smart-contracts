@@ -34,6 +34,7 @@ module.exports = async function (deployer) {
     const proxyActionsStorage = await getProxy(proxyFactory, "ProxyActionsStorage");
     const adminControls = await getProxy(proxyFactory, "AdminControls");
     const centralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed");
+    const fathomPriceOracle = await getProxy(proxyFactory, "FathomPriceOracle");
     // To be sunsetted on xdc mainnet, then to be deprecated
     // const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
@@ -145,7 +146,9 @@ module.exports = async function (deployer) {
             flashMintModule.address,
             stablecoinAdapter.address
         ),
-        // centralizedOraclePriceFeed.initialize(priceOracleAddress, accessControlConfig.address, pools.NATIVE),
+        centralizedOraclePriceFeed.initialize(fathomPriceOracle.address, accessControlConfig.address, pools.NATIVE),
+        // FathomPriceOracle is not initialized in this script because it needs to be initialized only when the NATIVE coin's price aggregator is ready
+        // fathomPriceOracle.initialize(accessControlConfig.address, NATIVECOIN_s_AGGREGATOR),
         // To be sunsetted on xdc mainnet, then to be deprecated
         // stableSwapModuleWrapper.initialize(
         //     bookKeeper.address,
@@ -187,6 +190,7 @@ module.exports = async function (deployer) {
         // delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address,
         adminControls: adminControls.address,
         centralizedOraclePriceFeed: centralizedOraclePriceFeed.address,
+        fathomPriceOracle: fathomPriceOracle.address,
         proxyActionsStorage: proxyActionsStorage.address,
         fathomProxyAdmin: proxyAdmin.address,
         // slidingWindowDexOracle: slidingWindowDexOracle.address,
