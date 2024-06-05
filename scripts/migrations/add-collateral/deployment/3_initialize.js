@@ -1,7 +1,6 @@
 const fs = require('fs');
 
 const { getProxy, getProxyById } = require("../../../common/proxies");
-
 const { getConfig, getProxyId, token, poolId } = require("../../../common/add-collateral-helper")
 
 module.exports = async function (deployer) {

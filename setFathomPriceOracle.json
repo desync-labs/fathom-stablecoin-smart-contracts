@@ -1,0 +1,20 @@
+{
+"51":
+{
+    "PriceAggregator":"0x0000000000000000000000000000000000000000",
+    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+    "CollateralSymbol":"CGO",
+},
+"1337":
+{
+    "PriceAggregator":"0x0000000000000000000000000000000000000000",
+    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+    "CollateralSymbol":"CGO",
+},
+"17000":
+{
+    "PriceAggregator":"0x0000000000000000000000000000000000000000",
+    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+    "CollateralSymbol":"CGO",
+}
+}
