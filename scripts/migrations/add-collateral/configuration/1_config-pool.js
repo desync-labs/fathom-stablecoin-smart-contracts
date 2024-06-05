@@ -1,24 +1,29 @@
 const { getProxy, getProxyById } = require("../../../common/proxies");
+const { getConfigAddCollateral } = require("../../../common/collateral-setup-helper");
+const { getConfig, getProxyId, poolId } = require("../../../common/add-collateral-helper")
 
 const { BigNumber } = require("ethers");
 const WeiPerRay = BigNumber.from(`1${"0".repeat(27)}`)
 const WeiPerRad = BigNumber.from(`1${"0".repeat(45)}`)
 
-const CLOSE_FACTOR_BPS = BigNumber.from(500)   // <- 0.5
-const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)  // <- 1.05
-const TREASURY_FEE_BPS = BigNumber.from(8000) // <- 0.8
-const STABILITY_FEE = BigNumber.from("1000000000627937192491029811")
-const LIQUIDATIONRATIO_75 = WeiPerRay.mul(133).div(100).toString(); // LTV 75%
-const DEBT_CEILING = WeiPerRad.mul(10000000)
-
-const { getConfig, getProxyId, poolId } = require("../../../common/add-collateral-helper")
 
 module.exports = async function (deployer) {
     const config = getConfig(deployer.networkId());
+    const config2 = getConfigAddCollateral(deployer.networkId());
+
+    const CLOSE_FACTOR_BPS = BigNumber.from(config2.CLOSE_FACTOR_BPS)   // <- 0.25
+    const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(config2.LIQUIDATOR_INCENTIVE_BPS)  // <- 1.05
+    const TREASURY_FEE_BPS = BigNumber.from(config2.TREASURY_FEE_BPS) // <- 0.8
+    const STABILITY_FEE = BigNumber.from(config2.STABILITY_FEE)
+    const LIQUIDATIONRATIO = WeiPerRay.mul(config2.LIQUIDATIONRATIO_NUMERATOR).div(config2.LIQUIDATIONRATIO_DENOMINATOR).toString(); // LTV 75%
+    const debtCeilingSetUpTotal = WeiPerRad.mul(config2.DEBTCELINGSETUP_TOTAL);
+    const debtCeilingSetUp = WeiPerRad.mul(config2.DEBTCELINGSETUP_NUMERATOR).div(config2.DEBTCELINGSETUP_DENOMINATOR);
+    const debtFloor = WeiPerRad.mul(config2.DEBT_FLOOR);
+    const positionDebtCeiling = WeiPerRad.mul(config2.POSITION_DEBT_CEILING);
 
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", config.fathomProxyFactory);
     const collateralTokenAdapter = await getProxyById(proxyFactory, "CollateralTokenAdapter", getProxyId("CollateralTokenAdapter"));
-    const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy")
+    const fixedSpreadLiquidationStrategy = config2.FIXED_SPREAD_LIQUIDATION_STRATEGY;
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig")
     const priceOracle = await getProxy(proxyFactory, "PriceOracle")
 
@@ -37,11 +42,11 @@ module.exports = async function (deployer) {
 
     await collateralPoolConfig.initCollateralPool(
         poolId,
-        DEBT_CEILING,
-        0,
-        WeiPerRad.mul(50000),
+        debtCeilingSetUp,
+        debtFloor,
+        positionDebtCeiling,
         priceFeed.address,
-        LIQUIDATIONRATIO_75,
+        LIQUIDATIONRATIO,
         STABILITY_FEE,
         collateralTokenAdapter.address,
         CLOSE_FACTOR_BPS,
