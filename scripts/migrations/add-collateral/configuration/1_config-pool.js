@@ -38,7 +38,7 @@ module.exports = async function (deployer) {
     await simplePriceFeedNewCol.setPrice(WeiPerWad.toString());
 
     const priceFeed = simplePriceFeedNewCol;
-=
+
     const priceFeed = await getProxyById(proxyFactory, "CentralizedOraclePriceFeed", getProxyId("CentralizedOraclePriceFeed"));
     await priceFeed.peekPrice({ gasLimit: 2000000 });
 
