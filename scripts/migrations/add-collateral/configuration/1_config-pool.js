@@ -38,8 +38,9 @@ module.exports = async function (deployer) {
     await simplePriceFeedNewCol.setPrice(WeiPerWad.toString());
 
     const priceFeed = simplePriceFeedNewCol;
-
-    const priceFeed = await getProxyById(proxyFactory, "CentralizedOraclePriceFeed", getProxyId("CentralizedOraclePriceFeed"));
+    // Below line is commented out to explicitedly show that for initial collateral setup, we need to use simplePriceFeed instead of CentralizedOraclePriceFeed
+    // But later during priceFeedSwitch, CentralizedOraclePriceFeed will be used.
+    // const priceFeed = await getProxyById(proxyFactory, "CentralizedOraclePriceFeed", getProxyId("CentralizedOraclePriceFeed"));
     await priceFeed.peekPrice({ gasLimit: 2000000 });
 
     await collateralPoolConfig.initCollateralPool(
