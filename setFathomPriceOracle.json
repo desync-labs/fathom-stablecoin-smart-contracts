@@ -1,20 +1,26 @@
 {
-"51":
-{
-    "PriceAggregator":"0x0000000000000000000000000000000000000000",
-    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
-    "CollateralSymbol":"CGO",
-},
-"1337":
-{
-    "PriceAggregator":"0x0000000000000000000000000000000000000000",
-    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
-    "CollateralSymbol":"CGO",
-},
-"17000":
-{
-    "PriceAggregator":"0x0000000000000000000000000000000000000000",
-    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
-    "CollateralSymbol":"CGO",
-}
+    "50": {
+        "FathomProxyFactory": "0x0acf88Ba60561372Ef93a67E04e1A55d9fC1D910",
+        "PriceAggregator":"0x0000000000000000000000000000000000000000",
+        "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+        "CollateralSymbol":"CGO",
+    },
+    "51": {
+        "FathomProxyFactory": "0xf62f41d00EAaf02fD31FA24C5630C9AcfEf8D69F",
+        "PriceAggregator":"0x0000000000000000000000000000000000000000",
+        "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+        "CollateralSymbol":"CGO",
+    },
+    "1337": {
+        "FathomProxyFactory": "0x0000000000000000000000000000000000000000",
+        "PriceAggregator":"0x0000000000000000000000000000000000000000",
+        "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+        "CollateralSymbol":"CGO",
+    },
+    "17000": {
+        "FathomProxyFactory": "0x0000000000000000000000000000000000000000",
+        "PriceAggregator":"0x0000000000000000000000000000000000000000",
+        "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+        "CollateralSymbol":"CGO",
+    }
 }

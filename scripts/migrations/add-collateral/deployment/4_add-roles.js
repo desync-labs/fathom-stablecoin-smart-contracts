@@ -7,7 +7,7 @@ module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", config.fathomProxyFactory);
 
     // const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
-    const fixedSpreadLiquidationStrategy = "0xfe5037504E0EF5eC2DfBEEA03f9d9cB43580EF23";
+    const fixedSpreadLiquidationStrategy = config.fixedSpreadLiquidationStrategy;
     const showStopper = await getProxy(proxyFactory, "ShowStopper");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const liquidationEngine = await getProxy(proxyFactory, "LiquidationEngine");

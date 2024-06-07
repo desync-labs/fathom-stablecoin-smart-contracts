@@ -3,25 +3,29 @@
         "tokenAddress": "0x8f9920283470f52128bf11b0c14e798be704fd15",
         "testOracle": "0x0000000000000000000000000000000000000000",
         "fathomProxyFactory": "0x0acf88Ba60561372Ef93a67E04e1A55d9fC1D910",
-        "fathomProxyAdmin": "0xb82AD475fc113671840D510B60Cbae5630a07f3B"
+        "fathomProxyAdmin": "0xb82AD475fc113671840D510B60Cbae5630a07f3B",
+        "fixedSpreadLiquidationStrategy": "0xfe5037504E0EF5eC2DfBEEA03f9d9cB43580EF23"
     },
     "31337": {
         "tokenAddress": "0x8f9920283470f52128bf11b0c14e798be704fd15",
         "testOracle": "0x0000000000000000000000000000000000000000",
         "fathomProxyFactory": "0x0acf88Ba60561372Ef93a67E04e1A55d9fC1D910",
-        "fathomProxyAdmin": "0xb82AD475fc113671840D510B60Cbae5630a07f3B"
+        "fathomProxyAdmin": "0xb82AD475fc113671840D510B60Cbae5630a07f3B",
+        "fixedSpreadLiquidationStrategy": "0xfe5037504E0EF5eC2DfBEEA03f9d9cB43580EF23"
     },
     "51": {
         "tokenAddress": "0x97EC6730Fd5F138fCB167cb62A9a4c1A8Be2eD7d",
         "testOracle": "0x0000000000000000000000000000000000000000",
         "fathomProxyFactory": "0xf62f41d00EAaf02fD31FA24C5630C9AcfEf8D69F",
-        "fathomProxyAdmin": "0x6B33e88ec42291Bf82C9E7CE7f45DdC3464897bf"
+        "fathomProxyAdmin": "0x6B33e88ec42291Bf82C9E7CE7f45DdC3464897bf",
+        "fixedSpreadLiquidationStrategy": "0x4bEb8638AFe2892Fa7D46303F60f22e106C9AB7B"
     },
     "1337": {
         "tokenAddress": "0x0000000000000000000000000000000000000000",
         "testOracle": "0x0000000000000000000000000000000000000000",
         "fathomProxyFactory": "0x0000000000000000000000000000000000000000",
-        "fathomProxyAdmin": "0x0000000000000000000000000000000000000000"
+        "fathomProxyAdmin": "0x0000000000000000000000000000000000000000",
+        "fixedSpreadLiquidationStrategy": "0x0000000000000000000000000000000000000000"
     },
     "token": "GLD"
 }
