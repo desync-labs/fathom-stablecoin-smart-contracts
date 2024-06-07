@@ -16,4 +16,4 @@ function getProxyIdSwitchPriceFeed(contract) {
     return formatBytes32String(`${contract}_${token}`)
 }
 
-module.exports = { getConfig, getProxyIdSwitchPriceFeed }
+module.exports = { getConfig, getProxyIdSwitchPriceFeed, token, poolId }
