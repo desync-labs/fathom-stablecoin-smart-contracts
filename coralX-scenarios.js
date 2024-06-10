@@ -30,7 +30,7 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'apothem']
   ],
   whitelistCollateralTokenAdapterLocal: [
-    ['execute', '--path', 'scripts/migrations/whitelist/collateral-adaptert', '--network', 'development']
+    ['execute', '--path', 'scripts/migrations/whitelist/collateral-adapter', '--network', 'development']
   ],
   whitelistFMMLocal: [
     ['execute', '--path', 'scripts/migrations/whitelist/FMM', '--network', 'development']
