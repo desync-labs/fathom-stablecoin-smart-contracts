@@ -29,6 +29,12 @@ module.exports = {
   deployTokensApothem: [
     ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'apothem']
   ],
+  whitelistCollateralTokenAdapterLocal: [
+    ['execute', '--path', 'scripts/migrations/whitelist/collateral-adaptert', '--network', 'development']
+  ],
+  whitelistFMMLocal: [
+    ['execute', '--path', 'scripts/migrations/whitelist/FMM', '--network', 'development']
+  ],
   migrateAndConfigureForTests: [
     ['compile'],
     ['execute', '--path', 'scripts/migrations/test/pre-deployment'],
