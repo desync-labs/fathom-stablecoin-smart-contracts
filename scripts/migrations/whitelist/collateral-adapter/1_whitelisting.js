@@ -1,4 +1,4 @@
-const { getConfig } = require("../../common/whitelist-helper.js");
+const { getConfig } = require("../../common/whitelist-helper");
 
 module.exports = async function (deployer) {
     try {
