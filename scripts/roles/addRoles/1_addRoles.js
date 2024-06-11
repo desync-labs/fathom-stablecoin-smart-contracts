@@ -1,4 +1,4 @@
-const { getConfig, getRolesInBytes32 } = require("../common/add-role-helper");
+const { getConfig, getRolesInBytes32 } = require("../../common/add-role-helper");
 
 module.exports = async function (deployer) {
     const roles = [

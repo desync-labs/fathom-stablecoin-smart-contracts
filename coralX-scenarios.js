@@ -35,6 +35,9 @@ module.exports = {
   whitelistFMMLocal: [
     ['execute', '--path', 'scripts/migrations/whitelist/FMM', '--network', 'development']
   ],
+  addRolesLocal: [
+    ['execute', '--path', 'scripts/roles/addRoles', '--network', 'development']
+  ],
   migrateAndConfigureForTests: [
     ['compile'],
     ['execute', '--path', 'scripts/migrations/test/pre-deployment'],
