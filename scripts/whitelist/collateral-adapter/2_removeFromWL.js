@@ -1,4 +1,4 @@
-const { getConfig } = require("../../common/whitelist-helper");
+const { getConfig } = require("../../common/removeFromWL-helper");
 
 module.exports = async function (deployer) {
     try {
@@ -8,7 +8,7 @@ module.exports = async function (deployer) {
         }
 
         const collateralTokenAdapter = await artifacts.initializeInterfaceAt("CollateralTokenAdapter", config.CollateralTokenAdapter);
-        console.log(`Whitelisting to CollateralTokenAdapter: ${collateralTokenAdapter.address}`);
+        console.log(`removeFromWhitelist to \: ${collateralTokenAdapter.address}`);
 
         for (let I = 0; I < config.ToBeRemoved_CollateralTokenAdapter.length; I++) {
             await collateralTokenAdapter.removeFromWhitelist(config.ToBeRemoved_CollateralTokenAdapter[I], { gasLimit: 2000000 });
