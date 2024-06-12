@@ -2,7 +2,7 @@ const fs = require('fs');
 const { formatBytes32String, solidityKeccak256 } = require("ethers/lib/utils");
 const ZeroAddress = "0x0000000000000000000000000000000000000000"
 
-const rawdata = fs.readFileSync('../../transferOwnership.json');
+const rawdata = fs.readFileSync('../../transferProtocolOwnership.json');
 const config = JSON.parse(rawdata);
 
 function getConfig(chainId)  {
