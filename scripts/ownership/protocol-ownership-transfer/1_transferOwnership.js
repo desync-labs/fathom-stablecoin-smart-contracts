@@ -14,7 +14,7 @@ module.exports = async function (deployer) {
 
         // Grant the OWNER_ROLE
         await accessControlConfig.grantRole(ownerRoleBytes32, config.Address_To_Give_Ownership);
-        await accessControlConfig.renounce(ownerRoleBytes32, config.Address_To_Renounce_Ownership);
+        await accessControlConfig.renounceRole(ownerRoleBytes32, config.Address_To_Renounce_Ownership);
         console.log(`Granted OWNER_ROLE to ${config.Address_To_Give_Ownership}`);
 
         console.log(`Finished`);
