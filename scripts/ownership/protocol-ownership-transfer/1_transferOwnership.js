@@ -14,11 +14,11 @@ module.exports = async function (deployer) {
 
         // Grant the OWNER_ROLE
         await accessControlConfig.grantRole(ownerRoleBytes32, config.Address_To_Give_Ownership);
-        await accessControlConfig.renounce(ownerRoleBytes32, deployer.address);
-        console.log(`Granted OWNER_ROLE to ${config.Address_To_Add_Role}`);
+        await accessControlConfig.renounce(ownerRoleBytes32, config.Address_To_Renounce_Ownership);
+        console.log(`Granted OWNER_ROLE to ${config.Address_To_Give_Ownership}`);
 
         console.log(`Finished`);
     } catch (error) {
-        console.error(`Error during adding OWNER_ROLE to ${config.Address_To_Add_Role} : ${error.message}`);
+        console.error(`Error during switching OWNER_ROLE : ${error.message}`);
     }
 }
