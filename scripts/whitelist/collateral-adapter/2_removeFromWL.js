@@ -12,11 +12,11 @@ module.exports = async function (deployer) {
 
         for (let I = 0; I < config.ToBeRemoved_CollateralTokenAdapter.length; I++) {
             await collateralTokenAdapter.removeFromWhitelist(config.ToBeRemoved_CollateralTokenAdapter[I], { gasLimit: 2000000 });
-            console.log(`Whitelisted: ${config.ToBeRemoved_CollateralTokenAdapter[I]}`);
+            console.log(`Removed from WL: ${config.ToBeRemoved_CollateralTokenAdapter[I]}`);
         }
 
         console.log(`Finished`);
     } catch (error) {
-        console.error(`Error during whitelisting: ${error.message}`);
+        console.error(`Error during removeFromWL: ${error.message}`);
     }
 }
