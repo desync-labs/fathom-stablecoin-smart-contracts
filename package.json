@@ -27,7 +27,8 @@
     "@openzeppelin/contracts-upgradeable": "4.9.2",
     "@truffle/hdwallet-provider": "^1.4.1",
     "bignumber.js": "7.2.1",
-    "solc": "0.8.13"
+    "solc": "0.8.13",
+    "asterizmprotocol": "^1.0.1"
   },
   "devDependencies": {
     "chai-bn": "^0.3.0",
