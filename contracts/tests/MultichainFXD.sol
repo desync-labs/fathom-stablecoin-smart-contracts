@@ -33,8 +33,8 @@ contract MultichainFXD is Ownable, ERC20, AsterizmClient {
         return _amount;
     }
     /// Minting logic on the receiver side
-    function _asterizmReceive(ClAsterizmReceiveRequestDto memory _dto) internal virtual {
-        (address to, uint amount, uint txId) = abi.decode(_dto.payload, (address, uint, uint));
+    function _asterizmReceive(ClAsterizmReceiveRequestDto memory _dto) internal override {
+        (address to, uint amount, ) = abi.decode(_dto.payload, (address, uint, uint));
         _mint(to, amount);
     }
 
