@@ -108,15 +108,11 @@ abstract contract AsterizmClientUpgradeableTransparency is IClientReceiverContra
     uint64 private localChainId;
     IERC20 private feeToken;
 
-    constructor() {
-        _disableInitializers();
-    }
-    
     /// Initializing function for upgradeable contracts (constructor)
     /// @param _initializerLib IInitializerSender  Initializer library address
     /// @param _notifyTransferSendingResult bool  Transfer sending result notification flag
     /// @param _disableHashValidation bool  Disable hash validation flag
-    function initialize(IInitializerSender _initializerLib, bool _notifyTransferSendingResult, bool _disableHashValidation) initializer public {
+    function _asterizm_initialize(IInitializerSender _initializerLib, bool _notifyTransferSendingResult, bool _disableHashValidation) internal {
         __Ownable_init();
         __ReentrancyGuard_init();
 
