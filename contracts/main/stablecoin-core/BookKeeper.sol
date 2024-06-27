@@ -41,11 +41,11 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
     address public override collateralPoolConfig;
     address public override accessControlConfig;
 
-    mapping(uint64 => uint256) public bridgedInAmount;
-    mapping(uint64 => uint256) public bridgedOutAmount;
+    mapping(uint64 => uint256) public bridgedInAmount; // [wad]
+    mapping(uint64 => uint256) public bridgedOutAmount; // [wad]
 
-    uint256 public totalBridgedInAmount;
-    uint256 public totalBridgedOutAmount;
+    uint256 public override totalBridgedInAmount; // [wad]
+    uint256 public override totalBridgedOutAmount; // [wad]
 
     event LogSetTotalDebtCeiling(address indexed _caller, uint256 _totalDebtCeiling);
     event LogSetAccessControlConfig(address indexed _caller, address _accessControlConfig);
