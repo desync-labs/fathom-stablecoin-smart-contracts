@@ -21,6 +21,9 @@ contract MockStablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGua
     IStablecoin public override stablecoin; // Stablecoin Token
     uint256 public live; // Active Flag
 
+    event LogCrossChainTransferOut(address indexed _from, uint256 _amount);
+    event LogCrossChainTransferIn(address indexed _to, uint256 _amount);
+
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
@@ -45,6 +48,19 @@ contract MockStablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGua
         ICollateralPoolConfig _collateralPoolConfig = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
         require(msg.sender == _collateralPoolConfig.getStrategy(_collateralPoolId), "!(LiquidationStrategy)");
         _;
+    }
+
+    modifier onlyBridge() {
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        require(
+            _accessControlConfig.hasRole(_accessControlConfig.BRIDGE_ROLE(), msg.sender),
+            "!(bridgeRole)"           
+        );
+        _;
+    }
+
+    constructor() {
+        _disableInitializers();
     }
 
     function initialize(address _bookKeeper, address _stablecoin) external initializer {
@@ -96,6 +112,18 @@ contract MockStablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGua
         require(live == 1, "StablecoinAdapter/not-live");
         bookKeeper.moveStablecoin(msg.sender, address(this), _wad * RAY);
         stablecoin.mint(_usr, _wad);
+    }
+
+    function crossChainTransferOut(address _from, uint256 _amount) external onlyBridge{
+        require(live == 1, "StablecoinAdapter/not-live");
+        stablecoin.burn(msg.sender, _amount);
+        emit LogCrossChainTransferOut(_from, _amount);
+    }
+
+    function crossChainTransferIn(address _to, uint256 _amount) external onlyBridge{
+        require(live == 1, "StablecoinAdapter/not-live");
+        stablecoin.mint(_to, _amount);
+        emit LogCrossChainTransferIn(_to, _amount);
     }
 
     /// @dev access: OWNER_ROLE, GOV_ROLE

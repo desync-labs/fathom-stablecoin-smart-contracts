@@ -64,6 +64,10 @@ interface IBookKeeper {
 
     function removeFromWhitelist(address _toBeRemovedAddress) external;
 
+    function handleBridgeOut(uint64 _destChainId, uint256 _amount) external;
+
+    function handleBridgeIn(uint64 _srcChainId, uint256 _amount) external;
+
     function collateralToken(bytes32 _collateralPoolId, address _ownerAddress) external view returns (uint256);
 
     function positionWhitelist(address _positionAddress, address _whitelistedAddress) external view returns (uint256);

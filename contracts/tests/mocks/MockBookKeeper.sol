@@ -41,6 +41,12 @@ contract MockBookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, Pausabl
     address public override collateralPoolConfig;
     address public override accessControlConfig;
 
+    mapping(uint64 => uint256) public bridgedInAmount;
+    mapping(uint64 => uint256) public bridgedOutAmount;
+
+    uint256 public totalBridgedInAmount;
+    uint256 public totalBridgedOutAmount;
+
     event LogSetTotalDebtCeiling(address indexed _caller, uint256 _totalDebtCeiling);
     event LogSetAccessControlConfig(address indexed _caller, address _accessControlConfig);
     event LogSetCollateralPoolConfig(address indexed _caller, address _collateralPoolConfig);
@@ -60,6 +66,8 @@ contract MockBookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, Pausabl
     event LogAddToWhitelist(address indexed _user);
     event LogRemoveFromWhitelist(address indexed _user);
     event StablecoinIssuedAmount(uint256 _totalStablecoinIssued, bytes32 indexed _collateralPoolId, uint256 _poolStablecoinIssued);
+    event LogHandleBridgeOut(uint64 indexed _destChainId, uint256 _bridgeOutAmount, uint256 totalBridgedOutAmount);
+    event LogHandleBridgeIn(uint64 indexed _srcChainId, uint256 _bridgeInAmount, uint256 totalBridgedInAmount);
 
     modifier onlyOwner() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(accessControlConfig);
@@ -121,6 +129,19 @@ contract MockBookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, Pausabl
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(accessControlConfig);
         require(_accessControlConfig.hasRole(_accessControlConfig.STABILITY_FEE_COLLECTOR_ROLE(), msg.sender), "!stabilityFeeCollectorRole");
         _;
+    }
+    
+    modifier onlyBridge() {
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(accessControlConfig);
+        require(
+            _accessControlConfig.hasRole(_accessControlConfig.BRIDGE_ROLE(), msg.sender),
+            "!(bridgeRole)"           
+        );
+        _;
+    }
+
+    constructor() {
+        _disableInitializers();
     }
 
     // --- Init ---
@@ -473,6 +494,18 @@ contract MockBookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, Pausabl
 
         stablecoin[_stabilityFeeRecipient] = add(stablecoin[_stabilityFeeRecipient], _value);
         totalStablecoinIssued = add(totalStablecoinIssued, _value);
+    }
+
+    function handleBridgeOut(uint64 _destChainId, uint256 _bridgeOutAmount) external override onlyBridge {
+        bridgedOutAmount[_destChainId] = bridgedOutAmount[_destChainId] + _bridgeOutAmount;
+        totalBridgedOutAmount = totalBridgedOutAmount + _bridgeOutAmount;
+        emit LogHandleBridgeOut(_destChainId, _bridgeOutAmount, totalBridgedOutAmount);
+    }
+
+    function handleBridgeIn(uint64 _srcChainId, uint256 _bridgeInAmount) external override onlyBridge {
+        bridgedInAmount[_srcChainId] = bridgedInAmount[_srcChainId] + _bridgeInAmount;
+        totalBridgedInAmount = totalBridgedInAmount + _bridgeInAmount;
+        emit LogHandleBridgeIn(_srcChainId, _bridgeInAmount, totalBridgedInAmount);
     }
 
     function _requireLive() internal view {
