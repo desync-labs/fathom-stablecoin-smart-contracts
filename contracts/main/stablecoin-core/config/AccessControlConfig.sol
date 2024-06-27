@@ -18,7 +18,7 @@ contract AccessControlConfig is IAccessControlConfig, AccessControlUpgradeable {
     bytes32 public immutable override MINTABLE_ROLE = keccak256("MINTABLE_ROLE");
     bytes32 public immutable override BOOK_KEEPER_ROLE = keccak256("BOOK_KEEPER_ROLE");
     bytes32 public immutable override COLLATERAL_MANAGER_ROLE = keccak256("COLLATERAL_MANAGER_ROLE");
-
+    bytes32 public immutable override BRIDGE_ROLE = keccak256("BRIDGE_ROLE");
     // solhint-enable var-name-mixedcase
 
     constructor() {
