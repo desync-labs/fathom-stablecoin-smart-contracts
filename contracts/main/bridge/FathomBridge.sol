@@ -46,13 +46,15 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         _disableInitializers();
     }
 
-    function initialize(IInitializerSender _initializerLib, bool _notifyTransferSendingResult, bool _disableHashValidation, address _bookKeeper, address _stablecoinAdapter) external initializer {
+    function initialize(IInitializerSender _initializerLib, address _bookKeeper, address _stablecoinAdapter) external initializer {
         _zeroAddressCheck(_bookKeeper);
         _zeroAddressCheck(_stablecoinAdapter);
         _zeroAddressCheck(address(_initializerLib));
         bookKeeper = IBookKeeper(_bookKeeper);
         stablecoinAdapter = IStablecoinAdapter(_stablecoinAdapter);
-        _asterizm_initialize(_initializerLib, _notifyTransferSendingResult, _disableHashValidation);
+        live = 1;
+        whitelisted[msg.sender] = true;
+        _asterizm_initialize(_initializerLib, true, false);
     }
 
     function addToWhitelist(address _usr) external onlyOwnerOrGov {

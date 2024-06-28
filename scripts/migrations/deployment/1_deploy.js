@@ -28,6 +28,8 @@ const AdminControls = artifacts.require('AdminControls.sol');
 const CentralizedOraclePriceFeed = artifacts.require('CentralizedOraclePriceFeed.sol');
 const StableSwapModuleWrapper = artifacts.require('StableSwapModuleWrapper.sol');
 const SimplePriceFeed = artifacts.require('SimplePriceFeed.sol');
+const FathomBridge = artifacts.require('FathomBridge.sol');
+
 
 module.exports = async function (deployer) {
   let promises = [
@@ -61,6 +63,7 @@ module.exports = async function (deployer) {
     deployer.deploy(CentralizedOraclePriceFeed, { gas: 7050000 }),
     deployer.deploy(StableSwapModuleWrapper, { gas: 7050000 }),
     deployer.deploy(SimplePriceFeed, { gas: 7050000 }),
+    deployer.deploy(FathomBridge, { gas: 7050000 }),
   ];
 
   await Promise.all(promises);

@@ -36,6 +36,7 @@ module.exports = async function (deployer) {
     const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
     const slidingWindowDexOracle = await getProxy(proxyFactory, "SlidingWindowDexOracle");
+    const fathomBridge = await getProxy(proxyFactory, "FathomBridge");
 
 
 
@@ -149,6 +150,11 @@ module.exports = async function (deployer) {
             accessControlConfig.address,
         ),
         // slidingWindowDexOracle.initialize(addresses.DEXFactory, 1800, 15);
+        fathomBridge.initialize(
+            addresses.AsterizmInitializerLib,
+            bookKeeper.address,
+            stablecoinAdapter.address
+        ),
     ];
 
     await Promise.all(promises);
