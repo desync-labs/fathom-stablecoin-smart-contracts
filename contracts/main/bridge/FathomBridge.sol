@@ -46,18 +46,23 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         _disableInitializers();
     }
 
-    function initialize(IInitializerSender _initializerLib, bool _notifyTransferSendingResult, bool _disableHashValidation, address _bookKeeper) external initializer {
-        require(_bookKeeper != address(0), "FathomBridge/zero-book-keeper");
+    function initialize(IInitializerSender _initializerLib, bool _notifyTransferSendingResult, bool _disableHashValidation, address _bookKeeper, address _stablecoinAdapter) external initializer {
+        _zeroAddressCheck(_bookKeeper);
+        _zeroAddressCheck(_stablecoinAdapter);
+        _zeroAddressCheck(address(_initializerLib));
         bookKeeper = IBookKeeper(_bookKeeper);
+        stablecoinAdapter = IStablecoinAdapter(_stablecoinAdapter);
         _asterizm_initialize(_initializerLib, _notifyTransferSendingResult, _disableHashValidation);
     }
 
     function addToWhitelist(address _usr) external onlyOwnerOrGov {
+        _zeroAddressCheck(_usr);
         whitelisted[_usr] = true;
         emit LogAddToWhitelist(_usr);
     }
 
     function removeFromWhitelist(address _usr) external onlyOwnerOrGov {
+        _zeroAddressCheck(_usr);
         whitelisted[_usr] = false;
         emit LogRemoveFromWhitelist(_usr);
     }
@@ -72,10 +77,10 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     /// @param _dstChainId uint64  Destination chain ID
     /// @param _to address  To address
     /// @param _amount uint  Amount
-    function crossChainTransfer(uint64 _dstChainId, address _to, uint _amount) public payable onlyWhitelisted {
+    function crossChainTransfer(uint64 _dstChainId, address _to, uint _amount) external onlyWhitelisted {
         require(live == 1, "FathomBridge/not-live");
         require(_amount > 0, "FathomBridge/zero-amount");
-        require(_to != address(0), "FathomBridge/zero-dest-address");
+        _zeroAddressCheck(_to);
         address stablecoin = address(stablecoinAdapter.stablecoin());
         require(stablecoin.balanceOf(msg.sender) >= _amount, "FathomBridge/insufficient-balance");
 
@@ -95,6 +100,10 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         (address from, address to, uint amount) = abi.decode(_dto.payload, (address, address, uint));
         stablecoinAdapter.crossChainTransferIn(to, amount);
         emit logCrossChainTransferIn(_dto.srcChainId, from, to, amount);
+    }
+
+    function _zeroAddressCheck(address _address) internal pure {
+        require(_address != address(0), "FathomBridge/zero-address");
     }
 
     /// @dev The `cage` function permanently halts the `collateralTokenAdapter` contract.
