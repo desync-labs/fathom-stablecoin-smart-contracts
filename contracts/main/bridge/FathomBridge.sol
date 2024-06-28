@@ -14,16 +14,19 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     using SafeToken for address;
     IBookKeeper public bookKeeper;
     IStablecoinAdapter public stablecoinAdapter;
-
+    uint256 public fixedBridgeFee; // fixed fee [wad]
     uint256 public live; // Active Flag
     bool public isDecentralizedMode;
     mapping(address => bool) public whitelisted;
 
     event LogAddToWhitelist(address indexed _user);
     event LogRemoveFromWhitelist(address indexed _user);
+    event LogSetFee(uint256 _newFee);
+    event LogWithdrawFees(address indexed _withdrawer, address indexed _to, uint256 _amount);
+    event LogFeeCollection(address indexed _from, uint256 _amount, uint256 _txId);
     event LogSetDecentralizedMode(bool _newValue);
-    event logCrossChainTransferOut(uint64 indexed _dstChainId, address indexed _from, address indexed _to, uint256 _amount, uint256 _txId);
-    event logCrossChainTransferIn(uint64 indexed  _srcChainId, address indexed _from, address indexed _to, uint256 _amount);
+    event LogCrossChainTransferOut(uint64 indexed _dstChainId, address indexed _from, address indexed _to, uint256 _amount, uint256 _txId);
+    event LogCrossChainTransferIn(uint64 indexed  _srcChainId, address indexed _from, address indexed _to, uint256 _amount);
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -74,34 +77,50 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         emit LogSetDecentralizedMode(_isOn);
     }
 
+    function setFee(uint256 _newFee) external onlyOwnerOrGov {
+        fixedBridgeFee = _newFee;
+        emit LogSetFee(_newFee);
+    }
+
+    function withdrawFees(address _to) external onlyOwnerOrGov {
+        address stablecoin = address(stablecoinAdapter.stablecoin());
+        stablecoin.safeTransfer(_to, stablecoin.balanceOf(address(this)));
+        emit LogWithdrawFees(msg.sender, _to, stablecoin.balanceOf(address(this)));
+    }
+
     /// Cross-chain transfer
     /// works only when the sender is whitelisted or in decentralized mode
     /// @param _dstChainId uint64  Destination chain ID
     /// @param _to address  To address
     /// @param _amount uint  Amount
-    function crossChainTransfer(uint64 _dstChainId, address _to, uint _amount) external onlyWhitelisted {
+    function crossChainTransfer(uint64 _dstChainId, address _to, uint _amount) external onlyWhitelisted nonReentrant{
         require(live == 1, "FathomBridge/not-live");
-        require(_amount > 0, "FathomBridge/zero-amount");
+        require(_amount > fixedBridgeFee, "FathomBridge/amount-less-than-fee");
         _zeroAddressCheck(_to);
         address stablecoin = address(stablecoinAdapter.stablecoin());
         require(stablecoin.balanceOf(msg.sender) >= _amount, "FathomBridge/insufficient-balance");
 
 	    stablecoin.safeTransferFrom(msg.sender, address(this), _amount);
+        
         stablecoin.safeApprove(address(stablecoinAdapter), 0);
-        stablecoin.safeApprove(address(stablecoinAdapter), _amount);
-        stablecoinAdapter.crossChainTransferOut(msg.sender, _amount);
+        uint256 _actualTransferAmount = fixedBridgeFee != 0 ? _amount - fixedBridgeFee : _amount;
+        stablecoin.safeApprove(address(stablecoinAdapter), _actualTransferAmount);
+        stablecoinAdapter.crossChainTransferOut(msg.sender, _actualTransferAmount);
         stablecoin.safeApprove(address(stablecoinAdapter), 0);
-        bookKeeper.handleBridgeOut(_dstChainId, _amount);
-        _initAsterizmTransferEvent(_dstChainId, abi.encode(msg.sender, _to, _amount));
-        emit logCrossChainTransferOut(_dstChainId, msg.sender, _to, _amount, _getTxId());
+        // bookkeeping
+        bookKeeper.handleBridgeOut(_dstChainId, _actualTransferAmount);
+        //generate event for off-chain components
+        _initAsterizmTransferEvent(_dstChainId, abi.encode(msg.sender, _to, _actualTransferAmount));
+        emit LogCrossChainTransferOut(_dstChainId, msg.sender, _to, _actualTransferAmount, _getTxId());
+        emit LogFeeCollection(msg.sender, fixedBridgeFee, _getTxId());
     }
 
     /// Cross-chain fn that triggers when receiving payload from another chain
     /// Minting logic on the receiver side
     function _asterizmReceive(ClAsterizmReceiveRequestDto memory _dto) internal override {
-        (address from, address to, uint amount) = abi.decode(_dto.payload, (address, address, uint));
-        stablecoinAdapter.crossChainTransferIn(to, amount);
-        emit logCrossChainTransferIn(_dto.srcChainId, from, to, amount);
+        (address _from, address _to, uint _amount) = abi.decode(_dto.payload, (address, address, uint256));
+        stablecoinAdapter.crossChainTransferIn(_to, _amount);
+        emit LogCrossChainTransferIn(_dto.srcChainId, _from, _to, _amount);
     }
 
     function _zeroAddressCheck(address _address) internal pure {
