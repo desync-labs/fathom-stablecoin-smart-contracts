@@ -22,7 +22,11 @@ interface IBookKeeper {
         int256 _debtShare
     ) external;
 
-    function totalStablecoinIssued() external returns (uint256);
+    function totalStablecoinIssued() external view returns (uint256);
+
+    function totalBridgedInAmount() external view returns (uint256);
+
+    function totalBridgedOutAmount() external view returns (uint256);
 
     function moveStablecoin(
         address _src,
@@ -63,6 +67,10 @@ interface IBookKeeper {
     function addToWhitelist(address _toBeWhitelistedAddress) external;
 
     function removeFromWhitelist(address _toBeRemovedAddress) external;
+
+    function handleBridgeOut(uint64 _destChainId, uint256 _amount) external;
+
+    function handleBridgeIn(uint64 _srcChainId, uint256 _amount) external;
 
     function collateralToken(bytes32 _collateralPoolId, address _ownerAddress) external view returns (uint256);
 
