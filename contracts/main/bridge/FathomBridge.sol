@@ -22,8 +22,8 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     event LogAddToWhitelist(address indexed _user);
     event LogRemoveFromWhitelist(address indexed _user);
     event LogSetDecentralizedMode(bool _newValue);
-    event logCrossChainTransferOut(uint64 indexed _dstChainId, address indexed _from, address indexed _to, uint _amount);
-    event logCrossChainTransferIn(uint64 indexed  _srcChainId, address indexed _from, address indexed _to, uint _amount);
+    event logCrossChainTransferOut(uint64 indexed _dstChainId, address indexed _from, address indexed _to, uint256 _amount, uint256 _txId);
+    event logCrossChainTransferIn(uint64 indexed  _srcChainId, address indexed _from, address indexed _to, uint256 _amount);
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
@@ -93,7 +93,7 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         stablecoin.safeApprove(address(stablecoinAdapter), 0);
         bookKeeper.handleBridgeOut(_dstChainId, _amount);
         _initAsterizmTransferEvent(_dstChainId, abi.encode(msg.sender, _to, _amount));
-        emit logCrossChainTransferOut(_dstChainId, msg.sender, _to, _amount);
+        emit logCrossChainTransferOut(_dstChainId, msg.sender, _to, _amount, _getTxId());
     }
 
     /// Cross-chain fn that triggers when receiving payload from another chain
