@@ -74,8 +74,8 @@ const setup = async () => {
         stableSwapModuleWrapper
     }
 }
-
-describe("StableSwapModule", () => {
+// Silenced due to SSM getting commented out from the deployment script
+xdescribe("StableSwapModule", () => {
     // Contracts
     let USDT
     let stableSwapModule

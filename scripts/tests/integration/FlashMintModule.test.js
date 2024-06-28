@@ -46,7 +46,7 @@ const loadFixtureHandler = async () => {
   }
 }
 
-describe("FlastMintModule", () => {
+xdescribe("FlastMintModule", () => {
   // Contracts
   let bookKeeper
   let USDT
@@ -77,7 +77,9 @@ describe("FlastMintModule", () => {
       stablecoinAdapter
     } = await loadFixture(loadFixtureHandler))
   })
-  describe("#flashLoan", async () => {
+
+  //Silenced due to SSM being soon sunsetted and deprecated
+  xdescribe("#flashLoan", async () => {
     context("receiver doesn't have enough tokens to return the loan + fee", async () => {
       it("should revert", async () => {
         await fathomStablecoin.mint(DeployerAddress, parseEther("3000"), { gasLimit: 1000000 })
@@ -139,8 +141,8 @@ describe("FlastMintModule", () => {
       })
     })
   })
-
-  describe("#bookKeeperFlashLoan", async () => {
+  //Silenced due to SSM being soon sunsetted and deprecated
+  xdescribe("#bookKeeperFlashLoan", async () => {
     context("receiver doesn't have enough tokens to return the loan + fee", async () => {
       it("should revert", async () => {
         await fathomStablecoin.mint(DeployerAddress, parseEther("3500"), { gasLimit: 1000000 })
