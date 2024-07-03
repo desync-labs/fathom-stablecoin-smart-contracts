@@ -120,6 +120,7 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     function _asterizmReceive(ClAsterizmReceiveRequestDto memory _dto) internal override {
         (address _from, address _to, uint _amount) = abi.decode(_dto.payload, (address, address, uint256));
         stablecoinAdapter.crossChainTransferIn(_to, _amount);
+        bookKeeper.handleBridgeIn(_dto.srcChainId, _amount);
         emit LogCrossChainTransferIn(_dto.srcChainId, _from, _to, _amount);
     }
 
