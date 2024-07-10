@@ -83,6 +83,7 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     }
 
     function withdrawFees(address _to) external onlyOwnerOrGov {
+        _zeroAddressCheck(_to);
         address stablecoin = address(stablecoinAdapter.stablecoin());
         stablecoin.safeTransfer(_to, stablecoin.balanceOf(address(this)));
         emit LogWithdrawFees(msg.sender, _to, stablecoin.balanceOf(address(this)));
