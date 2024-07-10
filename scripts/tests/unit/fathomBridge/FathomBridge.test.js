@@ -12,6 +12,7 @@ const { loadFixture } = require("../../helper/fixtures");
 
 const { formatBytes32String } = ethers.utils
 const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
+const ZeroAddress = "0x0000000000000000000000000000000000000000"
 
 const loadFixtureHandler = async () => {
     const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
@@ -28,10 +29,15 @@ const loadFixtureHandler = async () => {
     await mockedAccessControlConfig.mock.hasRole.returns(true)
     await mockedCollateralPoolConfig.mock.setTotalDebtShare.returns()
     await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address);
+    await mockedBookKeeper.mock.handleBridgeOut.returns()
+    await mockedBookKeeper.mock.handleBridgeIn.returns()
     await mockedStablecoinAdapter.mock.stablecoin.returns(mockedToken.address)
+    await mockedStablecoinAdapter.mock.crossChainTransferOut.returns()
+    await mockedStablecoinAdapter.mock.crossChainTransferIn.returns()
     await mockedToken.mock.transfer.returns(true)
     await mockedToken.mock.transferFrom.returns(true)
     await mockedToken.mock.balanceOf.returns(WeiPerRad)
+    await mockedToken.mock.approve.returns(true)
     const fathomBridge = getContract("MockFathomBridge", DeployerAddress)
 
     await fathomBridge.initialize(mockedBookKeeper.address, mockedStablecoinAdapter.address)
@@ -82,6 +88,14 @@ describe("FathomBridge", () => {
                 .withArgs(AliceAddress);
             })
         })
+        context("when the caller is the owner but trying to add ZeroAddress", async () => {
+            it("should revert", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(true)
+                await expect(
+                    fathomBridge.addToWhitelist(ZeroAddress)
+                ).to.be.revertedWith("FathomBridge/zero-address")
+            })
+        })
     })
 
     describe("#removeFromWhitelist", () => {
@@ -100,6 +114,14 @@ describe("FathomBridge", () => {
                 await expect(fathomBridge.removeFromWhitelist(AliceAddress, { gasLimit: 1000000 }))
                 .to.be.emit(fathomBridge, "LogRemoveFromWhitelist")
                 .withArgs(AliceAddress);
+            })
+        })
+        context("when the caller is the owner but trying to add ZeroAddress", async () => {
+            it("should revert", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(true)
+                await expect(
+                    fathomBridge.removeFromWhitelist(ZeroAddress)
+                ).to.be.revertedWith("FathomBridge/zero-address")
             })
         })
     })
@@ -165,6 +187,112 @@ describe("FathomBridge", () => {
                 await expect(fathomBridge.withdrawFees(AliceAddress, { gasLimit: 1000000 }))
                 .to.be.emit(fathomBridge, "LogWithdrawFees")
                 .withArgs(DeployerAddress, AliceAddress, WeiPerRad);
+            })
+        })
+        context("when the caller is the owner but withdraw fee to ZeroAddress", async () => {
+            it("should revert", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(true)
+                await expect(
+                    fathomBridge.withdrawFees(ZeroAddress)
+                ).to.be.revertedWith("FathomBridge/zero-address")
+            })
+        })
+    })
+
+    describe("#crossChainTransfer", () => {
+        context("when the caller is not whitelisted", async () => {
+            it("should revert", async () => {
+                await fathomBridge.removeFromWhitelist(DeployerAddress);
+                await expect(
+                    fathomBridge.crossChainTransfer(5522, AliceAddress, WeiPerWad)
+                ).to.be.revertedWith("FathomBridge/not-whitelisted")
+            })
+        })
+        context("when the caller is the whitelisted", async () => {
+            it("should work and emit LogCrossChainTransferOut", async () => {
+                await fathomBridge.addToWhitelist(DeployerAddress)
+                await expect(fathomBridge.crossChainTransfer(5522, AliceAddress, WeiPerWad, { gasLimit: 1000000 }))
+                .to.be.emit(fathomBridge, "LogCrossChainTransferOut")
+                .withArgs(5522, DeployerAddress, AliceAddress, WeiPerWad, 1);
+            })
+        })
+        context("when the caller is the whitelisted", async () => {
+            it("should work and emit LogFeeCollection", async () => {
+                await fathomBridge.addToWhitelist(DeployerAddress)
+                await expect(fathomBridge.crossChainTransfer(5522, AliceAddress, WeiPerWad, { gasLimit: 1000000 }))
+                .to.be.emit(fathomBridge, "LogFeeCollection")
+                .withArgs(DeployerAddress, 0, 1);
+            })
+        })
+        context("when the caller is the whitelisted but try to send to ZeroAddress", async () => {
+            it("should revert", async () => {
+                await fathomBridge.addToWhitelist(DeployerAddress)
+                await expect(
+                    fathomBridge.crossChainTransfer(5522, ZeroAddress, WeiPerWad,)
+                ).to.be.revertedWith("FathomBridge/zero-address")
+            })
+        })
+        context("when the caller is the whitelisted and fee is set", async () => {
+            it("should work and emit LogFeeCollection", async () => {
+                await fathomBridge.addToWhitelist(DeployerAddress)
+                const feeBefore = await fathomBridge.fixedBridgeFee()
+                expect(feeBefore).to.be.equal(0)
+                await expect(fathomBridge.setFee(WeiPerWad, { gasLimit: 1000000 }))
+                const feeAfter = await fathomBridge.fixedBridgeFee()
+                expect(feeAfter).to.be.equal(WeiPerWad)
+                await expect(fathomBridge.crossChainTransfer(5522, AliceAddress, WeiPerRad, { gasLimit: 1000000 }))
+                .to.be.emit(fathomBridge, "LogFeeCollection")
+                .withArgs(DeployerAddress, WeiPerWad, 1);
+            })
+        })
+    })
+
+    describe("#Cage", () => {
+        context("when the caller is not the owner", async () => {
+            it("should revert", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(false)
+                await expect(
+                    fathomBridge.cage()
+                ).to.be.revertedWith("!(ownerRole or govRole)")
+            })
+        })
+        context("when the caller is the owner", async () => {
+            it("should work", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(true)
+                await expect(fathomBridge.cage({ gasLimit: 1000000 }))
+                .to.be.emit(fathomBridge, "LogCage");
+            })
+        })
+    })
+    describe("#pause", () => {
+        context("when the caller is not the owner", async () => {
+            it("should revert", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(false)
+                await expect(
+                    fathomBridge.pause()
+                ).to.be.revertedWith("!(ownerRole or govRole)")
+            })
+        })
+        context("when the caller is the owner", async () => {
+            it("should work", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(true)
+                await fathomBridge.pause()
+            })
+        })
+    })
+    describe("#unpause", () => {
+        context("when the caller is not the owner", async () => {
+            it("should revert", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(false)
+                await expect(
+                    fathomBridge.unpause()
+                ).to.be.revertedWith("!(ownerRole or govRole)")
+            })
+        })
+        context("when the caller is the owner", async () => {
+            it("should work", async () => {
+                await mockedAccessControlConfig.mock.hasRole.returns(true)
+                await fathomBridge.pause()
             })
         })
     })
