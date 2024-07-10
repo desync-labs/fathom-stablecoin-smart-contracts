@@ -135,7 +135,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(accessControlConfig);
         require(
             _accessControlConfig.hasRole(_accessControlConfig.BRIDGE_ROLE(), msg.sender),
-            "!(bridgeRole)"           
+            "!bridgeRole"           
         );
         _;
     }
