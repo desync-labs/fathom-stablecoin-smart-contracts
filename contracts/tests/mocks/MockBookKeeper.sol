@@ -141,7 +141,8 @@ contract MockBookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, Pausabl
     }
 
     constructor() {
-        _disableInitializers();
+        // Must be commented out for test script
+        // _disableInitializers();
     }
 
     // --- Init ---
