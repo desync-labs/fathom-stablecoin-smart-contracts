@@ -176,7 +176,7 @@ contract MockFathomBridge is PausableUpgradeable, IFathomBridge, ICagable {
     }
 
     function _initAsterizmTransferEvent(uint64 _dstChainId, bytes memory _payload) internal {
-        uint id = txId++;
+        txId++;
     }
 
     function _getTxId() internal view returns(uint) {
