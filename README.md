@@ -51,6 +51,10 @@ As of July 2024, AsterizmInitializerLib was added to externalAddresses.json. It 
 https://docs.asterizm.io/technical-reference/mainnet<br>
 https://docs.asterizm.io/technical-reference/testnet<br>
 
+## After the deployment of FathomBridge
+Please change the OZ owner to an address that would manage bridge related activities. Also, please ensure that the EOA of off-chain client module is added as a sender.
+It is required that the destination's FathomBridge is added as trustedAddress in the source chain's FathomBridge
+
 ## Running tests
 
 ### 0) After cloning the repo,  install dependencies

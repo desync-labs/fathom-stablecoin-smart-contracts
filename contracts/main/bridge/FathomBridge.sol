@@ -9,6 +9,16 @@ import "../interfaces/ICagable.sol";
 import "../interfaces/IFathomBridge.sol";
 import "../utils/SafeToken.sol";
 
+/**
+ * @title FathomBridge
+ * @notice A contract which acts as an entrypoint for bridging Fathom Stablecoin.
+ * It has the ability to mint FXD in the source chain and burn FXD in the destination chain.
+ * _initializerLib contract needs to exist prior to the deployment of this smart contract. 
+ * Please refer to below documentation for the list of deployed AsterizmInitializerLib contract
+ * https://docs.asterizm.io/technical-reference/mainnet
+ * This contract, like FathomProxyAdmin&FathomProxyFactory, has its own owner outside of Fathom Protocol's accessControlSystem due to inheritance of AsterizmClientUpgradeableTransparency
+ * Have the off-chain client module as the OZ owner of this contract to manage bridge related operations
+ */
 
 contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradeable, IFathomBridge, ICagable {
     using SafeToken for address;
@@ -49,6 +59,8 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         _disableInitializers();
     }
 
+    // --- Init ---
+
     function initialize(IInitializerSender _initializerLib, address _bookKeeper, address _stablecoinAdapter) external initializer {
         _zeroAddressCheck(_bookKeeper);
         _zeroAddressCheck(_stablecoinAdapter);
@@ -59,6 +71,8 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         whitelisted[msg.sender] = true;
         _asterizm_initialize(_initializerLib, true, false);
     }
+
+    // --- Whitelisting ---
 
     function addToWhitelist(address _usr) external onlyOwnerOrGov {
         _zeroAddressCheck(_usr);
@@ -71,6 +85,8 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         whitelisted[_usr] = false;
         emit LogRemoveFromWhitelist(_usr);
     }
+
+    // --- Administration ---
 
     function setDecentralizedMode(bool _isOn) external onlyOwnerOrGov {
         isDecentralizedMode = _isOn;
@@ -90,6 +106,8 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     }
 
     /// Cross-chain transfer
+    /// @notice This function is used to transfer FXD from the source chain to the destination chain.
+    /// It works only when the off chain client module is up and running to listen to this function's event.
     /// works only when the sender is whitelisted or in decentralized mode
     /// @param _dstChainId uint64  Destination chain ID
     /// @param _to address  To address
