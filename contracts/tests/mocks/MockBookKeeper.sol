@@ -497,13 +497,13 @@ contract MockBookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, Pausabl
         totalStablecoinIssued = add(totalStablecoinIssued, _value);
     }
 
-    function handleBridgeOut(uint64 _destChainId, uint256 _bridgeOutAmount) external override onlyBridge {
+    function handleBridgeOut(uint64 _destChainId, uint256 _bridgeOutAmount) external override nonReentrant whenNotPaused onlyBridge {
         bridgedOutAmount[_destChainId] = bridgedOutAmount[_destChainId] + _bridgeOutAmount;
         totalBridgedOutAmount = totalBridgedOutAmount + _bridgeOutAmount;
         emit LogHandleBridgeOut(_destChainId, _bridgeOutAmount, totalBridgedOutAmount);
     }
 
-    function handleBridgeIn(uint64 _srcChainId, uint256 _bridgeInAmount) external override onlyBridge {
+    function handleBridgeIn(uint64 _srcChainId, uint256 _bridgeInAmount) external override nonReentrant whenNotPaused onlyBridge {
         bridgedInAmount[_srcChainId] = bridgedInAmount[_srcChainId] + _bridgeInAmount;
         totalBridgedInAmount = totalBridgedInAmount + _bridgeInAmount;
         emit LogHandleBridgeIn(_srcChainId, _bridgeInAmount, totalBridgedInAmount);

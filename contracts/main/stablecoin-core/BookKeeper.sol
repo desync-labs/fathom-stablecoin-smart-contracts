@@ -501,7 +501,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
     /// @dev This function can only be called by the Bridge role when the BookKeeper contract is not paused.
     /// @param _destChainId The destination chain ID
     /// @param _bridgeOutAmount The amount of stablecoin bridged out
-    function handleBridgeOut(uint64 _destChainId, uint256 _bridgeOutAmount) external override whenNotPaused onlyBridge {
+    function handleBridgeOut(uint64 _destChainId, uint256 _bridgeOutAmount) external override nonReentrant whenNotPaused onlyBridge {
         bridgedOutAmount[_destChainId] = bridgedOutAmount[_destChainId] + _bridgeOutAmount;
         totalBridgedOutAmount = totalBridgedOutAmount + _bridgeOutAmount;
         emit LogHandleBridgeOut(_destChainId, _bridgeOutAmount, totalBridgedOutAmount);
@@ -512,7 +512,7 @@ contract BookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, PausableUpg
     /// @dev This function can only be called by the Bridge role when the BookKeeper contract is not paused.
     /// @param _srcChainId The source chain ID
     /// @param _bridgeInAmount The amount of stablecoin bridged in
-    function handleBridgeIn(uint64 _srcChainId, uint256 _bridgeInAmount) external override whenNotPaused onlyBridge {
+    function handleBridgeIn(uint64 _srcChainId, uint256 _bridgeInAmount) external override nonReentrant whenNotPaused onlyBridge {
         bridgedInAmount[_srcChainId] = bridgedInAmount[_srcChainId] + _bridgeInAmount;
         totalBridgedInAmount = totalBridgedInAmount + _bridgeInAmount;
         emit LogHandleBridgeIn(_srcChainId, _bridgeInAmount, totalBridgedInAmount);
