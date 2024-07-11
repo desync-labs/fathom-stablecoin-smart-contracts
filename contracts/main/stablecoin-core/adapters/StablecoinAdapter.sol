@@ -114,13 +114,21 @@ contract StablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGuardUp
         stablecoin.mint(_usr, _wad);
     }
 
-    function crossChainTransferOut(address _from, uint256 _amount) external onlyBridge{
+    /// @notice handles FXD burn for cross-chain transfer in the source chain
+    /// @dev only bridge contract can call this fn
+    /// @param _from address caller of crossChainTransfer fn in FathomBridge
+    /// @param _amount amount the FXD that's being bridged
+    function crossChainTransferOut(address _from, uint256 _amount) external nonReentrant whenNotPaused onlyBridge{
         require(live == 1, "StablecoinAdapter/not-live");
         stablecoin.burn(msg.sender, _amount);
         emit LogCrossChainTransferOut(_from, _amount);
     }
 
-    function crossChainTransferIn(address _to, uint256 _amount) external onlyBridge{
+    /// @notice handles FXD mint for cross-chain transfer in the destination chain
+    /// @dev only bridge contract can call this fn
+    /// @param _to address recipient of the FXD that's being bridged
+    /// @param _amount amount the FXD that's being bridged
+    function crossChainTransferIn(address _to, uint256 _amount) external nonReentrant whenNotPaused onlyBridge{
         require(live == 1, "StablecoinAdapter/not-live");
         stablecoin.mint(_to, _amount);
         emit LogCrossChainTransferIn(_to, _amount);
