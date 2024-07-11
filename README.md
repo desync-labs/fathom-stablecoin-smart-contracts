@@ -45,6 +45,12 @@ $ curl -o /usr/bin/solc -fL https://github.com/ethereum/solidity/releases/downlo
     && chmod u+x /usr/bin/solc
 ```
 
+## Regarding AsterizmInitializerLib
+
+As of July 2024, AsterizmInitializerLib was added to externalAddresses.json. It is a smart contract pre-deployed on EVM chains to enable the bridge functionalities of Fathom Stablecoin. It does not exist in Apothem nor on a freshly run Ganache instance, therefore the deployment script for the FathomBridge contract would revert. Nevertheless, the test scripts run properly, as the FathomBridge smart contract, which uses AsterizmInitializerLib, is not used in the test script; instead, the MockFathomBridge contract is used. If you are deploying to any EVM chains, whether mainnet or testnet, please refer to the documentation below to choose which AsterizmInitializerLib contract address to include in externalAddresses.json.<br>
+https://docs.asterizm.io/technical-reference/mainnet<br>
+https://docs.asterizm.io/technical-reference/testnet<br>
+
 ## Running tests
 
 ### 0) After cloning the repo,  install dependencies
@@ -77,7 +83,8 @@ The chainId 1337 addresses are required to execute the test scripts on Ganache. 
     "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
     "DEXFactory": "0x5cf9FB75278606F23b2521e77A424174d2CAA2c3",
     "USDSTABLE": "0xb9AdA6B44E4CFF8FE00443Fadf8ad006CfCc2d10",
-    "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753"
+    "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753",
+    "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
   }
 }
 
@@ -128,7 +135,8 @@ The format of the content can be same as in the Running test sections. Like belo
     "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
     "DEXFactory": "0x5cf9FB75278606F23b2521e77A424174d2CAA2c3",
     "USDSTABLE": "0xb9AdA6B44E4CFF8FE00443Fadf8ad006CfCc2d10",
-    "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753"
+    "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753",
+    "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
   }
 }
 
@@ -172,7 +180,8 @@ ChainID of apothem is 51. Therefore, the externalAddresses.json need to have the
       "WXDC": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
       "USD": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
       "DEXFactory": "0x6FfcE1bb8fB4841B42C8ee5e91398068723ba80D",
-      "USDSTABLE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f"
+      "USDSTABLE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
+      "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
     }
 }
 ```
@@ -221,7 +230,8 @@ ChainID of XDC mainnet is 50. Therefore, the externalAddresses.json need to have
       "WXDC": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
       "USD": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
       "DEXFactory": "0x6FfcE1bb8fB4841B42C8ee5e91398068723ba80D",
-      "USDSTABLE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f"
+      "USDSTABLE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
+      "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
     }
 }
 ```
