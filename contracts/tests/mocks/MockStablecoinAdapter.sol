@@ -115,13 +115,13 @@ contract MockStablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGua
         stablecoin.mint(_usr, _wad);
     }
 
-    function crossChainTransferOut(address _from, uint256 _amount) external onlyBridge{
+    function crossChainTransferOut(address _from, uint256 _amount) external  nonReentrant whenNotPaused onlyBridge{
         require(live == 1, "StablecoinAdapter/not-live");
         stablecoin.burn(msg.sender, _amount);
         emit LogCrossChainTransferOut(_from, _amount);
     }
 
-    function crossChainTransferIn(address _to, uint256 _amount) external onlyBridge{
+    function crossChainTransferIn(address _to, uint256 _amount) external  nonReentrant whenNotPaused onlyBridge{
         require(live == 1, "StablecoinAdapter/not-live");
         stablecoin.mint(_to, _amount);
         emit LogCrossChainTransferIn(_to, _amount);
