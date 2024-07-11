@@ -137,11 +137,6 @@ contract MockFathomBridge is PausableUpgradeable, IFathomBridge, ICagable {
         emit LogFeeCollection(msg.sender, fixedBridgeFee, _getTxId());
     }
 
-    /// Below function is added for unit tests in Mock
-    function astterizmReceive(ClAsterizmReceiveRequestDto memory _dto) external {
-        _asterizmReceive(_dto);
-    }
-
     /// Cross-chain fn that triggers when receiving payload from another chain
     /// Minting logic on the receiver side
     function _asterizmReceive(ClAsterizmReceiveRequestDto memory _dto) internal {
