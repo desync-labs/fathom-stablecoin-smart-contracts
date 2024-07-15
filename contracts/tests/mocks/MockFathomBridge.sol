@@ -38,15 +38,6 @@ contract MockFathomBridge is PausableUpgradeable, IFathomBridge, ICagable {
     bool public isDecentralizedMode;
     mapping(address => bool) public whitelisted;
 
-    event LogAddToWhitelist(address indexed _user);
-    event LogRemoveFromWhitelist(address indexed _user);
-    event LogSetFee(uint256 _newFee);
-    event LogWithdrawFees(address indexed _withdrawer, address indexed _to, uint256 _amount);
-    event LogFeeCollection(address indexed _from, uint256 _amount, uint256 _txId);
-    event LogSetDecentralizedMode(bool _newValue);
-    event LogCrossChainTransferOut(uint64 indexed _dstChainId, address indexed _from, address indexed _to, uint256 _amount, uint256 _txId);
-    event LogCrossChainTransferIn(uint64 indexed  _srcChainId, address indexed _from, address indexed _to, uint256 _amount);
-
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(

@@ -9,17 +9,6 @@ import "../interfaces/ICagable.sol";
 import "../interfaces/IFathomBridge.sol";
 import "../utils/SafeToken.sol";
 
-/**
- * @title FathomBridge
- * @notice A contract which acts as an entrypoint for bridging Fathom Stablecoin.
- * It has the ability to mint FXD in the source chain and burn FXD in the destination chain.
- * _initializerLib contract needs to exist prior to the deployment of this smart contract. 
- * Please refer to below documentation for the list of deployed AsterizmInitializerLib contract
- * https://docs.asterizm.io/technical-reference/mainnet
- * This contract, like FathomProxyAdmin&FathomProxyFactory, has its own owner outside of Fathom Protocol's accessControlSystem due to inheritance of AsterizmClientUpgradeableTransparency
- * Have the off-chain client module as the OZ owner of this contract to manage bridge related operations
- */
-
 contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradeable, IFathomBridge, ICagable {
     using SafeToken for address;
     IBookKeeper public bookKeeper;
@@ -28,15 +17,6 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     uint256 public live; // Active Flag
     bool public isDecentralizedMode;
     mapping(address => bool) public whitelisted;
-
-    event LogAddToWhitelist(address indexed _user);
-    event LogRemoveFromWhitelist(address indexed _user);
-    event LogSetFee(uint256 _newFee);
-    event LogWithdrawFees(address indexed _withdrawer, address indexed _to, uint256 _amount);
-    event LogFeeCollection(address indexed _from, uint256 _amount, uint256 _txId);
-    event LogSetDecentralizedMode(bool _newValue);
-    event LogCrossChainTransferOut(uint64 indexed _dstChainId, address indexed _from, address indexed _to, uint256 _amount, uint256 _txId);
-    event LogCrossChainTransferIn(uint64 indexed  _srcChainId, address indexed _from, address indexed _to, uint256 _amount);
 
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
