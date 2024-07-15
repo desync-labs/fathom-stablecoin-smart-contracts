@@ -13,6 +13,7 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     using SafeToken for address;
     IBookKeeper public bookKeeper;
     IStablecoinAdapter public stablecoinAdapter;
+    address public stablecoin;
     uint256 public fixedBridgeFee; // fixed fee [wad]
     uint256 public live; // Active Flag
     bool public isDecentralizedMode;
@@ -47,6 +48,7 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         _zeroAddressCheck(address(_initializerLib));
         bookKeeper = IBookKeeper(_bookKeeper);
         stablecoinAdapter = IStablecoinAdapter(_stablecoinAdapter);
+        stablecoin = address(stablecoinAdapter.stablecoin());
         live = 1;
         whitelisted[msg.sender] = true;
         _asterizm_initialize(_initializerLib, true, false);
@@ -80,7 +82,6 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
 
     function withdrawFees(address _to) external onlyOwnerOrGov {
         _zeroAddressCheck(_to);
-        address stablecoin = address(stablecoinAdapter.stablecoin());
         stablecoin.safeTransfer(_to, stablecoin.balanceOf(address(this)));
         emit LogWithdrawFees(msg.sender, _to, stablecoin.balanceOf(address(this)));
     }
@@ -96,7 +97,6 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         require(live == 1, "FathomBridge/not-live");
         require(_amount > fixedBridgeFee, "FathomBridge/amount-less-than-fee");
         _zeroAddressCheck(_to);
-        address stablecoin = address(stablecoinAdapter.stablecoin());
         require(stablecoin.balanceOf(msg.sender) >= _amount, "FathomBridge/insufficient-balance");
 
 	    stablecoin.safeTransferFrom(msg.sender, address(this), _amount);
