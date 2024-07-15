@@ -140,7 +140,6 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     /// The `cage` function in this contract is unique because it must be called before users can initiate `emergencyWithdraw` in the `collateralTokenAdapter`.
     /// It's a must to invoke this function in the `collateralTokenAdapter` during the final phase of an emergency shutdown.
     function cage() external override nonReentrant onlyOwnerOrShowStopper {
-        revert("FathomBridge-cage-line143");
         if (live == 1) {
             live = 0;
             emit LogCage();
