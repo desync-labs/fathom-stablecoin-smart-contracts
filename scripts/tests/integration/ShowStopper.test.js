@@ -40,8 +40,8 @@ const setup = async () => {
     await showStopper.setFathomBridge(mockFathomBridge.address, { gasLimit: 1000000 });
     await mockFathomBridge.mock.totalBridgedInAmount.returns(0);
     await mockFathomBridge.mock.totalBridgedOutAmount.returns(0);
-    await mockFathomBridge.mock.cage.returns(0);
-    
+    await mockFathomBridge.mock.cage.returns();
+
     ({
         proxyWallets: [aliceProxyWallet, bobProxyWallet],
     } = await createProxyWallets([AliceAddress, BobAddress]));

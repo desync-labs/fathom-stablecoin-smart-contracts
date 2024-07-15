@@ -21,6 +21,7 @@ const loadFixtureHandler = async () => {
     await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
     await mockedAccessControlConfig.mock.MINTABLE_ROLE.returns(formatBytes32String("MINTABLE_ROLE"))
     await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
+    await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))
     await mockedAccessControlConfig.mock.hasRole.returns(true)
     await mockedToken.mock.transfer.returns(true)
     await mockedToken.mock.transferFrom.returns(true)
@@ -237,7 +238,7 @@ describe("FathomBridge", () => {
                 await mockedAccessControlConfig.mock.hasRole.returns(false)
                 await expect(
                     fathomBridge.cage()
-                ).to.be.revertedWith("!(ownerRole or govRole)")
+                ).to.be.revertedWith("!(ownerRole or showStopperRole)")
             })
         })
         context("when the caller is the owner", async () => {

@@ -51,6 +51,15 @@ contract MockFathomBridge is PausableUpgradeable, IFathomBridge, ICagable {
         _;
     }
 
+    modifier onlyOwnerOrShowStopper() {
+        require(
+            accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender) ||
+                accessControlConfig.hasRole(accessControlConfig.SHOW_STOPPER_ROLE(), msg.sender),
+            "!(ownerRole or showStopperRole)"
+        );
+        _;
+    }
+
     modifier onlyWhitelisted() {
         if (!whitelisted[msg.sender] && !isDecentralizedMode) {
             revert("FathomBridge/not-whitelisted");
@@ -143,7 +152,7 @@ contract MockFathomBridge is PausableUpgradeable, IFathomBridge, ICagable {
     /// Please exercise caution when using this function as there is no corresponding `uncage` function.
     /// The `cage` function in this contract is unique because it must be called before users can initiate `emergencyWithdraw` in the `collateralTokenAdapter`.
     /// It's a must to invoke this function in the `collateralTokenAdapter` during the final phase of an emergency shutdown.
-    function cage() external override onlyOwnerOrGov {
+    function cage() external override onlyOwnerOrShowStopper {
         if (live == 1) {
             live = 0;
             emit LogCage();
