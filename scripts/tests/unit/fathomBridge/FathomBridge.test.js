@@ -296,4 +296,12 @@ describe("FathomBridge", () => {
             })
         })
     })
+    describe("#stablecoin", () => {
+        context("when stablecoin address saved in storage is same as stablecoinadapter.stablecoin()", async () => {
+            it("should be equal", async () => {
+                const stablecoinAddress01 = await fathomBridge.stablecoin();
+                const stablecoinAddress02 = await mockedStablecoinAdapter.stablecoin();
+            })
+        })
+    })
 })
