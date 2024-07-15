@@ -15,47 +15,33 @@ const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 const ZeroAddress = "0x0000000000000000000000000000000000000000"
 
 const loadFixtureHandler = async () => {
-    const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
     const mockedAccessControlConfig = await createMock("AccessControlConfig");
-    const mockedBookKeeper = await createMock("BookKeeper");
-    const mockedStablecoinAdapter = await createMock("MockStablecoinAdapter");
     const mockedToken = await createMock("ERC20MintableStableSwap");
-
 
     await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
     await mockedAccessControlConfig.mock.MINTABLE_ROLE.returns(formatBytes32String("MINTABLE_ROLE"))
     await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
-    await mockedAccessControlConfig.mock.BRIDGE_ROLE.returns(formatBytes32String("BRIDGE_ROLE"))
     await mockedAccessControlConfig.mock.hasRole.returns(true)
-    await mockedCollateralPoolConfig.mock.setTotalDebtShare.returns()
-    await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address);
-    await mockedBookKeeper.mock.handleBridgeOut.returns()
-    await mockedBookKeeper.mock.handleBridgeIn.returns()
-    await mockedStablecoinAdapter.mock.stablecoin.returns(mockedToken.address)
-    await mockedStablecoinAdapter.mock.crossChainTransferOut.returns()
-    await mockedStablecoinAdapter.mock.crossChainTransferIn.returns()
     await mockedToken.mock.transfer.returns(true)
     await mockedToken.mock.transferFrom.returns(true)
     await mockedToken.mock.balanceOf.returns(WeiPerRad)
     await mockedToken.mock.approve.returns(true)
+    await mockedToken.mock.mint.returns()
+    await mockedToken.mock.burn.returns()
     const fathomBridge = getContract("MockFathomBridge", DeployerAddress)
 
-    await fathomBridge.initialize(mockedBookKeeper.address, mockedStablecoinAdapter.address)
+    await fathomBridge.initialize(mockedToken.address, mockedAccessControlConfig.address)
 
     return {
-        mockedCollateralPoolConfig,
         mockedAccessControlConfig,
-        mockedBookKeeper,
-        mockedStablecoinAdapter,
-        fathomBridge
+        fathomBridge,
+        mockedToken
     }
 }
 describe("FathomBridge", () => {
-    let mockedCollateralPoolConfig;
     let mockedAccessControlConfig;
-    let mockedBookKeeper;
-    let mockedStablecoinAdapter;
     let fathomBridge;
+    let mockedToken
 
     before(async () => {
         await snapshot.revertToSnapshot();
@@ -63,11 +49,9 @@ describe("FathomBridge", () => {
 
     beforeEach(async () => {
         ({
-            mockedCollateralPoolConfig,
             mockedAccessControlConfig,
-            mockedBookKeeper,
-            mockedStablecoinAdapter,
-            fathomBridge
+            fathomBridge,
+            mockedToken
         } = await loadFixture(loadFixtureHandler))
     })
 
@@ -293,14 +277,6 @@ describe("FathomBridge", () => {
             it("should work", async () => {
                 await mockedAccessControlConfig.mock.hasRole.returns(true)
                 await fathomBridge.pause()
-            })
-        })
-    })
-    describe("#stablecoin", () => {
-        context("when stablecoin address saved in storage is same as stablecoinadapter.stablecoin()", async () => {
-            it("should be equal", async () => {
-                const stablecoinAddress01 = await fathomBridge.stablecoin();
-                const stablecoinAddress02 = await mockedStablecoinAdapter.stablecoin();
             })
         })
     })

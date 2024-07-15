@@ -11,6 +11,7 @@ const PositionHelper = require("../helper/positions");
 const { loadFixture } = require("../helper/fixtures");
 const { getProxy } = require("../../common/proxies");
 const pools = require("../../common/collateral");
+const { getContract, createMock } = require("../helper/contracts");
 
 const { expect } = chai
 
@@ -27,6 +28,8 @@ const setup = async () => {
     const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
     const priceOracle = await getProxy(proxyFactory, "PriceOracle");
     const showStopper = await getProxy(proxyFactory, "ShowStopper");
+    const mockFathomBridge = await createMock("MockFathomBridge");
+
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
@@ -34,7 +37,11 @@ const setup = async () => {
     const MockCollateralTokenAdapter = await artifacts.initializeInterfaceAt("MockCollateralTokenAdapter", "MockCollateralTokenAdapter");
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
     await proxyWalletRegistry.setDecentralizedMode(true);
-
+    await showStopper.setFathomBridge(mockFathomBridge.address, { gasLimit: 1000000 });
+    await mockFathomBridge.mock.totalBridgedInAmount.returns(0);
+    await mockFathomBridge.mock.totalBridgedOutAmount.returns(0);
+    await mockFathomBridge.mock.cage.returns(0);
+    
     ({
         proxyWallets: [aliceProxyWallet, bobProxyWallet],
     } = await createProxyWallets([AliceAddress, BobAddress]));

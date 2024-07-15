@@ -27,7 +27,6 @@ const loadFixtureHandler = async () => {
   await mockedAccessControlConfig.mock.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"))
   await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
   await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))
-  await mockedAccessControlConfig.mock.BRIDGE_ROLE.returns(formatBytes32String("BRIDGE_ROLE"))
   await mockedAccessControlConfig.mock.hasRole.returns(true)
   await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address);
   await mockedBookKeeper.mock.accessControlConfig.returns(mockedAccessControlConfig.address);
@@ -89,40 +88,6 @@ describe("StablecoinAdapter", async () => {
         ).to.be.revertedWith("!(LiquidationStrategy)");
       });
     });
-  })
-  describe("#crossChainTransferOut", () => {
-    context("crossChainTransferOut", async () => {
-      it("should revert", async () => {
-          await mockedAccessControlConfig.mock.hasRole.returns(false)
-          await expect(stablecoinAdapter.crossChainTransferOut(AliceAddress, WeiPerWad)).to.be.revertedWith("!(bridgeRole)")
-      })
-    })
-    context("when the caller is the bridge", async () => {
-      it("should work", async () => {
-          await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-          await expect(stablecoinAdapter.crossChainTransferOut(AliceAddress, WeiPerWad, { gasLimit: 1000000 }))
-              .to.emit(stablecoinAdapter, "LogCrossChainTransferOut")
-              .withArgs(AliceAddress, WeiPerWad)
-      })
-    })
-  })
-  describe("#crossChainTransferIn", () => {
-    context("crossChainTransferIn", async () => {
-      it("should revert", async () => {
-          await mockedAccessControlConfig.mock.hasRole.returns(false)
-          await expect(stablecoinAdapter.crossChainTransferIn(AliceAddress, WeiPerWad)).to.be.revertedWith("!(bridgeRole)")
-      })
-    })
-    context("when the caller is the bridge", async () => {
-      it("should work", async () => {
-          await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-          await expect(stablecoinAdapter.crossChainTransferIn(AliceAddress, WeiPerWad, { gasLimit: 1000000 }))
-              .to.emit(stablecoinAdapter, "LogCrossChainTransferIn")
-              .withArgs(AliceAddress, WeiPerWad)
-      })
-    })
-  })
+  });
 });
 

@@ -3,28 +3,39 @@ pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "./AsterizmClientUpgradeableTransparency.sol";
-import "../interfaces/IStablecoinAdapter.sol";
-import "../interfaces/IBookKeeper.sol";
+import "../interfaces/IAccessControlConfig.sol";
+import "../interfaces/IStablecoin.sol";
 import "../interfaces/ICagable.sol";
 import "../interfaces/IFathomBridge.sol";
 import "../utils/SafeToken.sol";
 
 contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradeable, IFathomBridge, ICagable {
     using SafeToken for address;
-    IBookKeeper public bookKeeper;
-    IStablecoinAdapter public stablecoinAdapter;
     address public stablecoin;
+    IAccessControlConfig public accessControlConfig;
     uint256 public fixedBridgeFee; // fixed fee [wad]
     uint256 public live; // Active Flag
     bool public isDecentralizedMode;
     mapping(address => bool) public whitelisted;
+    mapping(uint64 => uint256) public bridgedInAmount; // [wad]
+    mapping(uint64 => uint256) public bridgedOutAmount; // [wad]
+    uint256 public override totalBridgedInAmount; // [wad]
+    uint256 public override totalBridgedOutAmount; // [wad]
 
     modifier onlyOwnerOrGov() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
-            _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
-                _accessControlConfig.hasRole(_accessControlConfig.GOV_ROLE(), msg.sender),
+            accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender) ||
+                accessControlConfig.hasRole(accessControlConfig.GOV_ROLE(), msg.sender),
             "!(ownerRole or govRole)"
+        );
+        _;
+    }
+
+    modifier onlyOwnerOrShowStopper() {
+        require(
+            accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender) ||
+                accessControlConfig.hasRole(accessControlConfig.SHOW_STOPPER_ROLE(), msg.sender),
+            "!(ownerRole or showStopperRole)"
         );
         _;
     }
@@ -42,13 +53,12 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
 
     // --- Init ---
 
-    function initialize(IInitializerSender _initializerLib, address _bookKeeper, address _stablecoinAdapter) external initializer {
-        _zeroAddressCheck(_bookKeeper);
-        _zeroAddressCheck(_stablecoinAdapter);
+    function initialize(IInitializerSender _initializerLib, address _stablecoin, address _accessControlConfig) external initializer {
         _zeroAddressCheck(address(_initializerLib));
-        bookKeeper = IBookKeeper(_bookKeeper);
-        stablecoinAdapter = IStablecoinAdapter(_stablecoinAdapter);
-        stablecoin = address(stablecoinAdapter.stablecoin());
+        _zeroAddressCheck(_stablecoin);
+        _zeroAddressCheck(_accessControlConfig);
+        stablecoin = _stablecoin;
+        accessControlConfig = IAccessControlConfig(_accessControlConfig);
         live = 1;
         whitelisted[msg.sender] = true;
         _asterizm_initialize(_initializerLib, true, false);
@@ -97,17 +107,14 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         require(live == 1, "FathomBridge/not-live");
         require(_amount > fixedBridgeFee, "FathomBridge/amount-less-than-fee");
         _zeroAddressCheck(_to);
-        require(stablecoin.balanceOf(msg.sender) >= _amount, "FathomBridge/insufficient-balance");
 
-	    stablecoin.safeTransferFrom(msg.sender, address(this), _amount);
-        
-        stablecoin.safeApprove(address(stablecoinAdapter), 0);
         uint256 _actualTransferAmount = fixedBridgeFee != 0 ? _amount - fixedBridgeFee : _amount;
-        stablecoin.safeApprove(address(stablecoinAdapter), _actualTransferAmount);
-        stablecoinAdapter.crossChainTransferOut(msg.sender, _actualTransferAmount);
-        stablecoin.safeApprove(address(stablecoinAdapter), 0);
-        // bookkeeping
-        bookKeeper.handleBridgeOut(_dstChainId, _actualTransferAmount);
+        IStablecoin(stablecoin).burn(msg.sender, _actualTransferAmount);
+	    stablecoin.safeTransferFrom(msg.sender, address(this), _amount - _actualTransferAmount);
+    
+        bridgedOutAmount[_dstChainId] = bridgedOutAmount[_dstChainId] + _amount;
+        totalBridgedOutAmount = totalBridgedOutAmount + _amount;
+
         //generate event for off-chain components
         _initAsterizmTransferEvent(_dstChainId, abi.encode(msg.sender, _to, _actualTransferAmount));
         emit LogCrossChainTransferOut(_dstChainId, msg.sender, _to, _actualTransferAmount, _getTxId());
@@ -118,8 +125,9 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     /// Minting logic on the receiver side
     function _asterizmReceive(ClAsterizmReceiveRequestDto memory _dto) internal override {
         (address _from, address _to, uint _amount) = abi.decode(_dto.payload, (address, address, uint256));
-        stablecoinAdapter.crossChainTransferIn(_to, _amount);
-        bookKeeper.handleBridgeIn(_dto.srcChainId, _amount);
+        bridgedInAmount[_dto.srcChainId] = bridgedInAmount[_dto.srcChainId] + _amount;
+        totalBridgedInAmount = totalBridgedInAmount + _amount;
+        IStablecoin(stablecoin).mint(_to, _amount);
         emit LogCrossChainTransferIn(_dto.srcChainId, _from, _to, _amount);
     }
 
@@ -131,7 +139,8 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     /// Please exercise caution when using this function as there is no corresponding `uncage` function.
     /// The `cage` function in this contract is unique because it must be called before users can initiate `emergencyWithdraw` in the `collateralTokenAdapter`.
     /// It's a must to invoke this function in the `collateralTokenAdapter` during the final phase of an emergency shutdown.
-    function cage() external override nonReentrant onlyOwnerOrGov {
+    function cage() external override nonReentrant onlyOwnerOrShowStopper {
+        revert("FathomBridge-cage-line143");
         if (live == 1) {
             live = 0;
             emit LogCage();
