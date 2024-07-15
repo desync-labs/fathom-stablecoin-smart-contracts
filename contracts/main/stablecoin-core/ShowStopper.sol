@@ -9,6 +9,7 @@ import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/IPriceFeed.sol";
 import "../interfaces/IPriceOracle.sol";
 import "../interfaces/ISystemDebtEngine.sol";
+import "../interfaces/IFathomBridge.sol";
 import "../interfaces/ICagable.sol";
 import "../utils/CommonMath.sol";
 
@@ -38,7 +39,7 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
     mapping(address => uint256) public stablecoinAccumulator; //    [wad]
     mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
 
-    address public fathomBridge;
+    IFathomBridge public fathomBridge;
 
     event LogCage(uint256 _cageCoolDown);
     event LogCageCollateralPool(bytes32 indexed _collateralPoolId);
@@ -104,7 +105,7 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
 
     function setFathomBridge(address _fathomBridge) external onlyOwner {
         require(live == 1, "ShowStopper/not-live");
-        fathomBridge = _fathomBridge;
+        fathomBridge = IFathomBridge(_fathomBridge);
         emit LogSetFathomBridge(msg.sender, _fathomBridge);
     }
 
@@ -258,8 +259,8 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
     }
 
     function _finalizeDebt() internal view returns (uint256){
-        uint256 _totalBridgedInAmount = bookKeeper.totalBridgedInAmount() * RAY;
-        uint256 _totalBridgedOutAmount = bookKeeper.totalBridgedOutAmount() * RAY;
+        uint256 _totalBridgedInAmount = fathomBridge.totalBridgedInAmount() * RAY;
+        uint256 _totalBridgedOutAmount = fathomBridge.totalBridgedOutAmount() * RAY;
         uint256 _debt = bookKeeper.totalStablecoinIssued();
         if (_totalBridgedInAmount > _totalBridgedOutAmount) {
             return _debt + _totalBridgedInAmount - _totalBridgedOutAmount;
@@ -271,8 +272,8 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
     }
 
     function _cageBridge() internal {
-        if (fathomBridge != address(0)) {
-            ICagable(fathomBridge).cage();
+        if (address(fathomBridge) != address(0)) {
+            ICagable(address(fathomBridge)).cage();
         }
     }
 

@@ -25,4 +25,9 @@ interface IFathomBridge {
 
 
     function crossChainTransfer(uint64 _dstChainId, address _to, uint _amount) external;
+
+    function totalBridgedInAmount() external view returns (uint256);
+
+    function totalBridgedOutAmount() external view returns (uint256);
+
 }

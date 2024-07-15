@@ -26,7 +26,6 @@ const loadFixtureHandler = async () => {
     await mockedAccessControlConfig.mock.POSITION_MANAGER_ROLE.returns(formatBytes32String("POSITION_MANAGER_ROLE"))
     await mockedAccessControlConfig.mock.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"))
     await mockedAccessControlConfig.mock.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"))
-    await mockedAccessControlConfig.mock.BRIDGE_ROLE.returns(formatBytes32String("BRIDGE_ROLE"))
     await mockedAccessControlConfig.mock.hasRole.returns(true)
     await mockedCollateralPoolConfig.mock.setTotalDebtShare.returns()
 
@@ -1990,56 +1989,6 @@ describe("BookKeeper", () => {
                         .withArgs(DeployerAddress, WeiPerRad)
                 })
             })
-        })
-    })
-
-    describe("#handleBridgeOut", () => {
-        context("when the caller is not the bridge", async () => {
-            it("should revert", async () => {
-                await mockedAccessControlConfig.mock.hasRole.returns(false)
-                await expect(bookKeeperAsAlice.handleBridgeOut(5522, WeiPerWad)).to.be.revertedWith("!bridgeRole")
-            })
-        })
-        context("when the caller is the bridge", async () => {
-                it("should work", async () => {
-                    // grant role access
-                    await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-                    await expect(bookKeeper.handleBridgeOut(5522, WeiPerWad, { gasLimit: 1000000 }))
-                        .to.emit(bookKeeper, "LogHandleBridgeOut")
-                        .withArgs(5522, WeiPerWad, WeiPerWad)
-
-                    const bridgedOutAmount = await bookKeeper.bridgedOutAmount(5522);
-                    expect(bridgedOutAmount).to.be.equal(WeiPerWad);
-
-                    const totalBridgedOutAmount = await bookKeeper.totalBridgedOutAmount();
-                    expect(totalBridgedOutAmount).to.be.equal(WeiPerWad);
-                })
-        })
-    })
-
-    describe("#handleBridgeIn", () => {
-        context("when the caller is not the bridge", async () => {
-            it("should revert", async () => {
-                await mockedAccessControlConfig.mock.hasRole.returns(false)
-                await expect(bookKeeperAsAlice.handleBridgeOut(5522, WeiPerWad)).to.be.revertedWith("!bridgeRole")
-            })
-        })
-        context("when the caller is the bridge", async () => {
-                it("should work", async () => {
-                    // grant role access
-                    await mockedAccessControlConfig.mock.hasRole.returns(true)
-
-                    await expect(bookKeeper.handleBridgeIn(5522, WeiPerWad, { gasLimit: 1000000 }))
-                        .to.emit(bookKeeper, "LogHandleBridgeIn")
-                        .withArgs(5522, WeiPerWad, WeiPerWad)
-
-                    const bridgedInAmount = await bookKeeper.bridgedInAmount(5522);
-                    expect(bridgedInAmount).to.be.equal(WeiPerWad);
-
-                    const totalBridgedInAmount = await bookKeeper.totalBridgedInAmount();
-                    expect(totalBridgedInAmount).to.be.equal(WeiPerWad);
-                })
         })
     })
 
