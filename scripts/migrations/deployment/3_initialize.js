@@ -198,6 +198,7 @@ module.exports = async function (deployer) {
         fathomPriceOracle: fathomPriceOracle.address,
         proxyActionsStorage: proxyActionsStorage.address,
         fathomProxyAdmin: proxyAdmin.address,
+        fathomBridge: fathomBridge.address,
         // slidingWindowDexOracle: slidingWindowDexOracle.address,
     }
 
