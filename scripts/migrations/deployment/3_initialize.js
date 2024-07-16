@@ -159,6 +159,7 @@ module.exports = async function (deployer) {
         ),
         // slidingWindowDexOracle.initialize(addresses.DEXFactory, 1800, 15);
         fathomBridge.initialize(
+            addresses.AsterizmInitializerLib,
             fathomStablecoin.address,
             accessControlConfig.address
         ),
