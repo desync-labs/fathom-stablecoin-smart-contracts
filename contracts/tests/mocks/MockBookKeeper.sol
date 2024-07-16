@@ -131,17 +131,9 @@ contract MockBookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, Pausabl
         _;
     }
     
-    modifier onlyBridge() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(accessControlConfig);
-        require(
-            _accessControlConfig.hasRole(_accessControlConfig.BRIDGE_ROLE(), msg.sender),
-            "!(bridgeRole)"           
-        );
-        _;
-    }
-
     constructor() {
-        _disableInitializers();
+        // Must be commented out for test script
+        // _disableInitializers();
     }
 
     // --- Init ---

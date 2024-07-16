@@ -45,6 +45,16 @@ $ curl -o /usr/bin/solc -fL https://github.com/ethereum/solidity/releases/downlo
     && chmod u+x /usr/bin/solc
 ```
 
+## Regarding AsterizmInitializerLib
+
+As of July 2024, AsterizmInitializerLib was added to externalAddresses.json. It is a smart contract pre-deployed on EVM chains to enable the bridge functionalities of Fathom Stablecoin. It does not exist in Apothem nor on a freshly run Ganache instance, therefore the deployment script for the FathomBridge contract would revert. Nevertheless, the test scripts run properly, as the FathomBridge smart contract, which uses AsterizmInitializerLib, is not used in the test script; instead, the MockFathomBridge contract is used. If you are deploying to any EVM chains, whether mainnet or testnet, please refer to the documentation below to choose which AsterizmInitializerLib contract address to include in externalAddresses.json.<br>
+https://docs.asterizm.io/technical-reference/mainnet<br>
+https://docs.asterizm.io/technical-reference/testnet<br>
+
+## After the deployment of FathomBridge
+Please change the OZ owner to an address that would manage bridge related activities. Also, please ensure that the EOA of off-chain client module is added as a sender.
+It is required that the destination's FathomBridge is added as trustedAddress in the source chain's FathomBridge
+
 ## Running tests
 
 ### 0) After cloning the repo,  install dependencies
@@ -73,6 +83,7 @@ The chainId 1337 addresses are required to execute the test scripts on Ganache. 
 {
   "1337": {
     "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
+    "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
   }
 }
 
@@ -119,7 +130,8 @@ WNATIVE address will be the collateralToken address for the initial collateral N
 ```JSON
 {
   "1337": {
-    "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714"
+    "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
+    "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
   }
 }
 
@@ -160,7 +172,8 @@ ChainID of apothem is 51. Therefore, the externalAddresses.json need to have the
 ```JSON
 {
     "51": {
-      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce"
+      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
+      "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
     }
 }
 ```
@@ -200,7 +213,8 @@ ChainID of NATIVE mainnet is 50. Therefore, the externalAddresses.json need to h
 ```JSON
 {
     "50": {
-      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce"
+      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
+      "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
     }
 }
 ```

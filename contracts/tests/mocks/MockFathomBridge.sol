@@ -2,15 +2,35 @@
 pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "./AsterizmClientUpgradeableTransparency.sol";
-import "../interfaces/IAccessControlConfig.sol";
-import "../interfaces/IStablecoin.sol";
-import "../interfaces/ICagable.sol";
-import "../interfaces/IFathomBridge.sol";
-import "../utils/SafeToken.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/interfaces/IAccessControlConfig.sol";
+import "../../main/interfaces/IStablecoin.sol";
+import "../../main/interfaces/IFathomBridge.sol";
+import "../../main/utils/SafeToken.sol";
 
-contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradeable, IFathomBridge, ICagable {
+
+contract MockFathomBridge is PausableUpgradeable, IFathomBridge, ICagable {
+    /// Client asterizm receive request DTO
+    /// @param srcChainId uint64  Source chain ID
+    /// @param srcAddress uint  Source address
+    /// @param dstChainId uint64  Destination chain ID
+    /// @param dstAddress uint  Destination address
+    /// @param txId uint  Transaction ID
+    /// @param transferHash bytes32  Transfer hash
+    /// @param payload bytes  Transfer payload
+    struct ClAsterizmReceiveRequestDto {
+        uint64 srcChainId;
+        uint srcAddress;
+        uint64 dstChainId;
+        uint dstAddress;
+        uint txId;
+        bytes32 transferHash;
+        bytes payload;
+    }
+
+
     using SafeToken for address;
+    uint256 private txId;
     address public stablecoin;
     IAccessControlConfig public accessControlConfig;
     uint256 public fixedBridgeFee; // fixed fee [wad]
@@ -48,23 +68,19 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     }
 
     constructor() {
-        _disableInitializers();
+        // Must be commented out for test script
+        // _disableInitializers();
     }
 
-    // --- Init ---
-
-    function initialize(IInitializerSender _initializerLib, address _stablecoin, address _accessControlConfig) external initializer {
-        _zeroAddressCheck(address(_initializerLib));
+    function initialize(address _stablecoin, address _accessControlConfig) external initializer {
         _zeroAddressCheck(_stablecoin);
         _zeroAddressCheck(_accessControlConfig);
         stablecoin = _stablecoin;
         accessControlConfig = IAccessControlConfig(_accessControlConfig);
         live = 1;
         whitelisted[msg.sender] = true;
-        _asterizm_initialize(_initializerLib, true, false);
+        // _asterizm_initialize(_initializerLib, true, false);
     }
-
-    // --- Whitelisting ---
 
     function addToWhitelist(address _usr) external onlyOwnerOrGov {
         _zeroAddressCheck(_usr);
@@ -77,8 +93,6 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         whitelisted[_usr] = false;
         emit LogRemoveFromWhitelist(_usr);
     }
-
-    // --- Administration ---
 
     function setDecentralizedMode(bool _isOn) external onlyOwnerOrGov {
         isDecentralizedMode = _isOn;
@@ -97,24 +111,22 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     }
 
     /// Cross-chain transfer
-    /// @notice This function is used to transfer FXD from the source chain to the destination chain.
-    /// It works only when the off chain client module is up and running to listen to this function's event.
     /// works only when the sender is whitelisted or in decentralized mode
     /// @param _dstChainId uint64  Destination chain ID
     /// @param _to address  To address
     /// @param _amount uint  Amount
-    function crossChainTransfer(uint64 _dstChainId, address _to, uint _amount) external onlyWhitelisted nonReentrant{
+    function crossChainTransfer(uint64 _dstChainId, address _to, uint _amount) external onlyWhitelisted {
         require(live == 1, "FathomBridge/not-live");
         require(_amount > fixedBridgeFee, "FathomBridge/amount-less-than-fee");
         _zeroAddressCheck(_to);
 
-	      stablecoin.safeTransferFrom(msg.sender, address(this), _amount);
         uint256 _actualTransferAmount = fixedBridgeFee != 0 ? _amount - fixedBridgeFee : _amount;
         IStablecoin(stablecoin).burn(msg.sender, _actualTransferAmount);
+	    stablecoin.safeTransferFrom(msg.sender, address(this), _amount - _actualTransferAmount);
     
-        bridgedOutAmount[_dstChainId] = bridgedOutAmount[_dstChainId] + _actualTransferAmount;
-        totalBridgedOutAmount = totalBridgedOutAmount + _actualTransferAmount;
-        
+        bridgedOutAmount[_dstChainId] = bridgedOutAmount[_dstChainId] + _amount;
+        totalBridgedOutAmount = totalBridgedOutAmount + _amount;
+
         //generate event for off-chain components
         _initAsterizmTransferEvent(_dstChainId, abi.encode(msg.sender, _to, _actualTransferAmount));
         emit LogCrossChainTransferOut(_dstChainId, msg.sender, _to, _actualTransferAmount, _getTxId());
@@ -123,13 +135,14 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
 
     /// Cross-chain fn that triggers when receiving payload from another chain
     /// Minting logic on the receiver side
-    function _asterizmReceive(ClAsterizmReceiveRequestDto memory _dto) internal override {
+    function _asterizmReceive(ClAsterizmReceiveRequestDto memory _dto) internal {
         (address _from, address _to, uint _amount) = abi.decode(_dto.payload, (address, address, uint256));
         bridgedInAmount[_dto.srcChainId] = bridgedInAmount[_dto.srcChainId] + _amount;
         totalBridgedInAmount = totalBridgedInAmount + _amount;
         IStablecoin(stablecoin).mint(_to, _amount);
         emit LogCrossChainTransferIn(_dto.srcChainId, _from, _to, _amount);
     }
+
 
     function _zeroAddressCheck(address _address) internal pure {
         require(_address != address(0), "FathomBridge/zero-address");
@@ -139,7 +152,7 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     /// Please exercise caution when using this function as there is no corresponding `uncage` function.
     /// The `cage` function in this contract is unique because it must be called before users can initiate `emergencyWithdraw` in the `collateralTokenAdapter`.
     /// It's a must to invoke this function in the `collateralTokenAdapter` during the final phase of an emergency shutdown.
-    function cage() external override nonReentrant onlyOwnerOrShowStopper {
+    function cage() external override onlyOwnerOrShowStopper {
         if (live == 1) {
             live = 0;
             emit LogCage();
@@ -154,6 +167,14 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
     /// @dev access: OWNER_ROLE, GOV_ROLE
     function unpause() external onlyOwnerOrGov {
         _unpause();
+    }
+
+    function _initAsterizmTransferEvent(uint64 /**_dstChainId**/ , bytes memory /** _payload **/) internal {
+        txId++;
+    }
+
+    function _getTxId() internal view returns(uint) {
+        return txId;
     }
 
 }

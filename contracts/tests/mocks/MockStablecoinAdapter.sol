@@ -50,17 +50,9 @@ contract MockStablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGua
         _;
     }
 
-    modifier onlyBridge() {
-        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
-        require(
-            _accessControlConfig.hasRole(_accessControlConfig.BRIDGE_ROLE(), msg.sender),
-            "!(bridgeRole)"           
-        );
-        _;
-    }
-
     constructor() {
-        _disableInitializers();
+        // Must be commented out for test script
+        // _disableInitializers();
     }
 
     function initialize(address _bookKeeper, address _stablecoin) external initializer {

@@ -33,6 +33,16 @@ module.exports = {
       private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },
+    sepolia: {
+      host: "https://ethereum-sepolia-rpc.publicnode.com",
+      private_key: fs.readFileSync("./privateKey").toString(),
+      gasPrice: '0x3b9aca00',
+    },
+    bsctest: {
+      host: "https://bsc-testnet-rpc.publicnode.com",
+      private_key: fs.readFileSync("./privateKey").toString(),
+      gasPrice: '0x3b9aca00',
+    },
     fromEnv: {
       host: process.env.ETH_HOST, // export ETH_HOST=...
       private_key: process.env.ETH_PK, // export ETH_PK=...

@@ -24,10 +24,6 @@ interface IBookKeeper {
 
     function totalStablecoinIssued() external view returns (uint256);
 
-    function totalBridgedInAmount() external view returns (uint256);
-
-    function totalBridgedOutAmount() external view returns (uint256);
-
     function moveStablecoin(
         address _src,
         address _dst,
