@@ -13,4 +13,6 @@ interface IStablecoin is IERC20 {
     function increaseAllowance(address, uint256) external returns (bool);
 
     function decreaseAllowance(address, uint256) external returns (bool);
+
+    function rename(string memory) external;
 }
