@@ -1,0 +1,23 @@
+{
+    "50": {
+        "FathomProxyFactory": "0x0acf88Ba60561372Ef93a67E04e1A55d9fC1D910",
+        "PriceAggregator":"0x0000000000000000000000000000000000000000",
+        "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000"
+    },
+    "51": {
+        "FathomProxyFactory": "0xf62f41d00EAaf02fD31FA24C5630C9AcfEf8D69F",
+        "PriceAggregator":"0x0000000000000000000000000000000000000000",
+        "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000"
+    },
+    "1337": {
+        "FathomProxyFactory": "0x8598b178d5e6C40Cb5800De5522184092469b40C",
+        "PriceAggregator":"0x8598b178d5e6C40Cb5800De5522184092469b40C",
+        "SubscriptionsRegistry":"0x8598b178d5e6C40Cb5800De5522184092469b40C"
+    },
+    "17000": {
+        "FathomProxyFactory": "0x0000000000000000000000000000000000000000",
+        "PriceAggregator":"0x0000000000000000000000000000000000000000",
+        "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000"
+    },
+    "token": "CGO"
+}

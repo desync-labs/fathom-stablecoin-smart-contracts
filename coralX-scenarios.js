@@ -19,11 +19,24 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/add-collateral/deployment', '--network', 'apothem'],
     ['execute', '--path', 'scripts/migrations/add-collateral/configuration', '--network', 'apothem']
   ],
+  addCollateralMainnet: [
+    ['execute', '--path', 'scripts/migrations/add-collateral/deployment', '--network', 'mainnet'],
+    ['execute', '--path', 'scripts/migrations/add-collateral/configuration', '--network', 'mainnet']
+  ],
   deployTokensLocal: [
     ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'development']
   ],
   deployTokensApothem: [
     ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'apothem']
+  ],
+  whitelistCollateralTokenAdapterLocal: [
+    ['execute', '--path', 'scripts/whitelist/collateral-adapter/1_whitelisting.js', '--network', 'development']
+  ],
+  whitelistFMMLocal: [
+    ['execute', '--path', 'scripts/whitelist/FMM/1_fmm-whitelisting.js', '--network', 'development']
+  ],
+  addRolesLocal: [
+    ['execute', '--path', 'scripts/roles/addRoles', '--network', 'development']
   ],
   migrateAndConfigureForTests: [
     ['compile'],

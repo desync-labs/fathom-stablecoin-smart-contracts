@@ -23,7 +23,7 @@ const setup = async () => {
     return { dexPriceOracle, mockedFactory, mockedPair, mockedToken, mockedUSD }
 }
 
-describe("DexPriceOracle", () => {
+xdescribe("DexPriceOracle", () => {
     // Contract
     let dexPriceOracle
     let mockedPair

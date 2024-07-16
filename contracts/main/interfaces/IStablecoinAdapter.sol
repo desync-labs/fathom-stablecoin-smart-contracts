@@ -14,4 +14,8 @@ interface IStablecoinAdapter {
     function depositRAD(address _positionAddress, uint256 _rad, bytes32 _collateralPoolId, bytes calldata _data) external;
 
     function withdraw(address _positionAddress, uint256 _wad, bytes calldata _data) external;
+
+    function crossChainTransferOut(address _from, uint256 _amount) external;
+
+    function crossChainTransferIn(address _to, uint256 _amount) external;
 }
