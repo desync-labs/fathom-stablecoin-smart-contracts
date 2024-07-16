@@ -50,7 +50,7 @@ module.exports = async function (deployer) {
 
     await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), systemDebtEngine.address)
 
-    await accessControlConfig.grantRole(await fathomStablecoin.MINTER_ROLE(), fathomBridge.address)
+    await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), fathomBridge.address)
 
     await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), stablecoinAdapter.address);
 
