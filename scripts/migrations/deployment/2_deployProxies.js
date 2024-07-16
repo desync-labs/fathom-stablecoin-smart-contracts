@@ -22,19 +22,16 @@ module.exports = async function (deployer) {
         "ProxyWalletFactory",
         "ProxyActionsStorage",
         "FlashMintModule",
-        // To be sunsetted on xdc mainnet, then to be deprecated
-        // "StableSwapModule",
-        // "FlashMintArbitrager",
-        // "BookKeeperFlashMintArbitrager",
-        // "DelayFathomOraclePriceFeed",
-        // "DexPriceOracle",
+        "StableSwapModule",
+        "FlashMintArbitrager",
+        "BookKeeperFlashMintArbitrager",
+        "DelayFathomOraclePriceFeed",
+        "DexPriceOracle",
         "CollateralTokenAdapter",
-        // "SlidingWindowDexOracle",
+        "SlidingWindowDexOracle",
         "AdminControls",
         "CentralizedOraclePriceFeed",
-        "FathomPriceOracle",
-        // To be sunsetted on xdc mainnet, then to be deprecated
-        // "StableSwapModuleWrapper",
+        "StableSwapModuleWrapper",
         "SimplePriceFeed",
         "FathomBridge"
     ]

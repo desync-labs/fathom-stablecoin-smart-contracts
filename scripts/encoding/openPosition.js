@@ -6,7 +6,7 @@ const { ethers } = require("ethers");
 
 const { formatBytes32String } = require("ethers/lib/utils");
 
-const COLLATERAL_POOL_ID = formatBytes32String("NATIVE");
+const COLLATERAL_POOL_ID = formatBytes32String("XDC");
 
 const { WeiPerWad } = require("../tests/helper/unit");
 
@@ -15,11 +15,11 @@ const openPositionAndDraw = async (collateralPoolId, stablecoinAmount) => {
 
     console.log("here1");
 
-    const openLockNATIVEAndDrawAbi = [
-        "function openLockNATIVEAndDraw(address _manager, address _stabilityFeeCollector, address _nativeAdapter, address _stablecoinAdapter, bytes32 _collateralPoolId, uint256 _stablecoinAmount, bytes calldata _data)"
+    const openLockXDCAndDrawAbi = [
+        "function openLockXDCAndDraw(address _manager, address _stabilityFeeCollector, address _xdcAdapter, address _stablecoinAdapter, bytes32 _collateralPoolId, uint256 _stablecoinAmount, bytes calldata _data)"
     ];
-    const openLockTokenAndDrawIFace = new ethers.utils.Interface(openLockNATIVEAndDrawAbi);
-    const openPositionCall = openLockTokenAndDrawIFace.encodeFunctionData("openLockNATIVEAndDraw", [
+    const openLockTokenAndDrawIFace = new ethers.utils.Interface(openLockXDCAndDrawAbi);
+    const openPositionCall = openLockTokenAndDrawIFace.encodeFunctionData("openLockXDCAndDraw", [
         stablecoinAddress.positionManager,  //Position Manager
         stablecoinAddress.stabilityFeeCollector, // StabilityFeeCollector
         stablecoinAddress.collateralTokenAdapter, // CollateralTokenAdapter

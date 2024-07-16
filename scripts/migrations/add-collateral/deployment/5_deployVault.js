@@ -14,5 +14,4 @@ module.exports = async function (deployer) {
   await deployer.deploy(Vault, formatBytes32String(token), config.tokenAddress, collateralTokenAdapter.address, { gas: 7050000 });
   await collateralTokenAdapter.setVault(Vault.address);
 
-  console.log("Vault address : " + Vault.address);
 };

@@ -73,8 +73,7 @@ const loadFixtureHandler = async () => {
     stableSwapModuleWrapper
   }
 }
-// Silenced due to SSM getting commented out from the deployment script
-xdescribe("StableSwapModule", () => {
+describe("StableSwapModule", () => {
   // Contracts
   let mockedAccessControlConfig
   let mockUSD

@@ -10,7 +10,7 @@ module.exports = async function (deployer) {
         "FathomPriceOracle",
         "CentralizedOraclePriceFeed"
     ]
-    
+
     const promises = contracts.map(contract => {
         const instance = artifacts.require(`${contract}.sol`);
         return proxyFactory.createProxy(getProxyId(contract), instance.address, proxyAdmin.address, "0x", { gasLimit: 2000000 })

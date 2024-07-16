@@ -22,7 +22,7 @@ contract CentralizedOraclePriceFeed is DelayPriceFeedBase {
 
         require(_oracle != address(0), "CentralizedOraclePriceFeed/zero-access-control-config");
         oracle = IFathomCentralizedOracle(_oracle);
-        priceLife = 60 minutes;
+        priceLife = 30 minutes;
         timeDelay = 15 minutes;
         poolId = _poolId;
     }

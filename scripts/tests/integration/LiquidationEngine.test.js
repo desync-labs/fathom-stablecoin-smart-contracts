@@ -23,12 +23,12 @@ const { expect } = chai
 const CLOSE_FACTOR_BPS = BigNumber.from(5000)
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)
 const TREASURY_FEE_BPS = BigNumber.from(5000)
-const COLLATERAL_POOL_ID = formatBytes32String("NATIVE")
+const COLLATERAL_POOL_ID = formatBytes32String("XDC")
 const BPS = BigNumber.from(10000)
 
 const setup = async () => {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
-    const WNATIVE = await artifacts.initializeInterfaceAt("WNATIVE", "WNATIVE");
+    const WXDC = await artifacts.initializeInterfaceAt("WXDC", "WXDC");
 
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
@@ -51,11 +51,11 @@ const setup = async () => {
         proxyWallets: [aliceProxyWallet],
     } = await createProxyWallets([AliceAddress, BobAddress]));
 
-    await collateralPoolConfig.setStabilityFeeRate(pools.NATIVE, WeiPerRay, { gasLimit: 1000000 });
-    await collateralPoolConfig.setLiquidationRatio(pools.NATIVE, WeiPerRay, { gasLimit: 1000000 });
-    await collateralPoolConfig.setLiquidatorIncentiveBps(pools.NATIVE, LIQUIDATOR_INCENTIVE_BPS, { gasLimit: 1000000 });
-    await collateralPoolConfig.setCloseFactorBps(pools.NATIVE, CLOSE_FACTOR_BPS, { gasLimit: 1000000 });
-    await collateralPoolConfig.setTreasuryFeesBps(pools.NATIVE, TREASURY_FEE_BPS, { gasLimit: 1000000 });
+    await collateralPoolConfig.setStabilityFeeRate(pools.XDC, WeiPerRay, { gasLimit: 1000000 });
+    await collateralPoolConfig.setLiquidationRatio(pools.XDC, WeiPerRay, { gasLimit: 1000000 });
+    await collateralPoolConfig.setLiquidatorIncentiveBps(pools.XDC, LIQUIDATOR_INCENTIVE_BPS, { gasLimit: 1000000 });
+    await collateralPoolConfig.setCloseFactorBps(pools.XDC, CLOSE_FACTOR_BPS, { gasLimit: 1000000 });
+    await collateralPoolConfig.setTreasuryFeesBps(pools.XDC, TREASURY_FEE_BPS, { gasLimit: 1000000 });
 
     await bookKeeper.addToWhitelist(liquidationEngine.address, { from: BobAddress, gasLimit: 3000000 })
     await bookKeeper.addToWhitelist(fixedSpreadLiquidationStrategy.address, { from: BobAddress, gasLimit: 3000000 })
@@ -74,7 +74,7 @@ const setup = async () => {
         fathomStablecoin,
         fixedSpreadLiquidationStrategy,
         priceOracle,
-        WNATIVE
+        WXDC
     }
 }
 
@@ -82,7 +82,7 @@ const setup = async () => {
 describe("LiquidationEngine", () => {
     // Contracts
     let aliceProxyWallet
-    let WNATIVE
+    let WXDC
     let bookKeeper
     let fathomToken
     let positionManager
@@ -104,7 +104,7 @@ describe("LiquidationEngine", () => {
             bookKeeper,
             collateralPoolConfig,
             positionManager,
-            WNATIVE,
+            WXDC,
             simplePriceFeed,
             aliceProxyWallet,
             stabilityFeeCollector,
@@ -120,15 +120,15 @@ describe("LiquidationEngine", () => {
     describe("#liquidate", async () => {
         context("price drop but does not make the position underwater", async () => {
             it("should revert", async () => {
-                // 1. Set price for NATIVE to 2 USD
+                // 1. Set price for XDC to 2 USD
                 await simplePriceFeed.setPrice(WeiPerRay.mul(2), { gasLimit: 1000000 });
                 await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
-                // 2. Alice open a new position with 1 NATIVE and draw 1 FXD
-                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad, WeiPerWad);
+                // 2. Alice open a new position with 1 XDC and draw 1 FXD
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad, WeiPerWad);
                 const alicePositionAddress = await positionManager.positions(1)
 
-                // 3. NATIVE price drop to 1 USD
+                // 3. XDC price drop to 1 USD
                 await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
                 await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
@@ -142,16 +142,16 @@ describe("LiquidationEngine", () => {
 
         context("safety buffer -0.1%, but liquidator does not have enough FXD to liquidate", async () => {
             it("should revert", async () => {
-                // 1. Set priceWithSafetyMargin for NATIVE to 2 USD
+                // 1. Set priceWithSafetyMargin for XDC to 2 USD
                 await simplePriceFeed.setPrice(WeiPerRay.mul(2), { gasLimit: 1000000 });
                 await priceOracle.setPrice(COLLATERAL_POOL_ID);
                 await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, WeiPerRay, { gasLimit: 1000000 })
 
-                // 2. Alice open a new position with 1 NATIVE and draw 1 FXD
-                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad, WeiPerWad);
+                // 2. Alice open a new position with 1 XDC and draw 1 FXD
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, WeiPerWad, WeiPerWad);
                 const alicePositionAddress = await positionManager.positions(1)
 
-                // 3. NATIVE price drop to 0.99 USD
+                // 3. XDC price drop to 0.99 USD
                 await simplePriceFeed.setPrice(WeiPerRay.sub(1).div(1e9), { gasLimit: 1000000 })
                 await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
@@ -399,16 +399,16 @@ describe("LiquidationEngine", () => {
                     await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 3000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
 
-                    // 2. Alice open a new position with 1 NATIVE and draw 1 FXD
+                    // 2. Alice open a new position with 1 XDC and draw 1 FXD
                     const lockedCollateralAmount = parseEther(testParam.collateralAmount)
                     const drawStablecoinAmount = parseEther(testParam.drawStablecoinAmount)
 
-                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
+                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
                     const alicePositionAddress = await positionManager.positions(1)
                     const alicePosition = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
 
 
-                    // 3. NATIVE price drop to 0.99 USD
+                    // 3. XDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 3000000 })
                     await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
@@ -424,7 +424,7 @@ describe("LiquidationEngine", () => {
                         "0x",
                         { gasLimit: 5000000 }
                     )
-                    const bobWETHAfterLiq = await WNATIVE.balanceOf(BobAddress);
+                    const bobWETHAfterLiq = await WXDC.balanceOf(BobAddress);
                     // 5. Settle system bad debt
                     await systemDebtEngine.settleSystemBadDebt(await bookKeeper.stablecoin(systemDebtEngine.address), { gasLimit: 1000000 })
 
@@ -493,16 +493,16 @@ describe("LiquidationEngine", () => {
                     await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 1000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
 
-                    // 2. Alice open a new position with 1 NATIVE and draw 1 FXD
+                    // 2. Alice open a new position with 1 XDC and draw 1 FXD
                     const lockedCollateralAmount = parseEther(testParam.collateralAmount)
                     const drawStablecoinAmount = parseEther(testParam.drawStablecoinAmount)
-                    // await NATIVE.approve(aliceProxyWallet.address, lockedCollateralAmount, { from: AliceAddress })
-                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
+                    // await XDC.approve(aliceProxyWallet.address, lockedCollateralAmount, { from: AliceAddress })
+                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
                     const alicePositionAddress = await positionManager.positions(1)
                     // const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
                     const alicePosition = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
 
-                    // 3. NATIVE price drop to 0.99 USD
+                    // 3. XDC price drop to 0.99 USD
                     await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 1000000 })
                     await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
@@ -590,7 +590,7 @@ describe("LiquidationEngine", () => {
                     await fathomStablecoin.mint(BobAddress, parseUnits("3000", 45), { gasLimit: 1000000 })
                     await fathomStablecoin.approve(fixedSpreadLiquidationStrategy.address, MaxUint256, { from: BobAddress, gasLimit: 1000000 })
 
-                    // 1. Set priceWithSafetyMargin for NATIVE to 420 USD
+                    // 1. Set priceWithSafetyMargin for XDC to 420 USD
                     await simplePriceFeed.setPrice(parseUnits("367", 18), { gasLimit: 1000000 })
                     await priceOracle.setPrice(COLLATERAL_POOL_ID);
                     let ratio = WeiPerRay.mul(1000).div(parseUnits("0.8", 3))
@@ -598,11 +598,11 @@ describe("LiquidationEngine", () => {
                     //   await collateralPoolConfig.setPriceWithSafetyMargin(COLLATERAL_POOL_ID, parseUnits("294", 27), { gasLimit: 1000000 })
                     await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseEther("100").mul(WeiPerRay), { gasLimit: 1000000 })
 
-                    // 2. Alice open a new position with 10 NATIVE and draw 2000 FXD
+                    // 2. Alice open a new position with 10 XDC and draw 2000 FXD
                     const lockedCollateralAmount = parseEther("10")
                     const drawStablecoinAmount = parseEther("2000")
 
-                    await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
+                    await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
 
                     // Set stability fee rate to 0.5% APR
                     await collateralPoolConfig.setStabilityFeeRate(
@@ -615,7 +615,7 @@ describe("LiquidationEngine", () => {
                     // const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress)
                     const alicePosition = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress)
 
-                    // 3. 1 year passed, NATIVE price drop to 285 USD
+                    // 3. 1 year passed, XDC price drop to 285 USD
                     await TimeHelpers.increase(TimeHelpers.duration.seconds(ethers.BigNumber.from("31536000")))
                     await stabilityFeeCollector.collect(COLLATERAL_POOL_ID, { gasLimit: 1000000 })
                     const aliceDebtValueAfterOneYear = (
@@ -640,7 +640,7 @@ describe("LiquidationEngine", () => {
                         "0x",
                         { gasLimit: 2000000 }
                     )
-                    const bobWETHAfterLiq = await WNATIVE.balanceOf(BobAddress);
+                    const bobWETHAfterLiq = await WXDC.balanceOf(BobAddress);
 
                     // // 5. Settle system bad debt
                     await systemDebtEngine.settleSystemBadDebt(await bookKeeper.systemBadDebt(systemDebtEngine.address), { gasLimit: 1000000 })
@@ -717,18 +717,18 @@ describe("LiquidationEngine", () => {
                 await collateralPoolConfig.setLiquidationRatio(COLLATERAL_POOL_ID, ratio, { gasLimit: 1000000 })
                 await collateralPoolConfig.setDebtFloor(COLLATERAL_POOL_ID, parseUnits(testParam.debtFloor, 45), { gasLimit: 1000000 })
 
-                // 2. Alice open a new position with 1 NATIVE and draw 1 FXD
+                // 2. Alice open a new position with 1 XDC and draw 1 FXD
                 const lockedCollateralAmount = parseEther(testParam.collateralAmount)
                 const drawStablecoinAmount = parseEther(testParam.drawStablecoinAmount)
 
-                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
-                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
 
                 const alicePositionAddress1 = await positionManager.positions(1)
                 const alicePositionAddress2 = await positionManager.positions(2)
                 const alicePosition = await bookKeeper.positions(COLLATERAL_POOL_ID, alicePositionAddress1)
 
-                // 3. NATIVE price drop to 0.99 USD
+                // 3. XDC price drop to 0.99 USD
                 await simplePriceFeed.setPrice(parseUnits(testParam.nextPrice, 18), { gasLimit: 1000000 })
                 await priceOracle.setPrice(COLLATERAL_POOL_ID);
 
@@ -745,7 +745,7 @@ describe("LiquidationEngine", () => {
                     ["0x", "0x"],
                     { gasLimit: 4000000 }
                 )
-                const bobWETHAfterLiq = await WNATIVE.balanceOf(BobAddress);
+                const bobWETHAfterLiq = await WXDC.balanceOf(BobAddress);
 
                 // 5. Settle system bad debt
                 await systemDebtEngine.settleSystemBadDebt(await bookKeeper.stablecoin(systemDebtEngine.address), { gasLimit: 1000000 })

@@ -14,7 +14,7 @@ const { loadFixture } = require("../../helper/fixtures");
 
 const { formatBytes32String } = ethers.utils
 
-const COLLATERAL_POOL_ID = formatBytes32String("WNATIVE")
+const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 const CLOSE_FACTOR_BPS = BigNumber.from(5000)
 const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(12500)
 const TREASURY_FEE_BPS = BigNumber.from(2500)

@@ -11,7 +11,7 @@ const { getContract, createMock } = require("../../helper/contracts");
 const { loadFixture } = require("../../helper/fixtures");
 
 const { formatBytes32String } = ethers.utils
-const COLLATERAL_POOL_ID = formatBytes32String("WNATIVE")
+const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 
 const loadFixtureHandler = async () => {
     const mockedCollateralPoolConfig = await createMock("CollateralPoolConfig");
@@ -81,7 +81,7 @@ describe("BookKeeper", () => {
                 it("should be able to call addCollateral", async () => {
                     await mockedAccessControlConfig.mock.hasRole.returns(true)
 
-                    // init WNATIVE collateral pool
+                    // init WXDC collateral pool
                     await mockedCollateralPoolConfig.mock.getStabilityFeeRate.returns(WeiPerRay)
 
                     const collateralTokenBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, DeployerAddress)
@@ -99,16 +99,16 @@ describe("BookKeeper", () => {
                 it("should be able to call addCollateral", async () => {
                     await mockedAccessControlConfig.mock.hasRole.returns(true)
 
-                    // init WNATIVE collateral pool
+                    // init WXDC collateral pool
                     await mockedCollateralPoolConfig.mock.getStabilityFeeRate.returns(WeiPerRay)
 
-                    // add collateral 1 WNATIVE
+                    // add collateral 1 WXDC
                     await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad, { gasLimit: 1000000 })
 
                     const collateralTokenBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, DeployerAddress)
                     expect(collateralTokenBefore).to.be.equal(WeiPerWad)
 
-                    // add collateral -1 WNATIVE
+                    // add collateral -1 WXDC
                     await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad.mul(-1), { gasLimit: 1000000 })
 
                     const collateralTokenAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, DeployerAddress)
@@ -158,7 +158,7 @@ describe("BookKeeper", () => {
                 it("should be able to call moveCollateral", async () => {
                     await mockedAccessControlConfig.mock.hasRole.returns(true)
 
-                    // add collateral 1 WNATIVE to alice
+                    // add collateral 1 WXDC to alice
                     await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad, { gasLimit: 1000000 })
 
                     const collateralTokenAliceBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress)
@@ -193,7 +193,7 @@ describe("BookKeeper", () => {
                 it("should be able to call moveCollateral", async () => {
                     await mockedAccessControlConfig.mock.hasRole.returns(true)
 
-                    // add collateral 1 WNATIVE to alice
+                    // add collateral 1 WXDC to alice
                     await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad, { gasLimit: 1000000 })
 
                     const collateralTokenAliceBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress)
@@ -201,7 +201,7 @@ describe("BookKeeper", () => {
                     const collateralTokenBobBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, BobAddress)
                     expect(collateralTokenBobBefore).to.be.equal(0)
 
-                    // move collateral 1 WNATIVE from alice to bob
+                    // move collateral 1 WXDC from alice to bob
                     await bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
 
                     const collateralTokenAliceAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress)
@@ -447,7 +447,7 @@ describe("BookKeeper", () => {
                                     positionDebtCeiling: WeiPerRad.mul(1000000)
                                 })
 
-                                // add collateral to bob 10 WNATIVE
+                                // add collateral to bob 10 WXDC
                                 await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                                 // alice allow bob to move stablecoin
@@ -518,7 +518,7 @@ describe("BookKeeper", () => {
                                 positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
-                            // add collateral to bob 10 WNATIVE
+                            // add collateral to bob 10 WXDC
                             await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                             const positionBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress)
@@ -589,7 +589,7 @@ describe("BookKeeper", () => {
                                 positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
-                            // add collateral to alice 10 WNATIVE
+                            // add collateral to alice 10 WXDC
                             await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                             // lock collateral
@@ -678,7 +678,7 @@ describe("BookKeeper", () => {
                                 positionDebtCeiling: WeiPerRad.mul(1000000)
                             })
 
-                            // add collateral to alice 10 WNATIVE
+                            // add collateral to alice 10 WXDC
                             await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
                             // lock collateral
@@ -852,10 +852,10 @@ describe("BookKeeper", () => {
                             // set total debt ceiling 10 rad
                             await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                            // add collateral to 10 WNATIVE
+                            // add collateral to 10 WXDC
                             await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                            // bob lock collateral 10 WNATIVE
+                            // bob lock collateral 10 WXDC
                             await bookKeeperAsBob.adjustPosition(
                                 COLLATERAL_POOL_ID,
                                 BobAddress,
@@ -902,10 +902,10 @@ describe("BookKeeper", () => {
                                 // set total debt ceiling 10 rad
                                 await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                                // add collateral to 10 WNATIVE
+                                // add collateral to 10 WXDC
                                 await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                                // bob lock collateral 10 WNATIVE
+                                // bob lock collateral 10 WXDC
                                 await bookKeeperAsBob.adjustPosition(
                                     COLLATERAL_POOL_ID,
                                     BobAddress,
@@ -966,10 +966,10 @@ describe("BookKeeper", () => {
                             // set total debt ceiling 10 rad
                             await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                            // add collateral to 10 WNATIVE
+                            // add collateral to 10 WXDC
                             await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                            // alice lock collateral 10 WNATIVE
+                            // alice lock collateral 10 WXDC
                             await bookKeeperAsAlice.adjustPosition(
                                 COLLATERAL_POOL_ID,
                                 AliceAddress,
@@ -1024,10 +1024,10 @@ describe("BookKeeper", () => {
                             // set total debt ceiling 10 rad
                             await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                            // add collateral to 10 WNATIVE
+                            // add collateral to 10 WXDC
                             await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                            // alice lock collateral 10 WNATIVE
+                            // alice lock collateral 10 WXDC
                             await bookKeeperAsAlice.adjustPosition(
                                 COLLATERAL_POOL_ID,
                                 AliceAddress,
@@ -1074,10 +1074,10 @@ describe("BookKeeper", () => {
                                 // set total debt ceiling 10 rad
                                 await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                                // add collateral to 10 WNATIVE
+                                // add collateral to 10 WXDC
                                 await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                                // alice lock collateral 10 WNATIVE
+                                // alice lock collateral 10 WXDC
                                 await bookKeeperAsAlice.adjustPosition(
                                     COLLATERAL_POOL_ID,
                                     AliceAddress,
@@ -1151,10 +1151,10 @@ describe("BookKeeper", () => {
                                 // set total debt ceiling 10 rad
                                 await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                                // add collateral to 10 WNATIVE
+                                // add collateral to 10 WXDC
                                 await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                                // alice lock collateral 10 WNATIVE
+                                // alice lock collateral 10 WXDC
                                 await bookKeeperAsAlice.adjustPosition(
                                     COLLATERAL_POOL_ID,
                                     AliceAddress,
@@ -1226,10 +1226,10 @@ describe("BookKeeper", () => {
                     // set total debt ceiling 10 rad
                     await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                    // add collateral to 10 WNATIVE
+                    // add collateral to 10 WXDC
                     await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                    // alice lock collateral 10 WNATIVE
+                    // alice lock collateral 10 WXDC
                     await bookKeeperAsAlice.adjustPosition(
                         COLLATERAL_POOL_ID,
                         AliceAddress,
@@ -1273,10 +1273,10 @@ describe("BookKeeper", () => {
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                        // add collateral to 10 WNATIVE
+                        // add collateral to 10 WXDC
                         await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                        // alice lock collateral 10 WNATIVE
+                        // alice lock collateral 10 WXDC
                         await bookKeeperAsAlice.adjustPosition(
                             COLLATERAL_POOL_ID,
                             AliceAddress,
@@ -1322,10 +1322,10 @@ describe("BookKeeper", () => {
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                        // add collateral to 10 WNATIVE
+                        // add collateral to 10 WXDC
                         await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                        // alice lock collateral 10 WNATIVE
+                        // alice lock collateral 10 WXDC
                         await bookKeeperAsAlice.adjustPosition(
                             COLLATERAL_POOL_ID,
                             AliceAddress,
@@ -1371,10 +1371,10 @@ describe("BookKeeper", () => {
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                        // add collateral to 10 WNATIVE
+                        // add collateral to 10 WXDC
                         await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                        // alice lock collateral 10 WNATIVE
+                        // alice lock collateral 10 WXDC
                         await bookKeeperAsAlice.adjustPosition(
                             COLLATERAL_POOL_ID,
                             AliceAddress,
@@ -1420,10 +1420,10 @@ describe("BookKeeper", () => {
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                        // add collateral to 10 WNATIVE
+                        // add collateral to 10 WXDC
                         await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                        // alice lock collateral 10 WNATIVE
+                        // alice lock collateral 10 WXDC
                         await bookKeeperAsAlice.adjustPosition(
                             COLLATERAL_POOL_ID,
                             AliceAddress,
@@ -1470,11 +1470,11 @@ describe("BookKeeper", () => {
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(100), { gasLimit: 1000000 })
 
-                        // add collateral to 10 WNATIVE
+                        // add collateral to 10 WXDC
                         await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
                         await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(20), { gasLimit: 1000000 })
 
-                        // alice lock collateral 10 WNATIVE
+                        // alice lock collateral 10 WXDC
                         await bookKeeperAsAlice.adjustPosition(
                             COLLATERAL_POOL_ID,
                             AliceAddress,
@@ -1485,7 +1485,7 @@ describe("BookKeeper", () => {
                             { gasLimit: 1000000 }
                         )
 
-                        // bob lock collateral 100 WNATIVE and borrow 10 FXD
+                        // bob lock collateral 100 WXDC and borrow 10 FXD
                         await bookKeeperAsBob.adjustPosition(
                             COLLATERAL_POOL_ID,
                             BobAddress,
@@ -1531,10 +1531,10 @@ describe("BookKeeper", () => {
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                        // add collateral to 10 WNATIVE
+                        // add collateral to 10 WXDC
                         await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 })
 
-                        // alice lock collateral 10 WNATIVE
+                        // alice lock collateral 10 WXDC
                         await bookKeeperAsAlice.adjustPosition(
                             COLLATERAL_POOL_ID,
                             AliceAddress,
@@ -1618,7 +1618,7 @@ describe("BookKeeper", () => {
                         // set total debt ceiling 1 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad, { gasLimit: 1000000 })
 
-                        // add collateral to 1 WNATIVE
+                        // add collateral to 1 WXDC
                         await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad, { gasLimit: 1000000 })
                         // adjust position
                         await bookKeeperAsAlice.adjustPosition(
@@ -1703,7 +1703,7 @@ describe("BookKeeper", () => {
                         // set total debt ceiling 10 rad
                         await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 })
 
-                        // add collateral to 2 WNATIVE
+                        // add collateral to 2 WXDC
                         await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(2), { gasLimit: 1000000 })
                         // adjust position
                         await bookKeeperAsAlice.adjustPosition(
@@ -1918,7 +1918,7 @@ describe("BookKeeper", () => {
                     // set total debt ceiling 1 rad
                     await bookKeeper.setTotalDebtCeiling(WeiPerRad, { gasLimit: 1000000 })
 
-                    // add collateral to 1 WNATIVE
+                    // add collateral to 1 WXDC
                     await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad, { gasLimit: 1000000 })
                     // adjust position
                     await bookKeeper.adjustPosition(
