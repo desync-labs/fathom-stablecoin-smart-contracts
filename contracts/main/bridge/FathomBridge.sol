@@ -108,12 +108,12 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         require(_amount > fixedBridgeFee, "FathomBridge/amount-less-than-fee");
         _zeroAddressCheck(_to);
 
+	    stablecoin.safeTransferFrom(msg.sender, address(this), _amount);
         uint256 _actualTransferAmount = fixedBridgeFee != 0 ? _amount - fixedBridgeFee : _amount;
         IStablecoin(stablecoin).burn(msg.sender, _actualTransferAmount);
-	    stablecoin.safeTransferFrom(msg.sender, address(this), _amount - _actualTransferAmount);
     
-        bridgedOutAmount[_dstChainId] = bridgedOutAmount[_dstChainId] + _amount;
-        totalBridgedOutAmount = totalBridgedOutAmount + _amount;
+        bridgedOutAmount[_dstChainId] = bridgedOutAmount[_dstChainId] + _actualTransferAmount;
+        totalBridgedOutAmount = totalBridgedOutAmount + _actualTransferAmount;
 
         //generate event for off-chain components
         _initAsterizmTransferEvent(_dstChainId, abi.encode(msg.sender, _to, _actualTransferAmount));
