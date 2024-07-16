@@ -47,6 +47,11 @@ contract MockStablecoinAdapter is CommonMath, PausableUpgradeable, ReentrancyGua
         _;
     }
 
+    constructor() {
+        // Must be commented out for test script
+        // _disableInitializers();
+    }
+
     function initialize(address _bookKeeper, address _stablecoin) external initializer {
         PausableUpgradeable.__Pausable_init();
         ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
