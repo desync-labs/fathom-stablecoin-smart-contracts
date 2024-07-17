@@ -22,7 +22,7 @@ interface IBookKeeper {
         int256 _debtShare
     ) external;
 
-    function totalStablecoinIssued() external returns (uint256);
+    function totalStablecoinIssued() external returns view (uint256);
 
     function moveStablecoin(
         address _src,
