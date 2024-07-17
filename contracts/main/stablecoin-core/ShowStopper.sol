@@ -9,6 +9,7 @@ import "../interfaces/ILiquidationEngine.sol";
 import "../interfaces/IPriceFeed.sol";
 import "../interfaces/IPriceOracle.sol";
 import "../interfaces/ISystemDebtEngine.sol";
+import "../interfaces/IFathomBridge.sol";
 import "../interfaces/ICagable.sol";
 import "../utils/CommonMath.sol";
 
@@ -38,6 +39,8 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
     mapping(address => uint256) public stablecoinAccumulator; //    [wad]
     mapping(bytes32 => mapping(address => uint256)) public redeemedStablecoinAmount; //    [wad]
 
+    IFathomBridge public fathomBridge;
+
     event LogCage(uint256 _cageCoolDown);
     event LogCageCollateralPool(bytes32 indexed _collateralPoolId);
 
@@ -52,6 +55,7 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
     event LogSetLiquidationEngine(address indexed _caller, address _liquidationEngine);
     event LogSetSystemDebtEngine(address indexed _caller, address _systemDebtEngine);
     event LogSetPriceOracle(address indexed _caller, address _priceOracle);
+    event LogSetFathomBridge(address indexed _caller, address _fathomBridge);
     event LogSetCageCoolDown(address indexed _caller, uint256 _cageCoolDown);
 
     modifier onlyOwner() {
@@ -97,6 +101,12 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
 
         priceOracle = IPriceOracle(_priceOracle);
         emit LogSetPriceOracle(msg.sender, _priceOracle);
+    }
+
+    function setFathomBridge(address _fathomBridge) external onlyOwner {
+        require(live == 1, "ShowStopper/not-live");
+        fathomBridge = IFathomBridge(_fathomBridge);
+        emit LogSetFathomBridge(msg.sender, _fathomBridge);
     }
 
     /// @notice Initiates the process of emergency shutdown (cage).
@@ -173,7 +183,8 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
         require(debt == 0, "ShowStopper/debt-not-zero");
         require(bookKeeper.stablecoin(address(systemDebtEngine)) == 0, "ShowStopper/surplus-not-zero");
         require(block.timestamp >= cagedTimestamp + cageCoolDown, "ShowStopper/cage-cool-down-not-finished");
-        debt = bookKeeper.totalStablecoinIssued();
+        _cageBridge();
+        debt = _finalizeDebt();
         emit LogFinalizeDebt();
     }
 
@@ -245,6 +256,25 @@ contract ShowStopper is CommonMath, IShowStopper, PausableUpgradeable {
             0
         );
         emit LogRedeemLockedCollateral(_collateralPoolId, _collateralReceiver, _lockedCollateralAmount);
+    }
+
+    function _finalizeDebt() internal view returns (uint256){
+        uint256 _totalBridgedInAmount = fathomBridge.totalBridgedInAmount() * RAY;
+        uint256 _totalBridgedOutAmount = fathomBridge.totalBridgedOutAmount() * RAY;
+        uint256 _debt = bookKeeper.totalStablecoinIssued();
+        if (_totalBridgedInAmount > _totalBridgedOutAmount) {
+            return _debt + _totalBridgedInAmount - _totalBridgedOutAmount;
+        } else if (_totalBridgedInAmount < _totalBridgedOutAmount) {
+            return _debt - (_totalBridgedOutAmount - _totalBridgedInAmount);
+        } else {
+            return _debt;
+        }
+    }
+
+    function _cageBridge() internal {
+        if (address(fathomBridge) != address(0)) {
+            ICagable(address(fathomBridge)).cage();
+        }
     }
 
     function _safeToInt256(uint256 _number) internal pure returns (int256) {

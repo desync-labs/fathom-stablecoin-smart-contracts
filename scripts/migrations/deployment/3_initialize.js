@@ -36,7 +36,7 @@ module.exports = async function (deployer) {
     const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
     const slidingWindowDexOracle = await getProxy(proxyFactory, "SlidingWindowDexOracle");
-
+    const fathomBridge = await getProxy(proxyFactory, "FathomBridge");
 
 
     const fathomStablecoinProxyActions = await artifacts.initializeInterfaceAt("FathomStablecoinProxyActions", "FathomStablecoinProxyActions");
@@ -149,6 +149,11 @@ module.exports = async function (deployer) {
             accessControlConfig.address,
         ),
         // slidingWindowDexOracle.initialize(addresses.DEXFactory, 1800, 15);
+        fathomBridge.initialize(
+            addresses.AsterizmInitializerLib,
+            fathomStablecoin.address,
+            accessControlConfig.address
+        ),
     ];
 
     await Promise.all(promises);
@@ -183,6 +188,7 @@ module.exports = async function (deployer) {
         proxyActionsStorage: proxyActionsStorage.address,
         fathomProxyAdmin: proxyAdmin.address,
         slidingWindowDexOracle: slidingWindowDexOracle.address,
+        fathomBridge: fathomBridge.address,
     }
 
     fs.writeFileSync('./addresses.json', JSON.stringify(newAddresses));

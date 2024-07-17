@@ -19,6 +19,7 @@ module.exports = async function (deployer) {
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
     const adminControls = await getProxy(proxyFactory, "AdminControls");
+    const fathomBridge = await getProxy(proxyFactory, "FathomBridge");
 
     await accessControlConfig.grantRole(await accessControlConfig.BOOK_KEEPER_ROLE(), bookKeeper.address)
 
@@ -47,6 +48,7 @@ module.exports = async function (deployer) {
 
     await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), systemDebtEngine.address)
 
+    await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), fathomBridge.address)
     await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), stablecoinAdapter.address);
 
     await accessControlConfig.grantRole(await accessControlConfig.GOV_ROLE(), adminControls.address)
