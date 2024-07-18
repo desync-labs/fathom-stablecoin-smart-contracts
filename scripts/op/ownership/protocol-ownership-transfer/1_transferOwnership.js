@@ -1,4 +1,4 @@
-const { getConfig } = require("../../common/transfer-ownership-helper");
+const { getConfig } = require("../../../common/transfer-ownership-helper");
 
 module.exports = async function (deployer) {
     try {

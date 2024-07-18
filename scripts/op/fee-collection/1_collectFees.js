@@ -1,4 +1,4 @@
-const { getConfig } = require("../common/fee-collection-helper");
+const { getConfig } = require("../../common/fee-collection-helper");
 
 module.exports = async function (deployer) {
     try {
