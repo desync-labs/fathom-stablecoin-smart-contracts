@@ -10,7 +10,7 @@ module.exports =  async function(deployer) {
   const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
 
   let promises = [
-      deployer.deploy(Vault, pools.XDC, addresses.WXDC, collateralTokenAdapter.address, { gas: 7050000 }),
+      deployer.deploy(Vault, pools.NATIVE, addresses.WNATIVE, collateralTokenAdapter.address, { gas: 7050000 }),
   ];
 
   await Promise.all(promises);

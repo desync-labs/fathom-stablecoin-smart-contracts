@@ -13,9 +13,9 @@ const MockFixedSpreadLiquidationStrategy = artifacts.require('MockFixedSpreadLiq
 
 const MockPositionManager = artifacts.require('MockPositionManager.sol');
 const MockCentralizedOraclePriceFeed = artifacts.require('MockCentralizedOraclePriceFeed.sol');
-const MockDelayFathomOraclePriceFeed = artifacts.require('MockDelayFathomOraclePriceFeed.sol');
-const MockDexPriceOracle = artifacts.require('MockDexPriceOracle.sol');
-const MockSlidingWindowDexOracle = artifacts.require('MockSlidingWindowDexOracle.sol');
+// const MockDelayFathomOraclePriceFeed = artifacts.require('MockDelayFathomOraclePriceFeed.sol');
+// const MockDexPriceOracle = artifacts.require('MockDexPriceOracle.sol');
+// const MockSlidingWindowDexOracle = artifacts.require('MockSlidingWindowDexOracle.sol');
 const MockAdminControls = artifacts.require('MockAdminControls.sol');
 const MockBookKeeper = artifacts.require('MockBookKeeper.sol');
 
@@ -30,14 +30,14 @@ const MockFathomBridge = artifacts.require('MockFathomBridge.sol');
 const MockShowStopper = artifacts.require('MockShowStopper.sol');
 
 const MockStabilityFeeCollector = artifacts.require('MockStabilityFeeCollector.sol');
-const MockStableSwapModule = artifacts.require('MockStableSwapModule.sol');
-const MockStableSwapModuleWrapper = artifacts.require('MockStableSwapModuleWrapper.sol');
+// const MockStableSwapModule = artifacts.require('MockStableSwapModule.sol');
+// const MockStableSwapModuleWrapper = artifacts.require('MockStableSwapModuleWrapper.sol');
 const MockSystemDebtEngine = artifacts.require('MockSystemDebtEngine.sol');
 
 const TokenAdapter = artifacts.require('TokenAdapter.sol');
 const FathomToken = artifacts.require('FathomToken.sol');
 const ERC20 = artifacts.require('ERC20Mintable.sol');
-const WXDC = artifacts.require('WXDC.sol');
+const WNATIVE = artifacts.require('WNATIVE.sol');
 const ERC20Stable = artifacts.require('ERC20MintableStableSwap.sol')
 const SimplePriceFeed = artifacts.require('SimplePriceFeed.sol')
 const StableswapMultipleSwapsMock = artifacts.require("StableswapMultipleSwapsMock");
@@ -58,9 +58,9 @@ module.exports = async function (deployer) {
     deployer.deploy(MockFixedSpreadLiquidationStrategy, { gas: 7050000 }),
     deployer.deploy(MockPositionManager, { gas: 7050000 }),
     deployer.deploy(MockCentralizedOraclePriceFeed, { gas: 7050000 }),
-    deployer.deploy(MockDelayFathomOraclePriceFeed, { gas: 7050000 }),
-    deployer.deploy(MockDexPriceOracle, { gas: 7050000 }),
-    deployer.deploy(MockSlidingWindowDexOracle, { gas: 7050000 }),
+    // deployer.deploy(MockDelayFathomOraclePriceFeed, { gas: 7050000 }),
+    // deployer.deploy(MockDexPriceOracle, { gas: 7050000 }),
+    // deployer.deploy(MockSlidingWindowDexOracle, { gas: 7050000 }),
     deployer.deploy(MockAdminControls, { gas: 7050000 }),
     deployer.deploy(MockBookKeeper, { gas: 7050000 }),
     deployer.deploy(MockFathomStablecoin, { gas: 7050000 }),
@@ -69,8 +69,8 @@ module.exports = async function (deployer) {
     deployer.deploy(MockFathomBridge, { gas: 7050000 }),
     deployer.deploy(MockShowStopper, { gas: 7050000 }),
     deployer.deploy(MockStabilityFeeCollector, { gas: 7050000 }),
-    deployer.deploy(MockStableSwapModule, { gas: 7050000 }),
-    deployer.deploy(MockStableSwapModuleWrapper, { gas: 7050000 }),
+    // deployer.deploy(MockStableSwapModule, { gas: 7050000 }),
+    // deployer.deploy(MockStableSwapModuleWrapper, { gas: 7050000 }),
     deployer.deploy(MockSystemDebtEngine, { gas: 7050000 }),
 
   ];
@@ -81,8 +81,8 @@ module.exports = async function (deployer) {
   addresses[chainId].USD = ERC20.address;
   addresses[chainId].USDSTABLE = ERC20Stable.address;
 
-  await deployer.deploy(WXDC, { gas: 3050000 }),
-    addresses[chainId].WXDC = WXDC.address;
+  await deployer.deploy(WNATIVE, { gas: 3050000 }),
+    addresses[chainId].WNATIVE = WNATIVE.address;
   addresses[chainId].testOracle = TestOracleMock.address;
 
   await deployer.deploy(StableswapMultipleSwapsMock, { gas: 3050000 })

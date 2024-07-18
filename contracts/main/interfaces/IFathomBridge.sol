@@ -29,5 +29,4 @@ interface IFathomBridge {
     function totalBridgedInAmount() external view returns (uint256);
 
     function totalBridgedOutAmount() external view returns (uint256);
-
 }

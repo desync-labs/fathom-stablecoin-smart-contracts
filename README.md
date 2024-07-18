@@ -2,7 +2,7 @@
 
 FXD is a stablecoin intended to maintain a soft peg to the US Dollar. Its value is meant to stay stable, with minor fluctuations permitted around the target price.
 
-Users may borrow FXD once they obtain the necessary borrowing power via the collateralization mechanism. The primary source of borrowing power in the Fathom Protocol comes from depositing XDC (the native coin of the XDC Network) as collateral.
+Users may borrow FXD once they obtain the necessary borrowing power via the collateralization mechanism. The primary source of borrowing power in the Fathom Protocol comes from depositing Native coin as collateral.
 
 Various mechanisms, including price oracles, Stable Swap, and a risk management system, preserve the stability of FXD.
 
@@ -82,12 +82,7 @@ The chainId 1337 addresses are required to execute the test scripts on Ganache. 
 ```JSON
 {
   "1337": {
-    "WXDC": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
-    "USD": "0xce75A95160D96F5388437993aB5825F322426E04",
-    "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
-    "DEXFactory": "0x5cf9FB75278606F23b2521e77A424174d2CAA2c3",
-    "USDSTABLE": "0xb9AdA6B44E4CFF8FE00443Fadf8ad006CfCc2d10",
-    "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753",
+    "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
     "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
   }
 }
@@ -112,7 +107,7 @@ You might face some tests failing with 'out of gas' error.
 
 ## Deployment
 
-The current codebase is structured so that the same set of smart contracts will be deployed, regardless of the target blockchain. By default, the protocol's price feed after deployment is set to `SimplePriceFeed`, a mock price feed that allows the protocol's deployer (owner) to freely modify prices. This default setting is based on the consideration that other price feeds for commercial use, whether sourcing from a DEX or a Centralized one, require external addresses or even price-related bots for successful deployment. Consequently, the adjusted deployment/migration script will deploy `DexPriceOracle`, `DelayFathomOraclePriceFeed`, `CentralizedOraclePriceFeed`, and `SlidingWindowDexOracle` using proxy patterns, but will not initialize them. Documentation regarding price feed changes will be included in this markdown document following the deployment section.
+The current codebase is structured so that the same set of smart contracts will be deployed, regardless of the target blockchain. By default, the protocol's price feed after deployment is set to `SimplePriceFeed`, a mock price feed that allows the protocol's deployer (owner) to freely modify prices. This default setting is based on the consideration that other price feeds for commercial use require external addresses or even price-related bots for successful deployment. Consequently, the adjusted deployment/migration script will deploy `CentralizedOraclePriceFeed`, 'FathomPriceOracle' using proxy patterns, but only CentralizedOraclePriceFeed will be initialize. Documentation regarding price feed changes will be included in this markdown document following the deployment section.
 
 ### On Ganache
 
@@ -130,23 +125,19 @@ $ echo -n PRIVATE_KEY_WITHOUT_0x_PREFIX > privateKey
 #### 2) Create externalAddresses.json in root directory. 
 
 The format of the content can be same as in the Running test sections. Like below
+WNATIVE address will be the collateralToken address for the initial collateral NAITVE coin of the network that you deploy fathomStablecoin to.
 
 ```JSON
 {
   "1337": {
-    "WXDC": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
-    "USD": "0xce75A95160D96F5388437993aB5825F322426E04",
-    "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
-    "DEXFactory": "0x5cf9FB75278606F23b2521e77A424174d2CAA2c3",
-    "USDSTABLE": "0xb9AdA6B44E4CFF8FE00443Fadf8ad006CfCc2d10",
-    "testOracle": "0xc36b26cf999F9f4A085Ce5bD1A541a4B81a70753",
+    "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
     "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
   }
 }
 
 ```
 
-If you want to see the protocol in action by depositing test ETH and borrowing FXD, I recommend that you first deploy WXDC||WETH on Ganache. After that, update the WXDC address in the externalAddresses.json file with the address of the WXDC you deployed. Additionally, if you aim to thoroughly test the StableSwapModule post-deployment, you must deploy an ERC20 token that can subsequently be deposited into the StableSwapModule. Therefore, please deploy an ERC20 token to substitute for the USD token, and update the USD value in the aforementioned JSON file.
+If you want to see the protocol in action by depositing test ETH and borrowing FXD, I recommend that you first deploy WNATIVE||WETH on Ganache. After that, update the WNATIVE address in the externalAddresses.json file with the address of the WNATIVE you deployed.
 
 #### 3) Compile contracts
 
@@ -166,7 +157,7 @@ $ coralX scenario --run deployLocal
 
 After deployment, addresses.json gets updated with addresses of proxies.
 
-### On apothem (XDC Testnet)
+### On apothem (NATIVE Testnet)
 
 #### 1) Create file called "privateKey" in the root directory (PRIVATE_KEY_WITHOUT_0x_PREFIX of the EOA that you would like to deploy contracts from):
 
@@ -181,22 +172,13 @@ ChainID of apothem is 51. Therefore, the externalAddresses.json need to have the
 ```JSON
 {
     "51": {
-      "WXDC": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
-      "USD": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
-      "DEXFactory": "0x6FfcE1bb8fB4841B42C8ee5e91398068723ba80D",
-      "USDSTABLE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
+      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
       "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
     }
 }
 ```
 
-The WXDC address above is officially deployed on the Apothem network. Therefore, I recommend using this address unless you have already deployed or are willing to deploy a new WXDC address for your testing purposes.
-
-For USD addresses, you may use the contract addresses of ERC20 tokens that you deployed yourself, or if you have balances of any USD-pegged stablecoin on Apothem, you can use its address.
-
-The USDSTABLE will be the USD address used for the StableSwapModule. You may keep the same address as the USD address.
-
-DEXFactory refers to the factory address of UniswapV2 fork. In this deployment, you can use the FathomSwap factory address provided above, or you can use your own factory address if you prefer. DEXFactory address was used for the priceOracle and priceFeed that use a DEX as the source of truth, but the default deployment setting does not use the address
+The WNATIVE address above is officially deployed on the Apothem network. Therefore, I recommend using this address unless you have already deployed or are willing to deploy a new WNATIVE address for your testing purposes.
 
 #### 4) Compile contracts
 
@@ -216,7 +198,7 @@ $ coralX scenario --run deployApothem
 
 After deployment, addresses.json gets updated with addresses of proxies.
 
-### On XDC mainnet (chainID 50)
+### On NATIVE mainnet (chainID 50)
 
 #### 1) Create file called "privateKey" in the root directory (PRIVATE_KEY_WITHOUT_0x_PREFIX of the EOA that you would like to deploy contracts from):
 
@@ -226,27 +208,18 @@ $ echo -n PRIVATE_KEY_WITHOUT_0x_PREFIX > privateKey
 
 #### 2) Create externalAddresses.json in root directory.:
 
-ChainID of XDC mainnet is 50. Therefore, the externalAddresses.json need to have the sets of addresses having 51 as key. For example, like below.
+ChainID of NATIVE mainnet is 50. Therefore, the externalAddresses.json need to have the sets of addresses having 51 as key. For example, like below.
 
 ```JSON
 {
     "50": {
-      "WXDC": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
-      "USD": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
-      "DEXFactory": "0x6FfcE1bb8fB4841B42C8ee5e91398068723ba80D",
-      "USDSTABLE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f",
+      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce",
       "AsterizmInitializerLib":"0xA55BDd1701D370cE9E2fb66EC0f934F3Dd981571"
     }
 }
 ```
 
-WXDC is recommended to have the official WXDC address unless you would like to use other wrapper contracts.
-
-For USD addresses, I recommend USDTx, however, if you have other stable token on XDC that you would like to use, no problem.
-
-The USDSTABLE will be the USD address used for the StableSwapModule. You may keep the same address as the USD address.
-
-DEXFactory refers to the factory address of UniswapV2. In this deployment, you can find and use the FathomSwap factory address or you can use your own factory address if you prefer. DEXFactory address was used for the priceOracle and priceFeed that use a DEX as the source of truth, but the default deployment setting does not use this address.
+WNATIVE is recommended to have the official WNATIVE address unless you would like to use other wrapper contracts.
 
 #### 4) Compile contracts
 
@@ -269,7 +242,7 @@ After deployment, addresses.json gets updated with addresses of proxies.
 # PriceFeed
 
 ## How to use SimplePriceFeed
-The default configuration for deployment specifies that SimplePriceFeed acts as the price feed for XDC collateral. To alter the price of the collateral, you must first establish the price within SimplePriceFeed and then set the Loan-to-Value (LTV) discounted price in the protocol via the PriceOracle contract.
+The default configuration for deployment specifies that SimplePriceFeed acts as the price feed for NATIVE collateral. To alter the price of the collateral, you must first establish the price within SimplePriceFeed and then set the Loan-to-Value (LTV) discounted price in the protocol via the PriceOracle contract.
 
 ```Solidity=
 //In SimplePriceFeed contract
@@ -277,7 +250,7 @@ The default configuration for deployment specifies that SimplePriceFeed acts as 
 function setPrice(uint256 _price) external onlyOwner {}
 
 ```
-You can establish the collateral price using the setPrice function mentioned above. To set the price of XDC to 2 USD, call the setPrice function with an argument of 2*10^18.
+You can establish the collateral price using the setPrice function mentioned above. To set the price of NATIVE to 2 USD, call the setPrice function with an argument of 2*10^18.
 
 Once the price is set in SimplePriceFeed, it is necessary to input the LTV discounted price into the protocol. This can be accomplished by calling the function provided below.
 
@@ -287,11 +260,11 @@ Once the price is set in SimplePriceFeed, it is necessary to input the LTV disco
     function setPrice(bytes32 _collateralPoolId) external override {}
 
 ```
-The setPrice function of the PriceOracle should be called with an argument, which is the collateralPoolId. This is a padded bytes32 value converted from the string 'XDC'.
+The setPrice function of the PriceOracle should be called with an argument, which is the collateralPoolId. This is a padded bytes32 value converted from the string 'NATIVE'.
 
-0x5844430000000000000000000000000000000000000000000000000000000000
+0x4e41544956452000000000000000000000000000000000000000000000000000
 
-For example, if the price of XDC set by SimplePriceFeed is 1 USD and the Loan-to-Value (LTV) ratio is 70%, then the LTV discounted price would be 0.7 USD.
+For example, if the price of NATIVE set by SimplePriceFeed is 1 USD and the Loan-to-Value (LTV) ratio is 70%, then the LTV discounted price would be 0.7 USD.
 
 ## How to change priceFeed for the protocol
 
@@ -316,34 +289,43 @@ Line 5~6 verifies the solvency of the new priceFeed. New priceFeed must have poo
 
 ### Simple way to initialize other priceFeeds and priceOracles
 
-`DexPriceOracle`, `DelayFathomOraclePriceFeed`, `CentralizedOraclePriceFeed`, and `SlidingWindowDexOracle`
+`CentralizedOraclePriceFeed`
 
 can be initialized with script below
 
 ```
-scripts/migrations/priceFeed/1_initialize.js
+scripts/migrations/priceFeed/1_setFathomPriceOracle.js
 ````
-#### To run the script with DEX as the price source, ensure that:
+#### To run the script for the price feed, ensure that the build files remain unchanged since deployment.
 
-0) The build files remain unchanged since deployment.
-1) The DEXFactory is valid and that an XDC/USD pair exists within the DEXFactory.
+The default is set as CentralizedOraclePriceFeed
 
-The default PriceOracle for DelayFathomOraclePriceFeed is set as DexPriceOracle since SlidingWindowDexOracle requires more involvement of PriceBot that will periodically keep feeding prices to SlidingWindowDexOracle. 
+### Please prepare setFathomPriceOracle.json file in the root. The file looks like below
+```JSON=
+{
+"51":
+{
+    "PriceAggregator":"0x0000000000000000000000000000000000000000",
+    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+    "CollateralSymbol":"CGO",
+},
+"1337":
+{
+    "PriceAggregator":"0x0000000000000000000000000000000000000000",
+    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+    "CollateralSymbol":"CGO",
+},
+"17000":
+{
+    "PriceAggregator":"0x0000000000000000000000000000000000000000",
+    "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
+    "CollateralSymbol":"CGO",
+}
+}
+```
 
 #### Run the init script with below command
 
 ```bash
-$ coralX execute --path scripts/migrations/priceFeed/1_initialize.js
+$ coralX execute --path scripts/migrations/priceFeed/1_setFathomPriceOracle.js --network anyConfiguredNetwork
 ```
-
-### DEX price feed info
-
-The DelayFathomOraclePriceFeed is designed to replace the SimplePriceFeed with DEX as the price source. To switch to the DelayFathomOraclePriceFeed, you must execute the peekPrice function on DelayFathomOraclePriceFeed twice.
-
-The following demonstrates the relationship between the price contracts. When the setPrice function is called in PriceOracle, the function calls flow as shown below:
-
-PriceOracle -> DelayFathomOraclePriceFeed -> DexPriceOracle -> DEX
-
-When the setPrice function is invoked in PriceOracle, or when a user opens a position, the price updates after a certain delay period has elapsed (default is set to 15 minutes). For more information, please refer to the DelayFathomOraclePriceFeed and DelayPriceFeedBase contract documentation.
-
-In practice, it is possible to test how the collateral price in the DEX is mirrored using DelayFathomOraclePriceFeed without the need for a priceBot. However, if there is insufficient activity from opening positions or if the setPrice function in PriceOracle is not called frequently enough, the price information in DelayFathomOraclePriceFeed may become outdated (with a priceLife of 30 minutes) and hinder CDP actions. In such instances, you should call peekPrice on the DelayFathomOraclePriceFeed, then proceed to call the setPrice function in PriceOracle.
