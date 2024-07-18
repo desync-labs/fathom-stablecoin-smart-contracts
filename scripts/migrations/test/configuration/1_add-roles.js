@@ -10,9 +10,8 @@ module.exports =  async function(deployer) {
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
-    // To be sunsetted on xdc mainnet, then to be deprecated
-    // const stableSwap = await getProxy(proxyFactory, "StableSwapModule");
-    // const stableSwapModuleWrapper = await getProxy(proxyFactory,"StableSwapModuleWrapper")
+    const stableSwap = await getProxy(proxyFactory, "StableSwapModule");
+    const stableSwapModuleWrapper = await getProxy(proxyFactory,"StableSwapModuleWrapper")
 
     await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), DeployerWallet);
 
@@ -21,11 +20,11 @@ module.exports =  async function(deployer) {
 
     await accessControlConfig.grantRole(await accessControlConfig.MINTABLE_ROLE(), DeployerWallet)
     
-    // await stableSwap.addToWhitelist(DeployerWallet)
-    // await stableSwapModuleWrapper.addToWhitelist(DeployerWallet)
-    // await stableSwap.setStableSwapWrapper(
-    //     stableSwapModuleWrapper.address,
-    //     { gasLimit: 1000000 }
-    // )
+    await stableSwap.addToWhitelist(DeployerWallet)
+    await stableSwapModuleWrapper.addToWhitelist(DeployerWallet)
+    await stableSwap.setStableSwapWrapper(
+        stableSwapModuleWrapper.address,
+        { gasLimit: 1000000 }
+    )
     
 }

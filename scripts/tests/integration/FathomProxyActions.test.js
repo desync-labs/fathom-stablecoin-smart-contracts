@@ -95,26 +95,26 @@ describe("Position Closure without collateral withdrawal", () => {
         } = await loadFixture(setup));
     })
 
-    describe("#wipeAndUnlockNATIVE", () => {
+    describe("#wipeAndUnlockXDC", () => {
         context("open position and pay back debt without collateral withdrawal", () => {
             it("should be success", async () => {
                 await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
 
                 // position 1
                 //  a. open a new position
-                //  b. lock WNATIVE
+                //  b. lock WXDC
                 //  c. mint FXD
-                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(10), WeiPerWad.mul(5))
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
 
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
 
                 //  a. repay 2 WAD of FXD
-                //  b. alice doesn't unlock any NATIVE
+                //  b. alice doesn't unlock any XDC
                 //  c. check if the position has the same amount of lockedCollateral
                 //  d. check if the position has now debtShare of 3 WAD (5-2)
 
-                await PositionHelper.wipeAndUnlockNATIVE(
+                await PositionHelper.wipeAndUnlockXDC(
                     aliceProxyWallet,
                     AliceAddress,
                     positionId,
@@ -123,7 +123,7 @@ describe("Position Closure without collateral withdrawal", () => {
                 )
 
                 const [lockedCollateral, debtShare] = await bookKeeper.positions(
-                    pools.NATIVE,
+                    pools.XDC,
                     positionAddress
                 )
 
@@ -140,9 +140,9 @@ describe("Position Closure without collateral withdrawal", () => {
 
                 // position 1
                 //  a. open a new position
-                //  b. lock WNATIVE
+                //  b. lock WXDC
                 //  c. mint FXD
-                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(10), WeiPerWad.mul(5))
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
 
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
@@ -153,10 +153,10 @@ describe("Position Closure without collateral withdrawal", () => {
                 await fathomStablecoin.transfer(reentrancyAttacker.address, WeiPerWad.mul(5), { from: AliceAddress });
                 //reentrancyAttack approve reEntrantProxyWallet as spender of FXD
                 await reentrancyAttacker.approveWallet(fathomStablecoin.address);
-                //reentrancyAttacker tries to call wipeAndUnlockNATIVE and then all proxyWallet again with fallback function
+                //reentrancyAttacker tries to call wipeAndUnlockXDC and then all proxyWallet again with fallback function
                 //but due to gas limit set in safeTransferETH, the fn call fails.
 
-                PositionHelper.wipeAndUnlockNATIVE(
+                PositionHelper.wipeAndUnlockXDC(
                     reentrancyAttacker,
                     AliceAddress,
                     positionId,
@@ -165,7 +165,7 @@ describe("Position Closure without collateral withdrawal", () => {
                 )
 
                 const [lockedCollateral, debtShare] = await bookKeeper.positions(
-                    pools.NATIVE,
+                    pools.XDC,
                     positionAddress
                 )
 
@@ -185,9 +185,9 @@ describe("Position Closure without collateral withdrawal", () => {
 
                 // position 1
                 //  a. open a new position
-                //  b. lock WNATIVE
+                //  b. lock WXDC
                 //  c. mint FXD
-                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(10), WeiPerWad.mul(5))
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
 
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
@@ -198,11 +198,11 @@ describe("Position Closure without collateral withdrawal", () => {
                 await fathomStablecoin.transfer(reentrancyAttacker2.address, WeiPerWad.mul(5), { from: AliceAddress });
                 //reentrancyAttack approve reEntrantProxyWallet as spender of FXD
                 await reentrancyAttacker2.approveWallet(fathomStablecoin.address);
-                //reentrancyAttacker tries to call wipeAndUnlockNATIVE and then all proxyWallet again with fallback function
+                //reentrancyAttacker tries to call wipeAndUnlockXDC and then all proxyWallet again with fallback function
                 //but due to gas limit set in safeTransferETH, the fn call fails.
 
                 await expect(
-                    PositionHelper.wipeAndUnlockNATIVE(
+                    PositionHelper.wipeAndUnlockXDC(
                         reentrancyAttacker2,
                         AliceAddress,
                         positionId,
@@ -214,30 +214,30 @@ describe("Position Closure without collateral withdrawal", () => {
         })
     })
 
-    describe("#wipeAllAndUnlockNATIVE", () => {
+    describe("#wipeAllAndUnlockXDC", () => {
         context("open position and pay back debt without collateral withdrawal", () => {
             it("should be success", async () => {
                 await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 })
 
                 // position 1
                 //  a. open a new position
-                //  b. lock WNATIVE
+                //  b. lock WXDC
                 //  c. mint FXD
-                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(10), WeiPerWad.mul(5))
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
                 const positionId = await positionManager.ownerLastPositionId(aliceProxyWallet.address)
                 const positionAddress = await positionManager.positions(positionId)
 
                 // position 2
                 //  a. open a new position
-                //  b. lock WNATIVE
+                //  b. lock WXDC
                 //  c. mint FXD
-                await PositionHelper.openNATIVEPositionAndDraw(aliceProxyWallet, AliceAddress, pools.NATIVE, WeiPerWad.mul(10), WeiPerWad.mul(5))
+                await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(10), WeiPerWad.mul(5))
 
                 //  a. repay debt fully for position1
-                //  b. alice doesn't unlock any NATIVE
+                //  b. alice doesn't unlock any XDC
                 //  c. check if the position has the same amount of lockedCollateral
                 //  d. check if the position has now debtShare of 0 WAD
-                await PositionHelper.wipeAllAndUnlockNATIVE(
+                await PositionHelper.wipeAllAndUnlockXDC(
                     aliceProxyWallet,
                     AliceAddress,
                     positionId,
@@ -245,7 +245,7 @@ describe("Position Closure without collateral withdrawal", () => {
                 )
 
                 const [lockedCollateral, debtShare] = await bookKeeper.positions(
-                    pools.NATIVE,
+                    pools.XDC,
                     positionAddress
                 )
 

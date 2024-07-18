@@ -64,6 +64,7 @@ module.exports = {
   deployTokensApothem: [
     ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'apothem']
   ],
+
   migrateAndConfigureForTests: [
     ['compile'],
     ['execute', '--path', 'scripts/migrations/test/pre-deployment'],

@@ -81,7 +81,7 @@ describe("StabilityFeeCollector", () => {
                 await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(UnitHelpers.WeiPerRay)
 
                 // Set expectations
-                const expectedCollateralPoolId = formatBytes32String("NATIVE");
+                const expectedCollateralPoolId = formatBytes32String("XDC");
                 const expectedStabilityFeeRecipient = DeployerAddress;
                 const expectedDebtAccumulatedRate = BigNumber.from("10000000000000000000000000");
 
@@ -92,7 +92,7 @@ describe("StabilityFeeCollector", () => {
                 ).returns();
 
                 // Execute the function
-                await stabilityFeeCollectorAsAlice.collect(formatBytes32String("WNATIVE"), { gasLimit: 2000000 })
+                await stabilityFeeCollectorAsAlice.collect(formatBytes32String("WXDC"), { gasLimit: 2000000 })
 
                 // Verify if the mocked function was called with the expected arguments
                 // Waffle automatically checks this based on the expectations set earlier
@@ -213,7 +213,7 @@ describe("StabilityFeeCollector", () => {
                 await mockedCollateralPoolConfig.mock.getDebtAccumulatedRate.returns(UnitHelpers.WeiPerRay)
                 await mockedBookKeeper.mock.accrueStabilityFee.returns()
 
-                await stabilityFeeCollector.collect(formatBytes32String("WNATIVE"), { gasLimit: 2000000 })
+                await stabilityFeeCollector.collect(formatBytes32String("WXDC"), { gasLimit: 2000000 })
             })
         })
     })

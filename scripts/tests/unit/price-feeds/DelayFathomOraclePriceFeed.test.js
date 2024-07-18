@@ -11,7 +11,7 @@ const { getContract, createMock } = require("../../helper/contracts");
 const { increase, latest } = require('../../helper/time');
 const { formatBytes32String } = ethers.utils
 
-const COLLATERAL_POOL_ID = formatBytes32String("NATIVE")
+const COLLATERAL_POOL_ID = formatBytes32String("XDC")
 
 describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () => {
   let mockedBookKeeper //  <- bookKeeper.collateralPoolConfig() should return the address of mockCollateralPoolConfig
@@ -23,7 +23,7 @@ describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () =
   let mockToken0 = "0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"; // <- some address from Remix
   let mockToken1 = "0x4B20993Bc481177ec7E8f571ceCaE8A9e22C02db"; // <- some address from Remix
 
-  // const delayFathomOraclePriceFeed = getContract("MockDelayFathomOraclePriceFeed", DeployerAddress);
+  const delayFathomOraclePriceFeed = getContract("MockDelayFathomOraclePriceFeed", DeployerAddress);
 
   beforeEach(async () => {
     await snapshot.revertToSnapshot();
@@ -39,10 +39,10 @@ describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () =
     await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address);
     await mockedCollateralPoolConfig.mock.getLiquidationRatio.returns(WeiPerRay);
 
-    // await delayFathomOraclePriceFeed.initialize(mockedDexPriceOracle.address, mockToken0, mockToken1, mockedAccessControlConfig.address, COLLATERAL_POOL_ID);
+    await delayFathomOraclePriceFeed.initialize(mockedDexPriceOracle.address, mockToken0, mockToken1, mockedAccessControlConfig.address, COLLATERAL_POOL_ID);
   })
 
-  xdescribe("DelayFathomOraclePriceFeed Contract Tests", () => {
+  describe("DelayFathomOraclePriceFeed Contract Tests", () => {
     it("Check latestrice method returns correct default price value", async () => {
       const returnValue = await delayFathomOraclePriceFeed.delayedPrice();
       expect(returnValue.price).to.be.equal(0);
@@ -176,7 +176,7 @@ describe("Delay Fathom Oracle with MockedDexPriceOracle - Unit Test Suite", () =
       expect(Number(returnValue)).to.be.equal(100);
     });
   });
-  xdescribe("#pause(), #unpause()", () => {
+  describe("#pause(), #unpause()", () => {
     context("when caller is not the owner", () => {
       it("should revert", async () => {
         await mockedAccessControlConfig.mock.hasRole.returns(false)

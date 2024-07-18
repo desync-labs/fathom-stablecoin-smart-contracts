@@ -11,7 +11,7 @@ const { getContract, createMock } = require("../../helper/contracts");
 const { increase, latest } = require('../../helper/time');
 const { formatBytes32String } = ethers.utils
 
-const COLLATERAL_POOL_ID = formatBytes32String("NATIVE")
+const COLLATERAL_POOL_ID = formatBytes32String("XDC")
 
 
 describe("CentralizedOraclePriceFeed", () => {

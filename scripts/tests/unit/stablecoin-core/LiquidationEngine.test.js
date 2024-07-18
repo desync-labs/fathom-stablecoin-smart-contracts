@@ -12,7 +12,7 @@ const { loadFixture } = require("../../helper/fixtures");
 
 const { formatBytes32String } = ethers.utils
 
-const COLLATERAL_POOL_ID = formatBytes32String("WNATIVE")
+const COLLATERAL_POOL_ID = formatBytes32String("WXDC")
 
 const loadFixtureHandler = async () => {
   const mockedAccessControlConfig = await createMock("AccessControlConfig");

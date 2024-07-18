@@ -10,7 +10,7 @@ module.exports = {
     },
     apothem: {
       // Please check the status of RPC URL in below link.
-      // https://chainlist.org/?search=native
+      // https://chainlist.org/?search=xdc
       host: "https://erpc.apothem.network/",
       // host: "https://rpc.apothem.network/",
       private_key: fs.readFileSync("./privateKey").toString(),
@@ -18,18 +18,8 @@ module.exports = {
     },
     mainnet: {
       // Please check the status of RPC URL in below link.
-      // https://chainlist.org/?search=native
-      host: "https://erpc.nativerpc.com/",
-      private_key: fs.readFileSync("./privateKey").toString(),
-      gasPrice: '0x3b9aca00',
-    },
-    sepolia: {
-      host: "https://ethereum-sepolia-rpc.publicnode.com",
-      private_key: fs.readFileSync("./privateKey").toString(),
-      gasPrice: '0x3b9aca00',
-    },
-    bsctest: {
-      host: "https://bsc-testnet-rpc.publicnode.com",
+      // https://chainlist.org/?search=xdc
+      host: "https://erpc.xdcrpc.com/",
       private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },

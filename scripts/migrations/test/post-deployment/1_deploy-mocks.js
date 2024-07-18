@@ -37,13 +37,13 @@ module.exports =  async function(deployer) {
   const promises1 = [
     MockCollateralTokenAdapter.initialize(
       bookKeeper.address,
-      pools.WNATIVE,
-      addresses.WNATIVE,
+      pools.WXDC,
+      addresses.WXDC,
       positionManager.address,
       proxyWalletFactory.address
   ),
   
-    deployer.deploy(MockVault, pools.WNATIVE, addresses.WNATIVE, MockCollateralTokenAdapter.address, { gas: 3050000 }),
+    deployer.deploy(MockVault, pools.WXDC, addresses.WXDC, MockCollateralTokenAdapter.address, { gas: 3050000 }),
   ];
 
   await Promise.all(promises1);

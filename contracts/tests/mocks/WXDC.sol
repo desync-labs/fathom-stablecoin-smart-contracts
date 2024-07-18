@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-contract WNATIVE {
-    string public name = "Wrapped NATIVE";
-    string public symbol = "WNATIVE";
+contract WXDC {
+    string public name = "Wrapped XDC";
+    string public symbol = "WXDC";
     uint8 public decimals = 18;
 
     event Approval(address indexed src, address indexed guy, uint256 wad);

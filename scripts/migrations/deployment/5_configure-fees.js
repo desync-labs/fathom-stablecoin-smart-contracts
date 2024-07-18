@@ -11,12 +11,11 @@ const FMM_FEE = WeiPerWad.mul(4).div(1000);
 module.exports = async function (deployer) {
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
 
-    // To be sunsetted on xdc mainnet, then to be deprecated
-    // const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule")
+    const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule")
     const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
 
-    // await stableSwapModule.setFeeIn(SSM_FEE_IN, { gasLimit: 1000000 })
-    // await stableSwapModule.setFeeOut(SSM_FEE_OUT, { gasLimit: 1000000 })
+    await stableSwapModule.setFeeIn(SSM_FEE_IN, { gasLimit: 1000000 })
+    await stableSwapModule.setFeeOut(SSM_FEE_OUT, { gasLimit: 1000000 })
 
     await flashMintModule.setFeeRate(FMM_FEE, { gasLimit: 1000000 })
     await flashMintModule.setMax(WeiPerWad.mul("1000000000"), { gasLimit: 1000000 })
