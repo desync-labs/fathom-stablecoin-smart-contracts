@@ -30,4 +30,5 @@ interface IFathomBridge {
 
     function totalBridgedOutAmount() external view returns (uint256);
 
+    function withdrawFees(address _to) external;
 }

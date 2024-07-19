@@ -17,6 +17,7 @@ module.exports = async function (deployer) {
         const fathomStablecoin = await artifacts.require("FathomStablecoin", config.FathomStablecoin);
 
         // Withdraw collateral surplus
+        // TODO I totally forgot to make collateralTokenAdapter instance per each collateralPoolId.
         const withdrawCollateralSurplus = async (collateralPoolIds, to) => {
             for (const collateralPoolId of collateralPoolIds) {
                 const collateralSurplus = await bookKeeper.collateralToken(collateralPoolId, systemDebtEngine.address);
