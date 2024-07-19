@@ -6,7 +6,8 @@ module.exports = async function (deployer) {
 
     const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", config.fathomProxyFactory);
 
-    const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
+    // const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
+    const fixedSpreadLiquidationStrategy = config.fixedSpreadLiquidationStrategy;
     const showStopper = await getProxy(proxyFactory, "ShowStopper");
     const positionManager = await getProxy(proxyFactory, "PositionManager");
     const liquidationEngine = await getProxy(proxyFactory, "LiquidationEngine");
@@ -16,7 +17,7 @@ module.exports = async function (deployer) {
     await accessControlConfig.grantRole(accessControlConfig.ADAPTER_ROLE(), collateralTokenAdapter.address)
 
     await collateralTokenAdapter.addToWhitelist(positionManager.address, { gasLimit: 1000000 });
-    await collateralTokenAdapter.addToWhitelist(fixedSpreadLiquidationStrategy.address, { gasLimit: 1000000 });
+    await collateralTokenAdapter.addToWhitelist(fixedSpreadLiquidationStrategy, { gasLimit: 1000000 });
     await collateralTokenAdapter.addToWhitelist(liquidationEngine.address, { gasLimit: 1000000 });
     await collateralTokenAdapter.addToWhitelist(showStopper.address, { gasLimit: 1000000 });
 }
