@@ -11,7 +11,7 @@ const { getContract, createMock } = require("../../helper/contracts");
 const { WeiPerWad } = require("../../helper/unit");
 const { loadFixture } = require("../../helper/fixtures");
 
-const COLLATERAL_POOL_ID = formatBytes32String("XDC")
+const COLLATERAL_POOL_ID = formatBytes32String("NATIVE")
 
 const loadFixtureHandler = async () => {
   const mockedAccessControlConfig = await createMock("AccessControlConfig");

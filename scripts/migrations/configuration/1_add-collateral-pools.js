@@ -1,58 +1,62 @@
 const pools = require("../../common/collateral");
 const { getAddresses } = require("../../common/addresses");
 const { getProxy } = require("../../common/proxies");
+const { getConfigInitialCollateral } = require("../../common/collateral-setup-helper");
 
 const { BigNumber } = require("ethers");
 const WeiPerWad = BigNumber.from(`1${"0".repeat(18)}`)
 const WeiPerRay = BigNumber.from(`1${"0".repeat(27)}`)
 const WeiPerRad = BigNumber.from(`1${"0".repeat(45)}`)
 
-const CLOSE_FACTOR_BPS = BigNumber.from(2500)   // <- 0.25
-const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(10500)  // <- 1.05
-const TREASURY_FEE_BPS = BigNumber.from(8000) // <- 0.8
-const STABILITY_FEE = BigNumber.from("1000000000627937192491029811")
-const LIQUIDATIONRATIO_75 = WeiPerRay.mul(133).div(100).toString(); // LTV 75%
-
 module.exports = async function (deployer) {
-    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
+    const config = getConfigInitialCollateral(deployer.networkId());
+    const CLOSE_FACTOR_BPS = BigNumber.from(config.CLOSE_FACTOR_BPS)   // <- 0.25
+    const LIQUIDATOR_INCENTIVE_BPS = BigNumber.from(config.LIQUIDATOR_INCENTIVE_BPS)  // <- 1.05
+    const TREASURY_FEE_BPS = BigNumber.from(config.TREASURY_FEE_BPS) // <- 0.8
+    const STABILITY_FEE = BigNumber.from(config.STABILITY_FEE)
+    const LIQUIDATIONRATIO = WeiPerRay.mul(config.LIQUIDATIONRATIO_NUMERATOR).div(config.LIQUIDATIONRATIO_DENOMINATOR).toString(); // LTV 75%
+    const debtCeilingSetUpTotal = WeiPerRad.mul(config.DEBTCELINGSETUP_TOTAL);
+    const debtCeilingSetUp = WeiPerRad.mul(config.DEBTCELINGSETUP_NUMERATOR).div(config.DEBTCELINGSETUP_DENOMINATOR);
+    const debtFloor = WeiPerRad.mul(config.DEBT_FLOOR);
+    const positionDebtCeiling = WeiPerRad.mul(config.POSITION_DEBT_CEILING);
 
+    const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
     const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy")
     const bookKeeper = await getProxy(proxyFactory, "BookKeeper")
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig")
     const priceOracle = await getProxy(proxyFactory, "PriceOracle")
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
+    // CentralizedOraclePriceFeed is commented since it can be used only when Price Aggregator is available
+    // For CentralizedOraclePriceFeed to be in use, below apps should be deployed and be active.
+    // CentralizedOraclePriceFeed - FathomPrieOracle - Price Aggregator for an Asset - Fathom Oracle infra's price feeder
     // const centralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed");
     const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
 
-    const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);
-    const debtCeilingSetUp = WeiPerRad.mul(10000000).div(2);
-
     // initial collateral price as 1 USD
     await simplePriceFeed.setPrice(WeiPerWad.toString());
-    await simplePriceFeed.setPoolId(pools.XDC);
+    await simplePriceFeed.setPoolId(pools.NATIVE);
     await simplePriceFeed.peekPrice();
     // await centralizedOraclePriceFeed.peekPrice({ gasLimit: 2000000 });
 
     const promises = [
-        initPool(pools.XDC, collateralTokenAdapter.address, simplePriceFeed.address, LIQUIDATIONRATIO_75),
+        initPool(pools.NATIVE, collateralTokenAdapter.address, simplePriceFeed.address, LIQUIDATIONRATIO),
     ]
 
     await Promise.all(promises);
 
     await bookKeeper.setTotalDebtCeiling(debtCeilingSetUpTotal, { gasLimit: 2000000 });
 
-
     async function initPool(poolId, adapter, priceFeed, liquidationRatio) {
         await collateralPoolConfig.initCollateralPool(
             poolId,
             debtCeilingSetUp,
-            0,
-            WeiPerRad.mul(50000),
+            debtFloor, // _debtFloor
+            positionDebtCeiling, // _positionDebtCeiling
             priceFeed,
             liquidationRatio,
             STABILITY_FEE,
             adapter,
-            CLOSE_FACTOR_BPS.mul(2),
+            CLOSE_FACTOR_BPS,
             LIQUIDATOR_INCENTIVE_BPS,
             TREASURY_FEE_BPS,
             fixedSpreadLiquidationStrategy.address,

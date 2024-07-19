@@ -97,12 +97,12 @@ describe("PriceOracle", () => {
           })
           await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("WXDC"),
+            formatBytes32String("WNATIVE"),
             BigNumber.from("0")
           ).returns()
-          await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
+          await expect(priceOracle.setPrice(formatBytes32String("WNATIVE")))
             .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(formatBytes32String("WXDC"), One, 0)
+            .withArgs(formatBytes32String("WNATIVE"), One, 0)
         })
       })
     })
@@ -138,12 +138,12 @@ describe("PriceOracle", () => {
           )
 
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("WXDC"),
+            formatBytes32String("WNATIVE"),
             BigNumber.from("0")
           ).returns()
-          await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
+          await expect(priceOracle.setPrice(formatBytes32String("WNATIVE")))
             .to.emit(priceOracle, "LogSetPrice")
-            .withArgs(formatBytes32String("WXDC"), BigNumber.from("700000000000"), 0)
+            .withArgs(formatBytes32String("WNATIVE"), BigNumber.from("700000000000"), 0)
         })
       })
     })
@@ -176,7 +176,7 @@ describe("PriceOracle", () => {
           })
           await mockedBookKeeper.mock.collateralPoolConfig.returns(mockedCollateralPoolConfig.address)
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("WXDC"),
+            formatBytes32String("WNATIVE"),
             BigNumber.from("0")
           ).returns()
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
@@ -184,9 +184,9 @@ describe("PriceOracle", () => {
             BigNumber.from("0")
           ).returns()
 
-          await expect(priceOracle.setPriceForBatch([formatBytes32String("WXDC"), formatBytes32String("JEJU")]))
+          await expect(priceOracle.setPriceForBatch([formatBytes32String("WNATIVE"), formatBytes32String("JEJU")]))
             .to.emit(priceOracle, "LogSetPriceForBatch")
-            .withArgs([formatBytes32String("WXDC"), formatBytes32String("JEJU")])
+            .withArgs([formatBytes32String("WNATIVE"), formatBytes32String("JEJU")])
         })
       })
     })
@@ -222,16 +222,16 @@ describe("PriceOracle", () => {
           )
 
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-            formatBytes32String("WXDC"),
+            formatBytes32String("WNATIVE"),
             BigNumber.from("0")
           ).returns()
           await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
             formatBytes32String("JEJU"),
             BigNumber.from("0")
           ).returns()
-          await expect(priceOracle.setPriceForBatch([formatBytes32String("WXDC"), formatBytes32String("JEJU")]))
+          await expect(priceOracle.setPriceForBatch([formatBytes32String("WNATIVE"), formatBytes32String("JEJU")]))
             .to.emit(priceOracle, "LogSetPriceForBatch")
-            .withArgs([formatBytes32String("WXDC"), formatBytes32String("JEJU")])
+            .withArgs([formatBytes32String("WNATIVE"), formatBytes32String("JEJU")])
         })
       })
     })
@@ -332,7 +332,7 @@ describe("PriceOracle", () => {
         })
 
         await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.returns()
-        await expect(priceOracle.setPrice(formatBytes32String("WXDC"))).to.be.revertedWith("Pausable: paused")
+        await expect(priceOracle.setPrice(formatBytes32String("WNATIVE"))).to.be.revertedWith("Pausable: paused")
       })
     })
   })
@@ -393,13 +393,13 @@ describe("PriceOracle", () => {
         })
 
         await mockedCollateralPoolConfig.mock.setPriceWithSafetyMargin.withArgs(
-          formatBytes32String("WXDC"),
+          formatBytes32String("WNATIVE"),
           BigNumber.from("0")
         ).returns()
 
-        await expect(priceOracle.setPrice(formatBytes32String("WXDC")))
+        await expect(priceOracle.setPrice(formatBytes32String("WNATIVE")))
           .to.emit(priceOracle, "LogSetPrice")
-          .withArgs(formatBytes32String("WXDC"), One, 0)
+          .withArgs(formatBytes32String("WNATIVE"), One, 0)
       })
     })
   })

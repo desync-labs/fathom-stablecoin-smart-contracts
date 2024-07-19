@@ -62,7 +62,7 @@ contract MockCollateralTokenAdapterMath {
     }
 }
 
-/// @dev receives WXDC from users and deposit in Vault.
+/// @dev receives WNATIVE from users and deposit in Vault.
 contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollateralAdapter, PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable {
     using SafeToken for address;
 
@@ -175,7 +175,7 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
     }
 
     /// @param _positionAddress The address that holding states of the position
-    /// @param _amount The XDC amount that being used as a collateral and to be staked to AnkrStakingPool
+    /// @param _amount The NATIVE amount that being used as a collateral and to be staked to AnkrStakingPool
     /// @param _data The extra data that may needs to execute the deposit
     function deposit(
         address _positionAddress,
@@ -185,9 +185,9 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
         _deposit(_positionAddress, _amount, _data);
     }
 
-    /// @dev Withdraw WXDC from Vault
+    /// @dev Withdraw WNATIVE from Vault
     /// @param _usr The address that holding states of the position
-    /// @param _amount The WXDC col amount in Vault to be returned to proxyWallet and then to user
+    /// @param _amount The WNATIVE col amount in Vault to be returned to proxyWallet and then to user
     function withdraw(
         address _usr,
         uint256 _amount,
@@ -207,9 +207,9 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
 
             //deduct emergency withdrawal amount of FXD
             bookKeeper.addCollateral(collateralPoolId, msg.sender, -int256(_amount));
-            //withdraw WXDC from Vault
+            //withdraw WNATIVE from Vault
             vault.withdraw(_amount);
-            //Transfer WXDC to msg.sender
+            //Transfer WNATIVE to msg.sender
             address(collateralToken).safeTransfer(_to, _amount);
             emit LogEmergencyWithdraw(msg.sender, _to);
         }
@@ -226,7 +226,7 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
         else return wdiv(netAssetValuation(), totalShare);
     }
 
-    /// @dev Lock XDC in the vault
+    /// @dev Lock NATIVE in the vault
     /// deposit collateral tokens to staking contract, and update BookKeeper
     /// @param _positionAddress The position address to be updated
     /// @param _amount The amount to be deposited
@@ -236,7 +236,7 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
             // Overflow check for int256(wad) cast below
             require(int256(_amount) > 0, "TokenAdapter/amount-overflow");
 
-            //transfer WXDC from proxyWallet to adapter
+            //transfer WNATIVE from proxyWallet to adapter
             address(collateralToken).safeTransferFrom(msg.sender, address(this), _amount);
 
             //bookKeeping
@@ -247,10 +247,10 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
 
             // safeApprove to Vault
             address(collateralToken).safeApprove(address(vault), _amount);
-            //deposit WXDC to Vault
+            //deposit WNATIVE to Vault
             vault.deposit(_amount);
         }
-        emit LogDeposit(_amount); // wxdc
+        emit LogDeposit(_amount); // wnative
     }
 
     /// @dev withdraw collateral tokens from staking contract, and update BookKeeper
@@ -267,9 +267,9 @@ contract MockCollateralTokenAdapter is MockCollateralTokenAdapterMath, ICollater
 
             totalShare = sub(totalShare, _amount);
 
-            //withdraw WXDC from Vault
+            //withdraw WNATIVE from Vault
             vault.withdraw(_amount);
-            //Transfer WXDC to proxyWallet
+            //Transfer WNATIVE to proxyWallet
             address(collateralToken).safeTransfer(_usr, _amount);
             emit LogWithdraw(_amount);
         }

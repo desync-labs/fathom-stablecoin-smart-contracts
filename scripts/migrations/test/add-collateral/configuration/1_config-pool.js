@@ -25,7 +25,8 @@ module.exports = async function (deployer) {
     const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const TestOracleMock = await artifacts.require('TestOracleMock');
     const CentralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed")
-    await CentralizedOraclePriceFeed.initialize(TestOracleMock.address, accessControlConfig.address, poolId)
+    //commented out due to collision with add-collateral and deployment
+    // await CentralizedOraclePriceFeed.initialize(TestOracleMock.address, accessControlConfig.address, poolId)
     const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
 
     const priceFeed = simplePriceFeed

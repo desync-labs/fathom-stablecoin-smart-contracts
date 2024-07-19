@@ -2,7 +2,7 @@
 pragma solidity 0.8.17;
 
 import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IWXDC.sol";
+import "../interfaces/IWNATIVE.sol";
 import "../interfaces/IToken.sol";
 import "../interfaces/IManager.sol";
 import "../interfaces/IGenericTokenAdapter.sol";
@@ -57,15 +57,15 @@ contract FathomStablecoinProxyActions is CommonMath {
         IManager(_manager).movePosition(_source, _destination);
     }
 
-    function safeLockXDC(
+    function safeLockNATIVE(
         address _manager,
-        address _xdcAdapter,
+        address _nativeAdapter,
         uint256 _positionId,
         address _owner,
         bytes calldata _data
     ) external payable onlyDelegateCall {
         require(IManager(_manager).owners(_positionId) == _owner, "!owner");
-        lockXDC(_manager, _xdcAdapter, _positionId, _data);
+        lockNATIVE(_manager, _nativeAdapter, _positionId, _data);
     }
 
     function draw(
@@ -101,22 +101,22 @@ contract FathomStablecoinProxyActions is CommonMath {
         emit LogBorrowedAmount(_positionAddress, _amount);
     }
 
-    function openLockXDCAndDraw(
+    function openLockNATIVEAndDraw(
         address _manager,
         address _stabilityFeeCollector,
-        address _xdcAdapter,
+        address _nativeAdapter,
         address _stablecoinAdapter,
         bytes32 _collateralPoolId,
         uint256 _stablecoinAmount, // [wad]
         bytes calldata _data
     ) external payable onlyDelegateCall returns (uint256 _positionId) {
         _positionId = open(_manager, _collateralPoolId, address(this));
-        lockXDCAndDraw(_manager, _stabilityFeeCollector, _xdcAdapter, _stablecoinAdapter, _positionId, _stablecoinAmount, _data);
+        lockNATIVEAndDraw(_manager, _stabilityFeeCollector, _nativeAdapter, _stablecoinAdapter, _positionId, _stablecoinAmount, _data);
     }
 
-    function wipeAndUnlockXDC(
+    function wipeAndUnlockNATIVE(
         address _manager,
-        address _xdcAdapter,
+        address _nativeAdapter,
         address _stablecoinAdapter,
         uint256 _positionId,
         uint256 _collateralAmount, // [wad]
@@ -126,7 +126,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         address _positionAddress = IManager(_manager).positions(_positionId);
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
         stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _stablecoinAmount, _data); // Deposits Fathom Stablecoin amount into the bookKeeper
-        // Paybacks debt to the position and unlocks WXDC amount from it
+        // Paybacks debt to the position and unlocks WNATIVE amount from it
         int256 _wipeDebtShare = _getWipeDebtShare(
             IManager(_manager).bookKeeper(),
             IBookKeeper(IManager(_manager).bookKeeper()).stablecoin(_positionAddress),
@@ -136,18 +136,18 @@ contract FathomStablecoinProxyActions is CommonMath {
         adjustPosition(_manager, _positionId, -_safeToInt256(_collateralAmount), _wipeDebtShare, _data);
         if (_collateralAmount > 0) {
             moveCollateral(_manager, _positionId, address(this), _collateralAmount, _data); // Moves the amount from the position to proxy's address
-            IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _collateralAmount, _data); // Withdraws WXDC amount to proxy address as a token
-            IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_collateralAmount); // Converts WXDC to XDC
-            SafeToken.safeTransferETH(msg.sender, _collateralAmount); // Send XDC to user
+            IGenericTokenAdapter(_nativeAdapter).withdraw(address(this), _collateralAmount, _data); // Withdraws WNATIVE amount to proxy address as a token
+            IWNATIVE(address(IGenericTokenAdapter(_nativeAdapter).collateralToken())).withdraw(_collateralAmount); // Converts WNATIVE to NATIVE
+            SafeToken.safeTransferETH(msg.sender, _collateralAmount); // Send NATIVE to user
         }
         IManager(_manager).updatePrice(_collateralPoolId);
 
         emit LogPaidAmount(_positionAddress, _stablecoinAmount);
     }
 
-    function wipeAllAndUnlockXDC(
+    function wipeAllAndUnlockNATIVE(
         address _manager,
-        address _xdcAdapter,
+        address _nativeAdapter,
         address _stablecoinAdapter,
         uint256 _positionId,
         uint256 _collateralAmount, // [wad]
@@ -161,12 +161,12 @@ contract FathomStablecoinProxyActions is CommonMath {
         uint256 _requiredStablecoinAmount = _getWipeAllStablecoinAmount(_bookKeeper, _positionAddress, _positionAddress, _collateralPoolId);
         // Deposits Fathom Stablecoin amount into the bookKeeper
         stablecoinAdapterDeposit(_stablecoinAdapter, _positionAddress, _requiredStablecoinAmount, _data);
-        adjustPosition(_manager, _positionId, -_safeToInt256(_collateralAmount), -_safeToInt256(_debtShare), _data); // Paybacks debt to the CDP and unlocks WXDC amount from it
+        adjustPosition(_manager, _positionId, -_safeToInt256(_collateralAmount), -_safeToInt256(_debtShare), _data); // Paybacks debt to the CDP and unlocks WNATIVE amount from it
         if (_collateralAmount > 0) {
             moveCollateral(_manager, _positionId, address(this), _collateralAmount, _data); // Moves the amount from the CDP positionAddress to proxy's address
-            IGenericTokenAdapter(_xdcAdapter).withdraw(address(this), _collateralAmount, _data);
-            IWXDC(address(IGenericTokenAdapter(_xdcAdapter).collateralToken())).withdraw(_collateralAmount); // Converts WXDC to XDC
-            SafeToken.safeTransferETH(msg.sender, _collateralAmount); // Send XDC to user
+            IGenericTokenAdapter(_nativeAdapter).withdraw(address(this), _collateralAmount, _data);
+            IWNATIVE(address(IGenericTokenAdapter(_nativeAdapter).collateralToken())).withdraw(_collateralAmount); // Converts WNATIVE to NATIVE
+            SafeToken.safeTransferETH(msg.sender, _collateralAmount); // Send NATIVE to user
         }
         IManager(_manager).updatePrice(_collateralPoolId);
 
@@ -202,14 +202,14 @@ contract FathomStablecoinProxyActions is CommonMath {
         IStablecoinAdapter(_adapter).deposit(_positionAddress, _stablecoinAmount, _data);
     }
 
-    function xdcAdapterDeposit(address _adapter, address _positionAddress, bytes calldata _data) public payable onlyDelegateCall {
+    function nativeAdapterDeposit(address _adapter, address _positionAddress, bytes calldata _data) public payable onlyDelegateCall {
         //##back to Vanilla - Adapter now needs to have collateralToken state variable added
         address _collateralToken = address(IGenericTokenAdapter(_adapter).collateralToken());
-        // Wraps XDC into WXDC
-        IWXDC(_collateralToken).deposit{ value: msg.value }();
-        // Approves adapter to take the WXDC amount
+        // Wraps NATIVE into WNATIVE
+        IWNATIVE(_collateralToken).deposit{ value: msg.value }();
+        // Approves adapter to take the WNATIVE amount
         _collateralToken.safeApprove(address(_adapter), msg.value);
-        // Deposits WXDC collateral into the bookKeeper
+        // Deposits WNATIVE collateral into the bookKeeper
         IGenericTokenAdapter(_adapter).deposit(_positionAddress, msg.value, _data);
     }
 
@@ -275,16 +275,16 @@ contract FathomStablecoinProxyActions is CommonMath {
         IManager(_manager).moveStablecoin(_positionId, _dst, _stablecoinValue);
     }
 
-    function lockXDC(address _manager, address _xdcAdapter, uint256 _positionId, bytes calldata _data) public payable onlyDelegateCall {
+    function lockNATIVE(address _manager, address _nativeAdapter, uint256 _positionId, bytes calldata _data) public payable onlyDelegateCall {
         address _positionAddress = IManager(_manager).positions(_positionId);
-        xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data);
-        adjustPosition(_manager, _positionId, _safeToInt256(msg.value), 0, _data); // Locks XDC amount into the CDP
+        nativeAdapterDeposit(_nativeAdapter, _positionAddress, _data);
+        adjustPosition(_manager, _positionId, _safeToInt256(msg.value), 0, _data); // Locks NATIVE amount into the CDP
     }
 
-    function lockXDCAndDraw(
+    function lockNATIVEAndDraw(
         address _manager,
         address _stabilityFeeCollector,
-        address _xdcAdapter,
+        address _nativeAdapter,
         address _stablecoinAdapter,
         uint256 _positionId,
         uint256 _stablecoinAmount, // [wad]
@@ -294,7 +294,7 @@ contract FathomStablecoinProxyActions is CommonMath {
         address _bookKeeper = IManager(_manager).bookKeeper();
         bytes32 _collateralPoolId = IManager(_manager).collateralPools(_positionId);
 
-        xdcAdapterDeposit(_xdcAdapter, _positionAddress, _data);
+        nativeAdapterDeposit(_nativeAdapter, _positionAddress, _data);
         adjustPosition(
             _manager,
             _positionId,

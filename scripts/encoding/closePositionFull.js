@@ -5,20 +5,20 @@ const { ethers } = require("ethers");
 
 const { formatBytes32String } = require("ethers/lib/utils");
 
-const COLLATERAL_POOL_ID = formatBytes32String("XDC");
+const COLLATERAL_POOL_ID = formatBytes32String("NATIVE");
 
 const { AliceAddress } = require("../tests/helper/address");
 
 const { WeiPerWad } = require("../tests/helper/unit");
 
 
-const wipeAllAndUnlockXDC = async (positionId, collateralAmount) => {
+const wipeAllAndUnlockNATIVE = async (positionId, collateralAmount) => {
 
-    const wipeAllAndUnlockXDCAbi = [
-        "function wipeAllAndUnlockXDC(address _manager, address _xdcAdapter, address _stablecoinAdapter, uint256 _positionId, uint256 _collateralAmount, bytes calldata _data)"
+    const wipeAllAndUnlockNATIVEAbi = [
+        "function wipeAllAndUnlockNATIVE(address _manager, address _nativeAdapter, address _stablecoinAdapter, uint256 _positionId, uint256 _collateralAmount, bytes calldata _data)"
     ];
-    const wipeAllAndUnlockXDCIFace = new ethers.utils.Interface(wipeAllAndUnlockXDCAbi);
-    const closePositionCall = wipeAllAndUnlockXDCIFace.encodeFunctionData("wipeAllAndUnlockXDC", [
+    const wipeAllAndUnlockNATIVEIFace = new ethers.utils.Interface(wipeAllAndUnlockNATIVEAbi);
+    const closePositionCall = wipeAllAndUnlockNATIVEIFace.encodeFunctionData("wipeAllAndUnlockNATIVE", [
         stablecoinAddress.positionManager,  //Position Manager
         stablecoinAddress.collateralTokenAdapter, // CollateralTokenAdapter
         stablecoinAddress.stablecoinAdapter, // StablecoinAdapter
@@ -31,5 +31,5 @@ const wipeAllAndUnlockXDC = async (positionId, collateralAmount) => {
 }
 
 module.exports = async function (deployer) {
-    await wipeAllAndUnlockXDC(161, WeiPerWad.mul(435));
+    await wipeAllAndUnlockNATIVE(161, WeiPerWad.mul(435));
 };

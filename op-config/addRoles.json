@@ -1,0 +1,62 @@
+{
+    "51": {
+      "AccessControlConfig": "0x0000000000000000000000000000000000000000",
+      "Address_To_Add_Role": "0x0000000000000000000000000000000000000000",
+      "OWNER_ROLE": false,
+      "GOV_ROLE": false,
+      "PRICE_ORACLE_ROLE": false,
+      "ADAPTER_ROLE": false,
+      "LIQUIDATION_ENGINE_ROLE": false,
+      "STABILITY_FEE_COLLECTOR_ROLE": false,
+      "SHOW_STOPPER_ROLE": false,
+      "POSITION_MANAGER_ROLE": false,
+      "MINTABLE_ROLE": false,
+      "BOOK_KEEPER_ROLE": false,
+      "COLLATERAL_MANAGER_ROLE": false
+    },
+    "50": {
+      "AccessControlConfig": "0x0000000000000000000000000000000000000000",
+      "Address_To_Add_Role": "0x0000000000000000000000000000000000000000",
+      "OWNER_ROLE": false,
+      "GOV_ROLE": false,
+      "PRICE_ORACLE_ROLE": false,
+      "ADAPTER_ROLE": false,
+      "LIQUIDATION_ENGINE_ROLE": false,
+      "STABILITY_FEE_COLLECTOR_ROLE": false,
+      "SHOW_STOPPER_ROLE": false,
+      "POSITION_MANAGER_ROLE": false,
+      "MINTABLE_ROLE": false,
+      "BOOK_KEEPER_ROLE": false,
+      "COLLATERAL_MANAGER_ROLE": false
+    },
+    "1337": {
+      "AccessControlConfig": "0x0000000000000000000000000000000000000000",
+      "Address_To_Add_Role": "0x0000000000000000000000000000000000000000",
+      "OWNER_ROLE": false,
+      "GOV_ROLE": false,
+      "PRICE_ORACLE_ROLE": false,
+      "ADAPTER_ROLE": false,
+      "LIQUIDATION_ENGINE_ROLE": false,
+      "STABILITY_FEE_COLLECTOR_ROLE": false,
+      "SHOW_STOPPER_ROLE": false,
+      "POSITION_MANAGER_ROLE": false,
+      "MINTABLE_ROLE": false,
+      "BOOK_KEEPER_ROLE": false,
+      "COLLATERAL_MANAGER_ROLE": false
+    },
+    "17000": {
+      "AccessControlConfig": "0x0000000000000000000000000000000000000000",
+      "Address_To_Add_Role": "0x0000000000000000000000000000000000000000",
+      "OWNER_ROLE": false,
+      "GOV_ROLE": false,
+      "PRICE_ORACLE_ROLE": false,
+      "ADAPTER_ROLE": false,
+      "LIQUIDATION_ENGINE_ROLE": false,
+      "STABILITY_FEE_COLLECTOR_ROLE": false,
+      "SHOW_STOPPER_ROLE": false,
+      "POSITION_MANAGER_ROLE": false,
+      "MINTABLE_ROLE": false,
+      "BOOK_KEEPER_ROLE": false,
+      "COLLATERAL_MANAGER_ROLE": false
+    }
+  }

@@ -1,7 +1,6 @@
 const fs = require('fs');
 
 const { getProxy, getProxyById } = require("../../../common/proxies");
-
 const { getConfig, getProxyId, token, poolId } = require("../../../common/add-collateral-helper")
 
 module.exports = async function (deployer) {
@@ -29,7 +28,7 @@ module.exports = async function (deployer) {
             config.tokenAddress,
             proxyWalletFactory.address
         ),
-        fathomPriceOracle.initialize(accessControlConfig.address, config.fathomOracle),
+        // fathomPriceOracle.initialize(accessControlConfig.address, config.fathomOracle),
         centralizedOraclePriceFeed.initialize(fathomPriceOracle.address, accessControlConfig.address, poolId)
     ];
 

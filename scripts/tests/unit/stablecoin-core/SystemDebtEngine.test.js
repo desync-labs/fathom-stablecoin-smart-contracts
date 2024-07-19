@@ -263,7 +263,7 @@ describe("SystemDebtEngine", () => {
 
         await expect(
           systemDebtEngineAsAlice.withdrawCollateralSurplus(
-            formatBytes32String("WXDC"),
+            formatBytes32String("WNATIVE"),
             DeployerAddress,
             UnitHelpers.WeiPerWad
           )
@@ -275,14 +275,14 @@ describe("SystemDebtEngine", () => {
         await mockedAccessControlConfig.mock.hasRole.returns(true)
 
         await mockedBookKeeper.mock.moveCollateral.withArgs(
-          formatBytes32String("WXDC"),
+          formatBytes32String("WNATIVE"),
           systemDebtEngine.address,
           DeployerAddress,
           UnitHelpers.WeiPerWad
         ).returns()
 
         await systemDebtEngine.withdrawCollateralSurplus(
-          formatBytes32String("WXDC"),
+          formatBytes32String("WNATIVE"),
           DeployerAddress,
           UnitHelpers.WeiPerWad
         )

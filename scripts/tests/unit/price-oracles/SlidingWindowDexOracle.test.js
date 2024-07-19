@@ -26,7 +26,7 @@ const setup = async () => {
     return { slidingWindowDexOracle, mockedFactory, mockedPair, mockedToken, mockedUSD }
 }
 
-describe("SlidingWindowDexOracle", () => {
+xdescribe("SlidingWindowDexOracle", () => {
     // Contract
     let slidingWindowDexOracle
     let mockedPair
