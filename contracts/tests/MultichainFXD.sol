@@ -15,12 +15,12 @@ contract MultichainFXD is Ownable, ERC20, AsterizmClient {
 
     /// Cross-chain transfer
     /// @param _dstChainId uint64  Destination chain ID
-    /// @param _from address  From address
     /// @param _to address  To address
-    function crossChainTransfer(uint64 _dstChainId, address _from, address _to, uint _amount) public payable {
-        uint amount = _debitFrom(_from, _amount); // amount returned should not have dust
+    /// @param _amount uint  Amount to bridge transfer
+    function crossChainTransfer(uint64 _dstChainId, address _to, uint _amount) public payable {
+        uint amount = _debitFrom(msg.sender, _amount); // amount returned should not have dust
         require(amount > 0, "MultichainToken: amount too small");
-        _initAsterizmTransferEvent(_dstChainId, abi.encode(_to, amount, _getTxId()));
+        _initAsterizmTransferEvent(_dstChainId, abi.encode(msg.sender, _to, _amount));
     }
 
     /// Debit logic
@@ -34,7 +34,7 @@ contract MultichainFXD is Ownable, ERC20, AsterizmClient {
     }
     /// Minting logic on the receiver side
     function _asterizmReceive(ClAsterizmReceiveRequestDto memory _dto) internal override {
-        (address to, uint amount, ) = abi.decode(_dto.payload, (address, uint, uint));
+        (address from, address to, uint256 amount ) = abi.decode(_dto.payload, (address, uint, uint));
         _mint(to, amount);
     }
 

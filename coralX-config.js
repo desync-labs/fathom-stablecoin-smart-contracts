@@ -25,6 +25,8 @@ module.exports = {
     },
     sepolia: {
       host: "https://ethereum-sepolia-rpc.publicnode.com",
+      // host : "https://1rpc.io/sepolia",
+      // host : "https://rpc.sepolia.org",
       private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },
@@ -33,13 +35,8 @@ module.exports = {
       private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },
-    sepolia: {
-      host: "https://ethereum-sepolia-rpc.publicnode.com",
-      private_key: fs.readFileSync("./privateKey").toString(),
-      gasPrice: '0x3b9aca00',
-    },
-    bsctest: {
-      host: "https://bsc-testnet-rpc.publicnode.com",
+    fantomTest: {
+      host: "https://fantom.api.onfinality.io/public",
       private_key: fs.readFileSync("./privateKey").toString(),
       gasPrice: '0x3b9aca00',
     },
