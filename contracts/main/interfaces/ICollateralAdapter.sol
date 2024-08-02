@@ -9,4 +9,6 @@ interface ICollateralAdapter {
     function withdraw(address _positionAddress, uint256 _wad, bytes calldata _data) external;
 
     function collateralPoolId() external view returns (bytes32);
+
+    function whiteListed(address _whitelistee) external view returns (bool);
 }

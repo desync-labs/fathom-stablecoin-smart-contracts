@@ -31,6 +31,15 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         _;
     }
 
+    modifier onlyOwnerOrFeeCollector() {
+        require(
+            accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender) ||
+                accessControlConfig.hasRole(accessControlConfig.FEE_COLLECTOR_ROLE(), msg.sender),
+            "!(ownerRole or feeCollectorRole)"
+        );
+        _;
+    }
+
     modifier onlyOwnerOrShowStopper() {
         require(
             accessControlConfig.hasRole(accessControlConfig.OWNER_ROLE(), msg.sender) ||
@@ -90,7 +99,7 @@ contract FathomBridge is AsterizmClientUpgradeableTransparency, PausableUpgradea
         emit LogSetFee(_newFee);
     }
 
-    function withdrawFees(address _to) external onlyOwnerOrGov {
+    function withdrawFees(address _to) external onlyOwnerOrFeeCollector {
         _zeroAddressCheck(_to);
         stablecoin.safeTransfer(_to, stablecoin.balanceOf(address(this)));
         emit LogWithdrawFees(msg.sender, _to, stablecoin.balanceOf(address(this)));

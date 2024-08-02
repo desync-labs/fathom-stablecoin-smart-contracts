@@ -26,5 +26,7 @@ interface IAccessControlConfig is IAccessControlUpgradeable {
     function BOOK_KEEPER_ROLE() external view returns (bytes32);
 
     function COLLATERAL_MANAGER_ROLE() external view returns (bytes32);
+
+    function FEE_COLLECTOR_ROLE() external view returns (bytes32);
 }
 // solhint-enable func-name-mixedcase

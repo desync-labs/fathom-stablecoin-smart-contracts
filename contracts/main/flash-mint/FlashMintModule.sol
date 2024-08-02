@@ -45,6 +45,16 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         _;
     }
 
+    modifier onlyOwnerOrFeeCollector() {
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        require(
+            _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
+                _accessControlConfig.hasRole(_accessControlConfig.FEE_COLLECTOR_ROLE(), msg.sender),
+            "!(ownerRole or feeCollectorRole)"
+        );
+        _;
+    }
+
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
@@ -203,7 +213,7 @@ contract FlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender
         bookKeeper.moveStablecoin(address(this), systemDebtEngine, bookKeeper.stablecoin(address(this)));
     }
 
-    function refreshApproval() external lock onlyOwner {
+    function refreshApproval() external lock onlyOwnerOrFeeCollector {
         address(stablecoin).safeApprove(address(stablecoinAdapter), type(uint256).max);
     }
 

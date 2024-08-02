@@ -34,6 +34,16 @@ contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpg
         _;
     }
 
+    modifier onlyOwnerOrFeeCollector() {
+        IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
+        require(
+            _accessControlConfig.hasRole(_accessControlConfig.OWNER_ROLE(), msg.sender) ||
+                _accessControlConfig.hasRole(_accessControlConfig.FEE_COLLECTOR_ROLE(), msg.sender),
+            "!(ownerRole or feeCollectorRole)"
+        );
+        _;
+    }
+
     modifier onlyOwnerOrGov() {
         IAccessControlConfig _accessControlConfig = IAccessControlConfig(bookKeeper.accessControlConfig());
         require(
@@ -78,7 +88,7 @@ contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpg
         bytes32 _collateralPoolId,
         address _to,
         uint256 _amount // [wad]
-    ) external onlyOwner {
+    ) external onlyOwnerOrFeeCollector {
         bookKeeper.moveCollateral(_collateralPoolId, address(this), _to, _amount);
     }
 
@@ -92,7 +102,7 @@ contract SystemDebtEngine is CommonMath, PausableUpgradeable, ReentrancyGuardUpg
     /// @param _value The amount of surplus stablecoin to be withdrawn.
     /// @dev Reverts if the caller is not the contract owner or if the system bad debt is still remaining.
     ///      Also reverts if the remaining stablecoin balance after withdrawal would be less than the surplus buffer.
-    function withdrawStablecoinSurplus(address _to, uint256 _value) external onlyOwner {
+    function withdrawStablecoinSurplus(address _to, uint256 _value) external onlyOwnerOrFeeCollector {
         require(bookKeeper.systemBadDebt(address(this)) == 0, "SystemDebtEngine/system-bad-debt-remaining");
         require(bookKeeper.stablecoin(address(this)) - _value >= surplusBuffer, "SystemDebtEngine/insufficient-surplus");
         bookKeeper.moveStablecoin(address(this), _to, _value);
