@@ -16,6 +16,7 @@ privateKey*
 addresses.json
 
 addresses.json
+addresses_GLD.json
 #Hardhat files
 cache
 artifacts
