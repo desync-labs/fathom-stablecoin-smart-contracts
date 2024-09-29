@@ -1,4 +1,4 @@
-const { getConfig } = require("../../../common/transfer-admin-helper");
+const { getConfig } = require("../../common/transfer-admin-helper");
 
 module.exports = async function (deployer) {
     try {

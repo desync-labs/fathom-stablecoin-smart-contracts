@@ -2,7 +2,7 @@ const fs = require('fs');
 const { formatBytes32String, solidityKeccak256 } = require("ethers/lib/utils");
 const ZeroAddress = "0x0000000000000000000000000000000000000000"
 
-const rawdata = fs.readFileSync('../../op-config/addRoles.json');
+const rawdata = fs.readFileSync('../../addRoles.json');
 const config = JSON.parse(rawdata);
 
 function getConfig(chainId)  {

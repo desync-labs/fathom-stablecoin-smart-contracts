@@ -11,14 +11,6 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/deployment', '--network', 'apothem'],
     ['execute', '--path', 'scripts/migrations/configuration', '--network', 'apothem']
   ],
-  deploySepolia: [
-    ['execute', '--path', 'scripts/migrations/deployment-continue', '--network', 'sepolia'],
-    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'sepolia']
-  ],
-  deployFantom: [
-    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'fantom'],
-    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'fantom']
-  ],
   addCollateralLocal: [
     ['execute', '--path', 'scripts/migrations/add-collateral/deployment', '--network', 'development'],
     ['execute', '--path', 'scripts/migrations/add-collateral/configuration', '--network', 'development']
@@ -31,38 +23,20 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/add-collateral/deployment', '--network', 'mainnet'],
     ['execute', '--path', 'scripts/migrations/add-collateral/configuration', '--network', 'mainnet']
   ],
-  switchPriceFeedLocal: [
-    ['execute', '--path', 'scripts/migrations/priceFeed', '--network', 'development'],
-  ],
-  whitelistCollateralTokenAdapterLocal: [
-    ['execute', '--path', 'scripts/op/whitelist/collateral-adapter/1_whitelisting.js', '--network', 'development']
-  ],
-  removeFromWLCollateralTokenAdapterLocal: [
-    ['execute', '--path', 'scripts/op/whitelist/collateral-adapter/2_removeFromWL.js', '--network', 'development']
-  ],
-  whitelistFMMLocal: [
-    ['execute', '--path', 'scripts/op/whitelist/FMM/1_fmm-whitelisting.js', '--network', 'development']
-  ],
-  addRolesLocal: [
-    ['execute', '--path', 'scripts/op/roles/addRoles', '--network', 'development']
-  ],
-  revokeRolesLocal: [
-    ['execute', '--path', 'scripts/op/roles/revokeRoles', '--network', 'development']
-  ],
-  transferProtocolOwnershipLocal: [
-    ['execute', '--path', 'scripts/op/ownership/protocol-ownership-transfer', '--network', 'development']
-  ],
-  transferProxyAdminOwnershipLocal: [
-    ['execute', '--path', 'scripts/op/ownership/proxy-admin-ownership-transfer', '--network', 'development']
-  ],
-  feeCollectionLocal: [
-    ['execute', '--path', 'scripts/op/fee-collection', '--network', 'development']
-  ],
   deployTokensLocal: [
     ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'development']
   ],
   deployTokensApothem: [
     ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'apothem']
+  ],
+  whitelistCollateralTokenAdapterLocal: [
+    ['execute', '--path', 'scripts/whitelist/collateral-adapter/1_whitelisting.js', '--network', 'development']
+  ],
+  whitelistFMMLocal: [
+    ['execute', '--path', 'scripts/whitelist/FMM/1_fmm-whitelisting.js', '--network', 'development']
+  ],
+  addRolesLocal: [
+    ['execute', '--path', 'scripts/roles/addRoles', '--network', 'development']
   ],
   migrateAndConfigureForTests: [
     ['compile'],

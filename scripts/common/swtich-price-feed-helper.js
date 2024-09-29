@@ -2,7 +2,7 @@ const fs = require('fs');
 const { formatBytes32String } = require("ethers/lib/utils");
 const ZeroAddress = "0x0000000000000000000000000000000000000000"
 
-const rawdata = fs.readFileSync('../../op-config/setFathomPriceOracle.json');
+const rawdata = fs.readFileSync('../../setFathomPriceOracle.json');
 const config = JSON.parse(rawdata);
 const token = config.token;
 const poolId = formatBytes32String(token);
