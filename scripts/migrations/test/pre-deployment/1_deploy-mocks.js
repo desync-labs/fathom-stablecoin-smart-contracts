@@ -25,8 +25,6 @@ const MockLiquidationEngine = artifacts.require('MockLiquidationEngine.sol');
 
 const MockPriceOracle = artifacts.require('MockPriceOracle.sol');
 
-const MockFathomBridge = artifacts.require('MockFathomBridge.sol');
-
 const MockShowStopper = artifacts.require('MockShowStopper.sol');
 
 const MockStabilityFeeCollector = artifacts.require('MockStabilityFeeCollector.sol');
@@ -66,7 +64,6 @@ module.exports = async function (deployer) {
     deployer.deploy(MockFathomStablecoin, { gas: 7050000 }),
     deployer.deploy(MockLiquidationEngine, { gas: 7050000 }),
     deployer.deploy(MockPriceOracle, { gas: 7050000 }),
-    deployer.deploy(MockFathomBridge, { gas: 7050000 }),
     deployer.deploy(MockShowStopper, { gas: 7050000 }),
     deployer.deploy(MockStabilityFeeCollector, { gas: 7050000 }),
     // deployer.deploy(MockStableSwapModule, { gas: 7050000 }),
