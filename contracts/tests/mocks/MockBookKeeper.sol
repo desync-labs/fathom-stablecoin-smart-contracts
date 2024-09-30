@@ -122,11 +122,6 @@ contract MockBookKeeper is IBookKeeper, ICagable, IPausable, CommonMath, Pausabl
         require(_accessControlConfig.hasRole(_accessControlConfig.STABILITY_FEE_COLLECTOR_ROLE(), msg.sender), "!stabilityFeeCollectorRole");
         _;
     }
-    
-    constructor() {
-        // Must be commented out for test script
-        // _disableInitializers();
-    }
 
     // --- Init ---
 

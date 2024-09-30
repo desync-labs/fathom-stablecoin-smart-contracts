@@ -11,14 +11,6 @@ module.exports = {
     ['execute', '--path', 'scripts/migrations/deployment', '--network', 'apothem'],
     ['execute', '--path', 'scripts/migrations/configuration', '--network', 'apothem']
   ],
-  deploySepolia: [
-    ['execute', '--path', 'scripts/migrations/deployment-continue', '--network', 'sepolia'],
-    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'sepolia']
-  ],
-  deployFantom: [
-    ['execute', '--path', 'scripts/migrations/deployment', '--network', 'fantom'],
-    ['execute', '--path', 'scripts/migrations/configuration', '--network', 'fantom']
-  ],
   addCollateralLocal: [
     ['execute', '--path', 'scripts/migrations/add-collateral/deployment', '--network', 'development'],
     ['execute', '--path', 'scripts/migrations/add-collateral/configuration', '--network', 'development']
@@ -30,6 +22,12 @@ module.exports = {
   addCollateralMainnet: [
     ['execute', '--path', 'scripts/migrations/add-collateral/deployment', '--network', 'mainnet'],
     ['execute', '--path', 'scripts/migrations/add-collateral/configuration', '--network', 'mainnet']
+  ],
+  deployTokensLocal: [
+    ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'development']
+  ],
+  deployTokensApothem: [
+    ['execute', '--path', 'scripts/migrations/collateral-tokens', '--network', 'apothem']
   ],
   switchPriceFeedLocal: [
     ['execute', '--path', 'scripts/migrations/priceFeed', '--network', 'development'],

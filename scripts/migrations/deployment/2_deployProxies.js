@@ -35,8 +35,7 @@ module.exports = async function (deployer) {
         "FathomPriceOracle",
         // To be sunsetted on xdc mainnet, then to be deprecated
         // "StableSwapModuleWrapper",
-        "SimplePriceFeed",
-        "FathomBridge"
+        "SimplePriceFeed"
     ]
 
     const promises = contracts.map(contract => {
