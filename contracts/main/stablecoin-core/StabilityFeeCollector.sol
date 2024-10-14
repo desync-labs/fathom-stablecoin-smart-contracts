@@ -95,14 +95,14 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
     /// @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
     function _collect(bytes32 _collateralPoolId) internal returns (uint256 _debtAccumulatedRate) {
         ICollateralPoolConfig _config = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
-        // where update for the stabilit fee happens
+
         uint256 _previousDebtAccumulatedRate = _config.getDebtAccumulatedRate(_collateralPoolId);
         uint256 _stabilityFeeRate = _config.getStabilityFeeRate(_collateralPoolId);
         uint256 _lastAccumulationTime = _config.getLastAccumulationTime(_collateralPoolId);
         require(block.timestamp >= _lastAccumulationTime, "StabilityFeeCollector/invalid-block.timestamp");
         require(systemDebtEngine != address(0), "StabilityFeeCollector/system-debt-engine-not-set");
 
-        _debtAccumulatedRate = rmul(rpow(_stabilityFeeRate, block.timestamp - _lastAccumulationTime, RAY), _previousDebtAccumulatedRate); // where the stability fee is updated
+        _debtAccumulatedRate = rmul(rpow(_stabilityFeeRate, block.timestamp - _lastAccumulationTime, RAY), _previousDebtAccumulatedRate);
 
         bookKeeper.accrueStabilityFee(_collateralPoolId, systemDebtEngine, diff(_debtAccumulatedRate, _previousDebtAccumulatedRate));
         _config.updateLastAccumulationTime(_collateralPoolId);

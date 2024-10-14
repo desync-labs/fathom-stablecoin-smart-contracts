@@ -213,7 +213,6 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
                 _collateralRecipient,
                 info.collateralAmountToBeLiquidated - info.treasuryFees
             );
-            // call to a strategy that is connected to a vault
             IFlashLendingCallee(_collateralRecipient).flashLendingCall(
                 msg.sender,
                 info.actualDebtValueToBeLiquidated,
