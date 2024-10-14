@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import "../../../interfaces/IGenericTokenAdapter.sol";
+import { IGenericTokenAdapter } from "../../../interfaces/IGenericTokenAdapter.sol";
 
 interface ICollateralTokenAdapter is IGenericTokenAdapter {
     function initialize(

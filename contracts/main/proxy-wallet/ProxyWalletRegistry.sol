@@ -1,11 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "../interfaces/IPausable.sol";
-import "./ProxyWallet.sol";
-import "./ProxyWalletFactory.sol";
+import { IPausable } from "../interfaces/IPausable.sol";
+import { IBookKeeper } from "../interfaces/IBookKeeper.sol";
+import { ProxyWallet } from "./ProxyWallet.sol";
+import { ProxyWalletFactory } from "./ProxyWalletFactory.sol";
+import { IAccessControlConfig } from "../interfaces/IAccessControlConfig.sol";
 
 /// @dev This Registry deploys new proxy instances through ProxyWalletFactory.build(address) and keeps a registry of owner => proxy
 contract ProxyWalletRegistry is PausableUpgradeable, IPausable {

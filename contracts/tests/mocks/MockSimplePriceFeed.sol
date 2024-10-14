@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import { AccessControlUpgradeable } from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-import "../../main/interfaces/IPriceFeed.sol";
-import "../../main/interfaces/IAccessControlConfig.sol";
+import { IPriceFeed } from "../../main/interfaces/IPriceFeed.sol";
+import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
 
 contract MockSimplePriceFeed is PausableUpgradeable, AccessControlUpgradeable, IPriceFeed {
     IAccessControlConfig public accessControlConfig;

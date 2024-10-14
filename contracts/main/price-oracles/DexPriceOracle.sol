@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "./lib/FathomSwapLibrary.sol";
-import "../apis/interfaces/IFathomSwapPair.sol";
-import "../interfaces/IFathomDEXOracle.sol";
-import "../interfaces/IToken.sol";
+import { FathomSwapLibrary } from "./lib/FathomSwapLibrary.sol";
+import { IFathomSwapPair } from "../apis/interfaces/IFathomSwapPair.sol";
+import { IFathomDEXOracle } from "../interfaces/IFathomDEXOracle.sol";
+import { IToken } from "../interfaces/IToken.sol";
 
 contract DexPriceOracle is Initializable, IFathomDEXOracle {
     address public dexFactory;

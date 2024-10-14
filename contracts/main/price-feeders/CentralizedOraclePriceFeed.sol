@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "../interfaces/IFathomCentralizedOracle.sol";
-import "../interfaces/IAccessControlConfig.sol";
-import "./DelayPriceFeedBase.sol";
+import { IFathomCentralizedOracle } from "../interfaces/IFathomCentralizedOracle.sol";
+import { IAccessControlConfig } from "../interfaces/IAccessControlConfig.sol";
+import { DelayPriceFeedBase } from "./DelayPriceFeedBase.sol";
 
 contract CentralizedOraclePriceFeed is DelayPriceFeedBase {
     IFathomCentralizedOracle public oracle;

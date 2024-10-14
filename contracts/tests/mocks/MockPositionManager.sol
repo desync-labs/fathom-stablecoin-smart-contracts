@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import "../../main/managers/PositionHandler.sol";
-import "../../main/interfaces/IManager.sol";
-import "../../main/interfaces/IBookKeeper.sol";
-import "../../main/interfaces/IShowStopper.sol";
-import "../../main/interfaces/ISetPrice.sol";
-import "../../main/interfaces/IPriceFeed.sol";
-import "../../main/interfaces/IPriceOracle.sol";
+import { IManager } from "../../main/interfaces/IManager.sol";
+import { IBookKeeper } from "../../main/interfaces/IBookKeeper.sol";
+import { IShowStopper } from "../../main/interfaces/IShowStopper.sol";
+import { ISetPrice } from "../../main/interfaces/ISetPrice.sol";
+import { IPriceFeed } from "../../main/interfaces/IPriceFeed.sol";
+import { IPriceOracle } from "../../main/interfaces/IPriceOracle.sol";
+import { ICollateralPoolConfig } from "../../main/interfaces/ICollateralPoolConfig.sol";
+import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
+import { PositionHandler } from "../../main/managers/PositionHandler.sol";
 
 contract MockPositionManager is PausableUpgradeable, IManager {
     struct List {

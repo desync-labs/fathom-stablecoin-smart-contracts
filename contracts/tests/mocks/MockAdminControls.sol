@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "../../main/interfaces/IAccessControlConfig.sol";
-import "../../main/interfaces/IPausable.sol";
-import "../../main/interfaces/IBookKeeper.sol";
+import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
+import { IPausable } from "../../main/interfaces/IPausable.sol";
+import { IBookKeeper } from "../../main/interfaces/IBookKeeper.sol";
 
 contract MockAdminControls is Initializable {
     address public bookKeeper;

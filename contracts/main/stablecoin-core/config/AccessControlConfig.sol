@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
+import { AccessControlUpgradeable } from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 
-import "../../interfaces/IAccessControlConfig.sol";
+import { IAccessControlConfig } from "../../interfaces/IAccessControlConfig.sol";
 
 contract AccessControlConfig is IAccessControlConfig, AccessControlUpgradeable {
     // solhint-disable var-name-mixedcase

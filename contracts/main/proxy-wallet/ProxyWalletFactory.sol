@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import "./ProxyWallet.sol";
+import { ProxyWallet } from "./ProxyWallet.sol";
 
 /// @dev This factory deploys new proxy instances through build(). Deployed proxy addresses are logged
 contract ProxyWalletFactory is Initializable {

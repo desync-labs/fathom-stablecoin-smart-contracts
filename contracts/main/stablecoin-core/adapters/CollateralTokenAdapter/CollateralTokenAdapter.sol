@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../../../interfaces/IBookKeeper.sol";
-import "../../../interfaces/ICollateralAdapter.sol";
-import "../../../interfaces/ICagable.sol";
-import "../../../interfaces/IProxyRegistry.sol";
-import "../../../interfaces/IVault.sol";
-import "../../../utils/SafeToken.sol";
-import "../../../utils/CommonMath.sol";
+import { IBookKeeper } from "../../../interfaces/IBookKeeper.sol";
+import { ICollateralAdapter } from "../../../interfaces/ICollateralAdapter.sol";
+import { ICagable } from "../../../interfaces/ICagable.sol";
+import { IProxyRegistry } from "../../../interfaces/IProxyRegistry.sol";
+import { IVault } from "../../../interfaces/IVault.sol";
+import { SafeToken } from "../../../utils/SafeToken.sol";
+import { CommonMath } from "../../../utils/CommonMath.sol";
+import { IAccessControlConfig } from "../../../interfaces/IAccessControlConfig.sol";
 
 /// @title CollateralTokenAdapter
 /// @dev receives collateral from users and deposit in Vault.

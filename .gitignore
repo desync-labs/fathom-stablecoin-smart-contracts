@@ -1,25 +1,26 @@
-/node_modules
-/build
+node_modules
+build
 .npm-debug.log
 .vscode
 .env
 *.DS_Store
-addresses.json
-yarn.lock
-package-lock.json
-coverage
-coverage.json
-typechain
-typechain-types
-privateKey*
-/build
-addresses.json
 
-addresses.json
 addresses_GLD.json
-#Hardhat files
-cache
-artifacts
+addresses.json
+privateKey*
 
-*.zip
-/scripts-bunker
+# TypeChain files
+/typechain
+/typechain-types
+
+# Hardhat files
+/cache
+/artifacts
+
+# solidity-coverage files
+/coverage
+/coverage.json
+
+# Hardhat Ignition default folder for deployments against a local node
+ignition/deployments/chain-31337
+/deployments

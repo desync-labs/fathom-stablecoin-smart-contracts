@@ -1,21 +1,23 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../../main/interfaces/IBookKeeper.sol";
-import "../../main/interfaces/IPriceFeed.sol";
-import "../../main/interfaces/IPriceOracle.sol";
-import "../../main/interfaces/ILiquidationEngine.sol";
-import "../../main/interfaces/ILiquidationStrategy.sol";
-import "../../main/interfaces/ISystemDebtEngine.sol";
-import "../../main/interfaces/IFlashLendingCallee.sol";
-import "../../main/interfaces/IGenericTokenAdapter.sol";
-import "../../main/interfaces/IStablecoinAdapter.sol";
-import "../../main/interfaces/IERC165.sol";
-import "../../main/utils/SafeToken.sol";
-import "../../main/utils/CommonMath.sol";
+import { IBookKeeper } from "../../main/interfaces/IBookKeeper.sol";
+import { IPriceFeed } from "../../main/interfaces/IPriceFeed.sol";
+import { IPriceOracle } from "../../main/interfaces/IPriceOracle.sol";
+import { ILiquidationEngine } from "../../main/interfaces/ILiquidationEngine.sol";
+import { ILiquidationStrategy } from "../../main/interfaces/ILiquidationStrategy.sol";
+import { ISystemDebtEngine } from "../../main/interfaces/ISystemDebtEngine.sol";
+import { IFlashLendingCallee } from "../../main/interfaces/IFlashLendingCallee.sol";
+import { IGenericTokenAdapter } from "../../main/interfaces/IGenericTokenAdapter.sol";
+import { IStablecoinAdapter } from "../../main/interfaces/IStablecoinAdapter.sol";
+import { IERC165 } from "../../main/interfaces/IERC165.sol";
+import { SafeToken } from "../../main/utils/SafeToken.sol";
+import { CommonMath } from "../../main/utils/CommonMath.sol";
+import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
+import { ICollateralPoolConfig } from "../../main/interfaces/ICollateralPoolConfig.sol";
 
 /**
  * @title FixedSpreadLiquidationStrategy

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "../FlashMintModule.sol";
-import "../../interfaces/IBookKeeperFlashBorrower.sol";
-import "../../interfaces/IERC3156FlashBorrower.sol";
-import "../../utils/SafeToken.sol";
+import { FlashMintModule } from "../FlashMintModule.sol";
+import { IBookKeeperFlashBorrower } from "../../interfaces/IBookKeeperFlashBorrower.sol";
+import { IERC3156FlashBorrower } from "../../interfaces/IERC3156FlashBorrower.sol";
+import { SafeToken } from "../../utils/SafeToken.sol";
 
 abstract contract FlashLoanReceiverBase is IBookKeeperFlashBorrower, IERC3156FlashBorrower {
     using SafeToken for address;

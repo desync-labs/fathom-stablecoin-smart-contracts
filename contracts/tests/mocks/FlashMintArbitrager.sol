@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { SafeMathUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
-import "../../main/interfaces/IERC3156FlashBorrower.sol";
-import "../../main/interfaces/IStableSwapModule.sol";
-import "../../main/interfaces/IStablecoinAdapter.sol";
-import "../../main/utils/SafeToken.sol";
-import "../../main/apis/interfaces/IFathomSwapRouter.sol";
+import { IERC3156FlashBorrower } from "../../main/interfaces/IERC3156FlashBorrower.sol";
+import { IStableSwapModule } from "../../main/interfaces/IStableSwapModule.sol";
+import { IStablecoinAdapter } from "../../main/interfaces/IStablecoinAdapter.sol";
+import { SafeToken } from "../../main/utils/SafeToken.sol";
+import { IFathomSwapRouter } from "../../main/apis/interfaces/IFathomSwapRouter.sol";
 
 contract FlashMintArbitrager is OwnableUpgradeable, IERC3156FlashBorrower {
     using SafeMathUpgradeable for uint256;

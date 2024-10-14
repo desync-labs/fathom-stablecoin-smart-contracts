@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../../main/interfaces/IBookKeeper.sol";
-import "../../main/interfaces/IStabilityFeeCollector.sol";
-import "../../main/interfaces/IPausable.sol";
-import "../../main/utils/CommonMath.sol";
+import { IBookKeeper } from "../../main/interfaces/IBookKeeper.sol";
+import { IStabilityFeeCollector } from "../../main/interfaces/IStabilityFeeCollector.sol";
+import { IPausable } from "../../main/interfaces/IPausable.sol";
+import { CommonMath } from "../../main/utils/CommonMath.sol";
+import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
+import { ICollateralPoolConfig } from "../../main/interfaces/ICollateralPoolConfig.sol";
 
 /**
  * @title StabilityFeeCollector

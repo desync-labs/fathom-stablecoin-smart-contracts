@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
+import { SafeToken } from "../../main/utils/SafeToken.sol";
+import { IToken } from "../../main/interfaces/IToken.sol";
 
-import "../../main/utils/SafeToken.sol";
-import "../../main/interfaces/IToken.sol";
 pragma solidity 0.8.17;
 
 contract MockedDexRouter {

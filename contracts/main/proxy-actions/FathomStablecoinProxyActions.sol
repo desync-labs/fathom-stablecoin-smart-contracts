@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IWNATIVE.sol";
-import "../interfaces/IToken.sol";
-import "../interfaces/IManager.sol";
-import "../interfaces/IGenericTokenAdapter.sol";
-import "../interfaces/IStablecoinAdapter.sol";
-import "../interfaces/IStabilityFeeCollector.sol";
-import "../utils/SafeToken.sol";
-import "../utils/CommonMath.sol";
+import { IBookKeeper } from "../interfaces/IBookKeeper.sol";
+import { IWNATIVE } from "../interfaces/IWNATIVE.sol";
+import { IToken } from "../interfaces/IToken.sol";
+import { IManager } from "../interfaces/IManager.sol";
+import { IGenericTokenAdapter } from "../interfaces/IGenericTokenAdapter.sol";
+import { IStablecoinAdapter } from "../interfaces/IStablecoinAdapter.sol";
+import { IStabilityFeeCollector } from "../interfaces/IStabilityFeeCollector.sol";
+import { SafeToken } from "../utils/SafeToken.sol";
+import { CommonMath } from "../utils/CommonMath.sol";
+import { ICollateralPoolConfig } from "../interfaces/ICollateralPoolConfig.sol";
 
 /// @notice WARNING: These functions meant to be used as a library for a Proxy.
 /// @notice DO NOT CALL ANY FUNCTION IN THIS CONTRACT DIRECTLY.

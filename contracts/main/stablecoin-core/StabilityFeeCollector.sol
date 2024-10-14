@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import "../interfaces/IBookKeeper.sol";
-import "../interfaces/IStabilityFeeCollector.sol";
-import "../interfaces/IPausable.sol";
-import "../utils/CommonMath.sol";
-
+import { IBookKeeper } from "../interfaces/IBookKeeper.sol";
+import { IStabilityFeeCollector } from "../interfaces/IStabilityFeeCollector.sol";
+import { IPausable } from "../interfaces/IPausable.sol";
+import { CommonMath } from "../utils/CommonMath.sol";
+import { IAccessControlConfig } from "../interfaces/IAccessControlConfig.sol";
+import { ICollateralPoolConfig } from "../interfaces/ICollateralPoolConfig.sol";
 /**
  * @title StabilityFeeCollector
  * @notice A contract that acts as a collector for the stability fee.
@@ -94,14 +95,14 @@ contract StabilityFeeCollector is CommonMath, PausableUpgradeable, ReentrancyGua
     /// @return _debtAccumulatedRate Updated debtAccumulatedRate for the specified collateral pool.
     function _collect(bytes32 _collateralPoolId) internal returns (uint256 _debtAccumulatedRate) {
         ICollateralPoolConfig _config = ICollateralPoolConfig(bookKeeper.collateralPoolConfig());
-
+        // where update for the stabilit fee happens
         uint256 _previousDebtAccumulatedRate = _config.getDebtAccumulatedRate(_collateralPoolId);
         uint256 _stabilityFeeRate = _config.getStabilityFeeRate(_collateralPoolId);
         uint256 _lastAccumulationTime = _config.getLastAccumulationTime(_collateralPoolId);
         require(block.timestamp >= _lastAccumulationTime, "StabilityFeeCollector/invalid-block.timestamp");
         require(systemDebtEngine != address(0), "StabilityFeeCollector/system-debt-engine-not-set");
 
-        _debtAccumulatedRate = rmul(rpow(_stabilityFeeRate, block.timestamp - _lastAccumulationTime, RAY), _previousDebtAccumulatedRate);
+        _debtAccumulatedRate = rmul(rpow(_stabilityFeeRate, block.timestamp - _lastAccumulationTime, RAY), _previousDebtAccumulatedRate); // where the stability fee is updated
 
         bookKeeper.accrueStabilityFee(_collateralPoolId, systemDebtEngine, diff(_debtAccumulatedRate, _previousDebtAccumulatedRate));
         _config.updateLastAccumulationTime(_collateralPoolId);

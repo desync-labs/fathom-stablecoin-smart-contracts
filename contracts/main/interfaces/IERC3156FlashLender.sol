@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import "./IERC3156FlashBorrower.sol";
+import { IERC3156FlashBorrower } from "./IERC3156FlashBorrower.sol";
 
 interface IERC3156FlashLender {
     /// @dev Initiate a flash loan.
