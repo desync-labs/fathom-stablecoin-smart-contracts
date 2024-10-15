@@ -60,18 +60,18 @@ const openNATIVEPositionAndDrawMock = async (proxyWallet, from, collateralPoolId
   const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
   const positionManager = await getProxy(proxyFactory, "PositionManager");
   const stablecoinAdapter = await getProxy(proxyFactory, "StablecoinAdapter");
-  const mockCollateralTokenAdapter = await getProxy(proxyFactory, "MockCollateralTokenAdapter");
+  const MockCollateralTokenAdapter = await deployments.get("MockCollateralTokenAdapter");
   const stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
-  const fathomStablecoinProxyActions = await getProxy(proxyFactory, "FathomStablecoinProxyActions");
 
   const abi = [
     "function openLockNATIVEAndDraw(address _manager, address _stabilityFeeCollector, address _nativeAdapter, address _stablecoinAdapter, bytes32 _collateralPoolId, uint256 _stablecoinAmount, bytes calldata _data)",
   ];
+
   const iFace = new ethers.utils.Interface(abi);
   const call = iFace.encodeFunctionData("openLockNATIVEAndDraw", [
     positionManager.address,
     stabilityFeeCollector.address,
-    mockCollateralTokenAdapter.address,
+    MockCollateralTokenAdapter.address,
     stablecoinAdapter.address,
     collateralPoolId,
     stablecoin,

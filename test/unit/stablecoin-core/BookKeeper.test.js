@@ -64,7 +64,7 @@ describe("BookKeeper", () => {
           const collateralTokenBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, DeployerAddress);
           expect(collateralTokenBefore).to.be.equal(0);
 
-          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad, { gasLimit: 1000000 });
+          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad);
 
           const collateralTokenAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, DeployerAddress);
           expect(collateralTokenAfter).to.be.equal(WeiPerWad);
@@ -80,13 +80,13 @@ describe("BookKeeper", () => {
           mockedCollateralPoolConfig.getStabilityFeeRate.returns(WeiPerRay);
 
           // add collateral 1 WNATIVE
-          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad, { gasLimit: 1000000 });
+          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad);
 
           const collateralTokenBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, DeployerAddress);
           expect(collateralTokenBefore).to.be.equal(WeiPerWad);
 
           // add collateral -1 WNATIVE
-          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad.mul(-1), { gasLimit: 1000000 });
+          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad.mul(-1));
 
           const collateralTokenAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, DeployerAddress);
           expect(collateralTokenAfter).to.be.equal(0);
@@ -102,7 +102,7 @@ describe("BookKeeper", () => {
         mockedAccessControlConfig.hasRole.returns(true);
 
         // Try moving 0 collateral from Alice to Bob
-        await expect(bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, 0, { gasLimit: 1000000 })).to.be.revertedWith(
+        await expect(bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, 0)).to.be.revertedWith(
           "bookKeeper/moveCollateral-zero-amount"
         );
       });
@@ -114,21 +114,21 @@ describe("BookKeeper", () => {
         mockedAccessControlConfig.hasRole.returns(true);
 
         // Add some collateral to Alice so she has some to move.
-        await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad, { gasLimit: 1000000 });
+        await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad);
 
         // Try moving collateral from Alice to Alice (same address)
-        await expect(
-          bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, WeiPerWad, { gasLimit: 1000000 })
-        ).to.be.revertedWith("bookKeeper/moveCollateral-src-dst-same");
+        await expect(bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, WeiPerWad)).to.be.revertedWith(
+          "bookKeeper/moveCollateral-src-dst-same"
+        );
       });
     });
 
     context("when the caller is not the owner", () => {
       it("should be revert", async () => {
         // bob call move collateral from alice to bob
-        await await expect(
-          bookKeeperAsBob.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })
-        ).to.be.revertedWith("BookKeeper/not-allowed-position-adjustment");
+        await await expect(bookKeeperAsBob.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad)).to.be.revertedWith(
+          "BookKeeper/not-allowed-position-adjustment"
+        );
       });
 
       context("when alice allow bob to move collateral", () => {
@@ -136,7 +136,7 @@ describe("BookKeeper", () => {
           mockedAccessControlConfig.hasRole.returns(true);
 
           // add collateral 1 WNATIVE to alice
-          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad, { gasLimit: 1000000 });
+          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad);
 
           const collateralTokenAliceBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress);
           expect(collateralTokenAliceBefore).to.be.equal(WeiPerWad);
@@ -147,7 +147,7 @@ describe("BookKeeper", () => {
           await bookKeeperAsAlice.addToWhitelist(BobAddress);
 
           // bob call move collateral from alice to bob
-          await bookKeeperAsBob.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 });
+          await bookKeeperAsBob.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad);
 
           const collateralTokenAliceAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress);
           expect(collateralTokenAliceAfter).to.be.equal(0);
@@ -161,8 +161,7 @@ describe("BookKeeper", () => {
       context("when alice doesn't have enough collateral", () => {
         it("shold be revert", async () => {
           // alice call move collateral from alice to bob
-          await expect(bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 })).to.be
-            .reverted;
+          await expect(bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad)).to.be.reverted;
         });
       });
       context("when alice has enough collateral", () => {
@@ -170,7 +169,7 @@ describe("BookKeeper", () => {
           mockedAccessControlConfig.hasRole.returns(true);
 
           // add collateral 1 WNATIVE to alice
-          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad, { gasLimit: 1000000 });
+          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad);
 
           const collateralTokenAliceBefore = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress);
           expect(collateralTokenAliceBefore).to.be.equal(WeiPerWad);
@@ -178,7 +177,7 @@ describe("BookKeeper", () => {
           expect(collateralTokenBobBefore).to.be.equal(0);
 
           // move collateral 1 WNATIVE from alice to bob
-          await bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad, { gasLimit: 1000000 });
+          await bookKeeperAsAlice.moveCollateral(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad);
 
           const collateralTokenAliceAfter = await bookKeeper.collateralToken(COLLATERAL_POOL_ID, AliceAddress);
           expect(collateralTokenAliceAfter).to.be.equal(0);
@@ -196,15 +195,13 @@ describe("BookKeeper", () => {
         mockedAccessControlConfig.hasRole.returns(true);
 
         // mint some stablecoin to Alice just for context, even though we are moving 0
-        await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad, { gasLimit: 1000000 });
+        await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad);
 
         // alice allow bob to move stablecoin, so the test focuses solely on the zero amount
         await bookKeeperAsAlice.addToWhitelist(BobAddress);
 
         // Try moving 0 stablecoin from Alice to Bob
-        await expect(bookKeeperAsAlice.moveStablecoin(AliceAddress, BobAddress, 0, { gasLimit: 1000000 })).to.be.revertedWith(
-          "bookKeeper/moveStablecoin-zero-amount"
-        );
+        await expect(bookKeeperAsAlice.moveStablecoin(AliceAddress, BobAddress, 0)).to.be.revertedWith("bookKeeper/moveStablecoin-zero-amount");
       });
     });
 
@@ -214,10 +211,10 @@ describe("BookKeeper", () => {
         mockedAccessControlConfig.hasRole.returns(true);
 
         // Mint some stablecoin to Alice to provide context.
-        await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad, { gasLimit: 1000000 });
+        await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad);
 
         // Attempt to move stablecoin from Alice to Alice (i.e., same address).
-        await expect(bookKeeperAsAlice.moveStablecoin(AliceAddress, AliceAddress, WeiPerRad, { gasLimit: 1000000 })).to.be.revertedWith(
+        await expect(bookKeeperAsAlice.moveStablecoin(AliceAddress, AliceAddress, WeiPerRad)).to.be.revertedWith(
           "bookKeeper/moveStablecoin-src-dst-same"
         );
       });
@@ -226,7 +223,7 @@ describe("BookKeeper", () => {
     context("when the caller is not the owner", () => {
       it("should be revert", async () => {
         // bob call move stablecoin from alice to bob
-        await expect(bookKeeperAsBob.moveStablecoin(AliceAddress, BobAddress, WeiPerRad, { gasLimit: 1000000 })).to.be.revertedWith(
+        await expect(bookKeeperAsBob.moveStablecoin(AliceAddress, BobAddress, WeiPerRad)).to.be.revertedWith(
           "BookKeeper/not-allowed-position-adjustment"
         );
       });
@@ -236,7 +233,7 @@ describe("BookKeeper", () => {
           mockedAccessControlConfig.hasRole.returns(true);
 
           // mint 1 rad to alice
-          await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad, { gasLimit: 1000000 });
+          await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad);
 
           const stablecoinAliceBefore = await bookKeeper.stablecoin(AliceAddress);
           expect(stablecoinAliceBefore).to.be.equal(WeiPerRad);
@@ -247,7 +244,7 @@ describe("BookKeeper", () => {
           await bookKeeperAsAlice.addToWhitelist(BobAddress);
 
           // bob call move stablecoin from alice to bob
-          await expect(bookKeeperAsBob.moveStablecoin(AliceAddress, BobAddress, WeiPerRad, { gasLimit: 1000000 }))
+          await expect(bookKeeperAsBob.moveStablecoin(AliceAddress, BobAddress, WeiPerRad))
             .to.be.emit(bookKeeperAsBob, "LogMoveStablecoin")
             .withArgs(BobAddress, AliceAddress, BobAddress, WeiPerRad);
 
@@ -263,7 +260,7 @@ describe("BookKeeper", () => {
       context("when alice doesn't have enough stablecoin", () => {
         it("shold be revert", async () => {
           // alice call move stablecoin from alice to bob
-          await expect(bookKeeperAsAlice.moveStablecoin(AliceAddress, BobAddress, WeiPerRad, { gasLimit: 1000000 })).to.be.reverted;
+          await expect(bookKeeperAsAlice.moveStablecoin(AliceAddress, BobAddress, WeiPerRad)).to.be.reverted;
         });
       });
       context("when alice has enough stablecoin", () => {
@@ -271,7 +268,7 @@ describe("BookKeeper", () => {
           mockedAccessControlConfig.hasRole.returns(true);
 
           // mint 1 rad to alice
-          await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad, { gasLimit: 1000000 });
+          await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad);
 
           const stablecoinAliceBefore = await bookKeeper.stablecoin(AliceAddress);
           expect(stablecoinAliceBefore).to.be.equal(WeiPerRad);
@@ -279,7 +276,7 @@ describe("BookKeeper", () => {
           expect(stablecoinBobBefore).to.be.equal(0);
 
           // alice call move stablecoin from alice to bob
-          await expect(bookKeeperAsAlice.moveStablecoin(AliceAddress, BobAddress, WeiPerRad, { gasLimit: 1000000 }))
+          await expect(bookKeeperAsAlice.moveStablecoin(AliceAddress, BobAddress, WeiPerRad))
             .to.be.emit(bookKeeperAsAlice, "LogMoveStablecoin")
             .withArgs(AliceAddress, AliceAddress, BobAddress, WeiPerRad);
 
@@ -300,9 +297,7 @@ describe("BookKeeper", () => {
         await bookKeeper.cage();
 
         await expect(
-          bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, WeiPerWad, 0, {
-            gasLimit: 1000000,
-          })
+          bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, WeiPerWad, 0)
         ).to.be.revertedWith("BookKeeper/not-live");
       });
     });
@@ -321,9 +316,7 @@ describe("BookKeeper", () => {
         });
 
         await expect(
-          bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, WeiPerWad, 0, {
-            gasLimit: 1000000,
-          })
+          bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, WeiPerWad, 0)
         ).to.be.revertedWith("BookKeeper/collateralPool-not-init");
       });
     });
@@ -350,9 +343,7 @@ describe("BookKeeper", () => {
             });
 
             await expect(
-              bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, AliceAddress, WeiPerWad.mul(10), 0, {
-                gasLimit: 1000000,
-              })
+              bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, AliceAddress, WeiPerWad.mul(10), 0)
             ).to.be.revertedWith("BookKeeper/not-allowed-collateral-owner");
           });
           context("when bob allow alice to move collateral", () => {
@@ -370,11 +361,8 @@ describe("BookKeeper", () => {
                 // alice allow bob to move stablecoin
                 await bookKeeperAsBob.addToWhitelist(AliceAddress);
 
-                await expect(
-                  bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, AliceAddress, WeiPerWad.mul(10), 0, {
-                    gasLimit: 1000000,
-                  })
-                ).to.be.reverted;
+                await expect(bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, AliceAddress, WeiPerWad.mul(10), 0)).to.be
+                  .reverted;
               });
             });
 
@@ -399,7 +387,7 @@ describe("BookKeeper", () => {
                 });
 
                 // add collateral to bob 10 WNATIVE
-                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10));
 
                 // alice allow bob to move stablecoin
                 await bookKeeperAsBob.addToWhitelist(AliceAddress);
@@ -408,9 +396,7 @@ describe("BookKeeper", () => {
                 expect(positionBefore.lockedCollateral).to.be.equal(0);
 
                 // lock collateral
-                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, AliceAddress, WeiPerWad.mul(10), 0, {
-                  gasLimit: 1000000,
-                });
+                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, AliceAddress, WeiPerWad.mul(10), 0);
 
                 const positionAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
                 expect(positionAfter.lockedCollateral).to.be.equal(WeiPerWad.mul(10));
@@ -430,11 +416,8 @@ describe("BookKeeper", () => {
               mockedCollateralPoolConfig.getPriceWithSafetyMargin.returns(WeiPerRay);
               mockedCollateralPoolConfig.setTotalDebtShare.returns();
 
-              await expect(
-                bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0, {
-                  gasLimit: 1000000,
-                })
-              ).to.be.reverted;
+              await expect(bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0)).to.be
+                .reverted;
             });
           });
 
@@ -458,15 +441,13 @@ describe("BookKeeper", () => {
               });
 
               // add collateral to bob 10 WNATIVE
-              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
               const positionBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
               expect(positionBefore.lockedCollateral).to.be.equal(0);
 
               // lock collateral
-              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0, {
-                gasLimit: 1000000,
-              });
+              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0);
 
               const positionAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
               expect(positionAfter.lockedCollateral).to.be.equal(WeiPerWad.mul(10));
@@ -488,11 +469,8 @@ describe("BookKeeper", () => {
               mockedCollateralPoolConfig.setTotalDebtShare.returns();
 
               // free collateral
-              await expect(
-                bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(-1), 0, {
-                  gasLimit: 1000000,
-                })
-              ).to.be.reverted;
+              await expect(bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(-1), 0)).to.be
+                .reverted;
             });
           });
           context("when alice has enough lock collateral in position", () => {
@@ -517,12 +495,10 @@ describe("BookKeeper", () => {
               });
 
               // add collateral to alice 10 WNATIVE
-              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
               // lock collateral
-              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0, {
-                gasLimit: 1000000,
-              });
+              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0);
 
               const positionAliceBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
               expect(positionAliceBefore.lockedCollateral).to.be.equal(WeiPerWad.mul(10));
@@ -552,11 +528,8 @@ describe("BookKeeper", () => {
               mockedCollateralPoolConfig.setTotalDebtShare.returns();
 
               // free collateral
-              await expect(
-                bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, AliceAddress, WeiPerWad.mul(-1), 0, {
-                  gasLimit: 1000000,
-                })
-              ).to.be.reverted;
+              await expect(bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, AliceAddress, WeiPerWad.mul(-1), 0)).to.be
+                .reverted;
             });
           });
           context("when alice has enough lock collateral in position", () => {
@@ -581,12 +554,10 @@ describe("BookKeeper", () => {
               });
 
               // add collateral to alice 10 WNATIVE
-              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
               // lock collateral
-              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0, {
-                gasLimit: 1000000,
-              });
+              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0);
 
               const positionAliceBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
               expect(positionAliceBefore.lockedCollateral).to.be.equal(WeiPerWad.mul(10));
@@ -594,9 +565,7 @@ describe("BookKeeper", () => {
               expect(collateralTokenBobBefore).to.be.equal(0);
 
               // free collateral
-              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, AliceAddress, WeiPerWad.mul(-1), 0, {
-                gasLimit: 1000000,
-              });
+              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, AliceAddress, WeiPerWad.mul(-1), 0);
 
               const positionAliceAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
               expect(positionAliceAfter.lockedCollateral).to.be.equal(WeiPerWad.mul(9));
@@ -630,12 +599,10 @@ describe("BookKeeper", () => {
               });
 
               // set total debt ceiling 10 rad
-              await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+              await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
               await expect(
-                bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, 0, WeiPerWad.mul(10), {
-                  gasLimit: 1000000,
-                })
+                bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, 0, WeiPerWad.mul(10))
               ).to.be.revertedWith("BookKeeper/ceiling-exceeded");
             });
           });
@@ -660,12 +627,10 @@ describe("BookKeeper", () => {
               });
 
               // set total debt ceiling 1 rad
-              await bookKeeper.setTotalDebtCeiling(WeiPerRad, { gasLimit: 1000000 });
+              await bookKeeper.setTotalDebtCeiling(WeiPerRad);
 
               await expect(
-                bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, 0, WeiPerWad.mul(10), {
-                  gasLimit: 1000000,
-                })
+                bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, 0, WeiPerWad.mul(10))
               ).to.be.revertedWith("BookKeeper/ceiling-exceeded");
             });
           });
@@ -691,12 +656,10 @@ describe("BookKeeper", () => {
             });
 
             // set total debt ceiling 10 rad
-            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
             await expect(
-              bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, 0, WeiPerWad.mul(10), {
-                gasLimit: 1000000,
-              })
+              bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, 0, WeiPerWad.mul(10))
             ).to.be.revertedWith("BookKeeper/not-safe");
           });
         });
@@ -722,20 +685,16 @@ describe("BookKeeper", () => {
               });
 
               // set total debt ceiling 10 rad
-              await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+              await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
               // add collateral to 10 WNATIVE
-              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10));
 
               // bob lock collateral 10 WNATIVE
-              await bookKeeperAsBob.adjustPosition(COLLATERAL_POOL_ID, BobAddress, BobAddress, BobAddress, WeiPerWad.mul(10), 0, {
-                gasLimit: 1000000,
-              });
+              await bookKeeperAsBob.adjustPosition(COLLATERAL_POOL_ID, BobAddress, BobAddress, BobAddress, WeiPerWad.mul(10), 0);
 
               await expect(
-                bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, BobAddress, BobAddress, BobAddress, 0, WeiPerWad.mul(10), {
-                  gasLimit: 1000000,
-                })
+                bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, BobAddress, BobAddress, BobAddress, 0, WeiPerWad.mul(10))
               ).to.be.revertedWith("BookKeeper/not-allowed-position-address");
             });
 
@@ -760,15 +719,13 @@ describe("BookKeeper", () => {
                 });
 
                 // set total debt ceiling 10 rad
-                await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+                await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
                 // add collateral to 10 WNATIVE
-                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(10));
 
                 // bob lock collateral 10 WNATIVE
-                await bookKeeperAsBob.adjustPosition(COLLATERAL_POOL_ID, BobAddress, BobAddress, BobAddress, WeiPerWad.mul(10), 0, {
-                  gasLimit: 1000000,
-                });
+                await bookKeeperAsBob.adjustPosition(COLLATERAL_POOL_ID, BobAddress, BobAddress, BobAddress, WeiPerWad.mul(10), 0);
 
                 const positionBobBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, BobAddress);
                 expect(positionBobBefore.debtShare).to.be.equal(0);
@@ -780,9 +737,7 @@ describe("BookKeeper", () => {
                 await bookKeeperAsBob.addToWhitelist(AliceAddress);
 
                 // alice draw
-                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, BobAddress, BobAddress, AliceAddress, 0, WeiPerWad.mul(10), {
-                  gasLimit: 1000000,
-                });
+                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, BobAddress, BobAddress, AliceAddress, 0, WeiPerWad.mul(10));
 
                 const positionBobAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, BobAddress);
                 expect(positionBobAfter.debtShare).to.be.equal(WeiPerWad.mul(10));
@@ -812,15 +767,13 @@ describe("BookKeeper", () => {
               });
 
               // set total debt ceiling 10 rad
-              await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+              await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
               // add collateral to 10 WNATIVE
-              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
               // alice lock collateral 10 WNATIVE
-              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0, {
-                gasLimit: 1000000,
-              });
+              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0);
 
               const positionaliceBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
               expect(positionaliceBefore.debtShare).to.be.equal(0);
@@ -829,9 +782,7 @@ describe("BookKeeper", () => {
               expect(stablecoinAliceBefore).to.be.equal(0);
 
               // alice draw
-              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(10), {
-                gasLimit: 1000000,
-              });
+              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(10));
 
               const positionaliceAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
               expect(positionaliceAfter.debtShare).to.be.equal(WeiPerWad.mul(10));
@@ -858,21 +809,17 @@ describe("BookKeeper", () => {
               });
 
               // set total debt ceiling 10 rad
-              await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+              await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
               // add collateral to 10 WNATIVE
-              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+              await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
               // alice lock collateral 10 WNATIVE
-              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0, {
-                gasLimit: 1000000,
-              });
+              await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0);
 
               // alice draw
               await expect(
-                bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(10), {
-                  gasLimit: 1000000,
-                })
+                bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(10))
               ).to.be.revertedWith("BookKeeper/debt-floor");
             });
           });
@@ -896,20 +843,16 @@ describe("BookKeeper", () => {
                 });
 
                 // set total debt ceiling 10 rad
-                await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+                await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
                 // add collateral to 10 WNATIVE
-                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
                 // alice lock collateral 10 WNATIVE
-                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0, {
-                  gasLimit: 1000000,
-                });
+                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0);
 
                 // alice draw
-                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(10), {
-                  gasLimit: 1000000,
-                });
+                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(10));
 
                 const positionaliceBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
                 expect(positionaliceBefore.debtShare).to.be.equal(WeiPerWad.mul(10));
@@ -925,9 +868,7 @@ describe("BookKeeper", () => {
                   positionDebtCeiling: WeiPerRad.mul(1000000),
                 });
                 // alice wipe
-                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(-10), {
-                  gasLimit: 1000000,
-                });
+                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(-10));
 
                 const positionaliceAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
                 expect(positionaliceAfter.debtShare).to.be.equal(0);
@@ -955,20 +896,16 @@ describe("BookKeeper", () => {
                 });
 
                 // set total debt ceiling 10 rad
-                await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+                await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
                 // add collateral to 10 WNATIVE
-                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+                await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
                 // alice lock collateral 10 WNATIVE
-                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0, {
-                  gasLimit: 1000000,
-                });
+                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), 0);
 
                 // alice draw
-                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(10), {
-                  gasLimit: 1000000,
-                });
+                await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(10));
                 mockedCollateralPoolConfig.getTotalDebtShare.returns(WeiPerWad.mul(10));
                 mockedCollateralPoolConfig.getCollateralPoolInfo.returns({
                   debtAccumulatedRate: WeiPerRay,
@@ -980,9 +917,7 @@ describe("BookKeeper", () => {
                 });
                 // alice wipe
                 await expect(
-                  bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(-9), {
-                    gasLimit: 1000000,
-                  })
+                  bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, 0, WeiPerWad.mul(-9))
                 ).to.be.revertedWith("BookKeeper/debt-floor");
               });
             });
@@ -1012,20 +947,16 @@ describe("BookKeeper", () => {
           });
 
           // set total debt ceiling 10 rad
-          await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+          await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
           // add collateral to 10 WNATIVE
-          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
           // alice lock collateral 10 WNATIVE
-          await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), WeiPerWad.mul(2), {
-            gasLimit: 1000000,
-          });
+          await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), WeiPerWad.mul(2));
 
           await expect(
-            bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(5), WeiPerWad.mul(1), {
-              gasLimit: 1000000,
-            })
+            bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(5), WeiPerWad.mul(1))
           ).to.be.revertedWith("BookKeeper/movePosition/not-allowed");
         });
       });
@@ -1048,29 +979,19 @@ describe("BookKeeper", () => {
             });
 
             // set total debt ceiling 10 rad
-            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
             // add collateral to 10 WNATIVE
-            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
             // alice lock collateral 10 WNATIVE
-            await bookKeeperAsAlice.adjustPosition(
-              COLLATERAL_POOL_ID,
-              AliceAddress,
-              AliceAddress,
-              AliceAddress,
-              WeiPerWad.mul(10),
-              WeiPerWad.mul(2),
-              { gasLimit: 1000000 }
-            );
+            await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), WeiPerWad.mul(2));
 
             // bob allow alice to manage a position
             await bookKeeperAsBob.addToWhitelist(AliceAddress);
 
             await expect(
-              bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(10), WeiPerWad.mul(0), {
-                gasLimit: 1000000,
-              })
+              bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(10), WeiPerWad.mul(0))
             ).to.be.revertedWith("BookKeeper/not-safe-src");
           });
         });
@@ -1092,29 +1013,19 @@ describe("BookKeeper", () => {
             });
 
             // set total debt ceiling 10 rad
-            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
             // add collateral to 10 WNATIVE
-            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
             // alice lock collateral 10 WNATIVE
-            await bookKeeperAsAlice.adjustPosition(
-              COLLATERAL_POOL_ID,
-              AliceAddress,
-              AliceAddress,
-              AliceAddress,
-              WeiPerWad.mul(10),
-              WeiPerWad.mul(2),
-              { gasLimit: 1000000 }
-            );
+            await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), WeiPerWad.mul(2));
 
             // bob allow alice to manage a position
             await bookKeeperAsBob.addToWhitelist(AliceAddress);
 
             await expect(
-              bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(0), WeiPerWad.mul(2), {
-                gasLimit: 1000000,
-              })
+              bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(0), WeiPerWad.mul(2))
             ).to.be.revertedWith("BookKeeper/not-safe-dst");
           });
         });
@@ -1136,29 +1047,19 @@ describe("BookKeeper", () => {
             });
 
             // set total debt ceiling 10 rad
-            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
             // add collateral to 10 WNATIVE
-            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
             // alice lock collateral 10 WNATIVE
-            await bookKeeperAsAlice.adjustPosition(
-              COLLATERAL_POOL_ID,
-              AliceAddress,
-              AliceAddress,
-              AliceAddress,
-              WeiPerWad.mul(10),
-              WeiPerWad.mul(2),
-              { gasLimit: 1000000 }
-            );
+            await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), WeiPerWad.mul(2));
 
             // bob allow alice to manage a position
             await bookKeeperAsBob.addToWhitelist(AliceAddress);
 
             await expect(
-              bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(5), WeiPerWad.mul(1), {
-                gasLimit: 1000000,
-              })
+              bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(5), WeiPerWad.mul(1))
             ).to.be.revertedWith("BookKeeper/debt-floor-src");
           });
         });
@@ -1180,29 +1081,19 @@ describe("BookKeeper", () => {
             });
 
             // set total debt ceiling 10 rad
-            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
             // add collateral to 10 WNATIVE
-            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
             // alice lock collateral 10 WNATIVE
-            await bookKeeperAsAlice.adjustPosition(
-              COLLATERAL_POOL_ID,
-              AliceAddress,
-              AliceAddress,
-              AliceAddress,
-              WeiPerWad.mul(10),
-              WeiPerWad.mul(3),
-              { gasLimit: 1000000 }
-            );
+            await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), WeiPerWad.mul(3));
 
             // bob allow alice to manage a position
             await bookKeeperAsBob.addToWhitelist(AliceAddress);
 
             await expect(
-              bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(5), WeiPerWad.mul(1), {
-                gasLimit: 1000000,
-              })
+              bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(5), WeiPerWad.mul(1))
             ).to.be.revertedWith("BookKeeper/debt-floor-dst");
           });
         });
@@ -1225,35 +1116,23 @@ describe("BookKeeper", () => {
             });
 
             // set total debt ceiling 10 rad
-            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(100), { gasLimit: 1000000 });
+            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(100));
 
             // add collateral to 10 WNATIVE
-            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
-            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(20), { gasLimit: 1000000 });
+            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
+            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, BobAddress, WeiPerWad.mul(20));
 
             // alice lock collateral 10 WNATIVE
-            await bookKeeperAsAlice.adjustPosition(
-              COLLATERAL_POOL_ID,
-              AliceAddress,
-              AliceAddress,
-              AliceAddress,
-              WeiPerWad.mul(10),
-              WeiPerWad.mul(3),
-              { gasLimit: 1000000 }
-            );
+            await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), WeiPerWad.mul(3));
 
             // bob lock collateral 100 WNATIVE and borrow 10 FXD
-            await bookKeeperAsBob.adjustPosition(COLLATERAL_POOL_ID, BobAddress, BobAddress, BobAddress, WeiPerWad.mul(20), WeiPerWad.mul(10), {
-              gasLimit: 1000000,
-            });
+            await bookKeeperAsBob.adjustPosition(COLLATERAL_POOL_ID, BobAddress, BobAddress, BobAddress, WeiPerWad.mul(20), WeiPerWad.mul(10));
 
             // bob allow alice to manage a position
             await bookKeeperAsBob.addToWhitelist(AliceAddress);
 
             await expect(
-              bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(5), WeiPerWad.mul(1), {
-                gasLimit: 1000000,
-              })
+              bookKeeperAsAlice.movePosition(COLLATERAL_POOL_ID, AliceAddress, BobAddress, WeiPerWad.mul(5), WeiPerWad.mul(1))
             ).to.be.revertedWith("BookKeeper/position-debt-ceiling-exceeded-dst");
           });
         });
@@ -1275,21 +1154,13 @@ describe("BookKeeper", () => {
             });
 
             // set total debt ceiling 10 rad
-            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
             // add collateral to 10 WNATIVE
-            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(10));
 
             // alice lock collateral 10 WNATIVE
-            await bookKeeperAsAlice.adjustPosition(
-              COLLATERAL_POOL_ID,
-              AliceAddress,
-              AliceAddress,
-              AliceAddress,
-              WeiPerWad.mul(10),
-              WeiPerWad.mul(2),
-              { gasLimit: 1000000 }
-            );
+            await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(10), WeiPerWad.mul(2));
 
             // bob allow alice to manage a position
             await bookKeeperAsBob.addToWhitelist(AliceAddress);
@@ -1328,8 +1199,7 @@ describe("BookKeeper", () => {
             DeployerAddress,
             DeployerAddress,
             WeiPerWad.mul(-1),
-            WeiPerWad.mul(-1),
-            { gasLimit: 1000000 }
+            WeiPerWad.mul(-1)
           )
         ).to.be.revertedWith("!liquidationEngineRole");
       });
@@ -1356,14 +1226,12 @@ describe("BookKeeper", () => {
             });
 
             // set total debt ceiling 1 rad
-            await bookKeeper.setTotalDebtCeiling(WeiPerRad, { gasLimit: 1000000 });
+            await bookKeeper.setTotalDebtCeiling(WeiPerRad);
 
             // add collateral to 1 WNATIVE
-            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad, { gasLimit: 1000000 });
+            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad);
             // adjust position
-            await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad, WeiPerWad, {
-              gasLimit: 1000000,
-            });
+            await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad, WeiPerWad);
 
             const positionBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
             expect(positionBefore.lockedCollateral).to.be.equal(WeiPerWad);
@@ -1392,8 +1260,7 @@ describe("BookKeeper", () => {
               DeployerAddress,
               DeployerAddress,
               WeiPerWad.mul(-1),
-              WeiPerWad.mul(-1),
-              { gasLimit: 1000000 }
+              WeiPerWad.mul(-1)
             );
 
             const positionAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
@@ -1429,14 +1296,12 @@ describe("BookKeeper", () => {
             });
 
             // set total debt ceiling 10 rad
-            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10), { gasLimit: 1000000 });
+            await bookKeeper.setTotalDebtCeiling(WeiPerRad.mul(10));
 
             // add collateral to 2 WNATIVE
-            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(2), { gasLimit: 1000000 });
+            await bookKeeper.addCollateral(COLLATERAL_POOL_ID, AliceAddress, WeiPerWad.mul(2));
             // adjust position
-            await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(2), WeiPerWad.mul(2), {
-              gasLimit: 1000000,
-            });
+            await bookKeeperAsAlice.adjustPosition(COLLATERAL_POOL_ID, AliceAddress, AliceAddress, AliceAddress, WeiPerWad.mul(2), WeiPerWad.mul(2));
 
             const positionBefore = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
             expect(positionBefore.lockedCollateral).to.be.equal(WeiPerWad.mul(2));
@@ -1463,8 +1328,7 @@ describe("BookKeeper", () => {
               DeployerAddress,
               DeployerAddress,
               WeiPerWad.mul(-1),
-              WeiPerWad.mul(-1),
-              { gasLimit: 1000000 }
+              WeiPerWad.mul(-1)
             );
 
             const positionAfter = await bookKeeper.positions(COLLATERAL_POOL_ID, AliceAddress);
@@ -1489,7 +1353,7 @@ describe("BookKeeper", () => {
         mockedAccessControlConfig.hasRole.returns(true);
 
         // Try to mint 0 unbacked stablecoin.
-        await expect(bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, 0, { gasLimit: 1000000 })).to.be.revertedWith(
+        await expect(bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, 0)).to.be.revertedWith(
           "bookKeeper/mintUnbackedStablecoin-zero-amount"
         );
       });
@@ -1497,9 +1361,7 @@ describe("BookKeeper", () => {
     context("when the caller is not the owner", async () => {
       it("should revert", async () => {
         mockedAccessControlConfig.hasRole.returns(false);
-        await expect(bookKeeperAsAlice.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad, { gasLimit: 1000000 })).to.be.revertedWith(
-          "!mintableRole"
-        );
+        await expect(bookKeeperAsAlice.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad)).to.be.revertedWith("!mintableRole");
       });
     });
     context("when the caller is the owner", async () => {
@@ -1517,7 +1379,7 @@ describe("BookKeeper", () => {
           mockedAccessControlConfig.hasRole.returns(true);
 
           //  mint 1 rad to alice
-          await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad, { gasLimit: 1000000 });
+          await bookKeeper.mintUnbackedStablecoin(DeployerAddress, AliceAddress, WeiPerRad);
 
           const systemBadDebtAfter = await bookKeeper.systemBadDebt(DeployerAddress);
           expect(systemBadDebtAfter).to.be.equal(WeiPerRad);
@@ -1533,18 +1395,18 @@ describe("BookKeeper", () => {
     context("when the _from address is the zero address", async () => {
       it("should revert with 'BookKeeper/zero-address'", async () => {
         mockedAccessControlConfig.hasRole.returns(true);
-        await expect(
-          bookKeeper.mintUnbackedStablecoin("0x0000000000000000000000000000000000000000", AliceAddress, WeiPerRad, { gasLimit: 1000000 })
-        ).to.be.revertedWith("BookKeeper/zero-address");
+        await expect(bookKeeper.mintUnbackedStablecoin("0x0000000000000000000000000000000000000000", AliceAddress, WeiPerRad)).to.be.revertedWith(
+          "BookKeeper/zero-address"
+        );
       });
     });
 
     context("when the _to address is the zero address", async () => {
       it("should revert with 'BookKeeper/zero-address'", async () => {
         mockedAccessControlConfig.hasRole.returns(true);
-        await expect(
-          bookKeeper.mintUnbackedStablecoin(DeployerAddress, "0x0000000000000000000000000000000000000000", WeiPerRad, { gasLimit: 1000000 })
-        ).to.be.revertedWith("BookKeeper/zero-address");
+        await expect(bookKeeper.mintUnbackedStablecoin(DeployerAddress, "0x0000000000000000000000000000000000000000", WeiPerRad)).to.be.revertedWith(
+          "BookKeeper/zero-address"
+        );
       });
     });
 
@@ -1552,9 +1414,7 @@ describe("BookKeeper", () => {
       it("should revert with 'BookKeeper/zero-address'", async () => {
         mockedAccessControlConfig.hasRole.returns(true);
         await expect(
-          bookKeeper.mintUnbackedStablecoin("0x0000000000000000000000000000000000000000", "0x0000000000000000000000000000000000000000", WeiPerRad, {
-            gasLimit: 1000000,
-          })
+          bookKeeper.mintUnbackedStablecoin("0x0000000000000000000000000000000000000000", "0x0000000000000000000000000000000000000000", WeiPerRad)
         ).to.be.revertedWith("BookKeeper/zero-address");
       });
     });
@@ -1566,7 +1426,7 @@ describe("BookKeeper", () => {
         mockedAccessControlConfig.hasRole.returns(true);
 
         //  mint 1 rad to deployer
-        await bookKeeper.mintUnbackedStablecoin(DeployerAddress, DeployerAddress, WeiPerRad, { gasLimit: 1000000 });
+        await bookKeeper.mintUnbackedStablecoin(DeployerAddress, DeployerAddress, WeiPerRad);
 
         const systemBadDebtBefore = await bookKeeper.systemBadDebt(DeployerAddress);
         expect(systemBadDebtBefore).to.be.equal(WeiPerRad);
@@ -1578,7 +1438,7 @@ describe("BookKeeper", () => {
         expect(totalStablecoinIssuedBefore).to.be.equal(WeiPerRad);
 
         // settle system bad debt 1 rad
-        await bookKeeper.settleSystemBadDebt(WeiPerRad, { gasLimit: 1000000 });
+        await bookKeeper.settleSystemBadDebt(WeiPerRad);
 
         const systemBadDebtAfter = await bookKeeper.systemBadDebt(DeployerAddress);
         expect(systemBadDebtAfter).to.be.equal(0);
@@ -1597,7 +1457,7 @@ describe("BookKeeper", () => {
       it("should revert", async () => {
         mockedAccessControlConfig.hasRole.returns(false);
 
-        await expect(bookKeeperAsAlice.accrueStabilityFee(COLLATERAL_POOL_ID, DeployerAddress, WeiPerRay, { gasLimit: 1000000 })).to.be.revertedWith(
+        await expect(bookKeeperAsAlice.accrueStabilityFee(COLLATERAL_POOL_ID, DeployerAddress, WeiPerRay)).to.be.revertedWith(
           "!stabilityFeeCollectorRole"
         );
       });
@@ -1609,9 +1469,7 @@ describe("BookKeeper", () => {
 
           await bookKeeper.cage();
 
-          await expect(bookKeeper.accrueStabilityFee(COLLATERAL_POOL_ID, DeployerAddress, WeiPerRay, { gasLimit: 1000000 })).to.be.revertedWith(
-            "BookKeeper/not-live"
-          );
+          await expect(bookKeeper.accrueStabilityFee(COLLATERAL_POOL_ID, DeployerAddress, WeiPerRay)).to.be.revertedWith("BookKeeper/not-live");
         });
       });
       context("when bookkeeper is live", () => {
@@ -1634,14 +1492,12 @@ describe("BookKeeper", () => {
           });
 
           // set total debt ceiling 1 rad
-          await bookKeeper.setTotalDebtCeiling(WeiPerRad, { gasLimit: 1000000 });
+          await bookKeeper.setTotalDebtCeiling(WeiPerRad);
 
           // add collateral to 1 WNATIVE
-          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad, { gasLimit: 1000000 });
+          await bookKeeper.addCollateral(COLLATERAL_POOL_ID, DeployerAddress, WeiPerWad);
           // adjust position
-          await bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, WeiPerWad, WeiPerWad, {
-            gasLimit: 1000000,
-          });
+          await bookKeeper.adjustPosition(COLLATERAL_POOL_ID, DeployerAddress, DeployerAddress, DeployerAddress, WeiPerWad, WeiPerWad);
 
           const stablecoinDeployerBefore = await bookKeeper.stablecoin(DeployerAddress);
           expect(stablecoinDeployerBefore).to.be.equal(WeiPerRad);
@@ -1660,7 +1516,7 @@ describe("BookKeeper", () => {
             positionDebtCeiling: WeiPerRad.mul(1000000),
           });
 
-          await bookKeeper.accrueStabilityFee(COLLATERAL_POOL_ID, DeployerAddress, WeiPerRay, { gasLimit: 1000000 });
+          await bookKeeper.accrueStabilityFee(COLLATERAL_POOL_ID, DeployerAddress, WeiPerRay);
 
           const stablecoinDeployerAfter = await bookKeeper.stablecoin(DeployerAddress);
           expect(stablecoinDeployerAfter).to.be.equal(WeiPerRad.mul(2));
@@ -1688,7 +1544,7 @@ describe("BookKeeper", () => {
 
           await bookKeeper.cage();
 
-          await expect(bookKeeper.setTotalDebtCeiling(WeiPerRad, { gasLimit: 1000000 })).to.be.revertedWith("BookKeeper/not-live");
+          await expect(bookKeeper.setTotalDebtCeiling(WeiPerRad)).to.be.revertedWith("BookKeeper/not-live");
         });
       });
       context("when bookkeeper is live", () => {
@@ -1696,9 +1552,7 @@ describe("BookKeeper", () => {
           // grant role access
           mockedAccessControlConfig.hasRole.returns(true);
           // set total debt ceiling 1 rad
-          await expect(bookKeeper.setTotalDebtCeiling(WeiPerRad, { gasLimit: 1000000 }))
-            .to.emit(bookKeeper, "LogSetTotalDebtCeiling")
-            .withArgs(DeployerAddress, WeiPerRad);
+          await expect(bookKeeper.setTotalDebtCeiling(WeiPerRad)).to.emit(bookKeeper, "LogSetTotalDebtCeiling").withArgs(DeployerAddress, WeiPerRad);
         });
       });
     });

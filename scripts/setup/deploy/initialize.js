@@ -49,68 +49,68 @@ async function initialize(deployments, getChainId) {
 
   const addresses = getAddresses(chainId);
 
-  await accessControlConfig.initialize(),
-    await collateralPoolConfig.initialize(accessControlConfig.address),
-    await bookKeeper.initialize(collateralPoolConfig.address, accessControlConfig.address),
-    await fathomStablecoin.initialize("Fathom USD", "FXD"),
-    await systemDebtEngine.initialize(bookKeeper.address),
-    await liquidationEngine.initialize(bookKeeper.address, systemDebtEngine.address),
-    await stablecoinAdapter.initialize(bookKeeper.address, fathomStablecoin.address),
-    await priceOracle.initialize(bookKeeper.address),
-    await showStopper.initialize(bookKeeper.address),
-    await positionManager.initialize(bookKeeper.address, showStopper.address, priceOracle.address),
-    await fixedSpreadLiquidationStrategy.initialize(
-      bookKeeper.address,
-      priceOracle.address,
-      liquidationEngine.address,
-      systemDebtEngine.address,
-      stablecoinAdapter.address
-    ),
-    await stabilityFeeCollector.initialize(bookKeeper.address, systemDebtEngine.address),
-    await proxyActionsStorage.initialize(fathomStablecoinProxyActions.address, bookKeeper.address),
-    await proxyWalletFactory.initialize(proxyActionsStorage.address, proxyWalletRegistry.address),
-    await proxyWalletRegistry.initialize(proxyWalletFactory.address, bookKeeper.address),
-    await proxyWalletRegistry.setDecentralizedMode(true),
-    await flashMintModule.initialize(stablecoinAdapter.address, systemDebtEngine.address),
-    // To be sunsetted on xdc mainnet, then to be deprecated
-    // await stableSwapModule.initialize(
-    //     bookKeeper.address,
-    //     addresses.USDSTABLE,
-    //     fathomStablecoin.address,
-    //     dailyLimitNumerator,
-    //     singleSwapLimitNumerator,
-    //     numberOfSwapsLimitPerUser,
-    //     blocksPerLimit,
-    //     { gasLimit: 1000000 }
-    // ),
-    // await flashMintArbitrager.initialize({ gasLimit: 1000000 }),
-    // await bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
-    // await dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
-    await collateralTokenAdapter.initialize(bookKeeper.address, pools.NATIVE, addresses.WNATIVE, proxyWalletFactory.address),
-    // await delayFathomOraclePriceFeed.initialize(
-    //     dexPriceOracle.address,
-    //     addresses.WNATIVE,
-    //     addresses.USD,
-    //     accessControlConfig.address,
-    //     pools.NATIVE
-    // ),
-    await adminControls.initialize(
-      bookKeeper.address,
-      liquidationEngine.address,
-      priceOracle.address,
-      positionManager.address,
-      systemDebtEngine.address,
-      flashMintModule.address,
-      stablecoinAdapter.address
-    ),
-    await centralizedOraclePriceFeed.initialize(fathomPriceOracle.address, accessControlConfig.address, pools.NATIVE),
-    // FathomPriceOracle is not initialized in this script because it needs to be initialized only when the NATIVE coin's price aggregator is ready
-    // await fathomPriceOracle.initialize(accessControlConfig.address, NATIVECOIN_s_AGGREGATOR),
-    // To be sunsetted on xdc mainnet, then to be deprecated
-    // await stableSwapModuleWrapper.initialize(
-    //     bookKeeper.address,
-    //     stableSwapModule.address),
-    await simplePriceFeed.initialize(accessControlConfig.address);
+  await accessControlConfig.initialize();
+  await collateralPoolConfig.initialize(accessControlConfig.address);
+  await bookKeeper.initialize(collateralPoolConfig.address, accessControlConfig.address);
+  await fathomStablecoin.initialize("Fathom USD", "FXD");
+  await systemDebtEngine.initialize(bookKeeper.address);
+  await liquidationEngine.initialize(bookKeeper.address, systemDebtEngine.address);
+  await stablecoinAdapter.initialize(bookKeeper.address, fathomStablecoin.address);
+  await priceOracle.initialize(bookKeeper.address);
+  await showStopper.initialize(bookKeeper.address);
+  await positionManager.initialize(bookKeeper.address, showStopper.address, priceOracle.address);
+  await fixedSpreadLiquidationStrategy.initialize(
+    bookKeeper.address,
+    priceOracle.address,
+    liquidationEngine.address,
+    systemDebtEngine.address,
+    stablecoinAdapter.address
+  );
+  await stabilityFeeCollector.initialize(bookKeeper.address, systemDebtEngine.address);
+  await proxyActionsStorage.initialize(fathomStablecoinProxyActions.address, bookKeeper.address);
+  await proxyWalletFactory.initialize(proxyActionsStorage.address, proxyWalletRegistry.address);
+  await proxyWalletRegistry.initialize(proxyWalletFactory.address, bookKeeper.address);
+  await proxyWalletRegistry.setDecentralizedMode(true);
+  await flashMintModule.initialize(stablecoinAdapter.address, systemDebtEngine.address);
+  // To be sunsetted on xdc mainnet, then to be deprecated
+  // await stableSwapModule.initialize(
+  //     bookKeeper.address,
+  //     addresses.USDSTABLE,
+  //     fathomStablecoin.address,
+  //     dailyLimitNumerator,
+  //     singleSwapLimitNumerator,
+  //     numberOfSwapsLimitPerUser,
+  //     blocksPerLimit,
+  //     { gasLimit: 1000000 }
+  // ),
+  // await flashMintArbitrager.initialize({ gasLimit: 1000000 }),
+  // await bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
+  // await dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
+  await collateralTokenAdapter.initialize(bookKeeper.address, pools.NATIVE, addresses.WNATIVE, proxyWalletFactory.address);
+  // await delayFathomOraclePriceFeed.initialize(
+  //     dexPriceOracle.address,
+  //     addresses.WNATIVE,
+  //     addresses.USD,
+  //     accessControlConfig.address,
+  //     pools.NATIVE
+  // ),
+  await adminControls.initialize(
+    bookKeeper.address,
+    liquidationEngine.address,
+    priceOracle.address,
+    positionManager.address,
+    systemDebtEngine.address,
+    flashMintModule.address,
+    stablecoinAdapter.address
+  );
+  await centralizedOraclePriceFeed.initialize(fathomPriceOracle.address, accessControlConfig.address, pools.NATIVE);
+  // FathomPriceOracle is not initialized in this script because it needs to be initialized only when the NATIVE coin's price aggregator is ready
+  // await fathomPriceOracle.initialize(accessControlConfig.address, NATIVECOIN_s_AGGREGATOR),
+  // To be sunsetted on xdc mainnet, then to be deprecated
+  // await stableSwapModuleWrapper.initialize(
+  //     bookKeeper.address,
+  //     stableSwapModule.address),
+  await simplePriceFeed.initialize(accessControlConfig.address);
   // await slidingWindowDexOracle.initialize(addresses.DEXFactory, 1800, 15);
 
   const newAddresses = {

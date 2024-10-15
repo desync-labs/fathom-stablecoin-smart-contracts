@@ -23,9 +23,9 @@ async function initialize(getChainId) {
     centralizedOraclePriceFeed: centralizedOraclePriceFeed.address,
   };
 
-  await collateralTokenAdapter.initialize(bookKeeper.address, poolId, config.tokenAddress, proxyWalletFactory.address),
-    // await fathomPriceOracle.initialize(accessControlConfig.address, config.fathomOracle),
-    await centralizedOraclePriceFeed.initialize(fathomPriceOracle.address, accessControlConfig.address, poolId),
-    fs.writeFileSync(`./addresses_${token}.json`, JSON.stringify(newAddresses));
+  await collateralTokenAdapter.initialize(bookKeeper.address, poolId, config.tokenAddress, proxyWalletFactory.address);
+  // await fathomPriceOracle.initialize(accessControlConfig.address, config.fathomOracle),
+  await centralizedOraclePriceFeed.initialize(fathomPriceOracle.address, accessControlConfig.address, poolId);
+  fs.writeFileSync(`./addresses_${token}.json`, JSON.stringify(newAddresses));
 }
 module.exports = { initialize };

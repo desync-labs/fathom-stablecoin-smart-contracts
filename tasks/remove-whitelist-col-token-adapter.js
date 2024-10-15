@@ -11,7 +11,7 @@ task("remove-whitelist-col-token-adapter", "Remove Whitelist CollateralTokenAdap
     console.log(`removeFromWhitelist to \: ${collateralTokenAdapter.address}`);
 
     for (let I = 0; I < config.ToBeRemoved_CollateralTokenAdapter.length; I++) {
-      await collateralTokenAdapter.removeFromWhitelist(config.ToBeRemoved_CollateralTokenAdapter[I], { gasLimit: 2000000 });
+      await collateralTokenAdapter.removeFromWhitelist(config.ToBeRemoved_CollateralTokenAdapter[I]);
       console.log(`Removed from WL: ${config.ToBeRemoved_CollateralTokenAdapter[I]}`);
     }
 

@@ -66,8 +66,7 @@ describe("LiquidationEngine", () => {
             WeiPerWad,
             WeiPerWad,
             DeployerAddress,
-            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress]),
-            { gasLimit: 1000000 }
+            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress])
           )
         ).to.be.revertedWith("LiquidationEngine/liquidator-not-whitelisted");
       });
@@ -84,8 +83,7 @@ describe("LiquidationEngine", () => {
             WeiPerWad,
             WeiPerWad,
             DeployerAddress,
-            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress]),
-            { gasLimit: 1000000 }
+            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress])
           )
         ).to.be.revertedWith("LiquidationEngine/liquidator-not-whitelisted");
       });
@@ -103,8 +101,7 @@ describe("LiquidationEngine", () => {
             WeiPerWad,
             WeiPerWad,
             DeployerAddress,
-            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress]),
-            { gasLimit: 1000000 }
+            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress])
           )
         ).to.be.revertedWith("LiquidationEngine/not-live");
       });
@@ -118,8 +115,7 @@ describe("LiquidationEngine", () => {
             0,
             0,
             DeployerAddress,
-            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress]),
-            { gasLimit: 1000000 }
+            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress])
           )
         ).to.be.revertedWith("LiquidationEngine/zero-debt-value-to-be-liquidated");
       });
@@ -138,8 +134,7 @@ describe("LiquidationEngine", () => {
             WeiPerWad,
             WeiPerWad,
             DeployerAddress,
-            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress]),
-            { gasLimit: 1000000 }
+            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress])
           )
         ).to.be.revertedWith("LiquidationEngine/not-set-strategy");
       });
@@ -159,8 +154,7 @@ describe("LiquidationEngine", () => {
             WeiPerWad,
             WeiPerWad,
             DeployerAddress,
-            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress]),
-            { gasLimit: 1000000 }
+            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress])
           )
         ).to.be.revertedWith("LiquidationEngine/price-is-not-healthy");
       });
@@ -267,8 +261,7 @@ describe("LiquidationEngine", () => {
             WeiPerWad,
             WeiPerWad,
             DeployerAddress,
-            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress]),
-            { gasLimit: 1000000 }
+            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress])
           )
         ).to.be.revertedWith("Pausable: paused");
       });
@@ -341,8 +334,7 @@ describe("LiquidationEngine", () => {
             WeiPerWad,
             WeiPerWad,
             DeployerAddress,
-            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress]),
-            { gasLimit: 1000000 }
+            ethers.utils.defaultAbiCoder.encode(["address", "address"], [DeployerAddress, DeployerAddress])
           )
         ).to.be.revertedWith("LiquidationEngine/debt-not-liquidated");
       });

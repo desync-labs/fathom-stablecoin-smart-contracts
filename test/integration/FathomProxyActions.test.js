@@ -122,7 +122,7 @@ describe("Position Closure without collateral withdrawal", () => {
     });
     context("try reentry with ReentrancyAttacker2", () => {
       it("should fail", async () => {
-        await simplePriceFeed.setPrice(WeiPerRay, { gasLimit: 1000000 });
+        await simplePriceFeed.setPrice(WeiPerRay);
 
         // position 1
         //  a. open a new position

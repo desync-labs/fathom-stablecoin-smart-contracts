@@ -65,7 +65,7 @@ describe("StabilityFeeCollector", () => {
           .returns();
 
         // Execute the function
-        await stabilityFeeCollectorAsAlice.collect(formatBytes32String("WNATIVE"), { gasLimit: 2000000 });
+        await stabilityFeeCollectorAsAlice.collect(formatBytes32String("WNATIVE"));
 
         // Verify if the mocked function was called with the expected arguments
         // Waffle automatically checks this based on the expectations set earlier
@@ -182,7 +182,7 @@ describe("StabilityFeeCollector", () => {
         mockedCollateralPoolConfig.getDebtAccumulatedRate.returns(UnitHelpers.WeiPerRay);
         mockedBookKeeper.accrueStabilityFee.returns();
 
-        await stabilityFeeCollector.collect(formatBytes32String("WNATIVE"), { gasLimit: 2000000 });
+        await stabilityFeeCollector.collect(formatBytes32String("WNATIVE"));
       });
     });
   });

@@ -48,12 +48,12 @@ async function deployMocksPostDeployment(getNamedAccounts, deployments, getChain
     addresses.WNATIVE,
     positionManager.address,
     proxyWalletFactory.address
-  ),
-    await deploy("MockVault", {
-      from: deployer,
-      args: [pools.WNATIVE, addresses.WNATIVE, MockCollateralTokenAdapter.address],
-      log: true,
-    });
+  );
+  await deploy("MockVault", {
+    from: deployer,
+    args: [pools.WNATIVE, addresses.WNATIVE, MockCollateralTokenAdapter.address],
+    log: true,
+  });
 
   const MockVault = await deployments.get("MockVault");
   //giving ADAPTER_ROLE to MockCollateralTokenAdapter

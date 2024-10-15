@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require("fs");
 const path = require("path");
 
 const externalFeeCollectionPath = path.resolve(__dirname, "..", "op-config", "feeCollection.json");
@@ -11,9 +11,9 @@ try {
   config = {};
 }
 
-function getConfig(chainId)  {
-    let chainConfig = config[chainId];
-    return chainConfig;
+function getConfig(chainId) {
+  let chainConfig = config[chainId];
+  return chainConfig;
 }
 
-module.exports = { getConfig }
+module.exports = { getConfig };
