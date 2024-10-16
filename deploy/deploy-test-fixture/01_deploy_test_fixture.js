@@ -31,11 +31,11 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   await deployMocks(getNamedAccounts, deployments, getChainId);
   await deployContracts(getNamedAccounts, deployments);
   await deployProxies(deployments);
-  await initialize(deployments, getChainId);
+  await initialize(deployments, getChainId, true);
   await addRoles(deployments);
   await configureFees(deployments);
   await configureShowStopper(deployments);
-  await deployVault(getNamedAccounts, deployments, getChainId);
+  await deployVault(getNamedAccounts, deployments, getChainId, true);
   await initCollateralTokenAdapter(deployments);
   await configFlashLending(deployments);
 
@@ -56,13 +56,13 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   // Add collateral
   await deploy(getNamedAccounts, deployments);
-  await deployProxiesAddCollateral(deployments, getChainId);
-  await initializeAddCollateral(getChainId);
-  await addRolesAddCollateral(getChainId);
-  await deployVaultAddCollateral(getNamedAccounts, deployments, getChainId);
+  await deployProxiesAddCollateral(deployments, getChainId, true);
+  await initializeAddCollateral(getChainId, true);
+  await addRolesAddCollateral(getChainId, true);
+  await deployVaultAddCollateral(getNamedAccounts, deployments, getChainId, true);
 
   // Configuration
-  await addCollateralConfigPool(getChainId);
+  await addCollateralConfigPool(deployments, getChainId);
 };
 
 module.exports.tags = ["DeployTestFixture"];

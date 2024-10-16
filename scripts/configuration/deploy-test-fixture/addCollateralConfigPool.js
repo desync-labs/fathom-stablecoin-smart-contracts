@@ -15,12 +15,12 @@ const STABILITY_FEE = BigNumber.from("1000000000627937192491029811");
 const DEBT_CEILING = WeiPerRad.mul(10000000).div(2);
 
 const { getConfig, getProxyId, poolId } = require("../../../common/add-collateral-helper");
-
-async function addCollateralConfigPool(getChainId) {
+async function addCollateralConfigPool(deployments, getChainId) {
   const chainId = await getChainId();
   const config = getConfig(chainId);
 
-  const proxyFactory = await ethers.getContractAt("FathomProxyFactory", config.fathomProxyFactory);
+  const ProxyFactory = await deployments.get("FathomProxyFactory");
+  const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
 
   const collateralTokenAdapter = await getProxyById(proxyFactory, "CollateralTokenAdapter", getProxyId("CollateralTokenAdapter"));
   const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");

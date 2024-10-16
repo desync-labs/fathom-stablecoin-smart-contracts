@@ -6,7 +6,6 @@ async function deployMocksPostDeployment(getNamedAccounts, deployments, getChain
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   const chainId = await getChainId();
-
   const addresses = getAddresses(chainId);
   const ProxyFactory = await deployments.get("FathomProxyFactory");
   const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
@@ -42,16 +41,17 @@ async function deployMocksPostDeployment(getNamedAccounts, deployments, getChain
   const MockCollateralTokenAdapter = await deployments.get("MockCollateralTokenAdapter");
   const mockCollateralTokenAdapter = await ethers.getContractAt("MockCollateralTokenAdapter", MockCollateralTokenAdapter.address);
 
+  const WNATIVE = await deployments.get("WNATIVE");
   await mockCollateralTokenAdapter.initialize(
     bookKeeper.address,
     pools.WNATIVE,
-    addresses.WNATIVE,
+    WNATIVE.address,
     positionManager.address,
     proxyWalletFactory.address
   );
   await deploy("MockVault", {
     from: deployer,
-    args: [pools.WNATIVE, addresses.WNATIVE, MockCollateralTokenAdapter.address],
+    args: [pools.WNATIVE, WNATIVE.address, MockCollateralTokenAdapter.address],
     log: true,
   });
 

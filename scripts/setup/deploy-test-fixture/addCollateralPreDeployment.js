@@ -44,9 +44,12 @@ async function addCollateralPreDeployment(getNamedAccounts, deployments, getChai
   const ERC20 = await deployments.get("ERC20");
   const TestOracleMock = await deployments.get("TestOracleMock");
 
+  const ProxyFactory = await deployments.get("FathomProxyFactory");
+  const ProxyAdmin = await deployments.get("FathomProxyAdmin");
+
   const chainId = await getChainId();
-  addCollateral[chainId].fathomProxyFactory = addresses.proxyFactory;
-  addCollateral[chainId].fathomProxyAdmin = addresses.proxyAdmin;
+  addCollateral[chainId].fathomProxyFactory = ProxyFactory.address;
+  addCollateral[chainId].fathomProxyAdmin = ProxyAdmin.address;
   addCollateral[chainId].testOracle = TestOracleMock.address;
   addCollateral[chainId].tokenAddress = ERC20.address;
 

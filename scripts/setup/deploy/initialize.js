@@ -5,7 +5,7 @@ const pools = require("../../../common/collateral");
 const { getAddresses } = require("../../../common/addresses");
 const { getProxy } = require("../../../common/proxies");
 
-async function initialize(deployments, getChainId) {
+async function initialize(deployments, getChainId, forFixture = false) {
   const chainId = await getChainId();
 
   const FathomStablecoinProxyActions = await deployments.get("FathomStablecoinProxyActions");
@@ -86,7 +86,14 @@ async function initialize(deployments, getChainId) {
   // await flashMintArbitrager.initialize({ gasLimit: 1000000 }),
   // await bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address, { gasLimit: 1000000 }),
   // await dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
-  await collateralTokenAdapter.initialize(bookKeeper.address, pools.NATIVE, addresses.WNATIVE, proxyWalletFactory.address);
+  let wnativeAddress;
+  if (forFixture) {
+    const WNATIVE = await deployments.get("WNATIVE");
+    wnativeAddress = WNATIVE.address;
+  } else {
+    wnativeAddress = addresses.WNATIVE;
+  }
+  await collateralTokenAdapter.initialize(bookKeeper.address, pools.NATIVE, wnativeAddress, proxyWalletFactory.address);
   // await delayFathomOraclePriceFeed.initialize(
   //     dexPriceOracle.address,
   //     addresses.WNATIVE,

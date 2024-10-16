@@ -3,7 +3,7 @@ const { getAddresses } = require("../../../common/addresses");
 const { getProxy } = require("../../../common/proxies");
 const pools = require("../../../common/collateral");
 
-async function deployVault(getNamedAccounts, deployments, getChainId) {
+async function deployVault(getNamedAccounts, deployments, getChainId, forFixture = false) {
   const chainId = await getChainId();
   const addresses = getAddresses(chainId);
   const { deploy } = deployments;
@@ -13,10 +13,16 @@ async function deployVault(getNamedAccounts, deployments, getChainId) {
   const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
 
   const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
-
+  let wnativeAddress;
+  if (forFixture) {
+    const WNATIVE = await deployments.get("WNATIVE");
+    wnativeAddress = WNATIVE.address;
+  } else {
+    wnativeAddress = addresses.WNATIVE;
+  }
   await deploy("Vault", {
     from: deployer,
-    args: [pools.NATIVE, addresses.WNATIVE, collateralTokenAdapter.address],
+    args: [pools.NATIVE, wnativeAddress, collateralTokenAdapter.address],
     log: true,
   });
 }

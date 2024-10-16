@@ -2,11 +2,11 @@ const { ethers } = require("hardhat");
 const { getProxy, getProxyById } = require("../../../common/proxies");
 const { getConfig, getProxyId } = require("../../../common/add-collateral-helper");
 
-async function addRoles(getChainId) {
+async function addRoles(getChainId, forFixture = false) {
   const chainId = await getChainId();
   const config = getConfig(chainId);
-
-  const proxyFactory = await ethers.getContractAt("FathomProxyFactory", config.fathomProxyFactory);
+  const ProxyFactory = await deployments.get("FathomProxyFactory");
+  const proxyFactory = await ethers.getContractAt("FathomProxyFactory", forFixture ? ProxyFactory.address : config.fathomProxyFactory);
 
   // TODO: Check why like this????
   const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
