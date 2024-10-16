@@ -18,19 +18,22 @@ Various mechanisms, including price oracles, Stable Swap, and a risk management 
 
 The smart contracts are written in [Solidity](https://github.com/ethereum/solidity) and tested/deployed using [Hardhat](https://hardhat.org/).
 
-
 ### Install nodejs:
+
 ```bash
 $ sudo apt install nodejs
 ```
+
 ### Install npm:
+
 ```bash
 $ sudo apt install npm
 ```
 
 ## Running tests
 
-### 0) After cloning the repo,  install dependencies
+### 0) After cloning the repo, install dependencies
+
 ```bash
 $ npm i
 ```
@@ -41,15 +44,45 @@ $ npm i
 $ echo -n SEED_PHRASE=12_WORD_MNEMONIC > .env
 ```
 
-### 3) Create externalAddresses.json file in root
+### 2) Create externalAddresses.json file in root
 
-The chainId 1337 addresses are required to execute the test scripts on Ganache. Checksummed addresses must be included in the externalAddresses.json file as placeholder addresses for test execution. Use the content provided below for the externalAddresses.json file to run the test scripts.
+The chainId 31337 WNATIVE address is required to execute the test scripts on built-in Hardhat Network. Zero addresses must be included in the externalAddresses.json file as placeholder addresses for test execution. Use the content provided below for the externalAddresses.json file to run the test scripts.
 
 ```JSON
 {
-  "1337": {
-    "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
-  }
+  "51": { "WNATIVE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f" },
+  "17000": { "WNATIVE": "0x94373a4919B3240D86eA41593D5eBa789FEF3848" },
+  "31337": { "WNATIVE": "0x0000000000000000000000000000000000000000" }
+}
+
+```
+
+### 3) Create add-collateral.json file in root
+
+```JSON
+{
+  "50": {
+    "tokenAddress": "0x8f9920283470f52128bf11b0c14e798be704fd15",
+    "testOracle": "0x0000000000000000000000000000000000000000",
+    "fathomProxyFactory": "0x0acf88Ba60561372Ef93a67E04e1A55d9fC1D910",
+    "fathomProxyAdmin": "0xb82AD475fc113671840D510B60Cbae5630a07f3B",
+    "fixedSpreadLiquidationStrategy": "0xfe5037504E0EF5eC2DfBEEA03f9d9cB43580EF23"
+  },
+  "51": {
+    "tokenAddress": "0x97EC6730Fd5F138fCB167cb62A9a4c1A8Be2eD7d",
+    "testOracle": "0x0000000000000000000000000000000000000000",
+    "fathomProxyFactory": "0xf62f41d00EAaf02fD31FA24C5630C9AcfEf8D69F",
+    "fathomProxyAdmin": "0x6B33e88ec42291Bf82C9E7CE7f45DdC3464897bf",
+    "fixedSpreadLiquidationStrategy": "0x4bEb8638AFe2892Fa7D46303F60f22e106C9AB7B"
+  },
+  "31337": {
+    "tokenAddress": "0x0000000000000000000000000000000000000000",
+    "testOracle": "0x0000000000000000000000000000000000000000",
+    "fathomProxyFactory": "0x0000000000000000000000000000000000000000",
+    "fathomProxyAdmin": "0x0000000000000000000000000000000000000000",
+    "fixedSpreadLiquidationStrategy": "0x0000000000000000000000000000000000000000"
+  },
+  "token": "GLD"
 }
 
 ```
@@ -57,7 +90,7 @@ The chainId 1337 addresses are required to execute the test scripts on Ganache. 
 ### 4) Run commands to run tests in root
 
 ```bash
-$ coralX test
+$ npm run test
 ```
 
 The contracts will compile, be deployed, and then the test scripts will run.
@@ -65,71 +98,64 @@ The contracts will compile, be deployed, and then the test scripts will run.
 To run a specific test script instead of running the the whole tests, run as below. For example, to run PositionPermissions.test.js
 
 ```bash
-$ coralX test --path integration/PositionPermissions.test.js
+$ npx hardhat test test/integration/AdminControls.test.js
 ```
-
-You might face some tests failing with 'out of gas' error. 
 
 ## Deployment
 
 The current codebase is structured so that the same set of smart contracts will be deployed, regardless of the target blockchain. By default, the protocol's price feed after deployment is set to `SimplePriceFeed`, a mock price feed that allows the protocol's deployer (owner) to freely modify prices. This default setting is based on the consideration that other price feeds for commercial use require external addresses or even price-related bots for successful deployment. Consequently, the adjusted deployment/migration script will deploy `CentralizedOraclePriceFeed`, 'FathomPriceOracle' using proxy patterns, but only CentralizedOraclePriceFeed will be initialize. Documentation regarding price feed changes will be included in this markdown document following the deployment section.
 
-### On Ganache
+### On built-in Hardhat network, Chain id: 31337
 
-#### 0) Run ganache with predefined accounts:
-```bash
-$ ganache-cli -m MNEMONIC --gasLimit 12500000 -v -e 100000000
-```
-
-### 1) Create file called "privateKey" in the root directory (copy the privateKey of the first account of ganache):
+### 0) Create SEED_PHRASE environment variable:
 
 ```bash
-$ echo -n PRIVATE_KEY_WITHOUT_0x_PREFIX > privateKey
+$ echo -n SEED_PHRASE=12_WORD_MNEMONIC > .env
 ```
 
-#### 2) Create externalAddresses.json in root directory. 
+#### 1) Create externalAddresses.json in root directory.
 
-The format of the content can be same as in the Running test sections. Like below
+The format of the content should differ from the one in the Running test sections, with the difference being that we can't use zero address for WNATIVE on chain 31337
 WNATIVE address will be the collateralToken address for the initial collateral NAITVE coin of the network that you deploy fathomStablecoin to.
 
 ```JSON
 {
-  "1337": {
-    "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714"
-  }
+  "51": { "WNATIVE": "0x82b4334F5CD8385f55969BAE0A863a0C6eA9F63f" },
+  "17000": { "WNATIVE": "0x94373a4919B3240D86eA41593D5eBa789FEF3848" },
+  "31337": { "WNATIVE": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714" }
 }
 
 ```
 
-If you want to see the protocol in action by depositing test ETH and borrowing FXD, I recommend that you first deploy WNATIVE||WETH on Ganache. After that, update the WNATIVE address in the externalAddresses.json file with the address of the WNATIVE you deployed.
+If you want to see the protocol in action by depositing test ETH and borrowing FXD, I recommend that you first deploy WNATIVE||WETH on Hardhat Network. After that, update the WNATIVE address in the externalAddresses.json file with the address of the WNATIVE you deployed.
 
-#### 3) Compile contracts
+#### 2) Compile contracts
 
 ```bash
-$ coralX compile
+$ npm run compile
 ```
 
 make sure that the contracts compile before deployment
 
-#### 4) Deploy with below command
+#### 3) Deploy with below command
 
 ```bash
-$ coralX scenario --run deployLocal
+$ npm run deploy-local
 ```
 
-#### 5) Check contract addresses in addresses.json file in root
+#### 4) Check contract addresses in addresses.json file in root
 
 After deployment, addresses.json gets updated with addresses of proxies.
 
 ### On apothem (NATIVE Testnet)
 
-#### 1) Create file called "privateKey" in the root directory (PRIVATE_KEY_WITHOUT_0x_PREFIX of the EOA that you would like to deploy contracts from):
+#### 0) Create SEED_PHRASE environment variable (12 word phrase of the wallet that holds the EOA that you would like to deploy contracts from):
 
 ```bash
-$ echo -n PRIVATE_KEY_WITHOUT_0x_PREFIX > privateKey
+$ echo -n SEED_PHRASE=12_WORD_MNEMONIC > .env
 ```
 
-#### 2) Create externalAddresses.json in root directory.:
+#### 1) Create externalAddresses.json in root directory.:
 
 ChainID of apothem is 51. Therefore, the externalAddresses.json need to have the sets of addresses having 51 as key. For example, like below.
 
@@ -143,35 +169,35 @@ ChainID of apothem is 51. Therefore, the externalAddresses.json need to have the
 
 The WNATIVE address above is officially deployed on the Apothem network. Therefore, I recommend using this address unless you have already deployed or are willing to deploy a new WNATIVE address for your testing purposes.
 
-#### 4) Compile contracts
+#### 2) Compile contracts
 
 ```bash
-$ coralX compile
+$ npm run compile
 ```
 
 make sure that the contracts compile before deployment
 
-#### 5) Deploy with below command
+#### 3) Deploy with below command
 
 ```bash
-$ coralX scenario --run deployApothem
+$ npm run deploy-apothem
 ```
 
-#### 6) Check contract addresses in addresses.json file in root
+#### 4) Check contract addresses in addresses.json file in root
 
 After deployment, addresses.json gets updated with addresses of proxies.
 
-### On NATIVE mainnet (chainID 50)
+### On NATIVE (XDC) mainnet (chainID 50)
 
-#### 1) Create file called "privateKey" in the root directory (PRIVATE_KEY_WITHOUT_0x_PREFIX of the EOA that you would like to deploy contracts from):
+#### 0) Create SEED_PHRASE environment variable (12 word phrase of the wallet that holds the EOA that you would like to deploy contracts from):
 
 ```bash
-$ echo -n PRIVATE_KEY_WITHOUT_0x_PREFIX > privateKey
+$ echo -n SEED_PHRASE=12_WORD_MNEMONIC > .env
 ```
 
 #### 2) Create externalAddresses.json in root directory.:
 
-ChainID of NATIVE mainnet is 50. Therefore, the externalAddresses.json need to have the sets of addresses having 51 as key. For example, like below.
+ChainID of NATIVE mainnet is 50. Therefore, the externalAddresses.json need to have the sets of addresses having 50 as key. For example, like below.
 
 ```JSON
 {
@@ -186,7 +212,7 @@ WNATIVE is recommended to have the official WNATIVE address unless you would lik
 #### 4) Compile contracts
 
 ```bash
-$ coralX compile
+$ npm run compile
 ```
 
 make sure that the contracts compile before deployment
@@ -194,7 +220,7 @@ make sure that the contracts compile before deployment
 #### 5) Deploy with below command
 
 ```bash
-$ coralX scenario --run deployMainnet
+$ npm run deploy-xdc
 ```
 
 #### 6) Check contract addresses in addresses.json file in root
@@ -204,6 +230,7 @@ After deployment, addresses.json gets updated with addresses of proxies.
 # PriceFeed
 
 ## How to use SimplePriceFeed
+
 The default configuration for deployment specifies that SimplePriceFeed acts as the price feed for NATIVE collateral. To alter the price of the collateral, you must first establish the price within SimplePriceFeed and then set the Loan-to-Value (LTV) discounted price in the protocol via the PriceOracle contract.
 
 ```Solidity=
@@ -212,16 +239,18 @@ The default configuration for deployment specifies that SimplePriceFeed acts as 
 function setPrice(uint256 _price) external onlyOwner {}
 
 ```
-You can establish the collateral price using the setPrice function mentioned above. To set the price of NATIVE to 2 USD, call the setPrice function with an argument of 2*10^18.
+
+You can establish the collateral price using the setPrice function mentioned above. To set the price of NATIVE to 2 USD, call the setPrice function with an argument of 2\*10^18.
 
 Once the price is set in SimplePriceFeed, it is necessary to input the LTV discounted price into the protocol. This can be accomplished by calling the function provided below.
 
 ```Solidity=
 //In PriceOracle contract
-    
+
     function setPrice(bytes32 _collateralPoolId) external override {}
 
 ```
+
 The setPrice function of the PriceOracle should be called with an argument, which is the collateralPoolId. This is a padded bytes32 value converted from the string 'NATIVE'.
 
 0x4e41544956452000000000000000000000000000000000000000000000000000
@@ -253,16 +282,18 @@ Line 5~6 verifies the solvency of the new priceFeed. New priceFeed must have poo
 
 `CentralizedOraclePriceFeed`
 
-can be initialized with script below
+can be initialized with task below
 
 ```
-scripts/migrations/priceFeed/1_setFathomPriceOracle.js
-````
+tasks/switch-price-feed.js
+```
+
 #### To run the script for the price feed, ensure that the build files remain unchanged since deployment.
 
 The default is set as CentralizedOraclePriceFeed
 
 ### Please prepare setFathomPriceOracle.json file in the root. The file looks like below
+
 ```JSON=
 {
 "51":
@@ -271,7 +302,7 @@ The default is set as CentralizedOraclePriceFeed
     "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
     "CollateralSymbol":"CGO",
 },
-"1337":
+"31337":
 {
     "PriceAggregator":"0x0000000000000000000000000000000000000000",
     "SubscriptionsRegistry":"0x0000000000000000000000000000000000000000",
@@ -289,5 +320,5 @@ The default is set as CentralizedOraclePriceFeed
 #### Run the init script with below command
 
 ```bash
-$ coralX execute --path scripts/migrations/priceFeed/1_setFathomPriceOracle.js --network anyConfiguredNetwork
+$ npx hardhat switch-price-feed
 ```

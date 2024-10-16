@@ -18,7 +18,7 @@ describe("CollateralTokenAdapter", () => {
     DeployerAddress = deployer;
     AliceAddress = allice;
     BobAddress = bob;
-    
+
     const ProxyFactory = await deployments.get("FathomProxyFactory");
     const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
     collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");

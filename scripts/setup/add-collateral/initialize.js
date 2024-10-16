@@ -26,12 +26,7 @@ async function initialize(getChainId, forFixture = false) {
   };
 
   const ERC20 = await deployments.get("ERC20");
-  await collateralTokenAdapter.initialize(
-    bookKeeper.address,
-    poolId,
-    forFixture ? ERC20.address : config.tokenAddress,
-    proxyWalletFactory.address
-  );
+  await collateralTokenAdapter.initialize(bookKeeper.address, poolId, forFixture ? ERC20.address : config.tokenAddress, proxyWalletFactory.address);
   // await fathomPriceOracle.initialize(accessControlConfig.address, config.fathomOracle),
   await centralizedOraclePriceFeed.initialize(fathomPriceOracle.address, accessControlConfig.address, poolId);
   fs.writeFileSync(`./addresses_${token}.json`, JSON.stringify(newAddresses));

@@ -7,6 +7,7 @@ try {
   const rawdata = fs.readFileSync(externalAddressesPath, "utf8");
   addresses = JSON.parse(rawdata);
 } catch (error) {
+  console.log("lurac");
   console.error(`Error reading or parsing externalAddresses.json: ${error.message}`);
   addresses = {};
 }
