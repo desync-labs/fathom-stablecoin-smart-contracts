@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { ITestOracleOracle } from "../../main/apis/interfaces/ITestOracleOracle.sol";
+import "../../main/apis/interfaces/ITestOracleOracle.sol";
 
 contract TestOracleMock is ITestOracleOracle {
     uint256 public price;

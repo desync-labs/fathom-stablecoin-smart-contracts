@@ -1,19 +1,18 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import { AddressUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import { IToken } from "../interfaces/IToken.sol";
-import { IStablecoinAdapter } from "../interfaces/IStablecoinAdapter.sol";
-import { IStablecoin } from "../interfaces/IStablecoin.sol";
-import { IBookKeeper } from "../interfaces/IBookKeeper.sol";
-import { IStableSwapModule } from "../interfaces/IStableSwapModule.sol";
-import { SafeToken } from "../utils/SafeToken.sol";
-import { IStableSwapModuleWrapper } from "../interfaces/IStableSwapModuleWrapper.sol";
-import { IStableSwapRetriever } from "../interfaces/IStableSwapRetriever.sol";
-import { IAccessControlConfig } from "../interfaces/IAccessControlConfig.sol";
+import "../interfaces/IToken.sol";
+import "../interfaces/IStablecoinAdapter.sol";
+import "../interfaces/IStablecoin.sol";
+import "../interfaces/IBookKeeper.sol";
+import "../interfaces/IStableSwapModule.sol";
+import "../utils/SafeToken.sol";
+import "../interfaces/IStableSwapModuleWrapper.sol";
+import "../interfaces/IStableSwapRetriever.sol";
+
 contract StableSwapModuleWrapper is PausableUpgradeable, ReentrancyGuardUpgradeable, IStableSwapModuleWrapper {
     using SafeToken for address;
     uint256 internal constant WAD = 10 ** 18;

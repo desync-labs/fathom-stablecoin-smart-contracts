@@ -2,24 +2,23 @@
 
 pragma solidity 0.8.17;
 
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import { IBookKeeper } from "../../main/interfaces/IBookKeeper.sol";
-import { ISystemDebtEngine } from "../../main/interfaces/ISystemDebtEngine.sol";
-import { ILiquidationEngine } from "../../main/interfaces/ILiquidationEngine.sol";
-import { ILiquidationStrategy } from "../../main/interfaces/ILiquidationStrategy.sol";
-import { ICagable } from "../../main/interfaces/ICagable.sol";
-import { ISetPrice } from "../../main/interfaces/ISetPrice.sol";
-import { IPausable } from "../../main/interfaces/IPausable.sol";
-import { IPriceFeed } from "../../main/interfaces/IPriceFeed.sol";
-import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
-import { ICollateralPoolConfig } from "../../main/interfaces/ICollateralPoolConfig.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/ISystemDebtEngine.sol";
+import "../../main/interfaces/ILiquidationEngine.sol";
+import "../../main/interfaces/ILiquidationStrategy.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/interfaces/ISetPrice.sol";
+import "../../main/interfaces/IPausable.sol";
+import "../../main/interfaces/IPriceFeed.sol";
 
 /// @title LiquidationEngine
 /** @notice A contract which is the manager for all of the liquidations of the protocol.
     LiquidationEngine will be the interface for the liquidator to trigger any positions into the liquidation process.
 */
+
 contract MockLiquidationEngine is PausableUpgradeable, ReentrancyGuardUpgradeable, ICagable, ILiquidationEngine, IPausable {
     struct LocalVars {
         uint256 positionLockedCollateral;

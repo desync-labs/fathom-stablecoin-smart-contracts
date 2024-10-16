@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import { IPriceFeed } from "../../main/interfaces/IPriceFeed.sol";
-import { IFathomOracle } from "../../main/interfaces/IFathomOracle.sol";
-import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
+import "../../main/interfaces/IPriceFeed.sol";
+import "../../main/interfaces/IFathomOracle.sol";
+import "../../main/interfaces/IAccessControlConfig.sol";
 
 contract ParanoidDexOraclePriceFeed is PausableUpgradeable, IPriceFeed {
     struct VerifiablePrice {

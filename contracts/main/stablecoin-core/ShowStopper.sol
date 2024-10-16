@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import { IBookKeeper } from "../interfaces/IBookKeeper.sol";
-import { IShowStopper } from "../interfaces/IShowStopper.sol";
-import { ILiquidationEngine } from "../interfaces/ILiquidationEngine.sol";
-import { IPriceFeed } from "../interfaces/IPriceFeed.sol";
-import { IPriceOracle } from "../interfaces/IPriceOracle.sol";
-import { ISystemDebtEngine } from "../interfaces/ISystemDebtEngine.sol";
-import { ICagable } from "../interfaces/ICagable.sol";
-import { CommonMath } from "../utils/CommonMath.sol";
-import { IAccessControlConfig } from "../interfaces/IAccessControlConfig.sol";
-import { ICollateralPoolConfig } from "../interfaces/ICollateralPoolConfig.sol";
+import "../interfaces/IBookKeeper.sol";
+import "../interfaces/IShowStopper.sol";
+import "../interfaces/ILiquidationEngine.sol";
+import "../interfaces/IPriceFeed.sol";
+import "../interfaces/IPriceOracle.sol";
+import "../interfaces/ISystemDebtEngine.sol";
+import "../interfaces/ICagable.sol";
+import "../utils/CommonMath.sol";
 
 /**
  * @title ShowStopper Contract

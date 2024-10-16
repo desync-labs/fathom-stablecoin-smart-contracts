@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import { IPriceFeed } from "../../interfaces/IPriceFeed.sol";
-import { IGenericTokenAdapter } from "../../interfaces/IGenericTokenAdapter.sol";
-import { ICollateralPoolConfig } from "../../interfaces/ICollateralPoolConfig.sol";
-import { IAccessControlConfig } from "../../interfaces/IAccessControlConfig.sol";
+import "../../interfaces/IPriceFeed.sol";
+import "../../interfaces/IGenericTokenAdapter.sol";
+import "../../interfaces/ICollateralPoolConfig.sol";
+import "../../interfaces/IAccessControlConfig.sol";
 
 /**
  * @title CollateralPoolConfig

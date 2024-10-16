@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { FathomAuth } from "./FathomAuth.sol";
-import { FathomNote } from "./FathomNote.sol";
-import { ProxyActionsStorage } from "./ProxyActionsStorage.sol";
+import "./FathomAuth.sol";
+import "./FathomNote.sol";
+import "./ProxyActionsStorage.sol";
 
 /// @dev Allows code execution using a persistent identity This can be very useful to execute a sequence of atomic actions. Since the owner of
 // the proxy can be changed, this allows for dynamic ownership models i.e. a multisig

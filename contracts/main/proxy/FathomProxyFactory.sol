@@ -2,8 +2,8 @@
 
 pragma solidity 0.8.17;
 
-import { FathomProxy } from "./FathomProxy.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import "./FathomProxy.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FathomProxyFactory is Ownable {
     mapping(bytes32 => address) public proxies;

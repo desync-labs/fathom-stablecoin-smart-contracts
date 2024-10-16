@@ -6,6 +6,7 @@
     "lint": "solhint 'contracts/**/*.sol'",
     "lint:fix": "solhint 'contracts/**/*.sol' --fix",
     "format": "prettier --write .",
+    "compile": "hardhat compile",
     "test": "hardhat test",
     "node": "hardhat node --tags DeployMain",
     "deploy-local": "hardhat deploy --deploy-scripts deploy/deploy-main --network hardhat",

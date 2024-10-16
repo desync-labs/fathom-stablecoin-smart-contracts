@@ -1,23 +1,21 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import { IBookKeeper } from "../../interfaces/IBookKeeper.sol";
-import { IPriceFeed } from "../../interfaces/IPriceFeed.sol";
-import { IPriceOracle } from "../../interfaces/IPriceOracle.sol";
-import { ILiquidationEngine } from "../../interfaces/ILiquidationEngine.sol";
-import { ILiquidationStrategy } from "../../interfaces/ILiquidationStrategy.sol";
-import { ISystemDebtEngine } from "../../interfaces/ISystemDebtEngine.sol";
-import { IFlashLendingCallee } from "../../interfaces/IFlashLendingCallee.sol";
-import { IGenericTokenAdapter } from "../../interfaces/IGenericTokenAdapter.sol";
-import { IStablecoinAdapter } from "../../interfaces/IStablecoinAdapter.sol";
-import { IERC165 } from "../../interfaces/IERC165.sol";
-import { IAccessControlConfig } from "../../interfaces/IAccessControlConfig.sol";
-import { ICollateralPoolConfig } from "../../interfaces/ICollateralPoolConfig.sol";
-import { SafeToken } from "../../utils/SafeToken.sol";
-import { CommonMath } from "../../utils/CommonMath.sol";
+import "../../interfaces/IBookKeeper.sol";
+import "../../interfaces/IPriceFeed.sol";
+import "../../interfaces/IPriceOracle.sol";
+import "../../interfaces/ILiquidationEngine.sol";
+import "../../interfaces/ILiquidationStrategy.sol";
+import "../../interfaces/ISystemDebtEngine.sol";
+import "../../interfaces/IFlashLendingCallee.sol";
+import "../../interfaces/IGenericTokenAdapter.sol";
+import "../../interfaces/IStablecoinAdapter.sol";
+import "../../interfaces/IERC165.sol";
+import "../../utils/SafeToken.sol";
+import "../../utils/CommonMath.sol";
 
 /**
  * @title FixedSpreadLiquidationStrategy

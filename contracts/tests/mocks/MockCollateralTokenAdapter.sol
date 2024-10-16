@@ -1,17 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import { IBookKeeper } from "../../main/interfaces/IBookKeeper.sol";
-import { ICollateralAdapter } from "../../main/interfaces/ICollateralAdapter.sol";
-import { ICagable } from "../../main/interfaces/ICagable.sol";
-import { IManager } from "../../main/interfaces/IManager.sol";
-import { IProxyRegistry } from "../../main/interfaces/IProxyRegistry.sol";
-import { SafeToken } from "../../main/utils/SafeToken.sol";
-import { IVault } from "../../main/interfaces/IVault.sol";
-import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/ICollateralAdapter.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/interfaces/IManager.sol";
+import "../../main/interfaces/IProxyRegistry.sol";
+import "../../main/utils/SafeToken.sol";
+import "../../main/interfaces/IVault.sol";
 
 contract MockCollateralTokenAdapterMath {
     uint256 internal constant WAD = 10 ** 18;

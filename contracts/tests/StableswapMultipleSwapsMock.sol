@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
-import { IStableSwapModule } from "../main/interfaces/IStableSwapModule.sol";
-import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import { Address } from "@openzeppelin/contracts/utils/Address.sol";
+import "../main/interfaces/IStableSwapModule.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
 
 contract StableswapMultipleSwapsMock {
     //@notice: A mock feature to test whether twoStableswaps can happen in same block.

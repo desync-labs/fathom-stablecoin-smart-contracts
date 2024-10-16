@@ -1,17 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import { IStablecoin } from "../../interfaces/IStablecoin.sol";
-import { IBookKeeper } from "../../interfaces/IBookKeeper.sol";
-import { IStablecoinAdapter } from "../../interfaces/IStablecoinAdapter.sol";
-import { ICagable } from "../../interfaces/ICagable.sol";
-import { IPausable } from "../../interfaces/IPausable.sol";
-import { IAccessControlConfig } from "../../interfaces/IAccessControlConfig.sol";
-import { ICollateralPoolConfig } from "../../interfaces/ICollateralPoolConfig.sol";
-import { CommonMath } from "../../utils/CommonMath.sol";
+import "../../interfaces/IStablecoin.sol";
+import "../../interfaces/IBookKeeper.sol";
+import "../../interfaces/IStablecoinAdapter.sol";
+import "../../interfaces/ICagable.sol";
+import "../../interfaces/IPausable.sol";
+import "../../utils/CommonMath.sol";
 
 /**
  * @title Stablecoin Adapter contract

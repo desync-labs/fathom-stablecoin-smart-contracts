@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.17;
 
-import { IFathomSwapFactory } from "../../apis/interfaces/IFathomSwapFactory.sol";
+import "../../apis/interfaces/IFathomSwapFactory.sol";
 
 library FathomSwapLibrary {
     function pairFor(address factory, address _tokenA, address _tokenB) internal view returns (address) {

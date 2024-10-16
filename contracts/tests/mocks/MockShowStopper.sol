@@ -1,18 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-import { IBookKeeper } from "../../main/interfaces/IBookKeeper.sol";
-import { IShowStopper } from "../../main/interfaces/IShowStopper.sol";
-import { ILiquidationEngine } from "../../main/interfaces/ILiquidationEngine.sol";
-import { IPriceFeed } from "../../main/interfaces/IPriceFeed.sol";
-import { IPriceOracle } from "../../main/interfaces/IPriceOracle.sol";
-import { ISystemDebtEngine } from "../../main/interfaces/ISystemDebtEngine.sol";
-import { ICagable } from "../../main/interfaces/ICagable.sol";
-import { CommonMath } from "../../main/utils/CommonMath.sol";
-import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
-import { ICollateralPoolConfig } from "../../main/interfaces/ICollateralPoolConfig.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IShowStopper.sol";
+import "../../main/interfaces/ILiquidationEngine.sol";
+import "../../main/interfaces/IPriceFeed.sol";
+import "../../main/interfaces/IPriceOracle.sol";
+import "../../main/interfaces/ISystemDebtEngine.sol";
+import "../../main/interfaces/ICagable.sol";
+import "../../main/utils/CommonMath.sol";
+
 /**
  * @title ShowStopper Contract
  * @dev The ShowStopper contract is a system component that handles the emergency shutdown process.

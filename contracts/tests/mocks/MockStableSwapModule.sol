@@ -1,18 +1,16 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import { AddressUpgradeable } from "@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import { IToken } from "../../main/interfaces/IToken.sol";
-import { IStablecoinAdapter } from "../../main/interfaces/IStablecoinAdapter.sol";
-import { IStablecoin } from "../../main/interfaces/IStablecoin.sol";
-import { IBookKeeper } from "../../main/interfaces/IBookKeeper.sol";
-import { IStableSwapModule } from "../../main/interfaces/IStableSwapModule.sol";
-import { IStableSwapModuleWrapperRetriever } from "../../main/interfaces/IStableSwapModuleWrapperRetriever.sol";
-import { SafeToken } from "../../main/utils/SafeToken.sol";
-import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
+import "../../main/interfaces/IToken.sol";
+import "../../main/interfaces/IStablecoinAdapter.sol";
+import "../../main/interfaces/IStablecoin.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IStableSwapModule.sol";
+import "../../main/interfaces/IStableSwapModuleWrapperRetriever.sol";
+import "../../main/utils/SafeToken.sol";
 
 // Stable Swap Module
 // Allows anyone to go between FXD and the Token by pooling the liquidity

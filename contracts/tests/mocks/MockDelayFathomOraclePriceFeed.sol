@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { IFathomOracle } from "../../main/interfaces/IFathomOracle.sol";
-import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
-import { DelayPriceFeedBase } from "../../main/price-feeders/DelayPriceFeedBase.sol";
+import "../../main/interfaces/IFathomOracle.sol";
+import "../../main/interfaces/IAccessControlConfig.sol";
+import "../../main/price-feeders/DelayPriceFeedBase.sol";
 
 contract MockDelayFathomOraclePriceFeed is DelayPriceFeedBase {
     address public token0;

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { IAuthority } from "../interfaces/IAuthority.sol";
+import "../interfaces/IAuthority.sol";
 
 contract FathomAuthEvents {
     event LogSetAuthority(address indexed _authority);

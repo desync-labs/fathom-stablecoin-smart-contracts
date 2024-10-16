@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { IBookKeeper } from "../interfaces/IBookKeeper.sol";
+import "../interfaces/IBookKeeper.sol";
 
 contract PositionHandler {
     constructor(address _bookKeeper) {

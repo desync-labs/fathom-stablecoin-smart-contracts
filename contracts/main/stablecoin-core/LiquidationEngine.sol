@@ -2,19 +2,17 @@
 
 pragma solidity 0.8.17;
 
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 
-import { IBookKeeper } from "../interfaces/IBookKeeper.sol";
-import { ISystemDebtEngine } from "../interfaces/ISystemDebtEngine.sol";
-import { ILiquidationEngine } from "../interfaces/ILiquidationEngine.sol";
-import { ILiquidationStrategy } from "../interfaces/ILiquidationStrategy.sol";
-import { ICagable } from "../interfaces/ICagable.sol";
-import { ISetPrice } from "../interfaces/ISetPrice.sol";
-import { IPausable } from "../interfaces/IPausable.sol";
-import { IPriceFeed } from "../interfaces/IPriceFeed.sol";
-import { IAccessControlConfig } from "../interfaces/IAccessControlConfig.sol";
-import { ICollateralPoolConfig } from "../interfaces/ICollateralPoolConfig.sol";
+import "../interfaces/IBookKeeper.sol";
+import "../interfaces/ISystemDebtEngine.sol";
+import "../interfaces/ILiquidationEngine.sol";
+import "../interfaces/ILiquidationStrategy.sol";
+import "../interfaces/ICagable.sol";
+import "../interfaces/ISetPrice.sol";
+import "../interfaces/IPausable.sol";
+import "../interfaces/IPriceFeed.sol";
 
 /// @title LiquidationEngine
 /** @notice A contract which is the manager for all of the liquidations of the protocol.

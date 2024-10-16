@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import { IDelayPriceFeed } from "../interfaces/IDelayPriceFeed.sol";
-import { IAccessControlConfig } from "../interfaces/IAccessControlConfig.sol";
+import "../interfaces/IDelayPriceFeed.sol";
+import "../interfaces/IAccessControlConfig.sol";
 
 abstract contract DelayPriceFeedBase is PausableUpgradeable, IDelayPriceFeed {
     PriceInfo public delayedPrice;

@@ -1,19 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 pragma solidity 0.8.17;
 
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
-import { IERC3156FlashLender } from "../../main/interfaces/IERC3156FlashLender.sol";
-import { IERC3156FlashBorrower } from "../../main/interfaces/IERC3156FlashBorrower.sol";
-import { IBookKeeperFlashLender } from "../../main/interfaces/IBookKeeperFlashLender.sol";
-import { IStablecoin } from "../../main/interfaces/IStablecoin.sol";
-import { IStablecoinAdapter } from "../../main/interfaces/IStablecoinAdapter.sol";
-import { IBookKeeper } from "../../main/interfaces/IBookKeeper.sol";
-import { IPausable } from "../../main/interfaces/IPausable.sol";
-import { SafeToken } from "../../main/utils/SafeToken.sol";
-import { CommonMath } from "../../main/utils/CommonMath.sol";
-import { IAccessControlConfig } from "../../main/interfaces/IAccessControlConfig.sol";
-import { IBookKeeperFlashBorrower } from "../../main/interfaces/IBookKeeperFlashBorrower.sol";
+import "../../main/interfaces/IERC3156FlashLender.sol";
+import "../../main/interfaces/IERC3156FlashBorrower.sol";
+import "../../main/interfaces/IBookKeeperFlashLender.sol";
+import "../../main/interfaces/IStablecoin.sol";
+import "../../main/interfaces/IStablecoinAdapter.sol";
+import "../../main/interfaces/IBookKeeper.sol";
+import "../../main/interfaces/IPausable.sol";
+import "../../main/utils/SafeToken.sol";
+import "../../main/utils/CommonMath.sol";
 
 contract MockFlashMintModule is CommonMath, PausableUpgradeable, IERC3156FlashLender, IBookKeeperFlashLender, IPausable {
     using SafeToken for address;
