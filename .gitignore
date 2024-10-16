@@ -7,6 +7,8 @@ build
 
 addresses_GLD.json
 addresses.json
+externalAddresses.json
+add-collateral.json
 privateKey*
 
 # TypeChain files
