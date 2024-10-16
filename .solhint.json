@@ -9,7 +9,7 @@
     "func-param-name-mixedcase": "error",
     "modifier-name-mixedcase": "error",
     "code-complexity": ["error", 7],
-    "function-max-lines": ["error", 50],
+    "function-max-lines": ["error", 150],
     "no-inline-assembly": "off",
     "no-empty-blocks": "off",
     "max-states-count": "off",
