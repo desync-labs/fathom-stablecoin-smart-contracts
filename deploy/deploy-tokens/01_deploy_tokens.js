@@ -1,8 +1,6 @@
 const { ethers } = require("hardhat");
 const { BigNumber } = ethers;
 
-const { Deployer } = require("../../common/addresses");
-
 module.exports = async ({ getNamedAccounts, deployments }) => {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
@@ -33,9 +31,9 @@ module.exports = async ({ getNamedAccounts, deployments }) => {
   const FTHM = await deployments.get("FTHM");
   const fthm = await ethers.getContractAt("ERC20Mintable", FTHM.address);
 
-  await wnative.mint(Deployer, BigNumber.from("10000000000000000000000000000"));
-  await usdt.mint(Deployer, BigNumber.from("10000000000000000000000000000"));
-  await fthm.mint(Deployer, BigNumber.from("10000000000000000000000000000"));
+  await wnative.mint(deployer, BigNumber.from("10000000000000000000000000000"));
+  await usdt.mint(deployer, BigNumber.from("10000000000000000000000000000"));
+  await fthm.mint(deployer, BigNumber.from("10000000000000000000000000000"));
 };
 
 module.exports.tags = ["DeployTokens"];

@@ -5,7 +5,6 @@ const { time } = require("@nomicfoundation/hardhat-network-helpers");
 
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../helper/unit");
 const { createProxyWallets } = require("../helper/proxy-wallets");
-const { AliceAddress, BobAddress } = require("../helper/address");
 const PositionHelper = require("../helper/positions");
 const { getProxy } = require("../../common/proxies");
 const pools = require("../../common/collateral");
@@ -30,8 +29,15 @@ describe("ShowStopper", () => {
   let MockCollateralTokenAdapter;
   let WNATIVE;
 
+  let AliceAddress;
+  let BobAddress;
+
   beforeEach(async () => {
     await deployments.fixture(["DeployTestFixture"]);
+
+    const { allice, bob } = await getNamedAccounts();
+    AliceAddress = allice;
+    BobAddress = bob;
 
     const ProxyFactory = await deployments.get("FathomProxyFactory");
     const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);

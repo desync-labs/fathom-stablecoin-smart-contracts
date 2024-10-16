@@ -6,7 +6,6 @@ const { smock } = require("@defi-wonderland/smock");
 
 const provider = ethers.provider;
 
-const { DeployerAddress, AliceAddress, AddressZero } = require("../../helper/address");
 const { WeiPerWad } = require("../../helper/unit");
 const dailyLimitNumerator = 2000; //on denomination of 10000th, 2000/10000 = 20%
 const singleSwapLimitNumerator = 100; ///on denomination of 10000th, 100/10000 = 1%
@@ -23,7 +22,16 @@ xdescribe("StableSwapModule", () => {
   let mockFathomStablecoin;
   let stableSwapModuleWrapper;
 
+  let DeployerAddress;
+  let AliceAddress;
+  let AddressZero;
+
   beforeEach(async () => {
+    const { deployer, allice, a0 } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
+    AddressZero = a0;
+
     mockedAccessControlConfig = await smock.fake("AccessControlConfig");
     const mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
     const mockStablecoinAdapter = await smock.fake("StablecoinAdapter");

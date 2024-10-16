@@ -2,15 +2,23 @@ const { ethers } = require("hardhat");
 const provider = ethers.provider;
 const { expect } = require("chai");
 
-const { AliceAddress, BobAddress, AddressZero } = require("../helper/address");
 const { getProxy } = require("../../common/proxies");
 
 describe("ProxyWallet", () => {
   // Contract
   let proxyWalletRegistry;
 
+  let AliceAddress;
+  let BobAddress;
+  let AddressZero;
+
   beforeEach(async () => {
     await deployments.fixture(["DeployTestFixture"]);
+
+    const { allice, bob, a0 } = await getNamedAccounts();
+    AliceAddress = allice;
+    BobAddress = bob;
+    AddressZero = a0;
 
     const ProxyFactory = await deployments.get("FathomProxyFactory");
     const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);

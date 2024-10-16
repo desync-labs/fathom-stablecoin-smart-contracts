@@ -3,7 +3,6 @@ const { expect } = require("chai");
 const { parseEther } = ethers.utils;
 
 const { WeiPerRay, WeiPerRad } = require("../helper/unit");
-const { DeployerAddress } = require("../helper/address");
 
 const { getProxy } = require("../../common/proxies");
 
@@ -34,9 +33,12 @@ xdescribe("FlastMintModule", () => {
   let stableSwapModuleWrapper;
   let bookKeeperFlashMintArbitrager;
   let stablecoinAdapter;
+  let DeployerAddress;
 
   beforeEach(async () => {
     await deployments.fixture(["DeployTestFixture"]);
+    const { deployer } = await getNamedAccounts();
+    DeployerAddress = deployer;
 
     const ProxyFactory = await deployments.get("FathomProxyFactory");
     const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);

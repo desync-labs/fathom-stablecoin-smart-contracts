@@ -3,13 +3,20 @@ const { expect } = require("chai");
 const provider = ethers.provider;
 
 const { WeiPerWad } = require("../../helper/unit");
-const { DeployerAddress, AliceAddress, BobAddress, AddressZero } = require("../../helper/address");
 
 describe("FathomStablecoin", () => {
   let fathomStablecoin;
   let fathomStablecoinAsAlice;
 
+  let DeployerAddress, AliceAddress, BobAddress, AddressZero;
+
   beforeEach(async () => {
+    const { deployer, allice, bob, a0 } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
+    BobAddress = bob;
+    AddressZero = a0;
+
     const FathomStablecoinFactory = await ethers.getContractFactory("MockFathomStablecoin");
     fathomStablecoin = await FathomStablecoinFactory.deploy();
     await fathomStablecoin.deployed();

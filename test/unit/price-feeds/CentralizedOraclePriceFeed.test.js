@@ -4,7 +4,6 @@ const { smock } = require("@defi-wonderland/smock");
 const { time } = require("@nomicfoundation/hardhat-network-helpers");
 
 const { WeiPerWad } = require("../../helper/unit");
-const { DeployerAddress, AddressZero } = require("../../helper/address");
 const { latest } = require("../../helper/time");
 const { formatBytes32String } = ethers.utils;
 
@@ -14,8 +13,13 @@ describe("CentralizedOraclePriceFeed", () => {
   let mockedAccessControlConfig;
   let mockedCentralizedPriceOracle;
   let centralizedOraclePriceFeed;
+  let DeployerAddress;
+  let AddressZero;
 
   beforeEach(async function () {
+    const { deployer, a0 } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AddressZero = a0;
     mockedAccessControlConfig = await smock.fake("AccessControlConfig");
     mockedCentralizedPriceOracle = await smock.fake("IFathomCentralizedOracle");
 

@@ -5,8 +5,6 @@ const { deployFixtures } = require("./StablecoinAdapter.fixtures");
 
 const { formatBytes32String } = ethers.utils;
 
-const { DeployerAddress, AliceAddress } = require("../../helper/address");
-
 const COLLATERAL_POOL_ID = formatBytes32String("NATIVE");
 
 describe("StablecoinAdapter", async () => {
@@ -14,9 +12,14 @@ describe("StablecoinAdapter", async () => {
   let mockedBookKeeper;
   let mockedToken;
   let mockedCollateralPoolConfig;
+  let DeployerAddress;
+  let AliceAddress;
 
   beforeEach(async () => {
     ({ stablecoinAdapter, mockedBookKeeper, mockedToken, mockedCollateralPoolConfig } = await loadFixture(deployFixtures));
+    const { deployer, allice } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
   });
 
   context("depositRAD function", async () => {

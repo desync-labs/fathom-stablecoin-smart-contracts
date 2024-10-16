@@ -9,8 +9,6 @@ const provider = ethers.provider;
 
 const { formatBytes32BigNumber } = require("../../helper/format");
 const { WeiPerRay, WeiPerWad, WeiPerRad } = require("../../helper/unit");
-const { DeployerAddress, AliceAddress } = require("../../helper/address");
-const { increase } = require("../../helper/time");
 
 const WeekInSeconds = 604800;
 
@@ -27,6 +25,9 @@ describe("ShowStopper", () => {
 
   let showStopper;
   let showStopperAsAlice;
+
+  let DeployerAddress;
+  let AliceAddress;
 
   const setup = async () => {
     mockedBookKeeper.cage.returns();
@@ -58,6 +59,10 @@ describe("ShowStopper", () => {
   };
 
   beforeEach(async () => {
+    const { deployer, allice } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
+
     mockedAccessControlConfig = await smock.fake("AccessControlConfig");
     mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
     mockedBookKeeper = await smock.fake("BookKeeper");

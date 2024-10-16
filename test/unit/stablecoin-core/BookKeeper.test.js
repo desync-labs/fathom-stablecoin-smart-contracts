@@ -5,7 +5,6 @@ const { smock } = require("@defi-wonderland/smock");
 const provider = ethers.provider;
 
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../../helper/unit");
-const { DeployerAddress, AliceAddress, BobAddress } = require("../../helper/address");
 
 const { formatBytes32String } = ethers.utils;
 const COLLATERAL_POOL_ID = formatBytes32String("WNATIVE");
@@ -18,7 +17,16 @@ describe("BookKeeper", () => {
   let mockedCollateralPoolConfig;
   let mockedAccessControlConfig;
 
+  let DeployerAddress;
+  let AliceAddress;
+  let BobAddress;
+
   beforeEach(async () => {
+    const { deployer, allice, bob } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
+    BobAddress = bob;
+
     mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
     mockedAccessControlConfig = await smock.fake("AccessControlConfig");
 

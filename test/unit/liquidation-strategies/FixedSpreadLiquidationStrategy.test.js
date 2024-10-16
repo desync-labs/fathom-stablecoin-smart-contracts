@@ -7,7 +7,6 @@ const { formatBytes32String } = ethers.utils;
 const provider = ethers.provider;
 
 const { formatBytes32BigNumber } = require("../../helper/format");
-const { DeployerAddress, AliceAddress, AddressZero } = require("../../helper/address");
 const UnitHelpers = require("../../helper/unit");
 
 const LIQUIDATION_ENGINE_ROLE = "0x73cc1824a5ac1764c2e141cf3615a9dcb73677c4e5be5154addc88d3e0cc1480";
@@ -27,8 +26,15 @@ describe("FixedSpreadLiquidationStrategy", () => {
   let fixedSpreadLiquidationStrategy;
   let fixedSpreadLiquidationStrategyAsAlice;
   let mockedLiquidationEngine;
+  let DeployerAddress;
+  let AliceAddress;
+  let AddressZero;
 
   beforeEach(async () => {
+    const { deployer, allice, a0 } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
+    AddressZero = a0;
     mockedCollateralTokenAdapter = await smock.fake("TokenAdapter");
     mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
     mockedBookKeeper = await smock.fake("BookKeeper");

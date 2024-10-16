@@ -6,15 +6,17 @@ const { deployFixtures } = require("./TokenAdapter.fixtures");
 
 const { formatBytes32String } = ethers.utils;
 
-const { DeployerAddress, AliceAddress } = require("../../helper/address");
 const { WeiPerWad } = require("../../helper/unit");
 
 describe("TokenAdapter", () => {
-  let tokenAdapter, tokenAdapterAsAlice, mockedBookKeeper, mockedToken, mockedAccessControlConfig, mockedCollateralPoolConfig, mockedVault;
+  let tokenAdapter, tokenAdapterAsAlice, mockedBookKeeper, mockedToken, mockedAccessControlConfig, mockedCollateralPoolConfig, mockedVault, DeployerAddress, AliceAddress;
 
   beforeEach(async () => {
     ({ tokenAdapter, tokenAdapterAsAlice, mockedBookKeeper, mockedToken, mockedAccessControlConfig, mockedCollateralPoolConfig, mockedVault } =
       await loadFixture(deployFixtures));
+      const { deployer, allice } = await getNamedAccounts();
+      DeployerAddress = deployer;
+      AliceAddress = allice;
   });
 
   describe("#deposit()", () => {

@@ -5,7 +5,6 @@ const { smock } = require("@defi-wonderland/smock");
 const { formatBytes32String } = ethers.utils;
 const provider = ethers.provider;
 
-const { DeployerAddress, AliceAddress } = require("../../helper/address");
 const UnitHelpers = require("../../helper/unit");
 
 describe("SystemDebtEngine", () => {
@@ -17,7 +16,13 @@ describe("SystemDebtEngine", () => {
   let systemDebtEngine;
   let systemDebtEngineAsAlice;
 
+  let DeployerAddress, AliceAddress;
+
   beforeEach(async () => {
+    const { deployer, allice } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
+
     mockedAccessControlConfig = await smock.fake("AccessControlConfig");
     const mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
     mockedBookKeeper = await smock.fake("BookKeeper");

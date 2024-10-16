@@ -2,7 +2,6 @@ const { ethers } = require("hardhat");
 const { expect } = require("chai");
 const { smock } = require("@defi-wonderland/smock");
 
-const { DeployerAddress, AddressZero } = require("../../helper/address");
 const { formatBytes32String } = ethers.utils;
 
 const GOV_ROLE = formatBytes32String("GOV_ROLE");
@@ -21,8 +20,14 @@ describe("AdminControls", () => {
   // Contract
   let adminControls;
   let mockedAccessControlConfig;
+  let DeployerAddress;
+  let AddressZero;
 
   beforeEach(async () => {
+    const { deployer, a0 } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AddressZero = a0;
+
     const mockedLiquidationEngine = await smock.fake("LiquidationEngine");
     const mockedPositionManager = await smock.fake("PositionManager");
     const mockedStablecoinAdapter = await smock.fake("StablecoinAdapter");

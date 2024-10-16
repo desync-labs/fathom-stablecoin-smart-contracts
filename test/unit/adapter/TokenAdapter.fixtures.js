@@ -3,9 +3,11 @@ const provider = ethers.provider;
 const { smock } = require("@defi-wonderland/smock");
 
 const { formatBytes32String } = ethers.utils;
-const { AliceAddress } = require("../../helper/address");
 
 const deployFixtures = async () => {
+  const { allice } = await getNamedAccounts();
+  const AliceAddress = allice;
+
   const mockedAccessControlConfig = await smock.fake("AccessControlConfig");
   const mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
   const mockedVault = await smock.fake("Vault");

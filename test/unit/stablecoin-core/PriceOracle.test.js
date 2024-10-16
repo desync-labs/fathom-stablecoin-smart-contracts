@@ -9,7 +9,6 @@ const { formatBytes32String } = ethers.utils;
 
 const { formatBytes32BigNumber } = require("../../helper/format");
 const { WeiPerRay, WeiPerRad } = require("../../helper/unit");
-const { DeployerAddress, AliceAddress, AddressZero } = require("../../helper/address");
 
 describe("PriceOracle", () => {
   // Contracts
@@ -21,7 +20,16 @@ describe("PriceOracle", () => {
   let priceOracle;
   let priceOracleAsAlice;
 
+  let DeployerAddress;
+  let AliceAddress;
+  let AddressZero;
+
   beforeEach(async () => {
+    const { deployer, allice, a0 } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
+    AddressZero = a0;
+
     mockedAccessControlConfig = await smock.fake("AccessControlConfig");
     mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
     mockedBookKeeper = await smock.fake("BookKeeper");

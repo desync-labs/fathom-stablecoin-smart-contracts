@@ -4,7 +4,6 @@ const { expect } = require("chai");
 const { smock } = require("@defi-wonderland/smock");
 const { time } = require("@nomicfoundation/hardhat-network-helpers");
 
-const { DeployerAddress, AliceAddress } = require("../../helper/address");
 const { formatBytes32String } = ethers.utils;
 const provider = ethers.provider;
 
@@ -19,7 +18,14 @@ describe("StabilityFeeCollector", () => {
   let stabilityFeeCollector;
   let stabilityFeeCollectorAsAlice;
 
+  let DeployerAddress;
+  let AliceAddress;
+
   beforeEach(async () => {
+    const { deployer, allice } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
+
     mockedAccessControlConfig = await smock.fake("AccessControlConfig");
     mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
     mockedBookKeeper = await smock.fake("BookKeeper");

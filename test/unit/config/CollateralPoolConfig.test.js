@@ -6,7 +6,6 @@ const { time } = require("@nomicfoundation/hardhat-network-helpers");
 
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../../helper/unit");
 const { formatBytes32BigNumber } = require("../../helper/format");
-const { DeployerAddress, AliceAddress, AddressZero } = require("../../helper/address");
 const AssertHelpers = require("../../helper/assert");
 
 const { formatBytes32String } = ethers.utils;
@@ -30,7 +29,15 @@ describe("CollateralPoolConfig", () => {
   let collateralPoolConfig;
   let collateralPoolConfigAsAlice;
 
+  let DeployerAddress;
+  let AliceAddress;
+  let AddressZero;
+
   beforeEach(async () => {
+    const { deployer, allice, a0 } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
+    AddressZero = a0;
     const CollateralPoolConfigFactory = await ethers.getContractFactory("MockCollateralPoolConfig");
     collateralPoolConfig = await CollateralPoolConfigFactory.deploy();
     await collateralPoolConfig.deployed();

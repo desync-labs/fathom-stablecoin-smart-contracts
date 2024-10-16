@@ -3,7 +3,6 @@ const { expect } = require("chai");
 const { formatBytes32String, keccak256, toUtf8Bytes } = ethers.utils;
 const { smock } = require("@defi-wonderland/smock");
 const provider = ethers.provider;
-const { DeployerAddress, AliceAddress } = require("../../helper/address");
 const { WeiPerRad, WeiPerWad } = require("../../helper/unit");
 
 describe("FlashMintModule", () => {
@@ -20,7 +19,13 @@ describe("FlashMintModule", () => {
   let flashMintModule;
   let flashMintModuleAsAlice;
 
+  let DeployerAddress;
+  let AliceAddress;
+
   beforeEach(async () => {
+    const { deployer, allice } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
     mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
     mockBookKeeper = await smock.fake("BookKeeper");
     mockedAccessControlConfig = await smock.fake("AccessControlConfig");

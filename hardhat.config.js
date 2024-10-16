@@ -58,5 +58,13 @@ module.exports = {
   },
   namedAccounts: {
     deployer: 0,
+    allice: 1,
+    bob: 2,
+    dev: 3,
+    treasury: 4,
+    a0: "0x0000000000000000000000000000000000000000",
+    a1: "0x0000000000000000000000000000000000000001",
+    a2: "0x0000000000000000000000000000000000000002",
+    apothemDeployerTest: "0xB4A0403376CA4f0a99b863840EfFf78bc061d71F",
   },
 };

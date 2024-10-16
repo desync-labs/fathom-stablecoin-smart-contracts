@@ -1,10 +1,8 @@
 const { ethers } = require("hardhat");
-const provider = ethers.provider;
 const { expect } = require("chai");
 const { BigNumber } = ethers;
 const TimeHelpers = require("../helper/time");
 
-const { DeployerAddress, AliceAddress } = require("../helper/address");
 const { getProxy } = require("../../common/proxies");
 const { WeiPerWad } = require("../helper/unit");
 
@@ -42,6 +40,9 @@ const _convertSixDecimalsToEtherBalance = (balance) => {
 };
 
 const setup = async () => {
+  const { deployer, allice } = await getNamedAccounts();
+  const DeployerAddress = deployer;
+  const AliceAddress = allice;
   const proxyFactory = await artifacts.initializeInterfaceAt("FathomProxyFactory", "FathomProxyFactory");
   const stableswapMultipleSwapsMock = await artifacts.initializeInterfaceAt("StableswapMultipleSwapsMock", "StableswapMultipleSwapsMock");
 
@@ -85,12 +86,18 @@ xdescribe("StableSwapModuleWrapper", () => {
   let stableSwapModuleWrapper;
   let stableswapMultipleSwapsMock;
 
+  let DeployerAddress;
+  let AliceAddress;
+
   before(async () => {
     await snapshot.revertToSnapshot();
   });
 
   beforeEach(async () => {
     ({ USDT, stableSwapModule, fathomStablecoin, stableswapMultipleSwapsMock, stableSwapModuleWrapper } = await loadFixture(setup));
+    const { deployer, allice } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
   });
 
   describe("#ShouldDepositTokens", async () => {

@@ -5,8 +5,6 @@ const { smock } = require("@defi-wonderland/smock");
 
 const { formatBytes32String, parseEther } = ethers.utils;
 const provider = ethers.provider;
-
-const { AliceAddress, BobAddress, AddressZero } = require("../../helper/address");
 const { WeiPerRad, WeiPerRay, WeiPerWad } = require("../../helper/unit");
 
 describe("PositionManager", () => {
@@ -25,7 +23,16 @@ describe("PositionManager", () => {
   let positionManagerAsAlice;
   let positionManagerAsBob;
 
+  let AliceAddress;
+  let BobAddress;
+  let AddressZero;
+
   beforeEach(async () => {
+    const { allice, bob, a0 } = await getNamedAccounts();
+    AliceAddress = allice;
+    BobAddress = bob;
+    AddressZero = a0;
+
     mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
     mockedBookKeeper = await smock.fake("BookKeeper");
     mockedTokenAdapter = await smock.fake("TokenAdapter");

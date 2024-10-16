@@ -40,7 +40,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   await configFlashLending(deployments);
 
   // Configuration
-  await addRolesTestFixture(deployments);
+  await addRolesTestFixture(getNamedAccounts, deployments);
   await addCollateralPools(deployments);
 
   // POST_DEPLOYMENT

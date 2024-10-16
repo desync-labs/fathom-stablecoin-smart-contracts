@@ -9,7 +9,6 @@ const { parseEther, parseUnits, defaultAbiCoder, formatBytes32String } = ethers.
 const { WeiPerRay, WeiPerWad } = require("../helper/unit");
 const AssertHelpers = require("../helper/assert");
 const { createProxyWallets } = require("../helper/proxy-wallets");
-const { AliceAddress, BobAddress } = require("../helper/address");
 const PositionHelper = require("../helper/positions");
 const { getProxy } = require("../../common/proxies");
 const pools = require("../../common/collateral");
@@ -36,8 +35,15 @@ describe("LiquidationEngine", () => {
   let collateralPoolConfig;
   let priceOracle;
 
+  let AliceAddress;
+  let BobAddress;
+
   beforeEach(async () => {
     await deployments.fixture(["DeployTestFixture"]);
+
+    const { allice, bob } = await getNamedAccounts();
+    AliceAddress = allice;
+    BobAddress = bob;
 
     const ProxyFactory = await deployments.get("FathomProxyFactory");
     const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);

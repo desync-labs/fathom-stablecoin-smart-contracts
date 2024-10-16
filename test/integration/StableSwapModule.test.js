@@ -3,8 +3,6 @@ const provider = ethers.provider;
 const { expect } = require("chai");
 const { BigNumber } = ethers;
 const TimeHelpers = require("../helper/time");
-
-const { DeployerAddress } = require("../helper/address");
 const { getProxy } = require("../../common/proxies");
 const WeiPerSixDecimals = BigNumber.from(`1${"0".repeat(6)}`);
 
@@ -38,9 +36,12 @@ xdescribe("StableSwapModule", () => {
   let fathomStablecoin;
   let stableSwapModuleWrapper;
   let stableswapMultipleSwapsMock;
+  let DeployerAddress;
 
   beforeEach(async () => {
     await deployments.fixture(["DeployTestFixture"]);
+    const { deployer } = await getNamedAccounts();
+    DeployerAddress = deployer;
 
     const ProxyFactory = await deployments.get("FathomProxyFactory");
     const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);

@@ -1,8 +1,6 @@
-const { ethers } = require("hardhat");
+const { ethers, getNamedAccounts } = require("hardhat");
 const provider = ethers.provider;
 const { expect } = require("chai");
-
-const { DeployerAddress, AliceAddress, BobAddress } = require("../helper/address");
 const { getProxy } = require("../../common/proxies");
 
 describe("CollateralTokenAdapter", () => {
@@ -10,10 +8,17 @@ describe("CollateralTokenAdapter", () => {
   let collateralTokenAdapter;
   let WNATIVE;
   let bookKeeper;
+  let DeployerAddress;
+  let AliceAddress;
+  let BobAddress;
 
   beforeEach(async () => {
     await deployments.fixture(["DeployTestFixture"]);
-
+    const { deployer, allice, bob } = await getNamedAccounts();
+    DeployerAddress = deployer;
+    AliceAddress = allice;
+    BobAddress = bob;
+    
     const ProxyFactory = await deployments.get("FathomProxyFactory");
     const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
     collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");

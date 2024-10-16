@@ -5,7 +5,6 @@ const { expect } = require("chai");
 const { WeiPerRay, WeiPerWad } = require("../helper/unit");
 const AssertHelpers = require("../helper/assert");
 const { createProxyWallets } = require("../helper/proxy-wallets");
-const { AliceAddress, DevAddress } = require("../helper/address");
 const PositionHelper = require("../helper/positions");
 const { getProxy } = require("../../common/proxies");
 const pools = require("../../common/collateral");
@@ -25,8 +24,15 @@ describe("Position Closure without collateral withdrawal", () => {
   let reEntrantProxyWallet;
   let reEntrantProxyWallet2;
 
+  let AliceAddress;
+  let DevAddress;
+
   beforeEach(async () => {
     await deployments.fixture(["DeployTestFixture"]);
+
+    const { allice, dev } = await getNamedAccounts();
+    AliceAddress = allice;
+    DevAddress = dev;
 
     const ProxyFactory = await deployments.get("FathomProxyFactory");
     const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
