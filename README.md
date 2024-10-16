@@ -10,15 +10,13 @@ Various mechanisms, including price oracles, Stable Swap, and a risk management 
 
 ## Package version requirements for your machine:
 
-- node v18.12.1
-- npm v8.19.2
-- CoralX v0.2.0
-- Solidity =0.8.17 (solc)
-- Ganache CLI v6.12.2 (ganache-core: 2.13.2)
+- node v20.17.0
+- npm v10.8.2
+- Hardhat v^2.22.12
 
 ## Basic setup
 
-The smart contracts are written in [Solidity](https://github.com/ethereum/solidity) and tested/deployed using [CoralX](https://github.com/Securrency-OSS/CoralX).
+The smart contracts are written in [Solidity](https://github.com/ethereum/solidity) and tested/deployed using [Hardhat](https://hardhat.org/).
 
 
 ### Install nodejs:
@@ -29,21 +27,6 @@ $ sudo apt install nodejs
 ```bash
 $ sudo apt install npm
 ```
-### Intall CoralX from the Securrency private registry.
-### Install CoralX package globally:
-```bash
-$ npm install -g coral-x
-```
-### Install ganache-cli:
-```bash
-$ npm install -g ganache-cli
-```
-### Install Solc (https://docs.soliditylang.org/en/v0.8.13/installing-solidity.html)
-
-```bash
-$ curl -o /usr/bin/solc -fL https://github.com/ethereum/solidity/releases/download/v0.8.13/solc-static-linux \
-    && chmod u+x /usr/bin/solc
-```
 
 ## Running tests
 
@@ -52,18 +35,11 @@ $ curl -o /usr/bin/solc -fL https://github.com/ethereum/solidity/releases/downlo
 $ npm i
 ```
 
-### 1) Run ganache with predefined accounts:
-```bash
-$ ganache-cli -m MNEMONIC --gasLimit 12500000 -v -e 100000000
-```
-
-### 2) Create file called "privateKey" in the root directory (to run tests, copy the privateKey of the first account of ganache):
+### 1) Create SEED_PHRASE environment variable:
 
 ```bash
-$ echo -n PRIVATE_KEY_WITHOUT_0x_PREFIX > privateKey
+$ echo -n SEED_PHRASE=12_WORD_MNEMONIC > .env
 ```
-
-Please make sure that the privateKey file's content doesn't have any unneccesary text. The file should only contain privateKey without the 0x prefix. Otherwise, it will fail.
 
 ### 3) Create externalAddresses.json file in root
 
