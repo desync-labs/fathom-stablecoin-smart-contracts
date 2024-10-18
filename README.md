@@ -161,9 +161,9 @@ ChainID of apothem is 51. Therefore, the externalAddresses.json need to have the
 
 ```JSON
 {
-    "51": {
-      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce"
-    }
+  "51": {
+    "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce"
+  }
 }
 ```
 
@@ -201,9 +201,9 @@ ChainID of NATIVE mainnet is 50. Therefore, the externalAddresses.json need to h
 
 ```JSON
 {
-    "50": {
-      "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce"
-    }
+  "50": {
+    "WNATIVE": "0xE99500AB4A413164DA49Af83B9824749059b46ce"
+  }
 }
 ```
 
@@ -226,6 +226,56 @@ $ npm run deploy-xdc
 #### 6) Check contract addresses in addresses.json file in root
 
 After deployment, addresses.json gets updated with addresses of proxies.
+
+### On Lisk Sepolia Testnet
+
+#### 0) Create SEED_PHRASE environment variable (12 word phrase of the wallet that holds the EOA that you would like to deploy contracts from):
+
+```bash
+$ echo -n SEED_PHRASE=12_WORD_MNEMONIC > .env
+```
+
+#### 1) Create externalAddresses.json in root directory.:
+
+ChainID of Lisk Sepolia Testnet is 4202. Therefore, the externalAddresses.json need to have the sets of addresses having 4202 as key. For example, like below.
+
+```JSON
+{
+  "4202": {
+    "WNATIVE": "0x4200000000000000000000000000000000000006"
+  }
+}
+```
+
+The WNATIVE address above is officially deployed on the Lisk Sepolia Testnet network. Therefore, I recommend using this address unless you have already deployed or are willing to deploy a new WNATIVE address for your testing purposes.
+
+#### 2) Compile contracts
+
+```bash
+$ npm run compile
+```
+
+make sure that the contracts compile before deployment
+
+#### 3) Deploy with below command
+
+```bash
+$ npm run deploy-lisk-sepolia
+```
+
+#### 4) Check contract addresses in addresses.json file in root
+
+After deployment, addresses.json gets updated with addresses of proxies.
+
+# Gas Report
+
+## How to measure gas consumption for protocol deployment
+
+#### 0) Run the following command
+
+```bash
+$ REPORT_GAS="true npx hardhat test" npm run gas-report
+```
 
 # PriceFeed
 
