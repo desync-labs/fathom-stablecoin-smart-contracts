@@ -41,9 +41,20 @@ module.exports = {
       gasPrice: 1000000000,
     },
     "lisk-sepolia": {
+      chainId: 4202,
       // Please check the status of RPC URL in below link.
       // https://chainlist.org/?search=native
       url: "https://rpc.sepolia-api.lisk.com",
+      accounts: {
+        mnemonic: process.env.SEED_PHRASE,
+      },
+      gasPrice: 1000000000,
+    },
+    lisk: {
+      chainId: 1135,
+      // Please check the status of RPC URL in below link.
+      // https://chainlist.org/?search=native
+      url: "https://rpc.api.lisk.com",
       accounts: {
         mnemonic: process.env.SEED_PHRASE,
       },
