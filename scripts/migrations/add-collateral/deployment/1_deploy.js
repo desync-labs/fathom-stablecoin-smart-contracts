@@ -1,10 +1,10 @@
-const DexPriceOracle = artifacts.require('DexPriceOracle.sol');
-const SlidingWindowDexOracle = artifacts.require('SlidingWindowDexOracle.sol');
-const DelayFathomOraclePriceFeed = artifacts.require('DelayFathomOraclePriceFeed.sol');
-const CollateralTokenAdapter = artifacts.require('CollateralTokenAdapter.sol');
-const CentralizedOraclePriceFeed = artifacts.require('CentralizedOraclePriceFeed.sol');
+const DexPriceOracle = artifacts.require("DexPriceOracle.sol");
+const SlidingWindowDexOracle = artifacts.require("SlidingWindowDexOracle.sol");
+const DelayFathomOraclePriceFeed = artifacts.require("DelayFathomOraclePriceFeed.sol");
+const CollateralTokenAdapter = artifacts.require("CollateralTokenAdapter.sol");
+const CentralizedOraclePriceFeed = artifacts.require("CentralizedOraclePriceFeed.sol");
 
-const { usePlugin } = require("../../../common/add-collateral-helper")
+const { usePlugin } = require("../../../common/add-collateral-helper");
 
 module.exports = async function (deployer) {
   let promises = [
@@ -15,7 +15,7 @@ module.exports = async function (deployer) {
   ];
 
   if (usePlugin(deployer.networkId())) {
-    promises.push(deployer.deploy(CentralizedOraclePriceFeed, { gas: 7050000 }))
+    promises.push(deployer.deploy(CentralizedOraclePriceFeed, { gas: 7050000 }));
   }
 
   await Promise.all(promises);

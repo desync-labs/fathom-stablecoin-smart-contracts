@@ -1,45 +1,45 @@
-const fs = require('fs');
-const { BigNumber } = require('ethers');
+const fs = require("fs");
+const { BigNumber } = require("ethers");
 
-const rawdata = fs.readFileSync('../../../../externalAddresses.json');
+const rawdata = fs.readFileSync("../../../../externalAddresses.json");
 let addresses = JSON.parse(rawdata);
 
-const MockedDexRouter = artifacts.require('MockedDexRouter.sol');
-const MockStablecoinAdapter = artifacts.require('MockStablecoinAdapter.sol');
-const MockCollateralPoolConfig = artifacts.require('MockCollateralPoolConfig.sol');
+const MockedDexRouter = artifacts.require("MockedDexRouter.sol");
+const MockStablecoinAdapter = artifacts.require("MockStablecoinAdapter.sol");
+const MockCollateralPoolConfig = artifacts.require("MockCollateralPoolConfig.sol");
 
-const MockFlashMintModule = artifacts.require('MockFlashMintModule.sol');
-const MockFixedSpreadLiquidationStrategy = artifacts.require('MockFixedSpreadLiquidationStrategy.sol');
+const MockFlashMintModule = artifacts.require("MockFlashMintModule.sol");
+const MockFixedSpreadLiquidationStrategy = artifacts.require("MockFixedSpreadLiquidationStrategy.sol");
 
-const MockPositionManager = artifacts.require('MockPositionManager.sol');
-const MockCentralizedOraclePriceFeed = artifacts.require('MockCentralizedOraclePriceFeed.sol');
-const MockDelayFathomOraclePriceFeed = artifacts.require('MockDelayFathomOraclePriceFeed.sol');
-const MockDexPriceOracle = artifacts.require('MockDexPriceOracle.sol');
-const MockSlidingWindowDexOracle = artifacts.require('MockSlidingWindowDexOracle.sol');
-const MockAdminControls = artifacts.require('MockAdminControls.sol');
-const MockBookKeeper = artifacts.require('MockBookKeeper.sol');
+const MockPositionManager = artifacts.require("MockPositionManager.sol");
+const MockCentralizedOraclePriceFeed = artifacts.require("MockCentralizedOraclePriceFeed.sol");
+const MockDelayFathomOraclePriceFeed = artifacts.require("MockDelayFathomOraclePriceFeed.sol");
+const MockDexPriceOracle = artifacts.require("MockDexPriceOracle.sol");
+const MockSlidingWindowDexOracle = artifacts.require("MockSlidingWindowDexOracle.sol");
+const MockAdminControls = artifacts.require("MockAdminControls.sol");
+const MockBookKeeper = artifacts.require("MockBookKeeper.sol");
 
-const MockFathomStablecoin = artifacts.require('MockFathomStablecoin.sol');
+const MockFathomStablecoin = artifacts.require("MockFathomStablecoin.sol");
 
-const MockLiquidationEngine = artifacts.require('MockLiquidationEngine.sol');
+const MockLiquidationEngine = artifacts.require("MockLiquidationEngine.sol");
 
-const MockPriceOracle = artifacts.require('MockPriceOracle.sol');
+const MockPriceOracle = artifacts.require("MockPriceOracle.sol");
 
-const MockFathomBridge = artifacts.require('MockFathomBridge.sol');
+const MockFathomBridge = artifacts.require("MockFathomBridge.sol");
 
-const MockShowStopper = artifacts.require('MockShowStopper.sol');
+const MockShowStopper = artifacts.require("MockShowStopper.sol");
 
-const MockStabilityFeeCollector = artifacts.require('MockStabilityFeeCollector.sol');
-const MockStableSwapModule = artifacts.require('MockStableSwapModule.sol');
-const MockStableSwapModuleWrapper = artifacts.require('MockStableSwapModuleWrapper.sol');
-const MockSystemDebtEngine = artifacts.require('MockSystemDebtEngine.sol');
+const MockStabilityFeeCollector = artifacts.require("MockStabilityFeeCollector.sol");
+const MockStableSwapModule = artifacts.require("MockStableSwapModule.sol");
+const MockStableSwapModuleWrapper = artifacts.require("MockStableSwapModuleWrapper.sol");
+const MockSystemDebtEngine = artifacts.require("MockSystemDebtEngine.sol");
 
-const TokenAdapter = artifacts.require('TokenAdapter.sol');
-const FathomToken = artifacts.require('FathomToken.sol');
-const ERC20 = artifacts.require('ERC20Mintable.sol');
-const WXDC = artifacts.require('WXDC.sol');
-const ERC20Stable = artifacts.require('ERC20MintableStableSwap.sol')
-const SimplePriceFeed = artifacts.require('SimplePriceFeed.sol')
+const TokenAdapter = artifacts.require("TokenAdapter.sol");
+const FathomToken = artifacts.require("FathomToken.sol");
+const ERC20 = artifacts.require("ERC20Mintable.sol");
+const WXDC = artifacts.require("WXDC.sol");
+const ERC20Stable = artifacts.require("ERC20MintableStableSwap.sol");
+const SimplePriceFeed = artifacts.require("SimplePriceFeed.sol");
 const StableswapMultipleSwapsMock = artifacts.require("StableswapMultipleSwapsMock");
 const TestOracleMock = artifacts.require("TestOracleMock");
 
@@ -72,7 +72,6 @@ module.exports = async function (deployer) {
     deployer.deploy(MockStableSwapModule, { gas: 7050000 }),
     deployer.deploy(MockStableSwapModuleWrapper, { gas: 7050000 }),
     deployer.deploy(MockSystemDebtEngine, { gas: 7050000 }),
-
   ];
 
   await Promise.all(promises);
@@ -81,10 +80,9 @@ module.exports = async function (deployer) {
   addresses[chainId].USD = ERC20.address;
   addresses[chainId].USDSTABLE = ERC20Stable.address;
 
-  await deployer.deploy(WXDC, { gas: 3050000 }),
-    addresses[chainId].WXDC = WXDC.address;
+  await deployer.deploy(WXDC, { gas: 3050000 }), (addresses[chainId].WXDC = WXDC.address);
   addresses[chainId].testOracle = TestOracleMock.address;
 
-  await deployer.deploy(StableswapMultipleSwapsMock, { gas: 3050000 })
-  fs.writeFileSync('./externalAddresses.json', JSON.stringify(addresses));
+  await deployer.deploy(StableswapMultipleSwapsMock, { gas: 3050000 });
+  fs.writeFileSync("./externalAddresses.json", JSON.stringify(addresses));
 };

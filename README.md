@@ -20,24 +20,32 @@ Various mechanisms, including price oracles, Stable Swap, and a risk management 
 
 The smart contracts are written in [Solidity](https://github.com/ethereum/solidity) and tested/deployed using [CoralX](https://github.com/Securrency-OSS/CoralX).
 
-
 ### Install nodejs:
+
 ```bash
 $ sudo apt install nodejs
 ```
+
 ### Install npm:
+
 ```bash
 $ sudo apt install npm
 ```
+
 ### Intall CoralX from the Securrency private registry.
+
 ### Install CoralX package globally:
+
 ```bash
 $ npm install -g coral-x
 ```
+
 ### Install ganache-cli:
+
 ```bash
 $ npm install -g ganache-cli
 ```
+
 ### Install Solc (https://docs.soliditylang.org/en/v0.8.13/installing-solidity.html)
 
 ```bash
@@ -47,12 +55,14 @@ $ curl -o /usr/bin/solc -fL https://github.com/ethereum/solidity/releases/downlo
 
 ## Running tests
 
-### 0) After cloning the repo,  install dependencies
+### 0) After cloning the repo, install dependencies
+
 ```bash
 $ npm i
 ```
 
 ### 1) Run ganache with predefined accounts:
+
 ```bash
 $ ganache-cli -m MNEMONIC --gasLimit 12500000 -v -e 100000000
 ```
@@ -67,11 +77,11 @@ Please make sure that the privateKey file's content doesn't have any unneccesary
 
 ### 3) Create externalAddresses.json file in root
 
-The chainId 1337 addresses are required to execute the test scripts on Ganache. Checksummed addresses must be included in the externalAddresses.json file as placeholder addresses for test execution. Use the content provided below for the externalAddresses.json file to run the test scripts.
+The chainId 31337 addresses are required to execute the test scripts on Ganache. Checksummed addresses must be included in the externalAddresses.json file as placeholder addresses for test execution. Use the content provided below for the externalAddresses.json file to run the test scripts.
 
 ```JSON
 {
-  "1337": {
+  "31337": {
     "WXDC": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
     "USD": "0xce75A95160D96F5388437993aB5825F322426E04",
     "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
@@ -97,7 +107,7 @@ To run a specific test script instead of running the the whole tests, run as bel
 $ coralX test --path integration/PositionPermissions.test.js
 ```
 
-You might face some tests failing with 'out of gas' error. 
+You might face some tests failing with 'out of gas' error.
 
 ## Deployment
 
@@ -106,6 +116,7 @@ The current codebase is structured so that the same set of smart contracts will 
 ### On Ganache
 
 #### 0) Run ganache with predefined accounts:
+
 ```bash
 $ ganache-cli -m MNEMONIC --gasLimit 12500000 -v -e 100000000
 ```
@@ -116,13 +127,13 @@ $ ganache-cli -m MNEMONIC --gasLimit 12500000 -v -e 100000000
 $ echo -n PRIVATE_KEY_WITHOUT_0x_PREFIX > privateKey
 ```
 
-#### 2) Create externalAddresses.json in root directory. 
+#### 2) Create externalAddresses.json in root directory.
 
 The format of the content can be same as in the Running test sections. Like below
 
 ```JSON
 {
-  "1337": {
+  "31337": {
     "WXDC": "0xf72f1a39ae0736Ef6A532605C85aFB0A4E349714",
     "USD": "0xce75A95160D96F5388437993aB5825F322426E04",
     "FTHM": "0x939Dd5c782620C92843689ad3DD7E7d1F4eb97aB",
@@ -255,6 +266,7 @@ After deployment, addresses.json gets updated with addresses of proxies.
 # PriceFeed
 
 ## How to use SimplePriceFeed
+
 The default configuration for deployment specifies that SimplePriceFeed acts as the price feed for XDC collateral. To alter the price of the collateral, you must first establish the price within SimplePriceFeed and then set the Loan-to-Value (LTV) discounted price in the protocol via the PriceOracle contract.
 
 ```Solidity=
@@ -263,16 +275,18 @@ The default configuration for deployment specifies that SimplePriceFeed acts as 
 function setPrice(uint256 _price) external onlyOwner {}
 
 ```
-You can establish the collateral price using the setPrice function mentioned above. To set the price of XDC to 2 USD, call the setPrice function with an argument of 2*10^18.
+
+You can establish the collateral price using the setPrice function mentioned above. To set the price of XDC to 2 USD, call the setPrice function with an argument of 2\*10^18.
 
 Once the price is set in SimplePriceFeed, it is necessary to input the LTV discounted price into the protocol. This can be accomplished by calling the function provided below.
 
 ```Solidity=
 //In PriceOracle contract
-    
+
     function setPrice(bytes32 _collateralPoolId) external override {}
 
 ```
+
 The setPrice function of the PriceOracle should be called with an argument, which is the collateralPoolId. This is a padded bytes32 value converted from the string 'XDC'.
 
 0x5844430000000000000000000000000000000000000000000000000000000000
@@ -308,13 +322,14 @@ can be initialized with script below
 
 ```
 scripts/migrations/priceFeed/1_initialize.js
-````
+```
+
 #### To run the script with DEX as the price source, ensure that:
 
-0) The build files remain unchanged since deployment.
-1) The DEXFactory is valid and that an XDC/USD pair exists within the DEXFactory.
+0. The build files remain unchanged since deployment.
+1. The DEXFactory is valid and that an XDC/USD pair exists within the DEXFactory.
 
-The default PriceOracle for DelayFathomOraclePriceFeed is set as DexPriceOracle since SlidingWindowDexOracle requires more involvement of PriceBot that will periodically keep feeding prices to SlidingWindowDexOracle. 
+The default PriceOracle for DelayFathomOraclePriceFeed is set as DexPriceOracle since SlidingWindowDexOracle requires more involvement of PriceBot that will periodically keep feeding prices to SlidingWindowDexOracle.
 
 #### Run the init script with below command
 
