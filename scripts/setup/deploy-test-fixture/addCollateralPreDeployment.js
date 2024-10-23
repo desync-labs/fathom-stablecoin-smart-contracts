@@ -29,7 +29,7 @@ async function addCollateralPreDeployment(getNamedAccounts, deployments, getChai
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  await deploy("ERC20", {
+  await deploy("GLD", {
     contract: "ERC20Mintable",
     from: deployer,
     args: ["GLD", "GLD"],
@@ -41,7 +41,7 @@ async function addCollateralPreDeployment(getNamedAccounts, deployments, getChai
     log: true,
   });
 
-  const ERC20 = await deployments.get("ERC20");
+  const ERC20 = await deployments.get("GLD");
   const TestOracleMock = await deployments.get("TestOracleMock");
 
   const ProxyFactory = await deployments.get("FathomProxyFactory");

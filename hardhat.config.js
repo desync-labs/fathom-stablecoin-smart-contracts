@@ -1,15 +1,8 @@
 require("dotenv").config({ path: __dirname + "/.env" });
 require("@nomicfoundation/hardhat-toolbox");
 require("hardhat-deploy");
-// require("./tasks/switch-price-feed");
-// require("./tasks/whitelist-col-token-adapter");
-// require("./tasks/remove-whitelist-col-token-adapter");
-// require("./tasks/whitelist-fmm");
-// require("./tasks/add-roles");
-// require("./tasks/revoke-roles");
-// require("./tasks/transfer-protocol-ownership");
-// require("./tasks/transfer-proxy-admin-ownership");
-// require("./tasks/fee-collection");
+require("./tasks/price-feed");
+require("./tasks/fathom-solidity-sdk");
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {

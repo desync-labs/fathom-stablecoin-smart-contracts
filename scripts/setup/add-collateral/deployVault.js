@@ -28,7 +28,6 @@ async function deployVault(getNamedAccounts, deployments, getChainId, forFixture
   } else {
     tokenAddress = config.tokenAddress;
   }
-  const ERC20 = await deployments.get("ERC20");
   await deploy("Vault", {
     from: deployer,
     args: [formatBytes32String(token), tokenAddress, collateralTokenAdapter.address],

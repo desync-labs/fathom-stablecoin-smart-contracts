@@ -15,7 +15,7 @@ async function deployMocks(getNamedAccounts, deployments, getChainId) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  await deploy("ERC20", {
+  await deploy("USD", {
     contract: "ERC20Mintable",
     from: deployer,
     args: ["US+", "US+"],
@@ -155,7 +155,7 @@ async function deployMocks(getNamedAccounts, deployments, getChainId) {
 
   const chainId = await getChainId();
 
-  const ERC20 = await deployments.get("ERC20");
+  const ERC20 = await deployments.get("USD");
   const ERC20Stable = await deployments.get("ERC20Stable");
   addresses[chainId].USD = ERC20.address;
   addresses[chainId].USDSTABLE = ERC20Stable.address;

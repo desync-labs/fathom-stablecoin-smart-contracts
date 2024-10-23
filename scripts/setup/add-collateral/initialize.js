@@ -33,21 +33,23 @@ async function initialize(getChainId, forFixture = false) {
     delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address,
   };
 
-  let tokenAddress, dexFactoryAddress;
+  let tokenAddress, usdAddress, dexFactoryAddress;
   if (forFixture) {
-    const ERC20 = await deployments.get("ERC20");
+    const GLD = await deployments.get("GLD");
+    const USD = await deployments.get("USD");
     const DEXFactory = await deployments.get("DEXFactory");
-    tokenAddress = ERC20.address;
+    tokenAddress = GLD.address;
+    usdAddress = USD.address;
     dexFactoryAddress = DEXFactory.address;
   } else {
     tokenAddress = config.tokenAddress;
+    usdAddress = addresses.USD;
     dexFactoryAddress = addresses.DEXFactory;
   }
 
   await dexPriceOracle.initialize(dexFactoryAddress);
   await collateralTokenAdapter.initialize(bookKeeper.address, poolId, tokenAddress, proxyWalletFactory.address);
-  // TODO: can we leave adresses.USD as it is?
-  delayFathomOraclePriceFeed.initialize(dexPriceOracle.address, tokenAddress, addresses.USD, accessControlConfig.address, poolId);
+  delayFathomOraclePriceFeed.initialize(dexPriceOracle.address, tokenAddress, usdAddress, accessControlConfig.address, poolId);
   fs.writeFileSync(`./addresses_${token}.json`, JSON.stringify(newAddresses));
 }
 module.exports = { initialize };
