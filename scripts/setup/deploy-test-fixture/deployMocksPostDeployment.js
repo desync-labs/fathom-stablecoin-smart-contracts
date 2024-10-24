@@ -39,13 +39,7 @@ async function deployMocksPostDeployment(getNamedAccounts, deployments, getChain
   const mockCollateralTokenAdapter = await ethers.getContractAt("MockCollateralTokenAdapter", MockCollateralTokenAdapter.address);
 
   const WXDC = await deployments.get("WXDC");
-  await mockCollateralTokenAdapter.initialize(
-    bookKeeper.address,
-    pools.WXDC,
-    WXDC.address,
-    positionManager.address,
-    proxyWalletFactory.address
-  );
+  await mockCollateralTokenAdapter.initialize(bookKeeper.address, pools.WXDC, WXDC.address, positionManager.address, proxyWalletFactory.address);
   await deploy("MockVault", {
     from: deployer,
     args: [pools.WXDC, WXDC.address, MockCollateralTokenAdapter.address],

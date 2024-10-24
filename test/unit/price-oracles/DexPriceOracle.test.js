@@ -23,7 +23,7 @@ describe("DexPriceOracle", () => {
     mockedPair = await smock.fake("IFathomSwapPair");
     mockedToken = await smock.fake("ERC20Mintable");
     mockedUSD = await smock.fake("ERC20Mintable");
-  
+
     await dexPriceOracle.initialize(mockedFactory.address);
   });
 

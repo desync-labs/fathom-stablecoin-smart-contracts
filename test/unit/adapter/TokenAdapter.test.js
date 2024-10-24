@@ -27,22 +27,22 @@ describe("TokenAdapter", () => {
     mockedAccessControlConfig = await smock.fake("AccessControlConfig");
     mockedCollateralPoolConfig = await smock.fake("CollateralPoolConfig");
     mockedVault = await smock.fake("Vault");
-  
+
     mockedBookKeeper = await smock.fake("BookKeeper");
     mockedToken = await smock.fake("ERC20Mintable");
-  
+
     mockedToken.decimals.returns(18);
     mockedAccessControlConfig.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"));
     mockedAccessControlConfig.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"));
     mockedAccessControlConfig.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"));
     mockedAccessControlConfig.hasRole.returns(true);
-  
+
     const TokenAdapterFactory = await ethers.getContractFactory("TokenAdapter");
     tokenAdapter = await TokenAdapterFactory.deploy();
     await tokenAdapter.deployed();
-  
+
     tokenAdapterAsAlice = tokenAdapter.connect(provider.getSigner(AliceAddress));
-  
+
     await tokenAdapter.initialize(mockedBookKeeper.address, formatBytes32String("BTCB"), mockedToken.address);
   });
 

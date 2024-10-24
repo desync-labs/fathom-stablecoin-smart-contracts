@@ -27,7 +27,7 @@ describe("SlidingWindowDexOracle", () => {
     mockedToken = await smock.fake("ERC20Mintable");
     mockedUSD = await smock.fake("ERC20Mintable");
     await slidingWindowDexOracle.initialize(mockedFactory.address, 900, 3);
-  
+
     mockedToken.decimals.returns(18);
     mockedUSD.decimals.returns(18);
   });

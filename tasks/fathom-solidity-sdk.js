@@ -12,31 +12,30 @@ try {
   addresses = {};
 }
 
-task("fathom-solidity-sdk", "Fathom Solidity SDK")
-  .setAction(async () => {
-    const FathomProxyWalletOwner = await ethers.getContractFactory("FathomProxyWalletOwner");
+task("fathom-solidity-sdk", "Fathom Solidity SDK").setAction(async () => {
+  const FathomProxyWalletOwner = await ethers.getContractFactory("FathomProxyWalletOwner");
 
-    const proxyWalletRegistry = addresses.proxyWalletRegistry;
-    const bookKeeper = addresses.bookKeeper;
-    const collateralPoolConfig = addresses.collateralPoolConfig;
-    const fathomStablecoin = addresses.fathomStablecoin;
-    const positionManager = addresses.positionManager;
-    const stabilityFeeCollector = addresses.stabilityFeeCollector;
-    const collateralTokenAdapter = addresses.collateralTokenAdapter;
-    const stablecoinAdapter = addresses.stablecoinAdapter;
+  const proxyWalletRegistry = addresses.proxyWalletRegistry;
+  const bookKeeper = addresses.bookKeeper;
+  const collateralPoolConfig = addresses.collateralPoolConfig;
+  const fathomStablecoin = addresses.fathomStablecoin;
+  const positionManager = addresses.positionManager;
+  const stabilityFeeCollector = addresses.stabilityFeeCollector;
+  const collateralTokenAdapter = addresses.collateralTokenAdapter;
+  const stablecoinAdapter = addresses.stablecoinAdapter;
 
-    proxyWalletOwner = await FathomProxyWalletOwner.deploy(
-      proxyWalletRegistry,
-      bookKeeper,
-      collateralPoolConfig,
-      fathomStablecoin,
-      positionManager,
-      stabilityFeeCollector,
-      collateralTokenAdapter,
-      stablecoinAdapter,
-      pools.XDC
-    );
-    await proxyWalletOwner.deployed();
-  });
-  
+  proxyWalletOwner = await FathomProxyWalletOwner.deploy(
+    proxyWalletRegistry,
+    bookKeeper,
+    collateralPoolConfig,
+    fathomStablecoin,
+    positionManager,
+    stabilityFeeCollector,
+    collateralTokenAdapter,
+    stablecoinAdapter,
+    pools.XDC
+  );
+  await proxyWalletOwner.deployed();
+});
+
 module.exports = {};

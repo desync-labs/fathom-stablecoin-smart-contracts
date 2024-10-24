@@ -21,18 +21,18 @@ describe("StablecoinAdapter", async () => {
 
     mockedBookKeeper = await smock.fake("BookKeeper");
     mockedToken = await smock.fake("ERC20Mintable");
-  
+
     mockedToken.decimals.returns(18);
     mockedAccessControlConfig.OWNER_ROLE.returns(formatBytes32String("OWNER_ROLE"));
     mockedAccessControlConfig.GOV_ROLE.returns(formatBytes32String("GOV_ROLE"));
     mockedAccessControlConfig.SHOW_STOPPER_ROLE.returns(formatBytes32String("SHOW_STOPPER_ROLE"));
     mockedAccessControlConfig.hasRole.returns(true);
     mockedBookKeeper.collateralPoolConfig.returns(mockedCollateralPoolConfig.address);
-  
+
     const StablecoinAdapterFactory = await ethers.getContractFactory("MockStablecoinAdapter");
     stablecoinAdapter = await StablecoinAdapterFactory.deploy();
     await stablecoinAdapter.deployed();
-  
+
     await stablecoinAdapter.initialize(mockedBookKeeper.address, mockedToken.address);
 
     const { deployer, allice } = await getNamedAccounts();

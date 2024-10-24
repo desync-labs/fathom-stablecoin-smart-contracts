@@ -34,7 +34,7 @@ const contracts = [
 
 async function deployProxies(deployments, getChainId) {
   const chainId = await getChainId();
-  
+
   const fathomProxyFactory = await deployments.get("FathomProxyFactory");
   const fathomProxyFactoryAddress = fathomProxyFactory.address;
 

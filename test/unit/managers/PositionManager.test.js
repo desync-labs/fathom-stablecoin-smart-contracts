@@ -93,9 +93,7 @@ describe("PositionManager", () => {
     context("when collateral pool doesn't init", () => {
       it("should revert", async () => {
         mockedCollateralPoolConfig.getDebtAccumulatedRate.returns(0);
-        await expect(positionManager.open(formatBytes32String("WXDC"), AliceAddress)).to.be.revertedWith(
-          "PositionManager/collateralPool-not-init"
-        );
+        await expect(positionManager.open(formatBytes32String("WXDC"), AliceAddress)).to.be.revertedWith("PositionManager/collateralPool-not-init");
       });
     });
     context("when parameters are valid", () => {

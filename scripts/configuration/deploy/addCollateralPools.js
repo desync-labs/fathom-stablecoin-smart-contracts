@@ -19,7 +19,7 @@ async function addCollateralPools(deployments, getChainId) {
 
   const ProxyFactory = await deployments.get("FathomProxyFactory");
   const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
-  
+
   const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
   const bookKeeper = await getProxy(proxyFactory, "BookKeeper");
   const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
@@ -30,7 +30,7 @@ async function addCollateralPools(deployments, getChainId) {
 
   const debtCeilingSetUpTotal = WeiPerRad.mul(10000000);
   const debtCeilingSetUp = WeiPerRad.mul(10000000).div(2);
-  
+
   // initial collateral price as 1 USD
   await simplePriceFeed.setPrice(WeiPerWad.toString());
   await simplePriceFeed.setPoolId(pools.XDC);

@@ -16,7 +16,6 @@ const DEBT_CEILING = WeiPerRad.mul(10000000).div(2);
 
 const { getProxyId, poolId } = require("../../../common/add-collateral-helper");
 async function addCollateralConfigPool(deployments, getChainId) {
-
   const ProxyFactory = await deployments.get("FathomProxyFactory");
   const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
 
@@ -25,13 +24,13 @@ async function addCollateralConfigPool(deployments, getChainId) {
   const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
   const priceOracle = await getProxy(proxyFactory, "PriceOracle");
   const accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
-  
+
   const TestOracleMock = await deployments.get("TestOracleMock");
   const CentralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed");
 
   await CentralizedOraclePriceFeed.initialize(TestOracleMock.address, accessControlConfig.address, poolId);
   const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
-  
+
   const priceFeed = simplePriceFeed;
   await simplePriceFeed.setPrice(WeiPerWad.toString());
   await simplePriceFeed.setPoolId(poolId);
@@ -50,7 +49,7 @@ async function addCollateralConfigPool(deployments, getChainId) {
     CLOSE_FACTOR_BPS.mul(2),
     LIQUIDATOR_INCENTIVE_BPS,
     TREASURY_FEE_BPS,
-    fixedSpreadLiquidationStrategy.address,
+    fixedSpreadLiquidationStrategy.address
   );
 
   await priceOracle.setPrice(poolId);

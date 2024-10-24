@@ -24,7 +24,7 @@ describe("ProxyWallet", () => {
     const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
 
     proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
-    proxyWalletRegistry.setDecentralizedMode(true);
+    await proxyWalletRegistry.setDecentralizedMode(true);
   });
   describe("#new user create a new proxy wallet", async () => {
     context("alice create a new proxy wallet", async () => {

@@ -279,9 +279,9 @@ describe("ShowStopper", () => {
 
             mockedBookKeeper.positions.returns([WeiPerRay, BigNumber.from("1")]);
 
-            await expect(
-              showStopper.redeemLockedCollateral(formatBytes32String("XDC"), DeployerAddress, DeployerAddress, "0x")
-            ).to.be.revertedWith("ShowStopper/debtShare-not-zero");
+            await expect(showStopper.redeemLockedCollateral(formatBytes32String("XDC"), DeployerAddress, DeployerAddress, "0x")).to.be.revertedWith(
+              "ShowStopper/debtShare-not-zero"
+            );
           });
         });
 
@@ -291,9 +291,9 @@ describe("ShowStopper", () => {
 
             mockedBookKeeper.positions.returns([ethers.constants.MaxUint256, BigNumber.from("0")]);
 
-            await expect(
-              showStopper.redeemLockedCollateral(formatBytes32String("XDC"), DeployerAddress, DeployerAddress, "0x")
-            ).to.be.revertedWith("ShowStopper/overflow");
+            await expect(showStopper.redeemLockedCollateral(formatBytes32String("XDC"), DeployerAddress, DeployerAddress, "0x")).to.be.revertedWith(
+              "ShowStopper/overflow"
+            );
           });
         });
 

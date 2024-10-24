@@ -66,7 +66,7 @@ describe("StableSwapModuleWrapper", () => {
     stableSwapModule = await StableSwapModule.deploy();
     await stableSwapModule.deployed();
     stableSwapModuleAsAlice = stableSwapModule.connect(provider.getSigner(AliceAddress));
-    
+
     const StableSwapModuleWrapper = await ethers.getContractFactory("MockStableSwapModuleWrapper");
     stableSwapModuleWrapper = await StableSwapModuleWrapper.deploy();
     await stableSwapModuleWrapper.deployed();
@@ -81,7 +81,7 @@ describe("StableSwapModuleWrapper", () => {
       numberOfSwapsLimitPerUser,
       blocksPerLimit
     );
-  
+
     await stableSwapModuleWrapper.initialize(mockBookKeeper.address, stableSwapModule.address);
 
     await stableSwapModule.addToWhitelist(DeployerAddress);

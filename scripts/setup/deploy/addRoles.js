@@ -3,7 +3,7 @@ const { getProxy } = require("../../../common/proxies");
 
 async function addRoles(deployments, getChainId) {
   const chainId = await getChainId();
-  
+
   const ProxyFactory = await deployments.get("FathomProxyFactory");
   const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
 

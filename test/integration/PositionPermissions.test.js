@@ -536,9 +536,7 @@ describe("PositionPermissions", () => {
           const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress);
           const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
 
-          expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(
-            WeiPerWad.mul(2)
-          );
+          expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
           expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad);
           expect(
             await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -783,9 +781,7 @@ describe("PositionPermissions", () => {
               const alicePositionAddress = await positionManager.positions(1);
               const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress);
               const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(
-                WeiPerWad.mul(2)
-              );
+              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
               expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -813,9 +809,7 @@ describe("PositionPermissions", () => {
                 0
               );
               const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(
-                WeiPerWad
-              );
+              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(WeiPerWad);
               expect(aliceAdjustPosition.debtShare, "debtShare should be 1 FXD, because Alice doesn't draw more").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -856,9 +850,7 @@ describe("PositionPermissions", () => {
               const alicePositionAddress = await positionManager.positions(1);
               const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress);
               const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(
-                WeiPerWad.mul(2)
-              );
+              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
               expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -887,9 +879,7 @@ describe("PositionPermissions", () => {
                 collateralTokenAdapter.address
               );
               const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(
-                WeiPerWad
-              );
+              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(WeiPerWad);
               expect(aliceAdjustPosition.debtShare, "debtShare should be 1 FXD, because Alice didn't draw more").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -936,9 +926,7 @@ describe("PositionPermissions", () => {
           const alicePositionAddress = await positionManager.positions(1);
           const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress);
           const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-          expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(
-            WeiPerWad.mul(2)
-          );
+          expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
           expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad);
           expect(
             await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -1147,9 +1135,7 @@ describe("PositionPermissions", () => {
               const bobPositionAddress = await positionManager.positions(2);
               const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress);
               const bobPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress);
-              expect(bobPosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC").to.be.equal(
-                WeiPerWad.mul(2)
-              );
+              expect(bobPosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
               expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
@@ -1165,9 +1151,7 @@ describe("PositionPermissions", () => {
                 0
               );
               const bobAdjustPosition = await bookKeeper.positions(pools.XDC, bobPositionAddress);
-              expect(bobAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Bob unlocked 1 WXDC").to.be.equal(
-                WeiPerWad
-              );
+              expect(bobAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Bob unlocked 1 WXDC").to.be.equal(WeiPerWad);
               expect(bobAdjustPosition.debtShare, "debtShare should be 1 FXD, because Bob doesn't draw more").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, bobPositionAddress),
@@ -1217,9 +1201,7 @@ describe("PositionPermissions", () => {
               const bobPositionAddress = await positionManager.positions(2);
               const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress);
               const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress);
-              expect(bobPosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC").to.be.equal(
-                WeiPerWad.mul(2)
-              );
+              expect(bobPosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
               expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
@@ -1236,9 +1218,7 @@ describe("PositionPermissions", () => {
                 collateralTokenAdapter2.address
               );
               const bobAdjustPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress);
-              expect(bobAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Bob unlocked 1 WXDC").to.be.equal(
-                WeiPerWad
-              );
+              expect(bobAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Bob unlocked 1 WXDC").to.be.equal(WeiPerWad);
               expect(bobAdjustPosition.debtShare, "debtShare should be 1 FXD, because Bob didn't draw more").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
@@ -1282,9 +1262,7 @@ describe("PositionPermissions", () => {
           const alicePositionAddress = await positionManager.positions(1);
           const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress);
           const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-          expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(
-            WeiPerWad.mul(2)
-          );
+          expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
           expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad);
           expect(
             await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -1389,9 +1367,7 @@ describe("PositionPermissions", () => {
               const alicePositionAddress = await positionManager.positions(1);
               const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress);
               const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(
-                WeiPerWad.mul(2)
-              );
+              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
               expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -1419,9 +1395,7 @@ describe("PositionPermissions", () => {
                 0
               );
               const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(
-                WeiPerWad
-              );
+              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(WeiPerWad);
               expect(aliceAdjustPosition.debtShare, "debtShare should be 1 FXD, because Alice didn't draw more").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -1465,9 +1439,7 @@ describe("PositionPermissions", () => {
               const alicePositionAddress = await positionManager.positions(1);
               const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress);
               const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(
-                WeiPerWad.mul(2)
-              );
+              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
               expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -1479,9 +1451,7 @@ describe("PositionPermissions", () => {
               const bobPositionAddress = await positionManager.positions(2);
               const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress);
               const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress);
-              expect(bobPosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC").to.be.equal(
-                WeiPerWad.mul(2)
-              );
+              expect(bobPosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
               expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
@@ -1498,9 +1468,7 @@ describe("PositionPermissions", () => {
                 collateralTokenAdapter.address
               );
               const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(
-                WeiPerWad
-              );
+              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(WeiPerWad);
               expect(aliceAdjustPosition.debtShare, "debtShare should be 1 FXD, because Alice didn't draw more").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -1548,9 +1516,7 @@ describe("PositionPermissions", () => {
           const alicePositionAddress = await positionManager.positions(1);
           const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress);
           const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-          expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(
-            WeiPerWad.mul(2)
-          );
+          expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
           expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad);
           expect(
             await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -1709,9 +1675,7 @@ describe("PositionPermissions", () => {
               const alicePositionAddress = await positionManager.positions(1);
               const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress);
               const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(
-                WeiPerWad.mul(2)
-              );
+              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
               expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -1739,9 +1703,7 @@ describe("PositionPermissions", () => {
                 0
               );
               const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(
-                WeiPerWad
-              );
+              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(WeiPerWad);
               expect(aliceAdjustPosition.debtShare, "debtShare should be 1 FXD, because Alice didn't draw more").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -1769,9 +1731,7 @@ describe("PositionPermissions", () => {
               const alicePositionAddress = await positionManager.positions(1);
               const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress);
               const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(
-                WeiPerWad.mul(2)
-              );
+              expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
               expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -1783,9 +1743,7 @@ describe("PositionPermissions", () => {
               const bobPositionAddress = await positionManager.positions(2);
               const bobFathomStablecoinBalance = await fathomStablecoin.balanceOf(BobAddress);
               const bobPosition = await bookKeeper.positions(pools.GLD, bobPositionAddress);
-              expect(bobPosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC").to.be.equal(
-                WeiPerWad.mul(2)
-              );
+              expect(bobPosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Bob locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
               expect(bobPosition.debtShare, "debtShare should be 1 FXD, because Bob drew 1 FXD").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.GLD, bobPositionAddress),
@@ -1802,9 +1760,7 @@ describe("PositionPermissions", () => {
                 collateralTokenAdapter.address
               );
               const aliceAdjustPosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(
-                WeiPerWad
-              );
+              expect(aliceAdjustPosition.lockedCollateral, "lockedCollateral should be 1 WXDC, because Alice unlocked 1 WXDC").to.be.equal(WeiPerWad);
               expect(aliceAdjustPosition.debtShare, "debtShare should be 1 FXD, because Alice didn't draw more").to.be.equal(WeiPerWad);
               expect(
                 await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),
@@ -1834,9 +1790,7 @@ describe("PositionPermissions", () => {
           const alicePositionAddress = await positionManager.positions(1);
           const fathomStablecoinBalance = await fathomStablecoin.balanceOf(AliceAddress);
           const alicePosition = await bookKeeper.positions(pools.XDC, alicePositionAddress);
-          expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(
-            WeiPerWad.mul(2)
-          );
+          expect(alicePosition.lockedCollateral, "lockedCollateral should be 2 WXDC, because Alice locked 2 WXDC").to.be.equal(WeiPerWad.mul(2));
           expect(alicePosition.debtShare, "debtShare should be 1 FXD, because Alice drew 1 FXD").to.be.equal(WeiPerWad);
           expect(
             await bookKeeper.collateralToken(pools.XDC, alicePositionAddress),

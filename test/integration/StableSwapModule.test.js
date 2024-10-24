@@ -2,7 +2,6 @@ const { ethers } = require("hardhat");
 const provider = ethers.provider;
 const { expect } = require("chai");
 const { BigNumber } = ethers;
-const TimeHelpers = require("../helper/time");
 const { time } = require("@nomicfoundation/hardhat-network-helpers");
 
 const { getProxy } = require("../../common/proxies");
@@ -46,23 +45,23 @@ describe("StableSwapModule", () => {
 
     const ProxyFactory = await deployments.get("FathomProxyFactory");
     const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
-    
+
     const StableswapMultipleSwapsMock = await deployments.get("StableswapMultipleSwapsMock");
     stableswapMultipleSwapsMock = await ethers.getContractAt("StableswapMultipleSwapsMock", StableswapMultipleSwapsMock.address);
-  
+
     stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
     fathomStablecoin = await getProxy(proxyFactory, "FathomStablecoin");
     stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
 
     const usdtAddr = await stableSwapModule.token();
     USDT = await ethers.getContractAt("ERC20Mintable", usdtAddr);
-  
+
     await USDT.approve(stableSwapModuleWrapper.address, ethers.constants.MaxUint256);
     await fathomStablecoin.approve(stableSwapModuleWrapper.address, ethers.constants.MaxUint256);
 
     await USDT.mint(DeployerAddress, TO_DEPOSIT);
     await fathomStablecoin.mint(DeployerAddress, TO_DEPOSIT);
-  
+
     await stableSwapModuleWrapper.depositTokens(TO_DEPOSIT);
 
     await USDT.approve(stableSwapModule.address, ethers.constants.MaxUint256);
@@ -143,7 +142,9 @@ describe("StableSwapModule", () => {
         const beforeBalanceOfStablecoin = await fathomStablecoin.balanceOf(whitelistAccount);
         const beforeBalanceOfUSDT = await USDT.balanceOf(whitelistAccount);
 
-        await stableSwapModule.connect(provider.getSigner(whitelistAccount)).swapStablecoinToToken(whitelistAccount, ethers.utils.parseEther("1000000"));
+        await stableSwapModule
+          .connect(provider.getSigner(whitelistAccount))
+          .swapStablecoinToToken(whitelistAccount, ethers.utils.parseEther("1000000"));
         const afterBalanceOfStablecoin = await fathomStablecoin.balanceOf(whitelistAccount);
         const afterBalanceOfUSDT = await USDT.balanceOf(whitelistAccount);
         expect(beforeBalanceOfStablecoin.sub(afterBalanceOfStablecoin)).to.be.equal(ethers.utils.parseEther("1000000"));
@@ -171,7 +172,9 @@ describe("StableSwapModule", () => {
         await fathomStablecoin.connect(provider.getSigner(whitelistAccount)).approve(stableSwapModule.address, ethers.constants.MaxUint256);
         await fathomStablecoin.mint(whitelistAccount, TO_MINT);
         await stableSwapModule.addToWhitelist(whitelistAccount);
-        await stableSwapModule.connect(provider.getSigner(whitelistAccount)).swapStablecoinToToken(whitelistAccount, ethers.utils.parseEther("1000000"));
+        await stableSwapModule
+          .connect(provider.getSigner(whitelistAccount))
+          .swapStablecoinToToken(whitelistAccount, ethers.utils.parseEther("1000000"));
         await stableSwapModule.removeFromWhitelist(whitelistAccount);
         await expect(
           stableSwapModule.connect(provider.getSigner(whitelistAccount)).swapStablecoinToToken(whitelistAccount, ethers.utils.parseEther("1000000"))
@@ -207,7 +210,8 @@ describe("StableSwapModule", () => {
           //div by 1000 so that single swap limit is not reached
           await stableSwapModule.swapTokenToStablecoin(
             DeployerAddress,
-            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)));
+            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+          );
           //increase block time so that a block is mined before swapping
           await time.increase(1);
           numberOfSwaps++;
@@ -217,7 +221,8 @@ describe("StableSwapModule", () => {
           console.log("Swapping Stablecion to Token - No...........", i + 1);
           await stableSwapModule.swapStablecoinToToken(
             DeployerAddress,
-            ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)));
+            ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+          );
           //increase block time so that a block is mined before swapping
           await time.increase(1);
           numberOfSwaps++;
@@ -227,13 +232,15 @@ describe("StableSwapModule", () => {
         await expect(
           stableSwapModule.swapTokenToStablecoin(
             DeployerAddress,
-            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)))
+            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+          )
         ).to.be.revertedWith("_updateAndCheckDailyLimit/daily-limit-exceeded");
         await time.increase(1);
         await expect(
           stableSwapModule.swapStablecoinToToken(
             DeployerAddress,
-            ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)))
+            ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+          )
         ).to.be.revertedWith("_updateAndCheckDailyLimit/daily-limit-exceeded");
         await time.increase(1);
         const ONE_DAY = 86400;
@@ -280,9 +287,9 @@ describe("StableSwapModule", () => {
       it("Should revert when SingleSwap Limit is reached", async () => {
         //first swap which takes all the allowance
         await stableSwapModule.setDecentralizedStatesStatus(true);
-        await expect(
-          stableSwapModule.swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT.add(1))
-        ).to.be.revertedWith("_checkSingleSwapLimit/single-swap-exceeds-limit");
+        await expect(stableSwapModule.swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT.add(1))).to.be.revertedWith(
+          "_checkSingleSwapLimit/single-swap-exceeds-limit"
+        );
       });
     });
   });
@@ -297,7 +304,8 @@ describe("StableSwapModule", () => {
         await expect(
           stableSwapModule.swapTokenToStablecoin(
             DeployerAddress,
-            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)))
+            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+          )
         ).to.be.revertedWith("_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded");
       });
     });
@@ -317,12 +325,14 @@ describe("StableSwapModule", () => {
 
         await stableSwapModule.swapStablecoinToToken(
           DeployerAddress,
-          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)));
+          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+        );
 
         await expect(
           stableSwapModule.swapTokenToStablecoin(
             DeployerAddress,
-            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)))
+            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+          )
         ).to.be.revertedWith("_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded");
       });
     });
@@ -339,15 +349,18 @@ describe("StableSwapModule", () => {
 
         await stableSwapModule.swapStablecoinToToken(
           DeployerAddress,
-          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)));
+          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+        );
 
         await stableSwapModule.swapStablecoinToToken(
           DeployerAddress,
-          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)));
+          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+        );
 
         await stableSwapModule.swapStablecoinToToken(
           DeployerAddress,
-          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)));
+          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+        );
       });
     });
     context("check for block limit", async () => {
@@ -363,23 +376,27 @@ describe("StableSwapModule", () => {
         await stableSwapModule.swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT);
         await stableSwapModule.swapStablecoinToToken(
           DeployerAddress,
-          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)));
+          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+        );
         await stableSwapModule.swapStablecoinToToken(
           DeployerAddress,
-          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)));
+          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+        );
         //This should fail because its 4th swap within 500 block window
         await expect(
           stableSwapModule.swapTokenToStablecoin(
             DeployerAddress,
-            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)))
+            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+          )
         ).to.be.revertedWith("_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded");
         for (let i = 0; i < blockNumbersToReachForNextSwap; i++) {
-          await TimeHelpers.advanceBlock();
+          await hre.network.provider.send("hardhat_mine", ["0x01"]);
         }
 
         await stableSwapModule.swapStablecoinToToken(
           DeployerAddress,
-          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT)));
+          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(DIVIDER_TO_FIT_SINGLE_SWAP_LIMIT))
+        );
       });
     });
   });
@@ -407,7 +424,8 @@ describe("StableSwapModule", () => {
           stableswapMultipleSwapsMock.twoStablecoinToTokenSwapAtSameBlock(
             stableSwapModule.address,
             fathomStablecoin.address,
-            ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(5000)))
+            ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(5000))
+          )
         ).to.be.revertedWith("_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded");
       });
     });
@@ -420,7 +438,8 @@ describe("StableSwapModule", () => {
           stableswapMultipleSwapsMock.twoTokenToStablecoinSwapAtSameBlock(
             stableSwapModule.address,
             USDT.address,
-            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(5000)))
+            ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.div(5000))
+          )
         ).to.be.revertedWith("_updateAndCheckNumberOfSwapsInBlocksPerLimit/swap-limit-exceeded");
       });
     });
@@ -436,7 +455,8 @@ describe("StableSwapModule", () => {
         await stableswapMultipleSwapsMock.twoStablecoinToTokenSwapAtSameBlock(
           stableSwapModule.address,
           fathomStablecoin.address,
-          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(4000)));
+          ONE_PERCENT_OF_TOTAL_DEPOSIT.sub(ONE_PERCENT_OF_TOTAL_DEPOSIT.div(4000))
+        );
       });
     });
 
@@ -461,16 +481,16 @@ describe("StableSwapModule", () => {
   describe("#stableswapNotWhitelistedUserSwaps", async () => {
     context("not whitelisted-swapTokenToStablecoin", () => {
       it("should revert -  fail if the decentralized state is not activated and sender is not whitelisted", async () => {
-        await expect(stableSwapModule.connect(provider.getSigner(accounts[2].address)).swapTokenToStablecoin(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT)).to.be.revertedWith(
-          "user-not-whitelisted"
-        );
+        await expect(
+          stableSwapModule.connect(provider.getSigner(accounts[2].address)).swapTokenToStablecoin(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT)
+        ).to.be.revertedWith("user-not-whitelisted");
       });
     });
     context("not whitelisted-swapStablecoinToToken", () => {
       it("should revert -  fail if the decentralized state is not activated and sender is not whitelisted", async () => {
-        await expect(stableSwapModule.connect(provider.getSigner(accounts[2].address)).swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT)).to.be.revertedWith(
-          "user-not-whitelisted"
-        );
+        await expect(
+          stableSwapModule.connect(provider.getSigner(accounts[2].address)).swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT)
+        ).to.be.revertedWith("user-not-whitelisted");
       });
     });
   });
@@ -506,18 +526,18 @@ describe("StableSwapModule", () => {
     context("exceed single swap limit", () => {
       it("should revert after setting decentralized state - single swap limit - swapStablecoinToToken", async () => {
         await stableSwapModule.setDecentralizedStatesStatus(true);
-        await expect(
-          stableSwapModule.swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT.add(1))
-        ).to.be.revertedWith("_checkSingleSwapLimit/single-swap-exceeds-limit");
+        await expect(stableSwapModule.swapStablecoinToToken(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT.add(1))).to.be.revertedWith(
+          "_checkSingleSwapLimit/single-swap-exceeds-limit"
+        );
       });
     });
 
     context("exceed single swap limit", () => {
       it("should revert after setting decentralized state - single swap limit - swapTokenToStablecoin", async () => {
         await stableSwapModule.setDecentralizedStatesStatus(true);
-        await expect(
-          stableSwapModule.swapTokenToStablecoin(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.add(1))
-        ).to.be.revertedWith("_checkSingleSwapLimit/single-swap-exceeds-limit");
+        await expect(stableSwapModule.swapTokenToStablecoin(DeployerAddress, ONE_PERCENT_OF_TOTAL_DEPOSIT_SIX_DECIMALS.add(1))).to.be.revertedWith(
+          "_checkSingleSwapLimit/single-swap-exceeds-limit"
+        );
       });
     });
   });

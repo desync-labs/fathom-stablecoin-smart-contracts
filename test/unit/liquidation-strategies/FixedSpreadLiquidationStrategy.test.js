@@ -232,12 +232,7 @@ describe("FixedSpreadLiquidationStrategy", () => {
               )
               .returns();
             mockedBookKeeper.moveCollateral
-              .whenCalledWith(
-                formatBytes32String("WXDC"),
-                fixedSpreadLiquidationStrategy.address,
-                DeployerAddress,
-                ethers.utils.parseEther("2.0375")
-              )
+              .whenCalledWith(formatBytes32String("WXDC"), fixedSpreadLiquidationStrategy.address, DeployerAddress, ethers.utils.parseEther("2.0375"))
               .returns();
             mockedBookKeeper.moveCollateral
               .whenCalledWith(

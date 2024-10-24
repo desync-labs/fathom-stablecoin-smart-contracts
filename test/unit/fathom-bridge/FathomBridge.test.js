@@ -52,9 +52,7 @@ describe("FathomBridge", () => {
     context("when the caller is the owner", async () => {
       it("should work", async () => {
         mockedAccessControlConfig.hasRole.returns(true);
-        await expect(fathomBridge.addToWhitelist(AliceAddress))
-          .to.be.emit(fathomBridge, "LogAddToWhitelist")
-          .withArgs(AliceAddress);
+        await expect(fathomBridge.addToWhitelist(AliceAddress)).to.be.emit(fathomBridge, "LogAddToWhitelist").withArgs(AliceAddress);
       });
     });
     context("when the caller is the owner but trying to add ZeroAddress", async () => {
@@ -76,9 +74,7 @@ describe("FathomBridge", () => {
       it("should work", async () => {
         mockedAccessControlConfig.hasRole.returns(true);
         await fathomBridge.addToWhitelist(AliceAddress);
-        await expect(fathomBridge.removeFromWhitelist(AliceAddress))
-          .to.be.emit(fathomBridge, "LogRemoveFromWhitelist")
-          .withArgs(AliceAddress);
+        await expect(fathomBridge.removeFromWhitelist(AliceAddress)).to.be.emit(fathomBridge, "LogRemoveFromWhitelist").withArgs(AliceAddress);
       });
     });
     context("when the caller is the owner but trying to add ZeroAddress", async () => {
@@ -101,9 +97,7 @@ describe("FathomBridge", () => {
         mockedAccessControlConfig.hasRole.returns(true);
         const decentralizedModeBefore = await fathomBridge.isDecentralizedMode();
         expect(decentralizedModeBefore).to.be.equal(false);
-        await expect(fathomBridge.setDecentralizedMode(true))
-          .to.be.emit(fathomBridge, "LogSetDecentralizedMode")
-          .withArgs(true);
+        await expect(fathomBridge.setDecentralizedMode(true)).to.be.emit(fathomBridge, "LogSetDecentralizedMode").withArgs(true);
         const decentralizedModeAfter = await fathomBridge.isDecentralizedMode();
         expect(decentralizedModeAfter).to.be.equal(true);
       });
@@ -122,9 +116,7 @@ describe("FathomBridge", () => {
         mockedAccessControlConfig.hasRole.returns(true);
         const feeBefore = await fathomBridge.fixedBridgeFee();
         expect(feeBefore).to.be.equal(0);
-        await expect(fathomBridge.setFee(WeiPerRad))
-          .to.be.emit(fathomBridge, "LogSetFee")
-          .withArgs(WeiPerRad);
+        await expect(fathomBridge.setFee(WeiPerRad)).to.be.emit(fathomBridge, "LogSetFee").withArgs(WeiPerRad);
         const feeAfter = await fathomBridge.fixedBridgeFee();
         expect(feeAfter).to.be.equal(WeiPerRad);
       });

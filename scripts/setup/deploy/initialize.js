@@ -14,7 +14,7 @@ async function initialize(deployments, getChainId, forFixture = false) {
   const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
   const ProxyAdmin = await deployments.get("FathomProxyAdmin");
   const proxyAdmin = await ethers.getContractAt("FathomProxyAdmin", ProxyAdmin.address);
-  
+
   const fixedSpreadLiquidationStrategy = await getProxy(proxyFactory, "FixedSpreadLiquidationStrategy");
   const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
   const proxyWalletFactory = await getProxy(proxyFactory, "ProxyWalletFactory");
@@ -50,7 +50,7 @@ async function initialize(deployments, getChainId, forFixture = false) {
   } else {
     fathomBridge = null;
   }
-  
+
   const fathomStablecoinProxyActions = await ethers.getContractAt("FathomStablecoinProxyActions", FathomStablecoinProxyActions.address);
 
   const addresses = getAddresses(chainId);
@@ -81,7 +81,7 @@ async function initialize(deployments, getChainId, forFixture = false) {
   await proxyWalletFactory.initialize(proxyActionsStorage.address, proxyWalletRegistry.address);
   await proxyWalletRegistry.initialize(proxyWalletFactory.address, bookKeeper.address);
   await flashMintModule.initialize(stablecoinAdapter.address, systemDebtEngine.address);
-  
+
   await stableSwapModule.initialize(
     bookKeeper.address,
     addresses.USDSTABLE,
@@ -89,12 +89,12 @@ async function initialize(deployments, getChainId, forFixture = false) {
     dailyLimitNumerator,
     singleSwapLimitNumerator,
     numberOfSwapsLimitPerUser,
-    blocksPerLimit,
+    blocksPerLimit
   );
   await flashMintArbitrager.initialize();
   await bookKeeperFlashMintArbitrager.initialize(fathomStablecoin.address);
   // await dexPriceOracle.initialize(addresses.DEXFactory, { gasLimit: 1000000 }),
-  
+
   let wxdcAddress;
   if (forFixture) {
     const WXDC = await deployments.get("WXDC");
@@ -120,10 +120,7 @@ async function initialize(deployments, getChainId, forFixture = false) {
     stablecoinAdapter.address
   );
   // await centralizedOraclePriceFeed.initialize(fathomPriceOracle.address, accessControlConfig.address, pools.XDC);
-  await stableSwapModuleWrapper.initialize(
-    bookKeeper.address,
-    stableSwapModule.address
-  );
+  await stableSwapModuleWrapper.initialize(bookKeeper.address, stableSwapModule.address);
   await simplePriceFeed.initialize(accessControlConfig.address);
   // await slidingWindowDexOracle.initialize(addresses.DEXFactory, 1800, 15);
 

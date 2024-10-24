@@ -13,7 +13,7 @@ async function configureFees(deployments) {
   const ProxyFactory = await deployments.get("FathomProxyFactory");
   const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
 
-  const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule")
+  const stableSwapModule = await getProxy(proxyFactory, "StableSwapModule");
   const flashMintModule = await getProxy(proxyFactory, "FlashMintModule");
 
   await stableSwapModule.setFeeIn(SSM_FEE_IN);

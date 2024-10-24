@@ -42,7 +42,7 @@ async function configPool(getChainId) {
     CLOSE_FACTOR_BPS.mul(2),
     LIQUIDATOR_INCENTIVE_BPS,
     TREASURY_FEE_BPS,
-    fixedSpreadLiquidationStrategy.address,
+    fixedSpreadLiquidationStrategy.address
   );
 
   await priceOracle.setPrice(poolId);

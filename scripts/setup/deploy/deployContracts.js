@@ -28,7 +28,7 @@ async function deployContracts(getNamedAccounts, deployments, getChainId) {
     args: [],
     log: true,
   });
-    await deploy("LiquidationEngine", {
+  await deploy("LiquidationEngine", {
     from: deployer,
     args: [],
     log: true,

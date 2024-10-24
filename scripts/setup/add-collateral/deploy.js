@@ -4,7 +4,7 @@ async function deploy(getNamedAccounts, deployments, getChainId) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   const chainId = await getChainId();
-  
+
   await deploy("DexPriceOracle", {
     from: deployer,
     args: [],

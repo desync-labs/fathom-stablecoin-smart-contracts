@@ -563,13 +563,7 @@ describe("LiquidationEngine", () => {
         const lockedCollateralAmount = parseEther("10");
         const drawStablecoinAmount = parseEther("2000");
 
-        await PositionHelper.openXDCPositionAndDraw(
-          aliceProxyWallet,
-          AliceAddress,
-          COLLATERAL_POOL_ID,
-          lockedCollateralAmount,
-          drawStablecoinAmount
-        );
+        await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
 
         // Set stability fee rate to 0.5% APR
         await collateralPoolConfig.setStabilityFeeRate(COLLATERAL_POOL_ID, BigNumber.from("1000000000158153903837946258"));
@@ -664,20 +658,8 @@ describe("LiquidationEngine", () => {
         const lockedCollateralAmount = parseEther(testParam.collateralAmount);
         const drawStablecoinAmount = parseEther(testParam.drawStablecoinAmount);
 
-        await PositionHelper.openXDCPositionAndDraw(
-          aliceProxyWallet,
-          AliceAddress,
-          COLLATERAL_POOL_ID,
-          lockedCollateralAmount,
-          drawStablecoinAmount
-        );
-        await PositionHelper.openXDCPositionAndDraw(
-          aliceProxyWallet,
-          AliceAddress,
-          COLLATERAL_POOL_ID,
-          lockedCollateralAmount,
-          drawStablecoinAmount
-        );
+        await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
+        await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, COLLATERAL_POOL_ID, lockedCollateralAmount, drawStablecoinAmount);
 
         const alicePositionAddress1 = await positionManager.positions(1);
         const alicePositionAddress2 = await positionManager.positions(2);

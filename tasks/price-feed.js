@@ -9,7 +9,7 @@ task("price-feed", "Price Feed")
     }
 
     const proxyFactory = await ethers.getContractAt("FathomProxyFactory", taskArgs.proxyFactoryAddress);
-  
+
     const delayFathomOraclePriceFeed = await getProxy(proxyFactory, "DelayFathomOraclePriceFeed");
     const dexPriceOracle = await getProxy(proxyFactory, "DexPriceOracle");
     // const centralizedOraclePriceFeed = await getProxy(proxyFactory, "CentralizedOraclePriceFeed");
@@ -22,5 +22,5 @@ task("price-feed", "Price Feed")
     await slidingWindowDexOracle.initialize(addresses.DEXFactory, 1800, 15);
     await delayFathomOraclePriceFeed.initialize(dexPriceOracle.address, addresses.WXDC, addresses.USD, accessControlConfig.address, pools.XDC);
   });
-  
+
 module.exports = {};
