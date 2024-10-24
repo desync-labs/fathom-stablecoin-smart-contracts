@@ -14,10 +14,10 @@ const { addCollateralPools } = require("../../scripts/configuration/deploy/addCo
 
 module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   // Setup
-  await deployContracts(getNamedAccounts, deployments);
-  await deployProxies(deployments);
+  await deployContracts(getNamedAccounts, deployments, getChainId);
+  await deployProxies(deployments, getChainId);
   await initialize(deployments, getChainId);
-  await addRoles(deployments);
+  await addRoles(deployments, getChainId);
   await configureFees(deployments);
   await configureShowStopper(deployments);
   await deployVault(getNamedAccounts, deployments, getChainId);

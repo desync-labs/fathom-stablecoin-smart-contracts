@@ -10,7 +10,7 @@ const { configPool } = require("../../scripts/configuration/add-collateral/confi
 
 module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   // Setup
-  await deploy(getNamedAccounts, deployments);
+  await deploy(getNamedAccounts, deployments, getChainId);
   await deployProxies(deployments, getChainId);
   await initialize(getChainId);
   await addRoles(getChainId);

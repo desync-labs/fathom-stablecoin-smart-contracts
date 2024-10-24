@@ -29,10 +29,10 @@ const { deployVault: deployVaultAddCollateral } = require("../../scripts/setup/a
 module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   // Setup
   await deployMocks(getNamedAccounts, deployments, getChainId);
-  await deployContracts(getNamedAccounts, deployments);
-  await deployProxies(deployments);
+  await deployContracts(getNamedAccounts, deployments, getChainId);
+  await deployProxies(deployments, getChainId);
   await initialize(deployments, getChainId, true);
-  await addRoles(deployments);
+  await addRoles(deployments, getChainId);
   await configureFees(deployments);
   await configureShowStopper(deployments);
   await deployVault(getNamedAccounts, deployments, getChainId, true);
@@ -55,7 +55,7 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
   await addCollateralPreDeployment(getNamedAccounts, deployments, getChainId);
 
   // Add collateral
-  await deploy(getNamedAccounts, deployments);
+  await deploy(getNamedAccounts, deployments, getChainId);
   await deployProxiesAddCollateral(deployments, getChainId, true);
   await initializeAddCollateral(getChainId, true);
   await addRolesAddCollateral(getChainId, true);

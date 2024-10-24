@@ -42,8 +42,14 @@ async function initialize(deployments, getChainId, forFixture = false) {
   const stableSwapModuleWrapper = await getProxy(proxyFactory, "StableSwapModuleWrapper");
   const simplePriceFeed = await getProxy(proxyFactory, "SimplePriceFeed");
   const slidingWindowDexOracle = await getProxy(proxyFactory, "SlidingWindowDexOracle");
-  // TODO
-  const fathomBridge = await getProxy(proxyFactory, "FathomBridge");
+
+  let fathomBridge;
+  if (chainId !== "31337") {
+    // Get FathomBridge Proxy only on testnet/mainnet
+    fathomBridge = await getProxy(proxyFactory, "FathomBridge");
+  } else {
+    fathomBridge = null;
+  }
   
   const fathomStablecoinProxyActions = await ethers.getContractAt("FathomStablecoinProxyActions", FathomStablecoinProxyActions.address);
 
@@ -120,8 +126,12 @@ async function initialize(deployments, getChainId, forFixture = false) {
   );
   await simplePriceFeed.initialize(accessControlConfig.address);
   // await slidingWindowDexOracle.initialize(addresses.DEXFactory, 1800, 15);
-  // TODO
-  await fathomBridge.initialize(addresses.AsterizmInitializerLib, fathomStablecoin.address, accessControlConfig.address);
+
+  // Initialize FathomBridge Proxy only on testnet/mainnet
+  if (chainId !== "31337") {
+    await fathomBridge.initialize(addresses.AsterizmInitializerLib, fathomStablecoin.address, accessControlConfig.address);
+    console.log("FathomBridge initialized");
+  }
 
   const newAddresses = {
     proxyFactory: proxyFactory.address,
@@ -153,8 +163,12 @@ async function initialize(deployments, getChainId, forFixture = false) {
     proxyActionsStorage: proxyActionsStorage.address,
     fathomProxyAdmin: proxyAdmin.address,
     slidingWindowDexOracle: slidingWindowDexOracle.address,
-    fathomBridge: fathomBridge.address, // TODO
+    // fathomBridge: fathomBridge.address,
   };
+
+  if (chainId !== "31337") {
+    newAddresses.fathomBridge = fathomBridge.address;
+  }
 
   fs.writeFileSync("./addresses.json", JSON.stringify(newAddresses));
 }

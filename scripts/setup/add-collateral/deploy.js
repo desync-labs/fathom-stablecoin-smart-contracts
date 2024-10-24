@@ -1,3 +1,5 @@
+const { usePlugin } = require("../../../common/add-collateral-helper");
+
 async function deploy(getNamedAccounts, deployments, getChainId) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();

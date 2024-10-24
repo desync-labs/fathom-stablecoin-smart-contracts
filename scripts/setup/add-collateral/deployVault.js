@@ -23,7 +23,7 @@ async function deployVault(getNamedAccounts, deployments, getChainId, forFixture
 
   let tokenAddress;
   if (forFixture) {
-    const ERC20 = await deployments.get("ERC20");
+    const ERC20 = await deployments.get("GLD");
     tokenAddress = ERC20.address;
   } else {
     tokenAddress = config.tokenAddress;

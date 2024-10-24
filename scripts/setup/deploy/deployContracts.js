@@ -1,6 +1,7 @@
-async function deployContracts(getNamedAccounts, deployments) {
+async function deployContracts(getNamedAccounts, deployments, getChainId) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
+  const chainId = await getChainId();
 
   await deploy("AccessControlConfig", {
     from: deployer,
@@ -152,11 +153,14 @@ async function deployContracts(getNamedAccounts, deployments) {
     args: [],
     log: true,
   });
-  await deploy("FathomBridge", {
-    from: deployer,
-    args: [],
-    log: true,
-  });
+  // Deploy FathomBridge only on testnet/mainnet
+  if (chainId !== "31337") {
+    await deploy("FathomBridge", {
+      from: deployer,
+      args: [],
+      log: true,
+    });
+  }
 }
 
 module.exports = {

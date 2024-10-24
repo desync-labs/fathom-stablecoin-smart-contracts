@@ -33,21 +33,18 @@ async function initialize(getChainId, forFixture = false) {
     delayFathomOraclePriceFeed: delayFathomOraclePriceFeed.address,
   };
 
-  let tokenAddress, usdAddress, dexFactoryAddress;
+  let tokenAddress, usdAddress;
   if (forFixture) {
     const GLD = await deployments.get("GLD");
     const USD = await deployments.get("USD");
-    const DEXFactory = await deployments.get("DEXFactory");
     tokenAddress = GLD.address;
     usdAddress = USD.address;
-    dexFactoryAddress = DEXFactory.address;
   } else {
     tokenAddress = config.tokenAddress;
     usdAddress = addresses.USD;
-    dexFactoryAddress = addresses.DEXFactory;
   }
 
-  await dexPriceOracle.initialize(dexFactoryAddress);
+  await dexPriceOracle.initialize(addresses.DEXFactory);
   await collateralTokenAdapter.initialize(bookKeeper.address, poolId, tokenAddress, proxyWalletFactory.address);
   delayFathomOraclePriceFeed.initialize(dexPriceOracle.address, tokenAddress, usdAddress, accessControlConfig.address, poolId);
   fs.writeFileSync(`./addresses_${token}.json`, JSON.stringify(newAddresses));

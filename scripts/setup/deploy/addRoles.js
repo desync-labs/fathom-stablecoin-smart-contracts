@@ -1,7 +1,9 @@
 const { ethers } = require("hardhat");
 const { getProxy } = require("../../../common/proxies");
 
-async function addRoles(deployments) {
+async function addRoles(deployments, getChainId) {
+  const chainId = await getChainId();
+  
   const ProxyFactory = await deployments.get("FathomProxyFactory");
   const proxyFactory = await ethers.getContractAt("FathomProxyFactory", ProxyFactory.address);
 
@@ -20,8 +22,14 @@ async function addRoles(deployments) {
   const collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
   const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
   const adminControls = await getProxy(proxyFactory, "AdminControls");
-  // TODO
-  const fathomBridge = await getProxy(proxyFactory, "FathomBridge");
+
+  let fathomBridge;
+  if (chainId !== "31337") {
+    // Get FathomBridge Proxy only on testnet/mainnet
+    fathomBridge = await getProxy(proxyFactory, "FathomBridge");
+  } else {
+    fathomBridge = null;
+  }
 
   await accessControlConfig.grantRole(await accessControlConfig.BOOK_KEEPER_ROLE(), bookKeeper.address);
 
@@ -50,8 +58,11 @@ async function addRoles(deployments) {
 
   await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), systemDebtEngine.address);
 
-  // TODO
-  await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), fathomBridge.address);
+  // Grant MINTER_ROLE to FathomBridge only on testnet/mainnet
+  if (chainId !== "31337") {
+    await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), fathomBridge.address);
+  }
+
   await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), stablecoinAdapter.address);
 
   await accessControlConfig.grantRole(await accessControlConfig.GOV_ROLE(), adminControls.address);
