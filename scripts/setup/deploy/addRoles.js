@@ -23,14 +23,6 @@ async function addRoles(deployments, getChainId) {
   const systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
   const adminControls = await getProxy(proxyFactory, "AdminControls");
 
-  let fathomBridge;
-  if (chainId !== "31337") {
-    // Get FathomBridge Proxy only on testnet/mainnet
-    fathomBridge = await getProxy(proxyFactory, "FathomBridge");
-  } else {
-    fathomBridge = null;
-  }
-
   await accessControlConfig.grantRole(await accessControlConfig.BOOK_KEEPER_ROLE(), bookKeeper.address);
 
   await accessControlConfig.grantRole(await accessControlConfig.POSITION_MANAGER_ROLE(), positionManager.address);
@@ -57,11 +49,6 @@ async function addRoles(deployments, getChainId) {
   await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), stableSwapModule.address);
 
   await accessControlConfig.grantRole(await accessControlConfig.COLLATERAL_MANAGER_ROLE(), systemDebtEngine.address);
-
-  // Grant MINTER_ROLE to FathomBridge only on testnet/mainnet
-  if (chainId !== "31337") {
-    await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), fathomBridge.address);
-  }
 
   await fathomStablecoin.grantRole(await fathomStablecoin.MINTER_ROLE(), stablecoinAdapter.address);
 

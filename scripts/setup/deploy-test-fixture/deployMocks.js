@@ -122,11 +122,6 @@ async function deployMocks(getNamedAccounts, deployments, getChainId) {
     args: [],
     log: true,
   });
-  await deploy("MockFathomBridge", {
-    from: deployer,
-    args: [],
-    log: true,
-  });
   await deploy("MockShowStopper", {
     from: deployer,
     args: [],

@@ -153,14 +153,6 @@ async function deployContracts(getNamedAccounts, deployments, getChainId) {
     args: [],
     log: true,
   });
-  // Deploy FathomBridge only on testnet/mainnet
-  if (chainId !== "31337") {
-    await deploy("FathomBridge", {
-      from: deployer,
-      args: [],
-      log: true,
-    });
-  }
 }
 
 module.exports = {

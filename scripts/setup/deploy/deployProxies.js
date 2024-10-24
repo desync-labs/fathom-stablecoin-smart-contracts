@@ -29,7 +29,6 @@ const contracts = [
   "CentralizedOraclePriceFeed",
   "StableSwapModuleWrapper",
   "SimplePriceFeed",
-  // "FathomBridge",
 ];
 
 async function deployProxies(deployments, getChainId) {
@@ -48,12 +47,6 @@ async function deployProxies(deployments, getChainId) {
       return fathomProxyFactoryContract.createProxy(formatBytes32String(contract), instance.address, fathomProxyAdminAddress, "0x");
     })
   );
-
-  // Create FathomBridge Proxy only on testnet/mainnet
-  if (chainId !== "31337") {
-    const instance = await deployments.get("FathomBridge");
-    await fathomProxyFactoryContract.createProxy(formatBytes32String("FathomBridge"), instance.address, fathomProxyAdminAddress, "0x");
-  }
 }
 
 module.exports = {

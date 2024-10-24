@@ -51,7 +51,6 @@ describe("ShowStopper", () => {
     systemDebtEngine = await getProxy(proxyFactory, "SystemDebtEngine");
     priceOracle = await getProxy(proxyFactory, "PriceOracle");
     showStopper = await getProxy(proxyFactory, "ShowStopper");
-    const mockFathomBridge = await smock.fake("MockFathomBridge");
     accessControlConfig = await getProxy(proxyFactory, "AccessControlConfig");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
@@ -63,11 +62,6 @@ describe("ShowStopper", () => {
 
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
     await proxyWalletRegistry.setDecentralizedMode(true);
-
-    await showStopper.setFathomBridge(mockFathomBridge.address);
-    mockFathomBridge.totalBridgedInAmount.returns(0);
-    mockFathomBridge.totalBridgedOutAmount.returns(0);
-    mockFathomBridge.cage.returns();
 
     ({
       proxyWallets: [aliceProxyWallet, bobProxyWallet],
