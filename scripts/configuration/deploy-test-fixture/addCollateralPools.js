@@ -31,6 +31,7 @@ async function addCollateralPools(deployments) {
 
   const debtCeilingSetUpTotal = WeiPerRad.mul(100000000000000);
   const debtCeilingSetUp = WeiPerRad.mul(100000000000000);
+  const debtFloorSetUp = WeiPerRad;
   await simplePriceFeed.setPoolId(pools.XDC);
   await simplePriceFeed.setPrice(WeiPerWad.mul(1));
   await simplePriceFeed.setPoolId(pools.XDC);
@@ -43,7 +44,7 @@ async function addCollateralPools(deployments) {
     await collateralPoolConfig.initCollateralPool(
       poolId,
       debtCeilingSetUp,
-      0,
+      debtFloorSetUp,
       WeiPerRad.mul(1000000),
       priceFeed,
       liquidationRatio,

@@ -21,6 +21,7 @@ describe("PositionPermissions", () => {
   let stabilityFeeCollector;
   let simplePriceFeed;
   let collateralTokenAdapter2;
+  let collateralPoolConfig;
 
   let AliceAddress;
   let BobAddress;
@@ -44,7 +45,7 @@ describe("PositionPermissions", () => {
     stabilityFeeCollector = await getProxy(proxyFactory, "StabilityFeeCollector");
     const priceOracle = await getProxy(proxyFactory, "PriceOracle");
     collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
-    const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
+    collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
     await proxyWalletRegistry.setDecentralizedMode(true);
 
@@ -1948,6 +1949,40 @@ describe("PositionPermissions", () => {
               WeiPerWad
             )
           ).to.be.revertedWith("BookKeeper/position-debt-ceiling-exceeded");
+        });
+      });
+    });
+    context("debt floor", async () => {
+      context("wipe and unlock XDC exceeds debt floor", async () => {
+        it("should revert", async () => {
+          await simplePriceFeed.setPrice(WeiPerRay.div(1000));
+          let lockedCollateral = ethers.BigNumber.from("100000000000000000000");
+          let debtShare = ethers.BigNumber.from("1929694057481578829");
+          await PositionHelper.openXDCPositionAndDraw(
+            aliceProxyWallet,
+            AliceAddress,
+            pools.XDC,
+            lockedCollateral,
+            debtShare
+          );
+          
+          lockedCollateral = ethers.BigNumber.from("99999999999999999950");
+          debtShare = ethers.BigNumber.from("1929694057481578828");
+
+          await fathomStablecoin.connect(provider.getSigner(AliceAddress)).approve(aliceProxyWallet.address, debtShare);
+          
+          await expect (
+            // We try to leave very small values for the locked collateral and debt share
+            // and expect this transaction to be reverted in order to avoid 
+            // hanging underwater position that can't be liquidated
+            PositionHelper.wipeAndUnlockXDC(
+              aliceProxyWallet,
+              AliceAddress,
+              await positionManager.ownerLastPositionId(aliceProxyWallet.address),
+              lockedCollateral,
+              debtShare
+            )
+          ).to.be.revertedWith("BookKeeper/debt-floor");
         });
       });
     });

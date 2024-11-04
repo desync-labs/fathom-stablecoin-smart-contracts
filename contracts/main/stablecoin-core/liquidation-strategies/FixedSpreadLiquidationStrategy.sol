@@ -302,7 +302,9 @@ contract FixedSpreadLiquidationStrategy is CommonMath, PausableUpgradeable, Reen
         uint256 _positionDebtValue = _positionDebtShare * _vars.debtAccumulatedRate;
 
         require(_vars.closeFactorBps > 0, "FixedSpreadLiquidationStrategy/close-factor-bps-not-set");
-        info.maxLiquidatableDebtShare = (_positionDebtShare * _vars.closeFactorBps) / 10000; // [wad]
+        uint256 _maxLiquidatableDebtShare = (_positionDebtShare * _vars.closeFactorBps) / 10000; // [wad]
+        // Avoid precision loss, because _maxLiquidatableDebtShare could be zero for small _positionDebtShare
+        info.maxLiquidatableDebtShare = _maxLiquidatableDebtShare < 1 ? _debtShareToBeLiquidated : _maxLiquidatableDebtShare;
 
         info.actualDebtShareToBeLiquidated = _debtShareToBeLiquidated > info.maxLiquidatableDebtShare
             ? info.maxLiquidatableDebtShare
