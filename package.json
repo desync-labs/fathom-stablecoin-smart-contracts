@@ -5,38 +5,34 @@
   "main": "",
   "directories": {},
   "scripts": {
-    "test": "coralX test",
-    "test-with-timeout": "coralX test --params TIMEOUT=100000",
-    "test-skip-compile": "coralX test skip_compile true",
-    "test-use-snapshot": "coralX test skip_compile true use_snapshot true",
-    "compile": "npm run prettier && npm run lint && coralX compile",
-    "prettier": "prettier --write 'contracts/**/*.sol'",
     "lint": "solhint 'contracts/**/*.sol'",
-    "pre-release": "npm run prettier && npm run lint && npm run test-with-timeout",
-    "migrate-reset": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run migrateAndConfigureForTests",
-    "migrate-reset-local": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployLocal",
-    "migrate-reset-apothem": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployApothem",
-    "migrate-reset-mainnet": "rm -rf build/contracts && rm -rf build/job-logs && coralX compile && coralX scenario --run deployMainNet",
-    "deploy-tokens-local": "coralX scenario --run deployTokensLocal",
-    "deploy-tokens-apothem": "coralX scenario --run deployTokensApothem"
+    "lint:fix": "solhint 'contracts/**/*.sol' --fix",
+    "format": "prettier --write .",
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "node": "hardhat node --tags DeployMain",
+    "pre-release": "npm run format && npm run lint && npm run test",
+    "deploy-local": "hardhat deploy --deploy-scripts deploy/deploy-main --network hardhat",
+    "deploy-apothem": "hardhat deploy --deploy-scripts deploy/deploy-main --network apothem",
+    "deploy-mainnet": "hardhat deploy --deploy-scripts deploy/deploy-main --network xdc",
+    "deploy-tokens-local": "hardhat deploy --deploy-scripts deploy/deploy-tokens --network hardhat",
+    "deploy-tokens-apothem": "hardhat deploy --deploy-scripts deploy/deploy-tokens --network apothem"
   },
   "author": "",
   "license": "",
   "dependencies": {
+    "@defi-wonderland/smock": "^2.4.0",
     "@openzeppelin/contracts": "4.9.2",
-    "@openzeppelin/contracts-upgradeable": "4.9.2",
-    "@truffle/hdwallet-provider": "^1.4.1",
-    "bignumber.js": "7.2.1",
-    "solc": "0.8.13"
+    "@openzeppelin/contracts-upgradeable": "4.9.2"
   },
   "devDependencies": {
-    "chai-bn": "^0.3.0",
-    "dotenv": "^16.0.1",
-    "ethereum-waffle": "^3.4.4",
-    "ethers": "^5.7.0",
-    "prettier": "^2.4.1",
-    "prettier-plugin-solidity": "^1.0.0-beta.18",
-    "solhint": "^3.3.6",
-    "solhint-plugin-prettier": "0.0.5"
+    "@nomicfoundation/hardhat-toolbox": "^2.0.2",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.12",
+    "hardhat-deploy": "^0.12.4",
+    "prettier": "^3.3.3",
+    "prettier-plugin-solidity": "^1.4.1",
+    "solhint": "^5.0.3",
+    "solhint-plugin-prettier": "^0.1.0"
   }
 }
