@@ -98,20 +98,20 @@ describe("LiquidationEngine", () => {
     const proposalReceipt = await proposalTx.wait();
     const proposalId = proposalReceipt.events[0].args.proposalId;
 
-    await time.increase((await time.latest()) + VOTING_DELAY + 1); // wait for the voting period to pass
-    await mine((await time.latestBlock()) + VOTING_DELAY + 1); // wait for the voting period to pass
+     // wait for the voting period to pass
+    await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
     await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-    await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-    await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+    
+    await mine(VOTING_PERIOD + 1);
 
     // Queue the TX
     const descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set LiquidationEngine"));
     await governor.queue(targets, values, calldatas, descriptionHash);
 
-    await time.increase((await time.latest()) + MIN_DELAY + 1);
-    await mine((await time.latestBlock()) + MIN_DELAY + 1);
+    await time.increase(MIN_DELAY + 1);
+    await mine(1);
 
     // Execute
     await governor.execute(targets, values, calldatas, descriptionHash);
@@ -146,20 +146,20 @@ describe("LiquidationEngine", () => {
         let proposalReceipt = await proposalTx.wait();
         let proposalId = proposalReceipt.events[0].args.proposalId;
 
-        await time.increase(100); // wait for the voting period to pass
-        await mine(100); // wait for the voting period to pass
+         // wait for the voting period to pass
+        await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
         await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-        await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-        await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+        
+        await mine(VOTING_PERIOD + 1);
 
         // Queue the TX
         let descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Price"));
         await governor.queue(targets, values, calldatas, descriptionHash);
 
-        await time.increase((await time.latest()) + MIN_DELAY + 1);
-        await mine((await time.latestBlock()) + MIN_DELAY + 1);
+        await time.increase(MIN_DELAY + 1);
+        await mine(1);
 
         // Execute
         await governor.execute(targets, values, calldatas, descriptionHash);
@@ -177,20 +177,20 @@ describe("LiquidationEngine", () => {
         proposalReceipt = await proposalTx.wait();
         proposalId = proposalReceipt.events[0].args.proposalId;
 
-        await time.increase(100); // wait for the voting period to pass
-        await mine(100); // wait for the voting period to pass
+         // wait for the voting period to pass
+        await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
         await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-        await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-        await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+        
+        await mine(VOTING_PERIOD + 1);
 
         // Queue the TX
         descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Price New"));
         await governor.queue(targets, values, calldatas, descriptionHash);
 
-        await time.increase((await time.latest()) + MIN_DELAY + 1);
-        await mine((await time.latestBlock()) + MIN_DELAY + 1);
+        await time.increase(MIN_DELAY + 1);
+        await mine(1);
 
         // Execute
         await governor.execute(targets, values, calldatas, descriptionHash);
@@ -225,20 +225,20 @@ describe("LiquidationEngine", () => {
         let proposalReceipt = await proposalTx.wait();
         let proposalId = proposalReceipt.events[0].args.proposalId;
 
-        await time.increase(100); // wait for the voting period to pass
-        await mine(100); // wait for the voting period to pass
+         // wait for the voting period to pass
+        await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
         await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-        await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-        await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+        
+        await mine(VOTING_PERIOD + 1);
 
         // Queue the TX
         let descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Price"));
         await governor.queue(targets, values, calldatas, descriptionHash);
 
-        await time.increase((await time.latest()) + MIN_DELAY + 1);
-        await mine((await time.latestBlock()) + MIN_DELAY + 1);
+        await time.increase(MIN_DELAY + 1);
+        await mine(1);
 
         // Execute
         await governor.execute(targets, values, calldatas, descriptionHash);
@@ -262,20 +262,20 @@ describe("LiquidationEngine", () => {
         proposalReceipt = await proposalTx.wait();
         proposalId = proposalReceipt.events[0].args.proposalId;
 
-        await time.increase(100); // wait for the voting period to pass
-        await mine(100); // wait for the voting period to pass
+         // wait for the voting period to pass
+        await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
         await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-        await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-        await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+        
+        await mine(VOTING_PERIOD + 1);
 
         // Queue the TX
         descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Price New"));
         await governor.queue(targets, values, calldatas, descriptionHash);
 
-        await time.increase((await time.latest()) + MIN_DELAY + 1);
-        await mine((await time.latestBlock()) + MIN_DELAY + 1);
+        await time.increase(MIN_DELAY + 1);
+        await mine(1);
 
         // Execute
         await governor.execute(targets, values, calldatas, descriptionHash);
@@ -534,20 +534,20 @@ describe("LiquidationEngine", () => {
           let proposalReceipt = await proposalTx.wait();
           let proposalId = proposalReceipt.events[0].args.proposalId;
 
-          await time.increase(100); // wait for the voting period to pass
-          await mine(100); // wait for the voting period to pass
+           // wait for the voting period to pass
+          await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
           await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-          await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-          await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+          
+          await mine(VOTING_PERIOD + 1);
 
           // Queue the TX
           let descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Protocol Config"));
           await governor.queue(targets, values, calldatas, descriptionHash);
 
-          await time.increase((await time.latest()) + MIN_DELAY + 1);
-          await mine((await time.latestBlock()) + MIN_DELAY + 1);
+          await time.increase(MIN_DELAY + 1);
+          await mine(1);
 
           // Execute
           await governor.execute(targets, values, calldatas, descriptionHash);
@@ -578,20 +578,20 @@ describe("LiquidationEngine", () => {
           proposalReceipt = await proposalTx.wait();
           proposalId = proposalReceipt.events[0].args.proposalId;
 
-          await time.increase(100); // wait for the voting period to pass
-          await mine(100); // wait for the voting period to pass
+           // wait for the voting period to pass
+          await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
           await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-          await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-          await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+          
+          await mine(VOTING_PERIOD + 1);
 
           // Queue the TX
           descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Protocol Config"));
           await governor.queue(targets, values, calldatas, descriptionHash);
 
-          await time.increase((await time.latest()) + MIN_DELAY + 1);
-          await mine((await time.latestBlock()) + MIN_DELAY + 1);
+          await time.increase(MIN_DELAY + 1);
+          await mine(1);
 
           // Execute
           await governor.execute(targets, values, calldatas, descriptionHash);
@@ -616,20 +616,20 @@ describe("LiquidationEngine", () => {
           proposalReceipt = await proposalTx.wait();
           proposalId = proposalReceipt.events[0].args.proposalId;
 
-          await time.increase(100); // wait for the voting period to pass
-          await mine(100); // wait for the voting period to pass
+           // wait for the voting period to pass
+          await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
           await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-          await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-          await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+          
+          await mine(VOTING_PERIOD + 1);
 
           // Queue the TX
           descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Protocol Config"));
           await governor.queue(targets, values, calldatas, descriptionHash);
 
-          await time.increase((await time.latest()) + MIN_DELAY + 1);
-          await mine((await time.latestBlock()) + MIN_DELAY + 1);
+          await time.increase(MIN_DELAY + 1);
+          await mine(1);
 
           // Execute
           await governor.execute(targets, values, calldatas, descriptionHash);
@@ -707,20 +707,20 @@ describe("LiquidationEngine", () => {
           let proposalReceipt = await proposalTx.wait();
           let proposalId = proposalReceipt.events[0].args.proposalId;
 
-          await time.increase(100); // wait for the voting period to pass
-          await mine(100); // wait for the voting period to pass
+           // wait for the voting period to pass
+          await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
           await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-          await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-          await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+          
+          await mine(VOTING_PERIOD + 1);
 
           // Queue the TX
           let descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Protocol Config"));
           await governor.queue(targets, values, calldatas, descriptionHash);
 
-          await time.increase((await time.latest()) + MIN_DELAY + 1);
-          await mine((await time.latestBlock()) + MIN_DELAY + 1);
+          await time.increase(MIN_DELAY + 1);
+          await mine(1);
 
           // Execute
           await governor.execute(targets, values, calldatas, descriptionHash);
@@ -751,20 +751,20 @@ describe("LiquidationEngine", () => {
           proposalReceipt = await proposalTx.wait();
           proposalId = proposalReceipt.events[0].args.proposalId;
 
-          await time.increase(100); // wait for the voting period to pass
-          await mine(100); // wait for the voting period to pass
+           // wait for the voting period to pass
+          await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
           await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-          await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-          await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+          
+          await mine(VOTING_PERIOD + 1);
 
           // Queue the TX
           descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Protocol Config"));
           await governor.queue(targets, values, calldatas, descriptionHash);
 
-          await time.increase((await time.latest()) + MIN_DELAY + 1);
-          await mine((await time.latestBlock()) + MIN_DELAY + 1);
+          await time.increase(MIN_DELAY + 1);
+          await mine(1);
 
           // Execute
           await governor.execute(targets, values, calldatas, descriptionHash);
@@ -789,20 +789,20 @@ describe("LiquidationEngine", () => {
           proposalReceipt = await proposalTx.wait();
           proposalId = proposalReceipt.events[0].args.proposalId;
 
-          await time.increase(100); // wait for the voting period to pass
-          await mine(100); // wait for the voting period to pass
+           // wait for the voting period to pass
+          await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
           await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-          await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-          await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+          
+          await mine(VOTING_PERIOD + 1);
 
           // Queue the TX
           descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Protocol Config"));
           await governor.queue(targets, values, calldatas, descriptionHash);
 
-          await time.increase((await time.latest()) + MIN_DELAY + 1);
-          await mine((await time.latestBlock()) + MIN_DELAY + 1);
+          await time.increase(MIN_DELAY + 1);
+          await mine(1);
 
           // Execute
           await governor.execute(targets, values, calldatas, descriptionHash);
@@ -882,20 +882,20 @@ describe("LiquidationEngine", () => {
         let proposalReceipt = await proposalTx.wait();
         let proposalId = proposalReceipt.events[0].args.proposalId;
 
-        await time.increase(100); // wait for the voting period to pass
-        await mine(100); // wait for the voting period to pass
+         // wait for the voting period to pass
+        await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
         await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-        await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-        await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+        
+        await mine(VOTING_PERIOD + 1);
 
         // Queue the TX
         let descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Protocol Config"));
         await governor.queue(targets, values, calldatas, descriptionHash);
 
-        await time.increase((await time.latest()) + MIN_DELAY + 1);
-        await mine((await time.latestBlock()) + MIN_DELAY + 1);
+        await time.increase(MIN_DELAY + 1);
+        await mine(1);
 
         // Execute
         await governor.execute(targets, values, calldatas, descriptionHash);
@@ -931,20 +931,20 @@ describe("LiquidationEngine", () => {
         proposalReceipt = await proposalTx.wait();
         proposalId = proposalReceipt.events[0].args.proposalId;
 
-        await time.increase(100); // wait for the voting period to pass
-        await mine(100); // wait for the voting period to pass
+         // wait for the voting period to pass
+        await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
         await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-        await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-        await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+        
+        await mine(VOTING_PERIOD + 1);
 
         // Queue the TX
         descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Stability Fee Rate"));
         await governor.queue(targets, values, calldatas, descriptionHash);
 
-        await time.increase((await time.latest()) + MIN_DELAY + 1);
-        await mine((await time.latestBlock()) + MIN_DELAY + 1);
+        await time.increase(MIN_DELAY + 1);
+        await mine(1);
 
         // Execute
         await governor.execute(targets, values, calldatas, descriptionHash);
@@ -971,20 +971,20 @@ describe("LiquidationEngine", () => {
         proposalReceipt = await proposalTx.wait();
         proposalId = proposalReceipt.events[0].args.proposalId;
 
-        await time.increase(100); // wait for the voting period to pass
-        await mine(100); // wait for the voting period to pass
+         // wait for the voting period to pass
+        await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
         await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-        await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-        await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+        
+        await mine(VOTING_PERIOD + 1);
 
         // Queue the TX
         descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Price"));
         await governor.queue(targets, values, calldatas, descriptionHash);
 
-        await time.increase((await time.latest()) + MIN_DELAY + 1);
-        await mine((await time.latestBlock()) + MIN_DELAY + 1);
+        await time.increase(MIN_DELAY + 1);
+        await mine(1);
 
         // Execute
         await governor.execute(targets, values, calldatas, descriptionHash);
@@ -1015,20 +1015,20 @@ describe("LiquidationEngine", () => {
         proposalReceipt = await proposalTx.wait();
         proposalId = proposalReceipt.events[0].args.proposalId;
 
-        await time.increase(100); // wait for the voting period to pass
-        await mine(100); // wait for the voting period to pass
+         // wait for the voting period to pass
+        await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
         await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-        await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-        await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+        
+        await mine(VOTING_PERIOD + 1);
 
         // Queue the TX
         descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Settle System Bad Debt"));
         await governor.queue(targets, values, calldatas, descriptionHash);
 
-        await time.increase((await time.latest()) + MIN_DELAY + 1);
-        await mine((await time.latestBlock()) + MIN_DELAY + 1);
+        await time.increase(MIN_DELAY + 1);
+        await mine(1);
 
         // Execute
         await governor.execute(targets, values, calldatas, descriptionHash);
@@ -1105,20 +1105,20 @@ describe("LiquidationEngine", () => {
         let proposalReceipt = await proposalTx.wait();
         let proposalId = proposalReceipt.events[0].args.proposalId;
 
-        await time.increase(100); // wait for the voting period to pass
-        await mine(100); // wait for the voting period to pass
+         // wait for the voting period to pass
+        await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
         await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-        await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-        await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+        
+        await mine(VOTING_PERIOD + 1);
 
         // Queue the TX
         let descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Protocol Config"));
         await governor.queue(targets, values, calldatas, descriptionHash);
 
-        await time.increase((await time.latest()) + MIN_DELAY + 1);
-        await mine((await time.latestBlock()) + MIN_DELAY + 1);
+        await time.increase(MIN_DELAY + 1);
+        await mine(1);
 
         // Execute
         await governor.execute(targets, values, calldatas, descriptionHash);
@@ -1152,20 +1152,20 @@ describe("LiquidationEngine", () => {
         proposalReceipt = await proposalTx.wait();
         proposalId = proposalReceipt.events[0].args.proposalId;
 
-        await time.increase(100); // wait for the voting period to pass
-        await mine(100); // wait for the voting period to pass
+         // wait for the voting period to pass
+        await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
         await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-        await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-        await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+        
+        await mine(VOTING_PERIOD + 1);
 
         // Queue the TX
         descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Price"));
         await governor.queue(targets, values, calldatas, descriptionHash);
 
-        await time.increase((await time.latest()) + MIN_DELAY + 1);
-        await mine((await time.latestBlock()) + MIN_DELAY + 1);
+        await time.increase(MIN_DELAY + 1);
+        await mine(1);
 
         // Execute
         await governor.execute(targets, values, calldatas, descriptionHash);
@@ -1194,20 +1194,20 @@ describe("LiquidationEngine", () => {
         proposalReceipt = await proposalTx.wait();
         proposalId = proposalReceipt.events[0].args.proposalId;
 
-        await time.increase(100); // wait for the voting period to pass
-        await mine(100); // wait for the voting period to pass
+         // wait for the voting period to pass
+        await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
         await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-        await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-        await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+        
+        await mine(VOTING_PERIOD + 1);
 
         // Queue the TX
         descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set System Debt Engine"));
         await governor.queue(targets, values, calldatas, descriptionHash);
 
-        await time.increase((await time.latest()) + MIN_DELAY + 1);
-        await mine((await time.latestBlock()) + MIN_DELAY + 1);
+        await time.increase(MIN_DELAY + 1);
+        await mine(1);
 
         // Execute
         await governor.execute(targets, values, calldatas, descriptionHash);

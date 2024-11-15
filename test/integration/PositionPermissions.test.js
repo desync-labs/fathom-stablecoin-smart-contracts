@@ -9,6 +9,7 @@ const PositionHelper = require("../helper/positions");
 const { getProxy } = require("../../common/proxies");
 const pools = require("../../common/collateral");
 
+
 const MIN_DELAY = 3600; // 1 hour
 const VOTING_PERIOD = 50400; // This is how long voting lasts, 1 week
 const VOTING_DELAY = 1; // How many blocks till a proposal vote becomes active
@@ -57,30 +58,37 @@ describe("PositionPermissions", () => {
     collateralTokenAdapter = await getProxy(proxyFactory, "CollateralTokenAdapter");
     const collateralPoolConfig = await getProxy(proxyFactory, "CollateralPoolConfig");
     const proxyWalletRegistry = await getProxy(proxyFactory, "ProxyWalletRegistry");
-
-    let values = [0];
-    let targets = [proxyWalletRegistry.address];
-    let calldatas = [proxyWalletRegistry.interface.encodeFunctionData("setDecentralizedMode", [true])];
-    let proposalTx = await governor.propose(targets, values, calldatas, "Set Decentralized Mode");
+    let values = [0, 0, 0, 0];
+    let targets = [
+      proxyWalletRegistry.address,
+      simplePriceFeed.address,
+      collateralPoolConfig.address,
+      collateralPoolConfig.address,
+    ];
+    let calldatas = [
+      proxyWalletRegistry.interface.encodeFunctionData("setDecentralizedMode", [true]),
+      simplePriceFeed.interface.encodeFunctionData("setPrice", [WeiPerRay]),
+      collateralPoolConfig.interface.encodeFunctionData("setStabilityFeeRate", [pools.XDC, WeiPerRay]),
+      collateralPoolConfig.interface.encodeFunctionData("setStabilityFeeRate", [pools.GLD, WeiPerRay]),
+    ];
+    let proposalTx = await governor.propose(targets, values, calldatas, "Setup");
     let proposalReceipt = await proposalTx.wait();
     let proposalId = proposalReceipt.events[0].args.proposalId;
 
-    await time.increase((await time.latest()) + VOTING_DELAY + 1); // wait for the voting period to pass
-    await mine((await time.latestBlock()) + VOTING_DELAY + 1); // wait for the voting period to pass
+    // wait for the voting period to pass
+    await mine(VOTING_DELAY + 1); // wait for the voting period to pass
 
     await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
 
-    await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-    await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
+    await mine(VOTING_PERIOD + 1);
 
     // Queue the TX
-    let descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Decentralized Mode"));
+    let descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Setup"));
     await governor.queue(targets, values, calldatas, descriptionHash);
 
-    await time.increase((await time.latest()) + MIN_DELAY + 1);
-    await mine((await time.latestBlock()) + MIN_DELAY + 1);
+    await time.increase(MIN_DELAY + 1);
+    await mine(1);
 
-    // Execute
     await governor.execute(targets, values, calldatas, descriptionHash);
     // await proxyWalletRegistry.setDecentralizedMode(true);
 
@@ -99,34 +107,6 @@ describe("PositionPermissions", () => {
     await GLD.mint(BobAddress, WeiPerWad.mul(1000));
     await GLD.connect(provider.getSigner(BobAddress)).approve(bobProxyWallet.address, WeiPerWad.mul(1000));
 
-    values = [0, 0, 0];
-    targets = [simplePriceFeed.address, collateralPoolConfig.address, collateralPoolConfig.address];
-    calldatas = [
-      simplePriceFeed.interface.encodeFunctionData("setPrice", [WeiPerRay]),
-      collateralPoolConfig.interface.encodeFunctionData("setStabilityFeeRate", [pools.XDC, WeiPerRay]),
-      collateralPoolConfig.interface.encodeFunctionData("setStabilityFeeRate", [pools.GLD, WeiPerRay]),
-    ];
-    proposalTx = await governor.propose(targets, values, calldatas, "Set Price");
-    proposalReceipt = await proposalTx.wait();
-    proposalId = proposalReceipt.events[0].args.proposalId;
-
-    await time.increase(1); // wait for the voting period to pass
-    await mine(1); // wait for the voting period to pass
-
-    await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
-
-    await time.increase((await time.latest()) + VOTING_PERIOD + 1);
-    await mine((await time.latestBlock()) + VOTING_PERIOD + 1);
-
-    // Queue the TX
-    descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Set Price"));
-    await governor.queue(targets, values, calldatas, descriptionHash);
-
-    await time.increase((await time.latest()) + MIN_DELAY + 1);
-    await mine((await time.latestBlock()) + MIN_DELAY + 1);
-
-    // Execute
-    await governor.execute(targets, values, calldatas, descriptionHash);
     // await simplePriceFeed.setPrice(WeiPerRay);
     // await collateralPoolConfig.setStabilityFeeRate(pools.XDC, WeiPerRay);
     // await collateralPoolConfig.setStabilityFeeRate(pools.GLD, WeiPerRay);
@@ -1992,7 +1972,33 @@ describe("PositionPermissions", () => {
     context("position ceiling", async () => {
       context("open position exceeds position ceiling", async () => {
         it("should revert", async () => {
-          await simplePriceFeed.setPrice(WeiPerRay.div(1000));
+          let values = [0];
+          let targets = [
+            simplePriceFeed.address,
+          ];
+          let calldatas = [
+            simplePriceFeed.interface.encodeFunctionData("setPrice", [WeiPerRay.div(1000)]),
+          ];
+          let proposalTx = await governor.propose(targets, values, calldatas, "Setup");
+          let proposalReceipt = await proposalTx.wait();
+          let proposalId = proposalReceipt.events[0].args.proposalId;
+      
+          // wait for the voting period to pass
+          await mine(VOTING_DELAY + 1); // wait for the voting period to pass
+      
+          await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
+      
+          await mine(VOTING_PERIOD + 1);
+      
+          // Queue the TX
+          let descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Setup"));
+          await governor.queue(targets, values, calldatas, descriptionHash);
+      
+          await time.increase(MIN_DELAY + 1);
+          await mine(1);
+      
+          await governor.execute(targets, values, calldatas, descriptionHash);
+          // await simplePriceFeed.setPrice(WeiPerRay.div(1000));
 
           await expect(
             PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2000), WeiPerWad.mul(1000001))
@@ -2001,7 +2007,34 @@ describe("PositionPermissions", () => {
       });
       context("adjust position exceeds position ceiling", async () => {
         it("should revert", async () => {
-          await simplePriceFeed.setPrice(WeiPerRay.div(1000));
+          let values = [0];
+          let targets = [
+            simplePriceFeed.address,
+          ];
+          let calldatas = [
+            simplePriceFeed.interface.encodeFunctionData("setPrice", [WeiPerRay.div(1000)]),
+          ];
+          let proposalTx = await governor.propose(targets, values, calldatas, "Setup");
+          let proposalReceipt = await proposalTx.wait();
+          let proposalId = proposalReceipt.events[0].args.proposalId;
+      
+          // wait for the voting period to pass
+          await mine(VOTING_DELAY + 1); // wait for the voting period to pass
+      
+          await governor.connect(provider.getSigner(DeployerAddress)).castVote(proposalId, VOTE_WAY);
+      
+          await mine(VOTING_PERIOD + 1);
+      
+          // Queue the TX
+          let descriptionHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("Setup"));
+          await governor.queue(targets, values, calldatas, descriptionHash);
+      
+          await time.increase(MIN_DELAY + 1);
+          await mine(1);
+      
+          await governor.execute(targets, values, calldatas, descriptionHash);
+          //  await simplePriceFeed.setPrice(WeiPerRay.div(1000));
+          
           await PositionHelper.openXDCPositionAndDraw(aliceProxyWallet, AliceAddress, pools.XDC, WeiPerWad.mul(2000), WeiPerWad.mul(1000000));
           await expect(
             PositionHelper.adjustPosition(

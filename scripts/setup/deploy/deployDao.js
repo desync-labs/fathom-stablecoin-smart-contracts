@@ -12,6 +12,7 @@ async function deployDao(getNamedAccounts, deployments) {
   const { deployer } = await getNamedAccounts();
 
   // Deploy token for voting
+  // Token should only be deployed for local tests, otherwise use the FTHM token deployed on mainnet/testnet
   await deploy("GovToken", {
     from: deployer,
     args: [],
